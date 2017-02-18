@@ -1,10 +1,8 @@
 #!/bin/bash
 
-#SBATCH -t 10:00:00 # maximum 5 days on cartesius
-#SBATCH -n 1
-#SBATCH -o /home/aeurai/jobs/slurm-%A_%a.out
-#SBATCH -e /home/aeurai/jobs/slurm-%A_%a.err
-#SBATCH -p normal # run on fat nodes for enough memory
+#PBS -o /home/aeurai/jobs
+#PBS -e /home/aeurai/jobs
+#PBS -lnodes=1 -lwalltime=00:04:00
 
 # load necessary modules
 module load stopos
@@ -12,7 +10,6 @@ module load mcr # this is the version that has been compiled with, matlab2015b
 
 # determine how many parallel jobs we can run on this node
 ncores=`sara-get-num-cores`
-ncores = 11
 
 # loop over the cores available
 for ((i=1; i<=ncores; i++)) ; do

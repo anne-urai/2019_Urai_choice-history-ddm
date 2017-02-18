@@ -25,7 +25,15 @@ delete requiredMCRProducts.txt
 
 %% generate allparams file to add to st
 subjects =  [3     4     5     6     7     8     9    10    11    12    13   ...
-    14    15    17    18    19    20    21    22    23    24    25]';
+    14    15    17    18    19    20    21    22    23    24    25];
+alldat = [];
+for sj = subjects,
+  for session = 1:5,
+    for block = 1:10,
+      alldat = [alldat; sj session block];
+    end
+  end
+end
 
 % write to a file
-dlmwrite('allsubjects', subjects, 'delimiter', ' ');
+dlmwrite('allblocks', alldat, 'delimiter', ' ');
