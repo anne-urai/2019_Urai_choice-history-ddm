@@ -2,11 +2,11 @@
 
 #PBS -o /home/aeurai/jobs
 #PBS -e /home/aeurai/jobs
-#PBS -lnodes=1 -lwalltime=00:04:00
+#PBS -lnodes=1 -lwalltime=01:00:00
 
 # load necessary modules
 module load stopos
-module load mcr # this is the version that has been compiled with, matlab2015b
+module load mcr #/9.0 # this is the version that has been compiled with, matlab2015b
 
 # determine how many parallel jobs we can run on this node
 ncores=`sara-get-num-cores`
@@ -18,16 +18,16 @@ for ((i=1; i<=ncores; i++)) ; do
 # set mcr cache to a unique value per processor, see email Lykle Voort 19.05.2016
 export MCR_CACHE_ROOT=$TMPDIR-$i
 
-  for ((j=1; j<=1; j++)) ; do
-     stopos next -p pool
-       if [ "$STOPOS_RC" != "OK" ]; then
-        break
-     fi
-    echo "Running with parameters: $STOPOS_VALUE"
- 	eval "/home/aeurai/code/RT_RDK/s1_PupilAnalysis_RT $STOPOS_VALUE"
-    stopos remove -p pool
-stopos status -p pool
-   done
- ) &
+for ((j=1; j<=1; j++)) ; do
+stopos next -p pool
+  if [ "$STOPOS_RC" != "OK" ]; then
+    break
+    fi
+      echo "Running with parameters: $STOPOS_VALUE"
+      eval "/home/aeurai/code/RT_RDK/s1_PupilAnalysis_RT $STOPOS_VALUE"
+      stopos remove -p pool
+      stopos status -p pool
+      done
+) &
 done
 wait
