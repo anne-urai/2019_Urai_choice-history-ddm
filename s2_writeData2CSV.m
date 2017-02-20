@@ -1,20 +1,26 @@
 
+
+% ==================================================================
+% now append all the eyelink files together
+% ==================================================================
+
 if ~isdeployed,
-  addpath(genpath('~/code/RT_RDK'));
-  addpath(genpath('~/code/Tools'));
-  addpath('~/Documents/fieldtrip/');
-  ft_defaults;
+    addpath(genpath('~/code/RT_RDK'));
+    addpath(genpath('~/code/Tools'));
+    addpath('~/Documents/fieldtrip/');
+    ft_defaults;
 end
 
 datapath = '~/Data/RT_RDK';
-if ~exist('subjects', 'var'), subjects = [8:15 17:25]; end % 16 was excluded
+if ~exist('subjects', 'var'), subjects = [3:15 17:25]; end % 16 was excluded
+
 
 for sj = subjects,
-  clearvars -except subjects sj datapath;
+    clearvars -except subjects sj datapath;
 
-    % ==================================================================
-    % now append all the eyelink files together
-    % ==================================================================
+    if exist(sprintf('%s/P%02d_alleye.mat', datapath, sj), 'file'),
+        continue;
+    end
 
     % check if the full dataset is not there yet
     cd(sprintf('%s/P%02d/pupil', datapath, sj));
@@ -23,8 +29,8 @@ for sj = subjects,
     % make sure these are in the right order!
     % otherwise, indexing of trials will go awry
     for f = 1:length(eyelinkfiles),
-      scandat         = sscanf(eyelinkfiles(f).name, 'P%*d_s%d_b%d_*.mat');
-      snum(f,:)       = scandat';
+        scandat         = sscanf(eyelinkfiles(f).name, 'P%*d_s%d_b%d_*.mat');
+        snum(f,:)       = scandat';
     end
     [sorted, sortidx]   = sort(snum(:,1)); % sort by session
     sorted(:,2)         = snum(sortidx, 2); % sort by block
@@ -36,43 +42,13 @@ for sj = subjects,
     ft_appenddata(cfg);
 end
 
-    % to save disk space
-    % eyelinkfiles = rdir(sprintf('%s/P%02d/pupil/P%02d*_eyeclean.mat', datapath, sj, sj));
+% to save disk space
+% eyelinkfiles = rdir(sprintf('%s/P%02d/pupil/P%02d*_eyeclean.mat', datapath, sj, sj));
 
-    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % CORRECT SESSION NRS FOR SOME PARTICIPANTS
-    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if 0,
-    clearvars -except sj subjects
-    load(sprintf('~/Data/RT_DDM/P%02d_alleye.mat', sj));
-
-    sessionsdone = unique(data.trialinfo(:, end));
-    switch sj
-    case 4
-      assert(isequal(sessionsdone', 1:7), 'did not find 5 sessions');
-    case 17
-      data.trialinfo(find(data.trialinfo(:, end)==5), end) = 4;
-      sessionsdone = unique(data.trialinfo(:, end));
-      assert(isequal(sessionsdone', 1:4), 'did not find 5 sessions');
-    case 18
-      data.trialinfo(:, end) = data.trialinfo(:, end) - 1;
-      sessionsdone = unique(data.trialinfo(:, end));
-      assert(isequal(sessionsdone', 1:4), 'did not find 5 sessions');
-    case 20
-      data.trialinfo(:, end) = data.trialinfo(:, end) - 1;
-      sessionsdone = unique(data.trialinfo(:, end));
-      assert(isequal(sessionsdone', 1:4), 'did not find 5 sessions');
-    otherwise
-      assert(isequal(sessionsdone', 1:5), 'did not find 5 sessions');
-    end
-
-    save(sprintf('%s/P%02d_alleye.mat', datapath, sj), 'data');
-  end
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ==================================================================
 % WRITE BEHAVIOURAL DATA AND SINGLE-TRIAL PUPIL MEASURES
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ==================================================================
 
 clearvars -except subjects datapath
 for sj = subjects,
@@ -93,12 +69,6 @@ for sj = subjects,
     data            = ft_selectdata(cfg, data);
     pupilchan       = find(strcmp(data.label, 'EyePupil')==1);
 
-    % correct weirdness
-    data.trialinfo(find(data.trialinfo(:,2)==27), 2) = 270;
-    data.trialinfo(find(data.trialinfo(:,2)==9), 2) = 90;
-    data.trialinfo(find(data.trialinfo(:,4)==27), 4) = 270;
-    data.trialinfo(find(data.trialinfo(:,4)==9), 4) = 90;
-
     assert(all(data.trialinfo(:,2)>50), 'wrongly coded stimulus');
     assert(all(data.trialinfo(:,4)>50), 'wrongly coded stimulus');
 
@@ -106,34 +76,53 @@ for sj = subjects,
     RT          = data.trialinfo(:,6);
 
     % trialinfo matrix as it is
-    blpup       = nan(length(data.trial), 1);
-    dilationpup = nan(length(data.trial), 1);
-    fbpup       = nan(length(data.trial), 1);
+    baseline_pupil      = nan(length(data.trial), 1);
+    response_pupil      = nan(length(data.trial), 1);
+    decision_pupil      = nan(length(data.trial), 1);
+    feedback_pupil      = nan(length(data.trial), 1);
 
     for t = 1:length(data.trial),
 
         % baseline
         stimstart = data.trialinfo(t,3)-data.trialinfo(t,1);
-        blpup(t)  = mean(data.trial{t}(pupilchan, stimstart-0.5*data.fsample : stimstart));
+        baseline_pupil(t)  = mean(data.trial{t}(pupilchan, stimstart-0.5*data.fsample : stimstart));
 
-        % dilation after decision - subtract pretrial baseline
+        % dilation 1.5s after decision - subtract pretrial baseline
         responseonset  = data.trialinfo(t,7) - data.trialinfo(t,1);
-        dilationpup(t) = mean(data.trial{t}(pupilchan, responseonset : responseonset+1.5*data.fsample)) - blpup(t);
+        response_pupil(t) = mean(data.trial{t}(pupilchan, responseonset : responseonset+1.5*data.fsample)) - baseline_pupil(t);
+
+        % dilation before feedback - subtract pretrial baseline
+        fbonset  = data.trialinfo(t,9) - data.trialinfo(t,1);
+        decision_pupil(t) = mean(data.trial{t}(pupilchan, fbonset - 0.5*data.fsample : fbonset)) - baseline_pupil(t);
 
         % dilation after feedback - subtract pretrial baseline
-        fbonset  = data.trialinfo(t,9) - data.trialinfo(t,1);
-        fbpup(t) = mean(data.trial{t}(pupilchan, fbonset : fbonset+1.5*data.fsample)) - blpup(t);
+        feedback_pupil(t) = mean(data.trial{t}(pupilchan, fbonset : fbonset+1.5*data.fsample)) - baseline_pupil(t);
 
     end
 
     alldat{sj} = [data.trialinfo(:,2) data.trialinfo(:,4) RT data.trialinfo(:,5) ...
         data.trialinfo(:, [10 11 12]) sj*ones(size(RT)) ...
-        blpup dilationpup fbpup];
+        baseline_pupil response_pupil decision_pupil feedback_pupil];
+    
+    switch sj
+        case {3, 5, 15, 18}
+            alldat{sj}(:, 7) = alldat{sj}(:, 7) - 1; % start at session 1
+        case 17
+            alldat{sj}(find(alldat{sj}(:, 7)) == 5, 7) = ...
+                alldat{sj}(find(alldat{sj}(:, 7)) == 5, 7) - 1;
+        case 20
+            alldat{sj}(:, 7) = alldat{sj}(:, 7) - 2; % start at session 1
+        case 4
+            alldat{sj}(:, 7) = alldat{sj}(:, 7) - 2; % start at session 1
+            assert(isequal(unique(alldat{sj}(:, 7))', 1:5), 'did not find 5 sessions');
+        otherwise
+            assert(isequal(unique(alldat{sj}(:, 7))', 1:5), 'did not find 5 sessions');
+    end
 
-    fprintf('\n subject %d, sessions %d %d %d %d %d %d %d \n', sj, unique(alldat{sj}(:, 7))');
+    fprintf('\n subject %d, sessions %d %d %d %d %d %d %d \n\n', sj, unique(alldat{sj}(:, 7))');
 
     subplot(5,5,find(sj==subjects));
-    plot(blpup, dilationpup, '.'); l = lsline; set(l, 'color', 'k');
+    plot(baseline_pupil, response_pupil, '.'); %l = lsline; set(l, 'color', 'k');
     axis tight; axis square; set(gca, 'tickdir', 'out');
 end
 
@@ -142,7 +131,24 @@ alldat2 = cat(1, alldat{:});
 
 % write to csv for all subjects
 t = array2table(alldat2, 'VariableNames', ...
-    {'stimulus', 'choice',  'rt', 'response', ...
+    {'stimulus', 'response', 'rt', 'correct', ...
     'trialnr', 'blocknr', 'sessionnr', 'subj_idx',  ...
-  'pupil_b', 'pupil', 'pupil_fb'});
-writetable(t, sprintf('fleurs_data_allsj.csv'));
+    'baseline_pupil', 'response_pupil', 'decision_pupil', 'feedback_pupil'});
+
+% recode for HDDM
+t.stimulus(t.stimulus == 90) = 0;
+t.stimulus(t.stimulus == 270) = 1;
+t.stimulus(t.stimulus == 90) = 0;
+t.stimulus(t.stimulus == 270) = 1;
+
+t.prevresp  = circshift(t.response, 1);
+t.prevrt    = circshift(zscore(log(t.rt)), 1);
+t.prevpupil = circshift(t.decision_pupil, 1);
+
+% remove trials where the previous trial was not immediately preceding
+wrongtrls               = find([NaN; diff(t.trialnr)] ~= 1);
+t.prevresp(wrongtrls)   = NaN;
+t.prevrt(wrongtrls)     = NaN;
+t.prevpupil(wrongtrls)  = NaN;
+
+writetable(t, sprintf('%s/rtrdk_data_allsj.csv', datapath));
