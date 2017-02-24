@@ -147,9 +147,12 @@ def plot_model(mypath, model_name, trace_id):
 
 # which model are we running at the moment?
 models = {0: 'stimcoding',
-    1: 'regress_dc',
-    2: 'regress_z'}
-
+    1: 'stimcoding_prevresp_dc'
+    2: 'stimcoding_prevresp_z'
+    3: 'regress_dc',
+    4: 'regress_dc_prevresp'}
+    5: 'regress_dc_prevresp_prevpupil_prevrt'}
+    
 # find path depending on location
 usr = os.environ.get('USER')
 mypath = '/Users/anne/Data/RT_RDK/HDDM'
