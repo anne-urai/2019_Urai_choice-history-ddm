@@ -138,10 +138,12 @@ t = array2table(alldat2, 'VariableNames', ...
 % recode for HDDM
 t.stimulus(t.stimulus == 90) = 0;
 t.stimulus(t.stimulus == 270) = 1;
-t.stimulus(t.stimulus == 90) = 0;
-t.stimulus(t.stimulus == 270) = 1;
+t.response(t.response == 90) = 0;
+t.response(t.response == 270) = 1;
 
-t.prevresp  = circshift(t.response, 1);
+t.responseSigned = t.response;
+t.responseSigned(t.responseSigned == 0) = -1;
+t.prevresp  = circshift(t.responseSigned, 1);
 t.prevrt    = circshift(zscore(log(t.rt)), 1);
 t.prevpupil = circshift(t.decision_pupil, 1);
 
@@ -151,4 +153,4 @@ t.prevresp(wrongtrls)   = NaN;
 t.prevrt(wrongtrls)     = NaN;
 t.prevpupil(wrongtrls)  = NaN;
 
-writetable(t, sprintf('%s/rtrdk_data_allsj.csv', datapath));
+writetable(t, sprintf('%s/HDDM/rtrdk_data_allsj.csv', datapath));

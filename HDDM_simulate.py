@@ -53,59 +53,53 @@ def run_model(mypath, model_name, trace_id, nr_samples=1000):
     print model_filename
     modelExists     = os.path.isfile(model_filename)
 
-    if not modelExists:
+    #if not modelExists:
 
-        # get the csv
-        mydata = hddm.load_csv(os.path.join(mypath, 'rtrdk_data_allsj.csv'))
+    # get the csv
+    mydata = hddm.load_csv(os.path.join(mypath, 'rtrdk_data_allsj.csv'))
 
-        # specify the model
-        if model_name == 'stimcoding':
+    # specify the model
+    if model_name == 'stimcoding':
 
-            mydata.ix[mydata['stimulus']==90,'stimulus']  = 0
-            mydata.ix[mydata['stimulus']==270,'stimulus'] = 1
-            mydata.ix[mydata['response']==90,'response']  = 0
-            mydata.ix[mydata['response']==270,'response'] = 1
+        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+            drift_criterion=True, bias=True, p_outlier=0.05)
+            # depends_on={'v':['sessionnr'], 'dc':['sessionnr']},
 
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True,
-                depends_on={'v':['sessionnr'], 'dc':['sessionnr']},
-                p_outlier=0.05)
+    elif model_name == 'regress_dc':
 
-        elif model_name == 'regress_dc':
+        # recode the stimuli into signed
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1
 
-            mydata.ix[mydata['stimulus']==90,'stimulus']  = -1
-            mydata.ix[mydata['stimulus']==270,'stimulus'] = 1
-            mydata.ix[mydata['response']==90,'response']  = 0
-            mydata.ix[mydata['response']==270,'response'] = 1
+        # question: should response have the choice or accuracy coding?
 
-            # this only works if all subjects have data in all conditions
-            # how to make HDDMRegressor output single-subject parameter estimates?
-            v_reg = {'model': 'v ~ 1 + C(sessionnr > 2):stimulus', 'link_func': lambda x:x}
-            # include a term for serial bias and its modulation by pupil/rt
-            v_reg = {'model': 'v ~ 1 + C(sessionnr > 2):stimulus + prevresp + prevresp*prevpupil + prevresp*prevrt',
-                'link_func': lambda x:x}
-            m = hddm.HDDMRegressor(mydata, v_reg, include='z',
-                p_outlier=0.05)
+        # this only works if all subjects have data in all conditions
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
+        # include a term for serial bias and its modulation by pupil/rt
+        # v_reg = {'model': 'v ~ 1 + C(sessionnr > 2):stimulus + prevresp + prevresp*prevpupil + prevresp*prevrt',
+        #    'link_func': lambda x:x}
 
-        # ============================================ #
-        # do the actual sampling
-        # ============================================ #
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, v_reg, include='z', group_only_regressors=False, p_outlier=0.05)
 
-        m.sample(nr_samples, burn=nr_samples/10, thin=1, db='pickle',
-            dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
-        m.save(model_filename) # save the model to disk
+    # ============================================ #
+    # do the actual sampling
+    # ============================================ #
 
-        # ============================================ #
-        # save the output values
-        # ============================================ #
+    m.sample(nr_samples, burn=nr_samples/10, thin=1, db='pickle',
+        dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
+    m.save(model_filename) # save the model to disk
 
-        results = m.gen_stats() # this seems different from print_stats??
-        results.to_csv(os.path.join(mypath, model_name, 'results-md%d.csv'%trace_id))
+    # ============================================ #
+    # save the output values
+    # ============================================ #
 
-        # save the DIC for this model
-        text_file = open(os.path.join(mypath, model_name, 'DIC-md%d.txt'%trace_id), 'w')
-        text_file.write("Model {}: {}\n".format(trace_id, m.dic))
-        text_file.close()
+    results = m.gen_stats() # this seems different from print_stats??
+    results.to_csv(os.path.join(mypath, model_name, 'results-md%d.csv'%trace_id))
+
+    # save the DIC for this model
+    text_file = open(os.path.join(mypath, model_name, 'DIC-md%d.txt'%trace_id), 'w')
+    text_file.write("Model {}: {}\n".format(trace_id, m.dic))
+    text_file.close()
 
 # ============================================ #
 # run one model per job
