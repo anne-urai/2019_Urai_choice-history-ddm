@@ -51,19 +51,9 @@ def run_model(mypath, model_name, trace_id, nr_samples=100000):
 
     model_filename  = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
     print model_filename
-    modelExists     = os.path.isfile(model_filename)
-
-    #if not modelExists:
 
     # get the csv
     mydata = hddm.load_csv(os.path.join(mypath, 'rtrdk_data_allsj.csv'))
-
-models = {0: 'stimcoding',
-    1: 'stimcoding_prevresp_dc'
-    2: 'stimcoding_prevresp_z'
-    3: 'regress_dc',
-    4: 'regress_dc_prevresp'}
-    5: 'regress_dc_prevresp_prevpupil_prevrt'}
 
     # specify the model
     if model_name == 'stimcoding':
@@ -89,12 +79,16 @@ models = {0: 'stimcoding',
 
     elif model_name == 'regress_dc_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna() # dont use trials with nan
+
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
         m = hddm.HDDMRegressor(mydata, v_reg, include='z', group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevpupil_prevrt':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna() # dont use trials with nan
+
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevresp:prevrt + prevresp:prevpupil', 'link_func': lambda x:x}
         m = hddm.HDDMRegressor(mydata, v_reg, include='z', group_only_regressors=False, p_outlier=0.05)
@@ -125,14 +119,14 @@ models = {0: 'stimcoding',
 
 # find path depending on location
 import os, time
-mypath = '/Users/anne/Data/RT_RDK/HDDM'
+mypath = '~/Data/RT_RDK/HDDM'
 
 # which model are we running at the moment?
 models = {0: 'stimcoding',
-    1: 'stimcoding_prevresp_dc'
-    2: 'stimcoding_prevresp_z'
+    1: 'stimcoding_prevresp_dc',
+    2: 'stimcoding_prevresp_z',
     3: 'regress_dc',
-    4: 'regress_dc_prevresp'}
+    4: 'regress_dc_prevresp',
     5: 'regress_dc_prevresp_prevpupil_prevrt'}
 
 # make a folder for the outputs, combine name and time
