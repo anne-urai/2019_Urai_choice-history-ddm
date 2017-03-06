@@ -50,7 +50,7 @@ trace_id        = opts.trace_id
 # define the function that will do the work
 # ============================================ #
 
-def run_model(mypath, model_name, trace_id, nr_samples=50):
+def run_model(mypath, model_name, trace_id, nr_samples=500):
 
     import os, fnmatch
     import hddm
@@ -61,7 +61,7 @@ def run_model(mypath, model_name, trace_id, nr_samples=50):
     # get the csv file for this dataset
     filename = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata = hddm.load_csv(os.path.join(mypath, filename[0]))
-    print mydata.head(n=10) # show the data
+    print mydata.head(n=5) # show the data
 
     # specify the model
     if model_name == 'stimcoding':
@@ -81,8 +81,10 @@ def run_model(mypath, model_name, trace_id, nr_samples=50):
 
     elif model_name == 'regress_dc':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        print mydata.head(n=20) # show the data
+
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
         m = hddm.HDDMRegressor(mydata, v_reg, include='z', group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp':
@@ -134,12 +136,11 @@ models = {0: 'stimcoding',
     4: 'regress_dc_prevresp',
     5: 'regress_dc_prevresp_prevpupil_prevrt'}
 
-datasets = {0: 'RT_RDK',
-    1: 'MEG-PL'}
+datasets = {0: 'RT_RDK', 1: 'MEG-PL'}
 
 # find path depending on location and dataset
 import os, time
-mypath = os.path.expanduser('~/Data/%s/HDDM'%datasets[d])
+mypath = os.path.realpath(os.path.expanduser('~/Data/%s/HDDM'%datasets[d]))
 
 # make a folder for the outputs, combine name and time
 thispath = os.path.join(mypath, models[model_version])
