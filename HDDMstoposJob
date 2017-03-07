@@ -18,7 +18,7 @@ for ((i=1; i<=ncores; i++)) ; do
 (
 
   for ((j=1; j<=1; j++)) ; do
-     stopos next -p poolhddm
+     stopos next -p pool
        if [ "$STOPOS_RC" != "OK" ]; then
         break
      fi
@@ -33,8 +33,8 @@ for ((i=1; i<=ncores; i++)) ; do
     # first, run the model
  	  eval "python /home/aeurai/code/RT_RDK/HDDM_run.py -d $d -v $v -i $i"
 
-    stopos remove -p poolhddm
-stopos status -p poolhddm
+    stopos remove -p pool
+stopos status -p pool
    done
  ) &
 done
