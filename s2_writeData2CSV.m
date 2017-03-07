@@ -45,7 +45,6 @@ end
 % to save disk space
 % eyelinkfiles = rdir(sprintf('%s/P%02d/pupil/P%02d*_eyeclean.mat', datapath, sj, sj));
 
-
 % ==================================================================
 % WRITE BEHAVIOURAL DATA AND SINGLE-TRIAL PUPIL MEASURES
 % ==================================================================
@@ -103,7 +102,7 @@ for sj = subjects,
     alldat{sj} = [data.trialinfo(:,2) data.trialinfo(:,4) RT data.trialinfo(:,5) ...
         data.trialinfo(:, [10 11 12]) sj*ones(size(RT)) ...
         baseline_pupil response_pupil decision_pupil feedback_pupil];
-    
+
     switch sj
         case {3, 5, 15, 18}
             alldat{sj}(:, 7) = alldat{sj}(:, 7) - 1; % start at session 1
@@ -132,7 +131,7 @@ alldat2 = cat(1, alldat{:});
 % write to csv for all subjects
 t = array2table(alldat2, 'VariableNames', ...
     {'stimulus', 'response', 'rt', 'correct', ...
-    'trialnr', 'blocknr', 'sessionnr', 'subj_idx',  ...
+    'trialnr', 'blocknr', 'session', 'subj_idx',  ...
     'baseline_pupil', 'response_pupil', 'decision_pupil', 'feedback_pupil'});
 
 % recode for HDDM
@@ -141,11 +140,23 @@ t.stimulus(t.stimulus == 270) = 1;
 t.response(t.response == 90) = 0;
 t.response(t.response == 270) = 1;
 
-t.responseSigned = t.response;
-t.responseSigned(t.responseSigned == 0) = -1;
-t.prevresp  = circshift(t.responseSigned, 1);
-t.prevrt    = circshift(zscore(log(t.rt)), 1);
+responseSigned = t.response;
+responseSigned(responseSigned == 0) = -1;
+t.prevresp  = circshift(responseSigned, 1);
+t.prevrt    = circshift(log(t.rt), 1);
 t.prevpupil = circshift(t.decision_pupil, 1);
+
+% normalise pupil and rt within each block
+nanzscore = @(x) (x - nanmean(x)) ./ nanstd(x);
+
+for sj = unique(t.subj_idx)',
+  for session = unique(t.session)',
+    t.prevrt(find(t.subj_idx == sj & t.session == session)) = ...
+    nanzscore(t.prevrt(find(t.subj_idx == sj & t.session == session)));
+    t.prevpupil(find(t.subj_idx == sj & t.session == session)) = ...
+    nanzscore(t.prevpupil(find(t.subj_idx == sj & t.session == session)));
+  end
+end
 
 % remove trials where the previous trial was not immediately preceding
 wrongtrls               = find([NaN; diff(t.trialnr)] ~= 1);
