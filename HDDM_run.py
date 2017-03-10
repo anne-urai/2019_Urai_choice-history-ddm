@@ -4,7 +4,7 @@
 """
 Anne Urai, 2016
 takes input arguments from stopos
-Important: on Cartesius, call module load python2.7.9 before running
+Important: on Cartesius, call module load python/2.7.9 before running
 (the only environment where HDDM is installed)
 """
 

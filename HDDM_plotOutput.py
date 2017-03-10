@@ -4,7 +4,7 @@
 """
 Anne Urai, 2016
 takes input arguments from stopos
-Important: on Cartesius, call module load python2.7.9 before running
+Important: on Cartesius, call module load python/2.7.9 before running
 (the only environment where HDDM is installed)
 """
 
@@ -152,7 +152,7 @@ models = {0: 'stimcoding',
     3: 'regress_dc',
     4: 'regress_dc_prevresp'}
     5: 'regress_dc_prevresp_prevpupil_prevrt'}
-    
+
 # find path depending on location
 usr = os.environ.get('USER')
 mypath = '/Users/anne/Data/RT_RDK/HDDM'

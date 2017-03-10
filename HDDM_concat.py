@@ -4,7 +4,7 @@
 """
 Anne Urai, 2016
 takes input arguments from stopos
-Important: on Cartesius, call module load python2.7.9 before running
+Important: on Cartesius, call module load pytho/2.7.9 before running
 (the only environment where HDDM is installed)
 """
 
@@ -47,35 +47,74 @@ d               = opts.dataset
 
 def concat_models(mypath, model_name):
 
-    import os, hddm
-    from IPython import embed as shell
+    import os, hddm, time, kabuki
 
-    shell()
+    # ============================================ #
+    # APPEND CHAINS
+    # ============================================ #
 
     allmodels = []
     print "appending models"
-    for trace_id in range(14): # 15 models were run
+    for trace_id in range(15): # 15 models were run
         model_filename              = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
         modelExists                 = os.path.isfile(model_filename)
         assert modelExists == True # if not, this model has to be rerun
+
+        starttime = time.time()
         print model_filename
         thism                       = hddm.load(model_filename)
-        allmodels.append(thism)
 
-    # compute rhat stats
-    hddm.analyse.gelman_rubin(allmodels)
+        # now append
+        allmodels.append(thism)
+        elapsed = time.time() - starttime
+        print( "Elapsed time: %f seconds." %elapsed )
+
+    # ============================================ #
+    # CHECK CONVERGENCE
+    # ============================================ #
+
+    gr = hddm.analyze.gelman_rubin(allmodels)
 
     # save
     text_file = open(os.path.join(mypath, model_name, 'gelman_rubin.txt'), 'w')
     for p in gr.items():
         text_file.write("%s:%s\n" % p)
+        # print a warning when non-convergence is detected
+        # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
+        # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
+        if abs(p[1]-1) > 0.02:
+            print "non-convergence found, %s:%s\n" %p
     text_file.close()
-    print "done"
+    print "written gelman rubin stats to file"
+
+    # ============================================ #
+    # SAVE POINT ESTIMATES
+    # ============================================ #
 
     # now actually concatenate them, see email Gilles
-    combined_model = kabuki.utils.concat_models(allmodels)
+    m = kabuki.utils.concat_models(allmodels)
+    m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
 
-    return combined_model
+    results = m.gen_stats() # point estimate for each parameter and subject
+    results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
+
+    # save the DIC for this model
+    text_file = open(os.path.join(mypath, model_name, 'DIC-combined.txt'), 'w')
+    text_file.write("Model {}: {}\n".format(trace_id, m.dic))
+    text_file.close()
+
+    # ============================================ #
+    # SAVE TRACES
+    # ============================================ #
+
+    # get the names for all nodes that are available here
+    group_traces = m.get_group_traces()
+    group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces.csv'))
+
+    all_traces = m.get_traces()
+    all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
+
+    # can then plot full posteriors and compute p-values in Matlab
 
 # ============================================ #
 # run one model per job
