@@ -58,6 +58,7 @@ def concat_models(mypath, model_name):
         model_filename              = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
         modelExists                 = os.path.isfile(model_filename)
         assert modelExists == True # if not, this model has to be rerun
+        print model_filename
         thism                       = hddm.load(model_filename)
         allmodels.append(thism)
 
