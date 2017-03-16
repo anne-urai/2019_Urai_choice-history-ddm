@@ -29,11 +29,11 @@ from optparse import OptionParser
 usage = "HDDM_run.py [options]"
 parser = OptionParser ( usage)
 parser.add_option ( "-d", "--dataset",
-        default = 0,
+        default = range(0,1),
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = 0,
+        default = range(0,5),
         type = "int",
         help = "Version of the model to run" )
 
@@ -130,16 +130,24 @@ models = {0: 'stimcoding',
 
 datasets = {0: 'RT_RDK', 1: 'MEG-PL'}
 
-# find path depending on location and dataset
-import os, time
-mypath = os.path.realpath(os.path.expanduser('~/Data/%s/HDDM'%datasets[d]))
+# recode
+if isinstance(d, int):
+    d = range(d,d+1) # makes a list out of an integer
+if isinstance(model_version, int):
+    model_version = range(model_version, model_version+1)
 
-# and... go!
-starttime = time.time()
-concat_models(mypath, models[model_version])
-elapsed = time.time() - starttime
-print( "Elapsed time: %f seconds\n" %elapsed )
+for dx in d:
+    # find path depending on location and dataset
+    import os, time
+    mypath = os.path.realpath(os.path.expanduser('~/Data/%s/HDDM'%datasets[dx]))
 
-# and plot
-# import HDDM_plotOutput
-# HDDM_plotOutput.plot_model(mypath, models[model_version], trace_id)
+    for vx in model_version:
+        # and... go!
+        starttime = time.time()
+        concat_models(mypath, models[vx])
+        elapsed = time.time() - starttime
+        print( "Elapsed time: %f seconds\n" %elapsed )
+
+    # and plot
+    # import HDDM_plotOutput
+    # HDDM_plotOutput.plot_model(mypath, models[model_version], trace_id)
