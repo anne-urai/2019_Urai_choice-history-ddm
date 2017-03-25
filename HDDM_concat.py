@@ -29,7 +29,7 @@ from optparse import OptionParser
 usage = "HDDM_run.py [options]"
 parser = OptionParser ( usage)
 parser.add_option ( "-d", "--dataset",
-        default = range(1,2),
+        default = range(0,1),
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
@@ -57,11 +57,11 @@ def concat_models(mypath, model_name):
     print "appending models"
     for trace_id in range(15): # 15 models were run
         model_filename              = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
-        print(model_filename)
         modelExists                 = os.path.isfile(model_filename)
         assert modelExists == True # if not, this model has to be rerun
 
         starttime = time.time()
+        print model_filename
         thism                       = hddm.load(model_filename)
 
         # now append
@@ -139,7 +139,7 @@ if isinstance(model_version, int):
 for dx in d:
     # find path depending on location and dataset
     import os, time
-    mypath = os.path.realpath(os.path.expanduser('~/neurodec/Data/%s/HDDM'%datasets[dx]))
+    mypath = os.path.realpath(os.path.expanduser('/home/aeurai/Data/%s/HDDM'%datasets[dx]))
 
     for vx in model_version:
         # and... go!
