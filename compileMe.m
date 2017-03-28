@@ -43,8 +43,8 @@ dlmwrite('allblocks', alldat, 'delimiter', ' ');
 % ============================================ #
 
 nrDatasets = 2; % RT-RDK and MEG-PL
-nrModels   = 6; % stimcoding and regression
-nrTraces   = 15; % nr of cores in a node
+nrModels   = 8; % the nr of the models
+nrTraces   = 60; % nr of chains, 15 cores/node
 
 alldat = [];
 for a = 0:nrDatasets-1,
@@ -57,3 +57,4 @@ end
 
 % write to a file
 dlmwrite('hddmparams', alldat, 'delimiter', ' ');
+size(alldat)

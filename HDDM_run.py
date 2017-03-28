@@ -50,7 +50,7 @@ trace_id        = opts.trace_id
 # define the function that will do the work
 # ============================================ #
 
-def run_model(mypath, model_name, trace_id, nr_samples=50000):
+def run_model(mypath, model_name, trace_id, nr_samples=10000):
 
     import os, fnmatch
     import hddm
@@ -58,109 +58,120 @@ def run_model(mypath, model_name, trace_id, nr_samples=50000):
 
     model_filename  = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
     modelExists     = os.path.isfile(model_filename)
-    if not modelExists:
-        print model_filename
+    print model_filename
 
-        # get the csv file for this dataset
-        filename = fnmatch.filter(os.listdir(mypath), '*.csv')
-        mydata = hddm.load_csv(os.path.join(mypath, filename[0]))
-        print mydata.head(n=5) # show the data
+    # get the csv file for this dataset
+    filename = fnmatch.filter(os.listdir(mypath), '*.csv')
+    mydata = hddm.load_csv(os.path.join(mypath, filename[0]))
+    print mydata.head(n=5) # show the data
 
-        # specify the model
-        if model_name == 'stimcoding':
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v':['session']})
+    # specify the model
+    if model_name == 'stimcoding':
+        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+            drift_criterion=True, bias=True, p_outlier=0.05,
+            include=('sv'), group_only_nodes=['sv'],
+            depends_on={'v':['session']})
 
-        elif model_name == 'stimcoding_prevresp_dc':
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v':['session'], 'dc':['prevresp']})
+    elif model_name == 'stimcoding_prevresp_dc':
+        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+            drift_criterion=True, bias=True, p_outlier=0.05,
+            include=('sv'), group_only_nodes=['sv'],
+            depends_on={'v':['session'], 'dc':['prevresp']})
 
-        elif model_name == 'stimcoding_prevresp_z':
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True, p_outlier=0.05,
-                depends_on={'v':['session'], 'z':['prevresp']})
+    elif model_name == 'stimcoding_prevresp_z':
+        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+            drift_criterion=True, bias=True, p_outlier=0.05,
+            include=('sv'), group_only_nodes=['sv'],
+            depends_on={'v':['session'], 'z':['prevresp']})
 
-        elif model_name == 'regress_dc':
-            mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-            print mydata.head(n=20) # show the data
+    elif model_name == 'regress_dc':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        print mydata.head(n=20) # show the data
 
-            # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-            v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
-            m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
-            group_only_regressors=False, p_outlier=0.05)
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
 
-        elif model_name == 'regress_dc_prevresp':
-            mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-            mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+    elif model_name == 'regress_dc_prevresp':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-            # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-            v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp', 'link_func': lambda x:x}
-            m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
-            group_only_regressors=False, p_outlier=0.05)
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
 
-        elif model_name == 'regress_dc_prevresp_prevpupil_prevrt':
-            mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-            mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
+    elif model_name == 'regress_dc_prevresp_prevpupil_prevrt':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
-            # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-            v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp + prevresp:prevrt + prevresp:prevpupil', 'link_func': lambda x:x}
-            m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
-            group_only_regressors=False, p_outlier=0.05)
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp + prevresp:prevrt + prevresp:prevpupil', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
 
-        elif model_name == 'regress_z_prevresp':
-            mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-            mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+    elif model_name == 'regress_z_prevresp':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-            def z_link_func(x, data=mydata):
-                return 1 / (1 + np.exp(-(x.values.ravel())))
+        def z_link_func(x, data=mydata):
+            return 1 / (1 + np.exp(-(x.values.ravel())))
 
-            z_reg = {'model': 'z ~ 0 + prevresp', 'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
-            reg_descr = [z_reg, v_reg]
+        z_reg = {'model': 'z ~ 0 + prevresp', 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        reg_descr = [z_reg, v_reg]
 
-            # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-            m = hddm.HDDMRegressor(mydata, reg_descr, include=['z', 'sv'], group_only_nodes=['sv'],
-            group_only_regressors=False, p_outlier=0.05)
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, reg_descr, include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
 
-        elif model_name == 'regress_z_prevresp_prevpupil_prevrt':
-            mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-            mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
+    elif model_name == 'regress_z_prevresp_prevpupil_prevrt':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
-            def z_link_func(x, data=mydata):
-                return 1 / (1 + np.exp(-(x.values.ravel())))
+        def z_link_func(x, data=mydata):
+            return 1 / (1 + np.exp(-(x.values.ravel())))
 
-            z_reg = {'model': 'z ~ 0 + prevresp + prevresp:prevrt + prevresp:prevpupil', 'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session ', 'link_func': lambda x:x}
-            reg_descr = [z_reg, v_reg]
+        z_reg = {'model': 'z ~ 0 + prevresp + prevresp:prevrt + prevresp:prevpupil', 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session ', 'link_func': lambda x:x}
+        reg_descr = [z_reg, v_reg]
 
-            # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-            m = hddm.HDDMRegressor(mydata, reg_descr, include=['z', 'sv'], group_only_nodes=['sv'],
-            group_only_regressors=False, p_outlier=0.05)
+    # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+    m = hddm.HDDMRegressor(mydata, reg_descr, include=['z', 'sv'], group_only_nodes=['sv'],
+    group_only_regressors=False, p_outlier=0.05)
 
-        # ============================================ #
-        # do the actual sampling
-        # ============================================ #
+    # ============================================ #
+    # do the actual sampling
+    # ============================================ #
 
-        m.sample(nr_samples, burn=nr_samples/10, thin=2, db='pickle',
-            dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
-        m.print_stats() # just for display in command window
-        m.save(model_filename) # save the model to disk
+    m.sample(nr_samples, burn=nr_samples/10, thin=2, db='pickle',
+        dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
+    m.print_stats() # just for display in command window
+    m.save(model_filename) # save the model to disk
 
-        # ============================================ #
-        # save the output values
-        # ============================================ #
+    # ============================================ #
+    # save the output values
+    # ============================================ #
 
-        results = m.gen_stats() # this seems different from print_stats??
-        results.to_csv(os.path.join(mypath, model_name, 'results-md%d.csv'%trace_id))
+    results = m.gen_stats() # this seems different from print_stats??
+    results.to_csv(os.path.join(mypath, model_name, 'results-md%d.csv'%trace_id))
 
-        # save the DIC for this model
-        text_file = open(os.path.join(mypath, model_name, 'DIC-md%d.txt'%trace_id), 'w')
-        text_file.write("Model {}: {}\n".format(trace_id, m.dic))
-        text_file.close()
+    # save the DIC for this model
+    text_file = open(os.path.join(mypath, model_name, 'DIC-md%d.txt'%trace_id), 'w')
+    text_file.write("Model {}: {}\n".format(trace_id, m.dic))
+    text_file.close()
+
+    # ============================================ #
+    # save traces
+    # ============================================ #
+
+    # get the names for all nodes that are available here
+    group_traces = m.get_group_traces()
+    group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces-md%d.csv'%trace_id))
+
+    all_traces = m.get_traces()
+    all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces-md%d.csv'%trace_id))
 
 # ============================================ #
 # run one model per job

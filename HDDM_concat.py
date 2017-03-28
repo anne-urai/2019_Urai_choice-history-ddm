@@ -126,7 +126,9 @@ models = {0: 'stimcoding',
     2: 'stimcoding_prevresp_z',
     3: 'regress_dc',
     4: 'regress_dc_prevresp',
-    5: 'regress_dc_prevresp_prevpupil_prevrt'}
+    5: 'regress_dc_prevresp_prevpupil_prevrt',
+    6: 'regress_z_prevresp',
+    7: 'regress_z_prevresp_prevpupil_prevrt'}
 
 datasets = {0: 'RT_RDK', 1: 'MEG-PL'}
 
