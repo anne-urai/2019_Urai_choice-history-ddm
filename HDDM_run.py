@@ -50,7 +50,7 @@ trace_id        = opts.trace_id
 # define the function that will do the work
 # ============================================ #
 
-def run_model(mypath, model_name, trace_id, nr_samples=10000):
+def run_model(mypath, model_name, trace_id, nr_samples=20000):
 
     import os, fnmatch
     import hddm
@@ -65,7 +65,18 @@ def run_model(mypath, model_name, trace_id, nr_samples=10000):
     mydata = hddm.load_csv(os.path.join(mypath, filename[0]))
     print mydata.head(n=5) # show the data
 
+    # prepare link functions for the regression models
+    def z_link_func(x, data=mydata):
+        return 1 / (1 + np.exp(-(x.values.ravel())))
+
+    z_reg = {'model': 'z ~ 0 + prevresp', 'link_func': z_link_func}
+    v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+    reg_both = [z_reg, v_reg]
+
+    # ============================================ #
     # specify the model
+    # ============================================ #
+
     if model_name == 'stimcoding':
         m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
             drift_criterion=True, bias=True, p_outlier=0.05,
@@ -86,20 +97,18 @@ def run_model(mypath, model_name, trace_id, nr_samples=10000):
 
     elif model_name == 'regress_dc':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        print mydata.head(n=20) # show the data
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
-        m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
+        m = hddm.HDDMRegressor(mydata, v_reg,
+        include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp', 'link_func': lambda x:x}
-        m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
+        m = hddm.HDDMRegressor(mydata, v_reg,
+        include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevpupil_prevrt':
@@ -107,39 +116,27 @@ def run_model(mypath, model_name, trace_id, nr_samples=10000):
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp + prevresp:prevrt + prevresp:prevpupil', 'link_func': lambda x:x}
-        m = hddm.HDDMRegressor(mydata, v_reg, include=['z', 'sv'], group_only_nodes=['sv'],
+        m = hddm.HDDMRegressor(mydata, v_reg,
+        include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_z_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-        def z_link_func(x, data=mydata):
-            return 1 / (1 + np.exp(-(x.values.ravel())))
-
-        z_reg = {'model': 'z ~ 0 + prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
-        reg_descr = [z_reg, v_reg]
-
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, reg_descr, include=['z', 'sv'], group_only_nodes=['sv'],
+        m = hddm.HDDMRegressor(mydata, reg_descr,
+        include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_z_prevresp_prevpupil_prevrt':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
-        def z_link_func(x, data=mydata):
-            return 1 / (1 + np.exp(-(x.values.ravel())))
-
-        z_reg = {'model': 'z ~ 0 + prevresp + prevresp:prevrt + prevresp:prevpupil', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session ', 'link_func': lambda x:x}
-        reg_descr = [z_reg, v_reg]
-
-    # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-    m = hddm.HDDMRegressor(mydata, reg_descr, include=['z', 'sv'], group_only_nodes=['sv'],
-    group_only_regressors=False, p_outlier=0.05)
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, reg_descr,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
 
     # ============================================ #
     # do the actual sampling
@@ -147,7 +144,7 @@ def run_model(mypath, model_name, trace_id, nr_samples=10000):
 
     m.sample(nr_samples, burn=nr_samples/10, thin=2, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
-    m.print_stats() # just for display in command window
+    # m.print_stats() # just for display in command window
     m.save(model_filename) # save the model to disk
 
     # ============================================ #

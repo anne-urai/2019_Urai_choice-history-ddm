@@ -33,7 +33,7 @@ parser.add_option ( "-d", "--dataset",
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(0,5),
+        default = range(0,8),
         type = "int",
         help = "Version of the model to run" )
 
@@ -55,7 +55,7 @@ def concat_models(mypath, model_name):
 
     allmodels = []
     print "appending models"
-    for trace_id in range(15): # 15 models were run
+    for trace_id in range(60): # 15 models were run
         model_filename              = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
         modelExists                 = os.path.isfile(model_filename)
         assert modelExists == True # if not, this model has to be rerun
