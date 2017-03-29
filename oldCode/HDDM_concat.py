@@ -50,7 +50,7 @@ def concat_models(mypath, model_name):
     import os, hddm, time, kabuki
 
     # ============================================ #
-    # APPEND CHAINS
+    # APPEND MODELS
     # ============================================ #
 
     allmodels = []
@@ -68,6 +68,34 @@ def concat_models(mypath, model_name):
         allmodels.append(thism)
         elapsed = time.time() - starttime
         print( "Elapsed time: %f seconds." %elapsed )
+
+    # ============================================ #
+    # MANUALLY APPEND CHAINS
+    # only
+    # ============================================ #
+
+    1. construct the model object with the original data and parameters
+2. call model.load_db(dbname, db='pickle') # or sqlite, whatever you used
+3. call model.gen_stats()
+
+    if model_name == 'regress_z_prevresp':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    elif model_name == 'regress_z_prevresp_prevpupil_prevrt':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
+
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
 
     # ============================================ #
     # CHECK CONVERGENCE
@@ -114,7 +142,7 @@ def concat_models(mypath, model_name):
     all_traces = m.get_traces()
     all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
-    # can then plot full posteriors and compute p-values in Matlab
+    # can then plot full posteriors and compute p-values between them in Matlab
 
 # ============================================ #
 # run one model per job

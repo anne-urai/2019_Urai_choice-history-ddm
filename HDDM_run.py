@@ -28,12 +28,16 @@ Important: on Cartesius, call module load python/2.7.9 before running
 from optparse import OptionParser
 usage = "HDDM_run.py [options]"
 parser = OptionParser ( usage)
-parser.add_option ( "-d", "--dataset",
+parser.add_option ( "-r", "--run",
         default = 0,
+        type = "int",
+        help = "Force running the model?" )
+parser.add_option ( "-d", "--dataset",
+        default = range(0,1),
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = 0,
+        default = range(0,8),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
@@ -45,25 +49,25 @@ opts,args       = parser.parse_args()
 model_version   = opts.version
 d               = opts.dataset
 trace_id        = opts.trace_id
+runMe           = opts.run
 
 # ============================================ #
 # define the function that will do the work
 # ============================================ #
 
-def run_model(mypath, model_name, trace_id, nr_samples=20000):
+def make_model(mypath, model_name, trace_id):
 
     import os, fnmatch
     import hddm
     import numpy as np
 
     model_filename  = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
-    modelExists     = os.path.isfile(model_filename)
     print model_filename
 
     # get the csv file for this dataset
     filename = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata = hddm.load_csv(os.path.join(mypath, filename[0]))
-    print mydata.head(n=5) # show the data
+    # print mydata.head(n=5) # show the data
 
     # prepare link functions for the regression models
     def z_link_func(x, data=mydata):
@@ -125,7 +129,7 @@ def run_model(mypath, model_name, trace_id, nr_samples=20000):
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, reg_descr,
+        m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
@@ -134,9 +138,13 @@ def run_model(mypath, model_name, trace_id, nr_samples=20000):
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, reg_descr,
+        m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
+
+    return m
+
+def run_model(m, mypath, model_name, trace_id, nr_samples=100):
 
     # ============================================ #
     # do the actual sampling
@@ -145,7 +153,9 @@ def run_model(mypath, model_name, trace_id, nr_samples=20000):
     m.sample(nr_samples, burn=nr_samples/10, thin=2, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # m.print_stats() # just for display in command window
-    m.save(model_filename) # save the model to disk
+    # specify a certain backend? pickle?
+    m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
+    # m.save(os.path.join(mypath, model_name, 'modelfit-md%d.pcl'%trace_id)) # save the model to disk
 
     # ============================================ #
     # save the output values
@@ -170,8 +180,113 @@ def run_model(mypath, model_name, trace_id, nr_samples=20000):
     all_traces = m.get_traces()
     all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces-md%d.csv'%trace_id))
 
+def concat_models(mypath, model_name):
+
+    import os, hddm, time, kabuki
+    from IPython import embed as shell
+
+    # ============================================ #
+    # MANUALLY APPEND MODELS
+    # ============================================ #
+
+    # shell()
+
+    # if this was a regression model with a custom link function for z
+    if model_name.find('regress_z') > -1:
+
+        # # push z through the reverse logistic function to make sense
+        # def z_reverse_link_func(x):
+        #     import numpy as np
+        #     return 1 / (1 + np.exp(-(x)))
+        #     # return np.exp(x) / (1 + np.exp((x)))
+
+        allmodels = []
+        for trace_id in range(60): # 15 models were run
+
+            # manually this specific database (which has been pickled)
+            db_filename = os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id)
+            thism       = make_model(mypath, model_name, trace_id) # first, get the stuff we want
+            thism.load_db(db_filename, db='pickle')
+
+            # a = thism.get_stochastics() # pandas dataframe
+            # rownames = list(a.index)
+            # for idx, znode in enumerate(thism.get_stochastics().node):
+            #     # determine whether this node has z
+            #     if 'z' in rownames[idx]:
+            #         print(znode)
+            #         # print(rownames[idx])
+            #         znode.trace._trace[0] = z_reverse_link_func(znode.trace._trace[0])
+            #         thism.get_stochastics().node[idx] = znode
+
+            # then append as usual
+            allmodels.append(thism)
+
+    # ============================================ #
+    # APPEND MODELS
+    # ============================================ #
+
+    else:
+        allmodels = []
+        print "appending models"
+        for trace_id in range(60): # 15 models were run
+            model_filename              = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
+            modelExists                 = os.path.isfile(model_filename)
+            print model_filename
+            assert modelExists == True # if not, this model has to be rerun
+            thism                       = hddm.load(model_filename)
+            # now append
+            allmodels.append(thism)
+
+    # ============================================ #
+    # CHECK CONVERGENCE
+    # ============================================ #
+
+    gr = hddm.analyze.gelman_rubin(allmodels)
+
+    # save
+    text_file = open(os.path.join(mypath, model_name, 'gelman_rubin.txt'), 'w')
+    for p in gr.items():
+        text_file.write("%s:%s\n" % p)
+        # print a warning when non-convergence is detected
+        # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
+        # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
+        if abs(p[1]-1) > 0.02:
+            print "non-convergence found, %s:%s\n" %p
+    text_file.close()
+    print "written gelman rubin stats to file"
+
+    # ============================================ #
+    # SAVE POINT ESTIMATES
+    # ============================================ #
+
+    if model_name.find('regress_z') < 0:
+
+        # now actually concatenate them, see email Gilles
+        # THIS ONLY WORKS IF Z HAS BEEN TRANSFORMED!
+        m = kabuki.utils.concat_models(allmodels)
+        # m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
+
+        results = m.gen_stats() # point estimate for each parameter and subject
+        results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
+
+        # save the DIC for this model
+        text_file = open(os.path.join(mypath, model_name, 'DIC-combined.txt'), 'w')
+        text_file.write("Model {}: {}\n".format(trace_id, m.dic))
+        text_file.close()
+
+        # ============================================ #
+        # SAVE TRACES
+        # ============================================ #
+
+        # get the names for all nodes that are available here
+        group_traces = m.get_group_traces()
+        group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces.csv'))
+
+        all_traces = m.get_traces()
+        all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
+
 # ============================================ #
-# run one model per job
+# PREPARE THE ACTUAL MODEL FITS
 # ============================================ #
 
 # which model are we running at the moment?
@@ -186,22 +301,33 @@ models = {0: 'stimcoding',
 
 datasets = {0: 'RT_RDK', 1: 'MEG-PL'}
 
-# find path depending on location and dataset
-import os, time
-mypath = os.path.realpath(os.path.expanduser('~/Data/%s/HDDM'%datasets[d]))
+# recode
+if isinstance(d, int):
+    d = range(d,d+1) # makes a list out of an integer
+if isinstance(model_version, int):
+    model_version = range(model_version, model_version+1)
 
-# make a folder for the outputs, combine name and time
-thispath = os.path.join(mypath, models[model_version])
-time.sleep(trace_id) # make sure this doesn't crash the script if multiple instances of the model are submitted simultaneously
-if not os.path.exists(thispath):
-    os.mkdir(thispath)
+for dx in d:
 
-# and... go!
-starttime = time.time()
-run_model(mypath, models[model_version], trace_id)
-elapsed = time.time() - starttime
-print( "Elapsed time: %f seconds\n" %elapsed )
+    # find path depending on location and dataset
+    import os, time
+    mypath = os.path.realpath(os.path.expanduser('~/Data/%s/HDDM'%datasets[dx]))
 
-# and plot
-# import HDDM_plotOutput
-# HDDM_plotOutput.plot_model(mypath, models[model_version], trace_id)
+    for vx in model_version:
+
+        # make a folder for the outputs, combine name and time
+        thispath = os.path.join(mypath, models[vx])
+        if not os.path.exists(thispath):
+            os.mkdir(thispath)
+
+        if runMe == True:
+            starttime = time.time()
+            # get the model specification
+            m = make_model(mypath, models[vx], trace_id) # first, get the stuff we want
+            # now sample and save
+            run_model(m, mypath, models[vx], trace_id)
+            elapsed = time.time() - starttime
+            print( "Elapsed time: %f seconds\n" %elapsed )
+
+        else: # concatenate the different chains
+            concat_models(mypath, models[vx])
