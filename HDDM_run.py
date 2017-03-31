@@ -95,6 +95,12 @@ def make_model(mypath, model_name, trace_id):
             include=('sv'), group_only_nodes=['sv'],
             depends_on={'v':['session'], 'z':['prevresp']})
 
+    elif model_name == 'stimcoding_prevresp_dc_z':
+        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+            drift_criterion=True, bias=True, p_outlier=0.05,
+            include=('sv'), group_only_nodes=['sv'],
+            depends_on={'v':['session'], 'z':['prevresp'], 'dc':['prevresp']})
+
     elif model_name == 'regress_dc':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
 
@@ -154,7 +160,7 @@ def make_model(mypath, model_name, trace_id):
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=50000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=40000):
 
     # ============================================ #
     # do the actual sampling
@@ -302,11 +308,12 @@ def concat_models(mypath, model_name):
 models = {0: 'stimcoding',
     1: 'stimcoding_prevresp_dc',
     2: 'stimcoding_prevresp_z',
-    3: 'regress_dc',
-    4: 'regress_dc_prevresp',
-    5: 'regress_dc_prevresp_prevpupil_prevrt',
-    6: 'regress_z_prevresp',
-    7: 'regress_z_prevresp_prevpupil_prevrt'}
+    3: 'stimcoding_prevresp_dc_z',
+    4: 'regress_dc',
+    5: 'regress_dc_prevresp',
+    6: 'regress_dc_prevresp_prevpupil_prevrt',
+    7: 'regress_z_prevresp',
+    8: 'regress_z_prevresp_prevpupil_prevrt'}
 
 datasets = {0: 'RT_RDK', 1: 'MEG-PL'}
 
