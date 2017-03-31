@@ -160,7 +160,7 @@ def make_model(mypath, model_name, trace_id):
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=40000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=30000):
 
     # ============================================ #
     # do the actual sampling
