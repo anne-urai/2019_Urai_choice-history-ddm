@@ -4,7 +4,7 @@
 """
 Anne Urai, 2016
 takes input arguments from stopos
-Important: on Cartesius, call module load python/2.7.9 before running
+Important: on Cartesius, call module load python2.7.9 before running
 (the only environment where HDDM is installed)
 """
 
@@ -129,17 +129,65 @@ def plot_model(mypath, model_name, trace_id):
 
     # 1. plot the traces and posteriors for each parameter
     m.plot_posteriors(save=True, path=figpath, format='pdf')
-    m.print_stats()
-    # m.gen_stats()
 
     # 2. plot posterior predictive
     print('plotting posterior predictive')
-    #    plot_posterior_predictive_anne(m, path=figpath)
+    plot_posterior_predictive_anne(m, path=figpath)
 
-    # ============================================ #
-    # print stats
-    # ============================================ #
+    # 3. plot the actual posteriors and the way they depend on the variables we specified
+    if model_name in ['prevresp_prevrt_dc', 'prevresp_prevpupil_dc']:
+        print('plotting the posteriors by previous response and rt')
+        dc_prevresp0_prevRTlow, dc_prevresp0_prevRTmed, dc_prevresp0_prevRThigh, \
+            dc_prevresp1_prevRTlow, dc_prevresp1_prevRTmed, dc_prevresp1_prevRThigh \
+            = m.nodes_db.node[['dc(-1.0.1.0)', 'dc(-1.0.2.0)', 'dc(-1.0.3.0)', 'dc(1.0.1.0)','dc(1.0.2.0)','dc(1.0.3.0)']]
 
+        # plot these myself
+        plot_posterior_nodes_anne([dc_prevresp0_prevRTlow, dc_prevresp0_prevRTmed, dc_prevresp0_prevRThigh, \
+            dc_prevresp1_prevRTlow, dc_prevresp1_prevRTmed, dc_prevresp1_prevRThigh])
+
+        plt.xlabel('Drift criterion')
+        plt.ylabel('Posterior probability')
+        plt.title('Posterior of drift-rate group means')
+        plt.savefig(os.path.join(figpath, 'driftcriterion_posteriors.pdf'))
+
+    elif model_name in ['prevresp_prevrt_z', 'prevresp_prevpupil_z']:
+        print('plotting the posteriors by previous response and rt')
+        dc_prevresp0_prevRTlow, dc_prevresp0_prevRTmed, dc_prevresp0_prevRThigh, \
+            dc_prevresp1_prevRTlow, dc_prevresp1_prevRTmed, dc_prevresp1_prevRThigh \
+            = m.nodes_db.node[['z(-1.0.1.0)', 'z(-1.0.2.0)', 'z(-1.0.3.0)', 'z(1.0.1.0)','z(1.0.2.0)','z(1.0.3.0)']]
+
+        # plot these myself
+        plot_posterior_nodes_anne([dc_prevresp0_prevRTlow, dc_prevresp0_prevRTmed, dc_prevresp0_prevRThigh, \
+            dc_prevresp1_prevRTlow, dc_prevresp1_prevRTmed, dc_prevresp1_prevRThigh])
+
+        plt.xlabel('Starting point')
+        plt.ylabel('Posterior probability')
+        plt.title('Posterior of drift-rate group means')
+        plt.savefig(os.path.join(figpath, 'startingpoint_posteriors.pdf'))
+
+    elif model_name in ['prevresp_z']:
+        print('plotting the posteriors by previous response')
+        dc_prevresp0, dc_prevresp1 \
+            = m.nodes_db.node[['z(-1.0)', 'z(1.0)']]
+
+        # plot these myself
+        plot_posterior_nodes_anne([dc_prevresp0, dc_prevresp1])
+        plt.xlabel('Starting point')
+        plt.ylabel('Posterior probability')
+        plt.title('Posterior of drift-rate group means')
+        plt.savefig(os.path.join(figpath, 'startingpoint_posteriors.pdf'))
+
+    elif model_name in ['prevresp_dc']:
+        print('plotting the posteriors by previous response')
+        dc_prevresp0, dc_prevresp1 \
+            = m.nodes_db.node[['dc(-1.0)', 'dc(1.0)']]
+
+        # plot these myself
+        plot_posterior_nodes_anne([dc_prevresp0, dc_prevresp1])
+        plt.xlabel('Drift criterion')
+        plt.ylabel('Posterior probability')
+        plt.title('Posterior of drift-rate group means')
+        plt.savefig(os.path.join(figpath, 'driftcriterion_posteriors.pdf'))
 
 # ============================================ #
 # run one model per job
@@ -147,15 +195,22 @@ def plot_model(mypath, model_name, trace_id):
 
 # which model are we running at the moment?
 models = {0: 'stimcoding',
-    1: 'stimcoding_prevresp_dc'
-    2: 'stimcoding_prevresp_z'
-    3: 'regress_dc',
-    4: 'regress_dc_prevresp'}
-    5: 'regress_dc_prevresp_prevpupil_prevrt'}
+    1: 'prevresp_z',
+    2: 'prevresp_dc',
+    3: 'prevresp_prevrt_z',
+    4: 'prevresp_prevrt_dc',
+    5: 'prevresp_prevpupil_z',
+    6: 'prevresp_prevpupil_dc'}
 
 # find path depending on location
 usr = os.environ.get('USER')
-mypath = '/Users/anne/Data/RT_RDK/HDDM'
+
+if usr in ['anne']: #local
+    mypath = '/Users/anne/Data/projects/0/neurodec/Data/MEG-PL/Data/HDDM'
+if usr in ['aurai']: #uke cluster
+    mypath = '/home/aurai/Data/MEG-PL/Data/HDDM'
+if usr in ['aeurai']: #cartesius
+    mypath = '/home/aeurai/neurodec/Data/MEG-PL/HDDM'
 
 # make a folder for the outputs, combine name and time
 thispath = os.path.join(mypath, models[model_version])

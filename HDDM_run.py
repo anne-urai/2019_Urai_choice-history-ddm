@@ -29,7 +29,7 @@ from optparse import OptionParser
 usage = "HDDM_run.py [options]"
 parser = OptionParser ( usage)
 parser.add_option ( "-r", "--run",
-        default = 0,
+        default = 1,
         type = "int",
         help = "Force running the model?" )
 parser.add_option ( "-d", "--dataset",
@@ -43,7 +43,7 @@ parser.add_option ( "-v", "--version",
 parser.add_option ( "-i", "--trace_id",
         default = 1,
         type = "int",
-        help = "Which trace to run, usually 1-3" )
+        help = "Which trace to run, usually 0-60" )
 
 opts,args       = parser.parse_args()
 model_version   = opts.version
@@ -73,10 +73,6 @@ def make_model(mypath, model_name, trace_id):
     def z_link_func(x, data=mydata):
         return 1 / (1 + np.exp(-(x.values.ravel())))
 
-    z_reg = {'model': 'z ~ 0 + prevresp', 'link_func': z_link_func}
-    v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
-    reg_both = [z_reg, v_reg]
-
     # ============================================ #
     # specify the model
     # ============================================ #
@@ -102,6 +98,8 @@ def make_model(mypath, model_name, trace_id):
     elif model_name == 'regress_dc':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
 
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
@@ -111,6 +109,8 @@ def make_model(mypath, model_name, trace_id):
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp', 'link_func': lambda x:x}
+
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
@@ -118,6 +118,8 @@ def make_model(mypath, model_name, trace_id):
     elif model_name == 'regress_dc_prevresp_prevpupil_prevrt':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
+
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': lambda x:x}
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, v_reg,
@@ -128,6 +130,10 @@ def make_model(mypath, model_name, trace_id):
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
+        z_reg = {'model': 'z ~ 0 + prevresp', 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        reg_both = [z_reg, v_reg]
+
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
@@ -137,6 +143,10 @@ def make_model(mypath, model_name, trace_id):
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
+        z_reg = {'model': 'z ~ 0 + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        reg_both = [z_reg, v_reg]
+
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
@@ -144,7 +154,7 @@ def make_model(mypath, model_name, trace_id):
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=100):
+def run_model(m, mypath, model_name, trace_id, nr_samples=50000):
 
     # ============================================ #
     # do the actual sampling
@@ -155,7 +165,6 @@ def run_model(m, mypath, model_name, trace_id, nr_samples=100):
     # m.print_stats() # just for display in command window
     # specify a certain backend? pickle?
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
-    # m.save(os.path.join(mypath, model_name, 'modelfit-md%d.pcl'%trace_id)) # save the model to disk
 
     # ============================================ #
     # save the output values
