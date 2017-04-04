@@ -47,9 +47,10 @@ nrModels   = 9; % the nr of the models
 nrTraces   = 60; % nr of chains, 15 cores/node
 
 alldat = [];
-for a = 0:nrDatasets-1,
+  for c = 0:nrTraces-1,
+    for a = 0:nrDatasets-1,
+
   for b = 0:nrModels-1,
-    for c = 0:nrTraces-1,
       alldat = [alldat; a b c];
     end
   end
