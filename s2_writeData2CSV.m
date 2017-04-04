@@ -164,4 +164,8 @@ t.prevresp(wrongtrls)   = NaN;
 t.prevrt(wrongtrls)     = NaN;
 t.prevpupil(wrongtrls)  = NaN;
 
+% correct some session nrss
+t.session(t.session == 0) = 1;
+t.session(t.subj_idx == 17 & t.session == 5) = 4;
+
 writetable(t, sprintf('%s/HDDM/rtrdk_data_allsj.csv', datapath));
