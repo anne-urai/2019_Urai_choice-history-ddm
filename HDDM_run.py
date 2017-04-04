@@ -217,6 +217,14 @@ def run_model(m, mypath, model_name, trace_id, nr_samples=30000):
     all_traces = m.get_traces()
     all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces-md%d.csv'%trace_id))
 
+    # ============================================ #
+    # plot convergence check
+    # ============================================ #
+
+    # plot the traces and posteriors for each parameter
+    figpath = os.path.join(mypath, model_name, 'figures-md%d'%trace_id)
+    m.plot_posteriors(save=True, path=figpath, format='pdf')
+
 def concat_models(mypath, model_name):
 
     import os, hddm, time, kabuki

@@ -1,7 +1,7 @@
 function HDDM_readIntoMatlab(ds, ts, ms)
 
-if ~exist('ds', 'var'), ds = 2:1; end
-if ~exist('ts', 'var'), ts = 2;   end
+if ~exist('ds', 'var'), ds = 2:-1:1; end
+if ~exist('ts', 'var'), ts = 1:2;   end
 if ~exist('ms', 'var'), ms = 1:9; end
 
 addpath(genpath('~/code/Tools'));
@@ -94,11 +94,13 @@ for d = ds,
             % WRITE TO TABLE
             % ============================================ %
 
-            tic;
-            writetable(alldat, sprintf('%s/%s/%s_traces_concat.csv', ...
-                usepath, mdls{m}, traces{t}));
-            toc;
-            fprintf('%s/%s/%s_traces_concat.csv \n',  usepath, mdls{m}, traces{t});
+            if t == 1,
+              tic;
+              writetable(alldat, sprintf('%s/summary/%s_%s_traces_concat.csv', ...
+                  usepath, mdls{m}, traces{t}));
+              toc;
+              fprintf('%s/%s/%s_traces_concat.csv \n',  usepath, mdls{m}, traces{t});
+            end
 
             % ============================================ %
             % EXTRACT POINT ESTIMATES AND QUARTILES
@@ -147,10 +149,10 @@ for d = ds,
             tic;
             switch t
             case 1
-              savefast(sprintf('%s/%s/%s_map.mat', ...
+              savefast(sprintf('%s/summary/%s_%s.mat', ...
                   usepath, mdls{m}, traces{t}), 'group');
             case 2
-            savefast(sprintf('%s/%s/%s_map.mat', ...
+            savefast(sprintf('%s/summary/%s_%s.mat', ...
                 usepath, mdls{m}, traces{t}), 'group', 'individuals');
               end
             toc;
