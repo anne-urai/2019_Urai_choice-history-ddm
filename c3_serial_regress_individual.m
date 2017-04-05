@@ -1,4 +1,4 @@
-function serial_regress_individual
+function c3_serial_regress_individual
 % using the stimcoding models where dc and/or z depend on previous
 % response, plot
 

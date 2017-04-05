@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# embedded options to qsub - start with #PBS
+# walltime: defines maximum lifetime of a job
+# nodes/ppn: how many nodes? how many cores?
+
+#PBS -q batch
+#PBS -l walltime=100:00:00
+#PBS -l nodes=1:ppn=3 # since we'll be using 3 parallel model fits
+#PBS -l pmem=24gb
+
+# -- run in the current working (submission) directory --
+cd $PBS_O_WORKDIR
+
+chmod g=wx $PBS_JOBNAME
+
+# get the right anaconda environment
+# source activate python2.7
+
+# FILE TO EXECUTE
+python joblib_HDDM_Anne.py 1> ~/jobs/$PBS_JOBID.out 2> ~/jobs/$PBS_JOBID.err

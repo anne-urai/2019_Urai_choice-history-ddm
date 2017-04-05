@@ -1,0 +1,24 @@
+
+# #
+# ## example within-subject model, including within-subject sequential effects
+# def z_link_func(x, data=mydata):
+#     stim = (np.asarray(dmatrix('0 + C(s,[[1],[-1]])', {'s':data.stimulus.ix[x.index]})))
+#     return 1 / (1 + np.exp(-(x * stim)))
+#
+# z_reg = {'model': 'z ~ 1 + C(condition)', 'link_func': z_link_func}
+# hddm.HDDMRegressor(mydata, z_reg, "z ~ C(prevresp)")
+# # , drift_criterion=True, bias=True)
+#
+# # how to combine regression with stimulus coding model
+# #
+#
+# #
+# # # here, previous choice affects drift criterion
+# # m_dc = hddm.HDDMRegressor(data, stim_col='stimulus', drift_criterion=True, bias=True,
+# #     include=('sv'), group_only_nodes=['sv'],
+# #     "dc ~ C(prev_resp):prev_rt", depends_on={'drug', 'sessionnr'}, p_outlier=.05)
+# #
+# # # here, previous choice affects starting point
+# # m_z = hddm.HDDMRegressor(data, z_reg, stim_col='stimulus', drift_criterion=True, bias=True,
+# #     include=('sv'), group_only_nodes=['sv'],
+# #     "z ~ C(prev_resp):prev_rt", depends_on={'drug', 'sessionnr'}, p_outlier=.05)
