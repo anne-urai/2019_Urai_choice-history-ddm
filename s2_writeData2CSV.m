@@ -168,4 +168,6 @@ t.prevpupil(wrongtrls)  = NaN;
 t.session(t.session == 0) = 1;
 t.session(t.subj_idx == 17 & t.session == 5) = 4;
 
+t.session = t.session - 1; % start at 0 for python
+
 writetable(t, sprintf('%s/HDDM/rtrdk_data_allsj.csv', datapath));

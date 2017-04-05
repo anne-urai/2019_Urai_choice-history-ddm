@@ -65,8 +65,8 @@ def make_model(mypath, model_name, trace_id):
     print model_filename
 
     # get the csv file for this dataset
-    filename = fnmatch.filter(os.listdir(mypath), '*.csv')
-    mydata = hddm.load_csv(os.path.join(mypath, filename[0]))
+    filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
+    mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
     # print mydata.head(n=5) # show the data
 
     # prepare link functions for the regression models
@@ -104,7 +104,7 @@ def make_model(mypath, model_name, trace_id):
     elif model_name == 'regress_dc':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
 
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus*session', 'link_func': lambda x:x}
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, v_reg,
@@ -115,7 +115,7 @@ def make_model(mypath, model_name, trace_id):
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp', 'link_func': lambda x:x}
 
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
@@ -125,7 +125,7 @@ def make_model(mypath, model_name, trace_id):
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': lambda x:x}
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, v_reg,
@@ -137,7 +137,7 @@ def make_model(mypath, model_name, trace_id):
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
         z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus*session', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -150,7 +150,7 @@ def make_model(mypath, model_name, trace_id):
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
         z_reg = {'model': 'z ~ 1 + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus*session', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -163,7 +163,7 @@ def make_model(mypath, model_name, trace_id):
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp or prevpupil
 
         z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -176,7 +176,7 @@ def make_model(mypath, model_name, trace_id):
         mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
 
         z_reg = {'model': 'z ~ 1 + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus + stimulus:session + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -186,14 +186,16 @@ def make_model(mypath, model_name, trace_id):
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=30000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
 
     # ============================================ #
     # do the actual sampling
     # ============================================ #
 
-    m.sample(nr_samples, burn=nr_samples/10, thin=2, db='pickle',
-        dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
+    m.sample(nr_samples, burn=nr_samples/3, thin=2)
+
+    #, db='pickle',
+    #    dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # m.print_stats() # just for display in command window
     # specify a certain backend? pickle?
     # m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
@@ -335,17 +337,15 @@ def concat_models(mypath, model_name):
 # ============================================ #
 
 # which model are we running at the moment?
-models = {0: 'stimcoding',
-    1: 'stimcoding_prevresp_dc',
-    2: 'stimcoding_prevresp_z',
-    3: 'stimcoding_prevresp_dc_z',
-    4: 'regress_dc',
-    5: 'regress_dc_prevresp',
-    6: 'regress_dc_prevresp_prevpupil_prevrt',
-    7: 'regress_z_prevresp',
-    8: 'regress_z_prevresp_prevpupil_prevrt',
-    9: 'regress_dc_z_prevresp',
-    10: 'regress_dc_z_prevresp_prevpupil_prevrt'}
+models = {0: 'stimcoding_prevresp_dc',
+    1: 'stimcoding_prevresp_z',
+    2: 'stimcoding_prevresp_dc_z',
+    3: 'regress_dc_prevresp',
+    4: 'regress_dc_prevresp_prevpupil_prevrt',
+    5: 'regress_z_prevresp',
+    6: 'regress_z_prevresp_prevpupil_prevrt',
+    7: 'regress_dc_z_prevresp',
+    8: 'regress_dc_z_prevresp_prevpupil_prevrt'}
 
 datasets = {0: 'RT_RDK', 1: 'MEG-PL'}
 

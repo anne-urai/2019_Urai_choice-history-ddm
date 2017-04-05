@@ -43,14 +43,14 @@ dlmwrite('allblocks', alldat, 'delimiter', ' ');
 % ============================================ #
 
 nrDatasets = 2; % RT-RDK and MEG-PL
-nrModels   = 7:10; % the nr of the models
-nrTraces   = 60; % nr of chains, 15 cores/node
+nrModels   = 9; % the nr of the models
+nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
   for c = 0:nrTraces-1,
     for a = 0:nrDatasets-1,
 
-  for b = nrModels,
+  for b = 0:nrModels-1,
       alldat = [alldat; a b c];
     end
   end
