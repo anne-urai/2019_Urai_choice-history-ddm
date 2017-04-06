@@ -1,33 +1,29 @@
-function results = A5a_behaviouralMetrics()
+function results = b4_behaviouralMetrics(alldata)
 % error vs correct, dprime vs criterion, serial choice bias
 % as a function of pupil and RT
-
-if ~isdeployed,
-    addpath(genpath('~/code/MEG'));
-    addpath(genpath('~/code/Tools'));
-    addpath('~/Documents/fieldtrip');
-    ft_defaults;
-    addpath /Users/anne/Dropbox/code/MEG;
-end
-% warning('error', 'MATLAB:table:ModifiedVarnames');
+warning off;
 
 % ========================================== %
 % COMPUTE FOR ALL SUBJECTS
 % ========================================== %
 
-clear all; clc; close all;
-subjectdata = subjectspecifics('ga');
-
 % preallocate variables
 varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'abscriterion', 'rt', ...
-    'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
+    'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error', ...
+    'rt_valid_slow_correct', 'rt_valid_fast_correct', 'rt_invalid_slow_correct', 'rt_invalid_fast_correct', ...
+    'rt_valid_slow_error', 'rt_valid_fast_error', 'rt_invalid_slow_error', 'rt_invalid_fast_error', ...
+    'accuracy_valid_slow', 'accuracy_valid_fast', 'accuracy_invalid_slow', 'accuracy_invalid_fast'};
 
-results = array2table(nan(length(subjectdata.all)*3, length(varnames)), 'variablenames', varnames);
-results.drug = repmat({'NaN'}, length(subjectdata.all)*3, 1);
+nrSess          = length(unique(alldata.session)) + 1;
+results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, length(varnames)), 'variablenames', varnames);
+results.drug    =  repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
 
+% measures that are modulated by previous trial RT or pupil
 metrics = {'dprime', 'criterion', 'abscriterion', 'accuracy', 'repetition', ...
-    'stimrepetition', 'repetitioncrit', 'criterionshift', 'handshift', 'nextdprime', 'nextabscriterion'};
+    'stimrepetition', 'repetitioncrit', 'criterionshift', 'handshift', ...
+    'nextdprime', 'nextabscriterion'};
 
+% modulation factors
 factors = {'pupil', 'rt', 'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
 for m = 1:length(metrics),
     % first, without modulation
@@ -42,24 +38,48 @@ for m = 1:length(metrics),
     end
 end
 
-% preallocate
-subjects = subjectdata.all;
-
 % get all data
-alldata = readtable(sprintf('%s/Data/CSV/2ifc_megdata_allsj.csv', subjectdata.path));
-alldata.subjnr = round(alldata.idx / 1000000);
-alldata.startHand(alldata.startHand > 20) = nan;
+subjects      = unique(alldata.subj_idx)';
+alldata.pupil = alldata.decision_pupil;
+
+% normalise previous RT per block
+blockchange = find(diff(alldata.block) > 0);
+blocknrs = zeros(height(alldata), 1);
+for b = 1:length(blockchange)-1,
+    blocknrs(blockchange(b)+1:blockchange(b+1)) = blocknrs(blockchange(b))+1;
+end
+blocknrs(blockchange(end)+1:end) = blocknrs(blockchange(end))+1;
+for b = unique(blocknrs)',
+    alldata.prevrt(blocknrs == b) = nanzscore(log(alldata.prevrt(blocknrs == b)));
+end
+
+% only MEG-PL data has starthand
+if isfield(alldata, 'startHand'),
+    alldata.startHand(alldata.startHand > 20) = nan;
+else
+    alldata.startHand = nan(size(alldata.subj_idx));
+end
 
 % for criterion shift
-alldata.nextstim = circshift(alldata.stim, -1);
-alldata.nextresp = circshift(alldata.resp, -1);
+alldata.nextstim = circshift(alldata.stimulus, -1);
+alldata.nextresp = circshift(alldata.response, -1);
 alldata.nextstim((diff(alldata.trial) ~= 1)) = NaN;
 alldata.nextresp((diff(alldata.trial) ~= 1)) = NaN;
 
+% for mulder et al. analysis
+alldata.prevstim = circshift(alldata.stimulus, 1);
+alldata.prevresp = circshift(alldata.response, 1);
+wrongtrls        = find([NaN; diff(alldata.trial)] ~= 1);
+alldata.prevstim(wrongtrls) = NaN;
+alldata.prevresp(wrongtrls) = NaN;
+
+% ========================================== %
+% READY, SET, GO
+% ========================================== %
+
 icnt = 0;
 for sj = subjects,
-    sjdat = subjectspecifics(sj);
-    for s = 0:2,
+    for s = [0 unique(alldata.session)'],
         
         icnt                    = icnt + 1;
         results.subjnr(icnt)    = sj;
@@ -67,26 +87,12 @@ for sj = subjects,
         
         switch s
             case 0
-                % both sessions together
-                data                    = alldata(alldata.subjnr == sj, :);
-            otherwise
-                data                    = alldata(alldata.subjnr == sj & alldata.session == s, :);
+                % all sessions together
+                data                    = alldata(alldata.subj_idx == sj, :);
+            otherwise % split by session
+                data                    = alldata(alldata.subj_idx == sj & alldata.session == s, :);
         end
-        data(isnan(data.resp), :) = [];
-        data.pupil              = data.decision_pupil;
-        
-        % ========================================== %
-        % GENERAL STUFF
-        % ========================================== %
-        
-        results.drug(icnt)          = {sjdat.drug};
-        
-        [d, c] = dprime(data.stim, data.resp);
-        results.dprime(icnt)        = d;
-        results.criterion(icnt)     = c;
-        results.abscriterion(icnt)  = abs(c);
-        results.accuracy(icnt)      = nanmean(data.correct);
-        results.rt(icnt)            = nanmedian(data.rt);
+        data(isnan(data.response), :) = [];
         
         % some people don't have pupil data in each session
         if isempty(data),
@@ -94,9 +100,20 @@ for sj = subjects,
             continue;
         end
         
+        % ========================================== %
+        % GENERAL STUFF
+        % ========================================== %
+        
+        [d, c] = dprime(data.stimulus, data.response);
+        results.dprime(icnt)        = d;
+        results.criterion(icnt)     = c;
+        results.abscriterion(icnt)  = abs(c);
+        results.accuracy(icnt)      = nanmean(data.correct);
+        results.rt(icnt)            = nanmedian(data.rt);
+        
         % measure of repetition behaviour
-        data.repeat = [~(abs(diff(data.resp)) > 0); NaN];
-        data.stimrepeat = [~(abs(diff(data.stim)) > 0); NaN];
+        data.repeat = [~(abs(diff(data.response)) > 0); NaN];
+        data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
         
         % skip trials at boundaries
         data.repeat((diff(data.trial) ~= 1)) = NaN;
@@ -110,9 +127,13 @@ for sj = subjects,
         results.repetitioncrit(icnt)    = -c;
         
         % criterion based on next trial bias, then collapsed
-        results.criterionshift(icnt)    = criterionshift(data.resp, data.nextstim, data.nextresp);
+        results.criterionshift(icnt)    = criterionshift(data.response, data.nextstim, data.nextresp);
+        if s == 0,
+            thispersonsbias = results.repetition(icnt) - results.stimrepetition(icnt);
+        end
+           
         % does the random hand they press cause a bias?
-        results.handshift(icnt)         = criterionshift(data.startHand, data.stim, data.resp);
+        results.handshift(icnt)         = criterionshift(data.startHand, data.stimulus, data.response);
         
         % pupilstuff
         results.pupil_error(icnt)       = nanmean(data.pupil(data.correct == 0));
@@ -122,87 +143,136 @@ for sj = subjects,
         results.rt_correct(icnt)        = nanmedian(data.rt(data.correct == 1));
         
         % ========================================== %
+        % MULDER ET AL. 2012
+        % http://www.jneurosci.org/content/32/7/2335.long
+        % treat the previous choice as a cue
+        % ========================================== %
+        
+        if thispersonsbias < 0, % alternators
+            % only previous trials that are correct
+            validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
+            invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
+            neutraltrls   = ones(height(data), 1); % only previous correct trls
+        elseif thispersonsbias > 0, % repeaters
+            % only previous trials that are correct
+            validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
+            invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
+            neutraltrls   = ones(height(data), 1); % only previous correct trls
+        end
+        
+        % data.rt = nanzscore(log(data.rt));
+        results.rt_invalid_fast_correct(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 1 & ...
+            data.prevrt < median(data.prevrt(invalidtrls & data.correct == 1))));
+        results.rt_invalid_slow_correct(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 1 & ...
+            data.prevrt > median(data.prevrt(invalidtrls & data.correct == 1))));
+        results.rt_valid_fast_correct(icnt)    = nanmedian(data.rt(validtrls & data.correct == 1 & ...
+            data.prevrt < median(data.prevrt(validtrls & data.correct == 1))));
+        results.rt_valid_slow_correct(icnt)    = nanmedian(data.rt(validtrls & data.correct == 1 & ...
+            data.prevrt > median(data.prevrt(validtrls & data.correct == 1))));
+
+        results.rt_invalid_fast_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
+            data.prevrt < median(data.prevrt(invalidtrls & data.correct == 0))));
+        results.rt_invalid_slow_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
+            data.prevrt > median(data.prevrt(invalidtrls & data.correct == 0))));
+        results.rt_valid_fast_error(icnt)    = nanmedian(data.rt(validtrls & data.correct == 0 & ...
+            data.prevrt < median(data.prevrt(validtrls & data.correct == 0))));
+        results.rt_valid_slow_error(icnt)    = nanmedian(data.rt(validtrls & data.correct ==0 & ...
+            data.prevrt > median(data.prevrt(validtrls & data.correct == 0))));
+
+        results.accuracy_invalid_fast(icnt)    = nanmean(data.correct(invalidtrls & ...
+            data.prevrt < median(data.prevrt(invalidtrls))));
+        results.accuracy_invalid_slow(icnt)    = nanmean(data.correct(invalidtrls & ...
+            data.prevrt > median(data.prevrt(invalidtrls))));
+        results.accuracy_valid_fast(icnt)    = nanmean(data.correct(validtrls & ...
+            data.prevrt < median(data.prevrt(validtrls))));
+        results.accuracy_valid_slow(icnt)    = nanmean(data.correct(validtrls & ...
+            data.prevrt > median(data.prevrt(validtrls))));
+        
+        % ========================================== %
         % DPRIME, CRITERION, ABSOLUTE CRITERION
         % correlation to pupil and RT
         % ========================================== %
         
-        flds = {'pupil', 'rt', 'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
-        nbins = 8; % with 5 bins, correlation quite unstable
-        for f = 1:length(flds),
-            
-            % for error and correct, make a temporary field
-            if strfind(flds{f}, '_correct'),
-                useFld = data.(flds{f}(1:end-8));
-                useFld(data.correct == 0) = NaN;
-            elseif strfind(flds{f}, '_error'),
-                useFld = data.(flds{f}(1:end-6));
-                useFld(data.correct == 1) = NaN;
-            else
-                useFld = data.(flds{f});
-            end
-            
-            % sanity check for those without pupil stuff
-            if all(isnan(useFld)), continue; end
-            
-            % ========================================== %
-            % correlate across five bins
-            % ========================================== %
-            
-            binIdx      = discretize(useFld, [-inf quantile(useFld, nbins-1) inf]);
-            [d, c]      = splitapply(@dprime, data.stim, data.resp, binIdx);
-            a           = splitapply(@nanmean, data.correct, binIdx);
-            [~, r]      = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
-            rep         = splitapply(@nanmean, data.repeat, binIdx);
-            stimrep     = splitapply(@nanmean, data.stimrepeat, binIdx);
-            cs          = splitapply(@criterionshift, data.resp, data.nextstim, data.nextresp, binIdx);
-            [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
-
-            % see corrFunc defined below
-            results.([flds{f} '_dprime_corr'])(icnt)            = corrFunc(d);
-            results.([flds{f} '_criterion_corr'])(icnt)         = corrFunc(c);
-            results.([flds{f} '_abscriterion_corr'])(icnt)      = corrFunc(abs(c));
-            results.([flds{f} '_accuracy_corr'])(icnt)          = corrFunc(a);
-            results.([flds{f} '_repetition_corr'])(icnt)        = corrFunc(rep);
-            results.([flds{f} '_stimrepetition_corr'])(icnt)    = corrFunc(stimrep);
-            results.([flds{f} '_repetitioncrit_corr'])(icnt)    = corrFunc(-r);
-            results.([flds{f} '_criterionshift_corr'])(icnt)    = corrFunc(cs);
-            results.([flds{f} '_nextdprime_corr'])(icnt)        = corrFunc(nextd);
-            results.([flds{f} '_nextabscriterion_corr'])(icnt)     = corrFunc(abs(nextc));
-            
-            % ========================================== %
-            % divide into 3 bins for viz
-            % ========================================== %
-            
-            binIdx = discretize(useFld, [-inf quantile(useFld, 2) inf]);
-            
-            [d, c] = splitapply(@dprime, data.stim, data.resp, binIdx);
-            a      = splitapply(@nanmean, data.correct, binIdx);
-            [~, r] = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
-            rep    = splitapply(@nanmean, data.repeat, binIdx);
-            cs     = splitapply(@criterionshift, data.resp, data.nextstim, data.nextresp, binIdx);
-            [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
-
-            for b = 1:length(d),
+        if 0,
+            flds = {'pupil', 'rt', 'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
+            nbins = 8; % with 5 bins, correlation quite unstable
+            for f = 1:length(flds),
                 
-                results.(sprintf('dprime_%s_bin%d', flds{f}, b))(icnt)      = d(b);
-                results.(sprintf('criterion_%s_bin%d', flds{f}, b))(icnt)   = c(b);
-                results.(sprintf('abscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(c(b));
-                results.(sprintf('accuracy_%s_bin%d', flds{f}, b))(icnt)    = a(b);
+                % for error and correct, make a temporary field
+                if strfind(flds{f}, '_correct'),
+                    useFld = data.(flds{f}(1:end-8));
+                    useFld(data.correct == 0) = NaN;
+                elseif strfind(flds{f}, '_error'),
+                    useFld = data.(flds{f}(1:end-6));
+                    useFld(data.correct == 1) = NaN;
+                else
+                    useFld = data.(flds{f});
+                end
                 
-                % repetition criterion as a function of pupil stuff
-                results.(sprintf('repetitioncrit_%s_bin%d', flds{f}, b))(icnt)  = -r(b);
+                % sanity check for those without pupil stuff
+                if all(isnan(useFld)), continue; end
                 
-                % repetition as a function of pupil stuff
-                results.(sprintf('repetition_%s_bin%d', flds{f}, b))(icnt)      = rep(b);
-                results.(sprintf('stimrepetition_%s_bin%d', flds{f}, b))(icnt)      = stimrep(b);
-
-                % criterionshift
-                results.(sprintf('criterionshift_%s_bin%d', flds{f}, b))(icnt)  = cs(b);
+                % ========================================== %
+                % correlate across five bins
+                % ========================================== %
                 
-                % next trial dprime and criterion
-                results.(sprintf('nextdprime_%s_bin%d', flds{f}, b))(icnt)      = nextd(b);
-                results.(sprintf('nextabscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(nextc(b));
-
+                binIdx      = discretize(useFld, [-inf quantile(useFld, nbins-1) inf]);
+                try % will put NaNs if not enough trials
+                    a           = splitapply(@nanmean, data.correct, binIdx);
+                    [~, r]      = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
+                    rep         = splitapply(@nanmean, data.repeat, binIdx);
+                    stimrep     = splitapply(@nanmean, data.stimrepeat, binIdx);
+                    cs          = splitapply(@criterionshift, data.response, data.nextstim, data.nextresp, binIdx);
+                    [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
+                    
+                    % see corrFunc defined below
+                    results.([flds{f} '_dprime_corr'])(icnt)            = corrFunc(d);
+                    results.([flds{f} '_criterion_corr'])(icnt)         = corrFunc(c);
+                    results.([flds{f} '_abscriterion_corr'])(icnt)      = corrFunc(abs(c));
+                    results.([flds{f} '_accuracy_corr'])(icnt)          = corrFunc(a);
+                    results.([flds{f} '_repetition_corr'])(icnt)        = corrFunc(rep);
+                    results.([flds{f} '_stimrepetition_corr'])(icnt)    = corrFunc(stimrep);
+                    results.([flds{f} '_repetitioncrit_corr'])(icnt)    = corrFunc(-r);
+                    results.([flds{f} '_criterionshift_corr'])(icnt)    = corrFunc(cs);
+                    results.([flds{f} '_nextdprime_corr'])(icnt)        = corrFunc(nextd);
+                    results.([flds{f} '_nextabscriterion_corr'])(icnt)  = corrFunc(abs(nextc));
+                end
+                
+                % ========================================== %
+                % divide into 3 bins for viz
+                % ========================================== %
+                
+                binIdx = discretize(useFld, [-inf quantile(useFld, 2) inf]);
+                
+                [d, c] = splitapply(@dprime, data.stimulus, data.response, binIdx);
+                a      = splitapply(@nanmean, data.correct, binIdx);
+                [~, r] = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
+                rep    = splitapply(@nanmean, data.repeat, binIdx);
+                cs     = splitapply(@criterionshift, data.response, data.nextstim, data.nextresp, binIdx);
+                [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
+                
+                for b = 1:length(d),
+                    
+                    results.(sprintf('dprime_%s_bin%d', flds{f}, b))(icnt)      = d(b);
+                    results.(sprintf('criterion_%s_bin%d', flds{f}, b))(icnt)   = c(b);
+                    results.(sprintf('abscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(c(b));
+                    results.(sprintf('accuracy_%s_bin%d', flds{f}, b))(icnt)    = a(b);
+                    
+                    % repetition criterion as a function of pupil stuff
+                    results.(sprintf('repetitioncrit_%s_bin%d', flds{f}, b))(icnt)  = -r(b);
+                    
+                    % repetition as a function of pupil stuff
+                    results.(sprintf('repetition_%s_bin%d', flds{f}, b))(icnt)      = rep(b);
+                    results.(sprintf('stimrepetition_%s_bin%d', flds{f}, b))(icnt)      = stimrep(b);
+                    
+                    % criterionshift
+                    results.(sprintf('criterionshift_%s_bin%d', flds{f}, b))(icnt)  = cs(b);
+                    
+                    % next trial dprime and criterion
+                    results.(sprintf('nextdprime_%s_bin%d', flds{f}, b))(icnt)      = nextd(b);
+                    results.(sprintf('nextabscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(nextc(b));
+                    
+                end
             end
         end
     end
