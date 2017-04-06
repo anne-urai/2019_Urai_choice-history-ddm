@@ -51,8 +51,14 @@ d               = opts.dataset
 trace_id        = opts.trace_id
 runMe           = opts.run
 
+# to avoid errors when plotting on cartesius
+# http://stackoverflow.com/questions/4706451/how-to-save-a-figure-remotely-with-pylab/4706614#4706614
+import matplotlib
+matplotlib.use('Agg') # to still plot even when no display is defined
+import matplotlib.pyplot as plt
+
 # ============================================ #
-# define the function that will do the work
+# define the function that will do the workq
 # ============================================ #
 
 def make_model(mypath, model_name, trace_id):
