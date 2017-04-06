@@ -1,4 +1,4 @@
-function HDDM_readIntoMatlab(ds, ts, ms)
+function b2_HDDM_readIntoMatlab(ds, ts, ms)
 
 if ~exist('ds', 'var'), ds = 2:-1:1; end
 if ~exist('ts', 'var'), ts = 2;   end
