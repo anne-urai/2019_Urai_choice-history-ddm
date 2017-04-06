@@ -1,7 +1,7 @@
 function HDDM_readIntoMatlab(ds, ts, ms)
 
 if ~exist('ds', 'var'), ds = 2:-1:1; end
-if ~exist('ts', 'var'), ts = 1:2;   end
+if ~exist('ts', 'var'), ts = 2;   end
 if ~exist('ms', 'var'), ms = 1:9; end
 
 addpath(genpath('~/code/Tools'));
@@ -17,15 +17,16 @@ end
 
 for d = ds,
     usepath = sprintf('~/Data/%s/HDDM', datasets{d});
-    mdls = {'stimcoding', 'stimcoding_prevresp_dc', 'stimcoding_prevresp_z', 'stimcoding_prevresp_dc_z', ...
-        'regress_dc', 'regress_dc_prevresp', 'regress_dc_prevresp_prevpupil_prevrt', ...
-        'regress_z_prevresp', 'regress_z_prevresp_prevpupil_prevrt'};
+    mdls = {'stimcoding_prevresp_dc', 'stimcoding_prevresp_z', 'stimcoding_prevresp_dc_z', ...
+      'regress_dc_prevresp', 'regress_dc_prevresp_prevpupil_prevrt', ...
+        'regress_z_prevresp', 'regress_z_prevresp_prevpupil_prevrt', ...
+        'regress_dc_z_prevresp', 'regress_dc_z_prevresp_prevpupil_prevrt',};
     traces = {'group', 'all'};
 
     for m = ms,
         for t = ts,
 
-            chains = 0:59;
+            chains = 0:29;
             clear dat; clear alldat clear dic;
 
             % ============================================ %
@@ -49,10 +50,11 @@ for d = ds,
             % ============================================ %
 
             for c = 1:length(chains),
+              fprintf('%s/%s/%s_traces-md%d.csv \n', ...
+                  usepath, mdls{m}, traces{t}, chains(c));
+
                 if exist(sprintf('%s/%s/%s_traces-md%d.csv', ...
                         usepath, mdls{m}, traces{t}, chains(c)), 'file'),
-                    fprintf('%s/%s/%s_traces-md%d.csv \n', ...
-                        usepath, mdls{m}, traces{t}, chains(c));
                     dat{c} = readtable(sprintf('%s/%s/%s_traces-md%d.csv', ...
                         usepath, mdls{m}, traces{t}, chains(c)));
                 end
@@ -110,13 +112,11 @@ for d = ds,
             % WRITE TO TABLE
             % ============================================ %
 
-            if t == 1,
-                tic;
-                writetable(alldat, sprintf('%s/summary/%s_%s_traces_concat.csv', ...
-                    usepath, mdls{m}, traces{t}));
-                toc;
-                fprintf('%s/%s/%s_traces_concat.csv \n',  usepath, mdls{m}, traces{t});
-            end
+            tic;
+            writetable(alldat, sprintf('%s/summary/%s_%s_traces_concat.csv', ...
+                usepath, mdls{m}, traces{t}));
+            toc;
+            fprintf('%s/%s/%s_traces_concat.csv \n',  usepath, mdls{m}, traces{t});
 
             % ============================================ %
             % EXTRACT POINT ESTIMATES AND QUARTILES
@@ -163,14 +163,8 @@ for d = ds,
             end
 
             tic;
-            switch t
-                case 1
-                    savefast(sprintf('%s/summary/%s_%s.mat', ...
-                        usepath, mdls{m}, traces{t}), 'group', 'dic');
-                case 2
-                    savefast(sprintf('%s/summary/%s_%s.mat', ...
-                        usepath, mdls{m}, traces{t}), 'group', 'individuals', 'dic');
-            end
+            savefast(sprintf('%s/summary/%s_%s.mat', ...
+                usepath, mdls{m}, traces{t}), 'group', 'individuals', 'dic');
             toc;
 
         end % mdls
