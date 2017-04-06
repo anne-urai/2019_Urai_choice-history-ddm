@@ -42,15 +42,14 @@ dlmwrite('allblocks', alldat, 'delimiter', ' ');
 % parameter file for HDDM
 % ============================================ #
 
-nrDatasets = 2; % RT-RDK and MEG-PL
-nrModels   = 9; % the nr of the models
+datasets   = 2:3; % RT-RDK and MEG-PL
+models     = [2 7 8]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
   for c = 0:nrTraces-1,
-    for a = 0:nrDatasets-1,
-
-  for b = 0:nrModels-1,
+    for a = datasets,
+      for b = models,
       alldat = [alldat; a b c];
     end
   end

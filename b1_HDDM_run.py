@@ -353,7 +353,7 @@ models = {0: 'stimcoding_prevresp_dc',
     7: 'regress_dc_z_prevresp',
     8: 'regress_dc_z_prevresp_prevpupil_prevrt'}
 
-datasets = {0: 'RT_RDK', 1: 'MEG-PL'}
+datasets = {0: 'RT_RDK', 1: 'MEG-PL', 2: 'MEG-PL-S1', 3: 'MEG-PL-S2'}
 
 # recode
 if isinstance(d, int):

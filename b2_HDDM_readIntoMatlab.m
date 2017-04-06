@@ -23,6 +23,13 @@ for d = ds,
         'regress_dc_z_prevresp', 'regress_dc_z_prevresp_prevpupil_prevrt',};
     traces = {'group', 'all'};
 
+    switch datasets{d}
+        case 'RT_RDK',
+            subjects = [3:15 17:25];
+        case 'MEG-PL',
+            subjects = 2:65;
+    end
+
     for m = ms,
         for t = ts,
 
@@ -50,15 +57,20 @@ for d = ds,
             % ============================================ %
 
             for c = 1:length(chains),
-              fprintf('%s/%s/%s_traces-md%d.csv \n', ...
-                  usepath, mdls{m}, traces{t}, chains(c));
-
                 if exist(sprintf('%s/%s/%s_traces-md%d.csv', ...
                         usepath, mdls{m}, traces{t}, chains(c)), 'file'),
+                    fprintf('%s/%s/%s_traces-md%d.csv \n', ...
+                        usepath, mdls{m}, traces{t}, chains(c));
                     dat{c} = readtable(sprintf('%s/%s/%s_traces-md%d.csv', ...
                         usepath, mdls{m}, traces{t}, chains(c)));
                 end
             end
+
+            % skip if these models are not done at all
+            if ~exist('dat', 'var'),
+              continue;
+            end
+
             alldat = cat(1, dat{:});
 
             % ============================================ %
@@ -138,13 +150,6 @@ for d = ds,
                 sjnodes = find(~cellfun(@isempty, strfind(vars, 'subj')) & ...
                     ~cellfun(@isempty, strfind(vars, [params{p} '_'])));
 
-                switch datasets{d}
-                    case 'RT_RDK',
-                        subjects = [3:15 17:25];
-                    case 'MEG-PL',
-                        subjects = 0:60;
-                end
-
                 % preallocate subject-specific datapoints
                 individuals.([params{p} '_mean']) = nan(fliplr(size(subjects)));
 
@@ -169,13 +174,14 @@ for d = ds,
 
         end % mdls
     end % traces
-    
+
     % ============================================ %
     % ONE LARGE TABLE FOR THIS DATASET
     % ============================================ %
-    
+
     results = array2table(subjects', 'variablenames', {'subjnr'});
     for m = 1:length(mdls),
+      try
         load(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'));
         flds = fieldnames(individuals);
         for p = 1:length(flds),
@@ -184,9 +190,10 @@ for d = ds,
                 results.(varname) = individuals.(flds{p});
             end
         end
+      end
     end
-    
+
     writetable(results, sprintf('%s/summary/individualresults.csv', usepath));
-    
+
 end % datasets
 end

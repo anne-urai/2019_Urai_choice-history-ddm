@@ -31,7 +31,7 @@ for ((i=1; i<=ncores; i++)) ; do
     i=${a[2]}
 
     # first, run the model
- 	  eval "python /home/aeurai/code/RT_RDK/HDDM_run.py -d $d -v $v -i $i"
+ 	  eval "python /home/aeurai/code/RT_RDK/b1_HDDM_run.py -d $d -v $v -i $i"
 
     stopos remove -p pool
 stopos status -p pool
