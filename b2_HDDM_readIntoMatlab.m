@@ -169,5 +169,24 @@ for d = ds,
 
         end % mdls
     end % traces
+    
+    % ============================================ %
+    % ONE LARGE TABLE FOR THIS DATASET
+    % ============================================ %
+    
+    results = array2table(subjects', 'variablenames', {'subjnr'});
+    for m = 1:length(mdls),
+        load(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'));
+        flds = fieldnames(individuals);
+        for p = 1:length(flds),
+            if ~isempty(strfind(flds{p}, 'mean')),
+                varname = [flds{p}(1:end-5) '__' mdls{m}];
+                results.(varname) = individuals.(flds{p});
+            end
+        end
+    end
+    
+    writetable(results, sprintf('%s/summary/individualresults.csv', usepath));
+    
 end % datasets
 end

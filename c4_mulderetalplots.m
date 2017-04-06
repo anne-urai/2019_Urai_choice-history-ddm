@@ -20,12 +20,13 @@ set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ..
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
 for d = 1:length(datasets),
-    results = readtable(sprintf('~/Data/%s/HDDM/summary/allresults.csv', datasets{d}));
+    
+    results = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
     
     % quick plot of mulder et al.
     cnt = 1; figure;
     sessions = [unique(results.session)'];
-    sessions(sessions == 0) = [];
+    sessions(sessions == 0) = []; % dont use the stuff computed over all sessions
     
     for s = sessions,
         
