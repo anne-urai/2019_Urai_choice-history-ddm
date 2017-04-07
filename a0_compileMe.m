@@ -42,7 +42,7 @@ dlmwrite('allblocks', alldat, 'delimiter', ' ');
 % parameter file for HDDM
 % ============================================ #
 
-datasets   = 2:3; % RT-RDK and MEG-PL
+datasets   = 4:6; % RT-RDK and MEG-PL
 models     = [2 7 8]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
