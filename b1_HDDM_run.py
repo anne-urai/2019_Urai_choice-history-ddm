@@ -107,6 +107,12 @@ def make_model(mypath, model_name, trace_id):
             include=('sv'), group_only_nodes=['sv'],
             depends_on={'v':['session'], 'z':['prevresp'], 'dc':['prevresp']})
 
+    elif model_name == 'stimcoding_prevresp_dc_z_sessions':
+        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+            drift_criterion=True, bias=True, p_outlier=0.05,
+            include=('sv'), group_only_nodes=['sv'],
+            depends_on={'v':['session'], 'z':['prevresp', 'session'], 'dc':['prevresp', 'session'], 'a':['session']})
+
     elif model_name == 'regress_dc':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
 
@@ -351,10 +357,11 @@ models = {0: 'stimcoding_prevresp_dc',
     5: 'regress_z_prevresp',
     6: 'regress_z_prevresp_prevpupil_prevrt',
     7: 'regress_dc_z_prevresp',
-    8: 'regress_dc_z_prevresp_prevpupil_prevrt'}
+    8: 'regress_dc_z_prevresp_prevpupil_prevrt',
+    9: 'stimcoding_prevresp_dc_z_sessions'}
 
 datasets = {0: 'RT_RDK', 1: 'MEG-PL', 2: 'MEG-PL-S1', 3: 'MEG-PL-S2',
-    4: 'Anke-neutral', 5: 'Anke-repetitive', 6:'Anke-alternating'}
+    4: 'Anke-neutral', 5: 'Anke-repetitive', 6:'Anke-alternating', 7: 'MEG-alldata'}
 
 # recode
 if isinstance(d, int):
