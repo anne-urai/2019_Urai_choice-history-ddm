@@ -1,6 +1,6 @@
 function b2_HDDM_readIntoMatlab(ds, ts, ms)
 
-if ~exist('ds', 'var'), ds = 2:-1:1; end
+if ~exist('ds', 'var'), ds =  3:7; end
 if ~exist('ts', 'var'), ts = 2;   end
 if ~exist('ms', 'var'), ms = 1:9; end
 
@@ -12,7 +12,8 @@ switch usr
     case 'anne' % local
         datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL'};
     case 'aeurai' % lisa/cartesius
-        datasets = {'RT_RDK', 'MEG-PL'};
+        datasets = {'RT_RDK', 'MEG-PL', 'MEG-PL-S1', 'MEG-PL-S2', ...
+          'Anke-alternating', 'Anke-neutral', 'Anke-repetitive'};
 end
 
 for d = ds,
@@ -23,11 +24,17 @@ for d = ds,
         'regress_dc_z_prevresp', 'regress_dc_z_prevresp_prevpupil_prevrt',};
     traces = {'group', 'all'};
 
+    if ~exist(sprintf('%s/summary', usepath), 'dir'),
+      cd(usepath); mkdir('summary');
+    end
+
     switch datasets{d}
         case 'RT_RDK',
             subjects = [3:15 17:25];
-        case 'MEG-PL',
+        case {'MEG-PL', 'MEG-PL-S1', 'MEG-PL-S2'}
             subjects = 2:65;
+        case {'Anke-repetitive', 'Anke-neutral', 'Anke-alternating'}
+            subjects = [1:7 9 11:16 18:21 23 24 26 27];
     end
 
     for m = ms,
@@ -180,7 +187,7 @@ for d = ds,
     % ============================================ %
 
     results = array2table(subjects', 'variablenames', {'subjnr'});
-    for m = 1:length(mdls),
+    for m = 3,
       try
         load(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'));
         flds = fieldnames(individuals);
