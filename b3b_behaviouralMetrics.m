@@ -1,4 +1,4 @@
-function results = b4_behaviouralMetrics(alldata)
+function results = b3b_behaviouralMetrics(alldata)
 % error vs correct, dprime vs criterion, serial choice bias
 % as a function of pupil and RT
 warning off;
@@ -16,13 +16,12 @@ varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'abscriterio
 
 nrSess          = length(unique(alldata.session)) + 1;
 results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, length(varnames)), 'variablenames', varnames);
-results.drug    =  repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
+results.drug    = repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
 
 % measures that are modulated by previous trial RT or pupil
 metrics = {'dprime', 'criterion', 'abscriterion', 'accuracy', 'repetition', ...
     'stimrepetition', 'repetitioncrit', 'criterionshift', 'handshift', ...
     'nextdprime', 'nextabscriterion'};
-
 modulation = false;
 
 if modulation,
@@ -45,17 +44,27 @@ end
 
 % get all data
 subjects      = unique(alldata.subj_idx)';
-alldata.pupil = alldata.decision_pupil;
-
-% normalise previous RT per block
-blockchange = find(diff(alldata.block) > 0);
-blocknrs = zeros(height(alldata), 1);
-for b = 1:length(blockchange)-1,
-    blocknrs(blockchange(b)+1:blockchange(b+1)) = blocknrs(blockchange(b))+1;
+if modulation,
+    alldata.pupil = alldata.decision_pupil;
 end
-blocknrs(blockchange(end)+1:end) = blocknrs(blockchange(end))+1;
-for b = unique(blocknrs)',
-    alldata.prevrt(blocknrs == b) = nanzscore(log(alldata.prevrt(blocknrs == b)));
+
+if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'prevrt'))),
+    % normalise previous RT per block
+    blockchange = find(diff(alldata.block) > 0);
+    blocknrs = zeros(height(alldata), 1);
+    for b = 1:length(blockchange)-1,
+        blocknrs(blockchange(b)+1:blockchange(b+1)) = blocknrs(blockchange(b))+1;
+    end
+    blocknrs(blockchange(end)+1:end) = blocknrs(blockchange(end))+1;
+    for b = unique(blocknrs)',
+        alldata.prevrt(blocknrs == b) = nanzscore(log(alldata.prevrt(blocknrs == b)));
+    end
+end
+
+
+% recode correct
+if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'correct')))
+    alldata.correct = (alldata.stimulus == alldata.response);
 end
 
 % only MEG-PL data has starthand
@@ -68,15 +77,20 @@ end
 % for criterion shift
 alldata.nextstim = circshift(alldata.stimulus, -1);
 alldata.nextresp = circshift(alldata.response, -1);
-alldata.nextstim((diff(alldata.trial) ~= 1)) = NaN;
-alldata.nextresp((diff(alldata.trial) ~= 1)) = NaN;
+try
+    alldata.nextstim((diff(alldata.trial) ~= 1)) = NaN;
+    alldata.nextresp((diff(alldata.trial) ~= 1)) = NaN;
+end
 
 % for mulder et al. analysis
 alldata.prevstim = circshift(alldata.stimulus, 1);
 alldata.prevresp = circshift(alldata.response, 1);
-wrongtrls        = find([NaN; diff(alldata.trial)] ~= 1);
-alldata.prevstim(wrongtrls) = NaN;
-alldata.prevresp(wrongtrls) = NaN;
+
+try
+    wrongtrls        = find([NaN; diff(alldata.trial)] ~= 1);
+    alldata.prevstim(wrongtrls) = NaN;
+    alldata.prevresp(wrongtrls) = NaN;
+end
 
 % ========================================== %
 % READY, SET, GO
@@ -120,9 +134,11 @@ for sj = subjects,
         data.repeat = [~(abs(diff(data.response)) > 0); NaN];
         data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
         
-        % skip trials at boundaries
-        data.repeat((diff(data.trial) ~= 1)) = NaN;
-        data.stimrepeat((diff(data.trial) ~= 1)) = NaN;
+        try
+            % skip trials at boundaries
+            data.repeat((diff(data.trial) ~= 1)) = NaN;
+            data.stimrepeat((diff(data.trial) ~= 1)) = NaN;
+        end
         
         results.repetition(icnt)        = nanmean(data.repeat);
         results.stimrepetition(icnt)    = nanmean(data.stimrepeat);
@@ -136,13 +152,15 @@ for sj = subjects,
         if s == 0,
             thispersonsbias = results.repetition(icnt) - results.stimrepetition(icnt);
         end
-           
+        
         % does the random hand they press cause a bias?
         results.handshift(icnt)         = criterionshift(data.startHand, data.stimulus, data.response);
         
-        % pupilstuff
-        results.pupil_error(icnt)       = nanmean(data.pupil(data.correct == 0));
-        results.pupil_correct(icnt)     = nanmean(data.pupil(data.correct == 1));
+        try
+            % pupilstuff
+            results.pupil_error(icnt)       = nanmean(data.pupil(data.correct == 0));
+            results.pupil_correct(icnt)     = nanmean(data.pupil(data.correct == 1));
+        end
         
         results.rt_error(icnt)          = nanmedian(data.rt(data.correct == 0));
         results.rt_correct(icnt)        = nanmedian(data.rt(data.correct == 1));
@@ -157,12 +175,16 @@ for sj = subjects,
             % only previous trials that are correct
             validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
             invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
-            neutraltrls   = ones(height(data), 1); % only previous correct trls
+            %neutraltrls   = ones(height(data), 1); % only previous correct trls
         elseif thispersonsbias > 0, % repeaters
             % only previous trials that are correct
             validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
             invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
-            neutraltrls   = ones(height(data), 1); % only previous correct trls
+            %neutraltrls   = ones(height(data), 1); % only previous correct trls
+        else
+            validtrls       = ones(height(data), 1);
+            invalidtrls     = ones(height(data), 1);
+            %neutraltrls    = ones(height(data), 1)
         end
         
         % data.rt = nanzscore(log(data.rt));
@@ -174,7 +196,7 @@ for sj = subjects,
             data.prevrt < median(data.prevrt(validtrls & data.correct == 1))));
         results.rt_valid_slow_correct(icnt)    = nanmedian(data.rt(validtrls & data.correct == 1 & ...
             data.prevrt > median(data.prevrt(validtrls & data.correct == 1))));
-
+        
         results.rt_invalid_fast_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
             data.prevrt < median(data.prevrt(invalidtrls & data.correct == 0))));
         results.rt_invalid_slow_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
@@ -183,7 +205,7 @@ for sj = subjects,
             data.prevrt < median(data.prevrt(validtrls & data.correct == 0))));
         results.rt_valid_slow_error(icnt)    = nanmedian(data.rt(validtrls & data.correct ==0 & ...
             data.prevrt > median(data.prevrt(validtrls & data.correct == 0))));
-
+        
         results.accuracy_invalid_fast(icnt)    = nanmean(data.correct(invalidtrls & ...
             data.prevrt < median(data.prevrt(invalidtrls))));
         results.accuracy_invalid_slow(icnt)    = nanmean(data.correct(invalidtrls & ...
