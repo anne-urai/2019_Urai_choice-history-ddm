@@ -24,7 +24,7 @@ set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ..
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 3:length(datasets),
+for d = 2; %3:length(datasets),
     
     % load data
     csvfile = dir(sprintf('~/Data/%s/*.csv', datasets{d}));
@@ -92,9 +92,9 @@ for d = 3:length(datasets),
             end
             
             % then, move the values over
-            tab.(newvar)(tab.session == s + 1) = tab.(vars{v})(tab.session == 0);
+            tab.(newvar)(tab.session == s) = tab.(vars{v})(tab.session == 0);
             % remove the old one
-            tab(:,{vars{v}}) = [];
+            % tab(:,{vars{v}}) = [];
         end
     end
     

@@ -23,7 +23,7 @@ set(groot, 'defaultaxesfontsize', 10, 'defaultaxestitlefontsizemultiplier', 1, .
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 2:length(datasets),
+for d = 1:length(datasets),
     results = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
     
     % ============================================ %
@@ -160,37 +160,41 @@ for d = 2:length(datasets),
     % use separate HDDM fits
     % ============================================ %
     
-    results2 	= readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults_separatesessions.csv', datasets{d}));
-    results2.dc_seq__stimcoding_prevresp_dc_z = results2.dc_1__stimcoding_prevresp_dc_z - results2.dc_2__stimcoding_prevresp_dc_z;
-    results2.z_seq__stimcoding_prevresp_dc_z = results2.z_2__stimcoding_prevresp_dc_z - results2.z_1__stimcoding_prevresp_dc_z;
-    
-    vars        = results2.Properties.VariableNames';
-    subjects    = unique(results2.subjnr(results2.session == 2));
-    
-    clf; cnt = 1;
-    for v = [31 35 36 39 40],
-        subplot(3,3,cnt); cnt = cnt + 1;
-        plot(results2.(vars{v})(results2.session == 1 & ismember(results2.subjnr, subjects)), ...
-            results2.(vars{v})(results2.session == 2 & ismember(results2.subjnr, subjects)), '.');
-        axis square; axisNotSoTight; box off;
-        xlabel(vars{v}(1:end-26), 'interpreter', 'none');
-        ylabel(vars{v}(1:end-26), 'interpreter', 'none');
-        [rho, pval] = corr(results2.(vars{v})(results2.session == 1 & ismember(results2.subjnr, subjects)), ...
-            results2.(vars{v})(results2.session == 2 & ismember(results2.subjnr, subjects)), 'type', 'spearman', 'rows', 'complete');
-        if pval < 0.05, lsline; end
-        title(sprintf('\\rho %.2f p %.3f', rho, pval));
+    if d == 2,
+        results2 	= readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults_separatesessions.csv', datasets{d}));
+        results2.dc_seq__stimcoding_prevresp_dc_z = results2.dc_1__stimcoding_prevresp_dc_z - results2.dc_2__stimcoding_prevresp_dc_z;
+        results2.z_seq__stimcoding_prevresp_dc_z = results2.z_2__stimcoding_prevresp_dc_z - results2.z_1__stimcoding_prevresp_dc_z;
+        
+        vars        = results2.Properties.VariableNames';
+        subjects    = unique(results2.subjnr(results2.session == 2));
+        
+        clf; cnt = 1;
+        for v = [31 35 36 39 40],
+            subplot(3,3,cnt); cnt = cnt + 1;
+            plot(results2.(vars{v})(results2.session == 1 & ismember(results2.subjnr, subjects)), ...
+                results2.(vars{v})(results2.session == 2 & ismember(results2.subjnr, subjects)), '.');
+            axis square; axisNotSoTight; box off;
+            xlabel(vars{v}(1:end-26), 'interpreter', 'none');
+            ylabel(vars{v}(1:end-26), 'interpreter', 'none');
+            [rho, pval] = corr(results2.(vars{v})(results2.session == 1 & ismember(results2.subjnr, subjects)), ...
+                results2.(vars{v})(results2.session == 2 & ismember(results2.subjnr, subjects)), 'type', 'spearman', 'rows', 'complete');
+            if pval < 0.05, lsline; end
+            title(sprintf('\\rho %.2f p %.3f', rho, pval));
+        end
+        suplabel('Session 1, MEG', 'x');
+        suplabel('Session 2, MEG', 'y');
+        
+        print(gcf, '-dpdf', sprintf('~/Data/%s/HDDM/summary/stability_HDDM.pdf', datasets{d}));
+        
     end
-    suplabel('Session 1, MEG', 'x');
-    suplabel('Session 2, MEG', 'y');
-    
-    print(gcf, '-dpdf', sprintf('~/Data/%s/HDDM/summary/stability_HDDM.pdf', datasets{d}));
     
     % ============================================ %
     % DIC VALUES
     % ============================================ %
     
     models = {'regress_dc_prevresp', 'regress_z_prevresp', 'regress_dc_z_prevresp', ...
-        'stimcoding_prevresp_dc', 'stimcoding_prevresp_z', 'stimcoding_prevresp_dc_z'};
+        'regress_dc_prevresp_prevpupil_prevrt', 'regress_z_prevresp_prevpupil_prevrt', ...
+        'regress_dc_z_prevresp_prevpupil_prevrt'};
     alldic = nan(30, length(models));
     for m = 1:length(models),
         load(sprintf('~/Data/%s/HDDM/summary/%s_all.mat', datasets{d}, models{m}));
@@ -203,19 +207,19 @@ for d = 2:length(datasets),
     box off;
     ylabel('DIC');
     set(gca, 'xticklabel', {'dc', 'z', 'both'});
-    title('Regression models');
+    title('Only previous repsonse');
     set(gca, 'YTickLabel', num2str(get(gca, 'YTick')'));
     axisNotSoTight;
-    print(gcf, '-dpdf', sprintf('~/Data/%s/HDDM/summary/DICcomparison.pdf', datasets{d}));
     
     subplot(222);
     bar(alldic(4:6), 'basevalue', nanmean(alldic(4:6)), 'facecolor', linspecer(1));
     box off;
     ylabel('DIC');
     set(gca, 'xticklabel', {'dc', 'z', 'both'});
-    title('Stimcoding');
+    title('With pupil and RT');
     set(gca, 'YTickLabel', num2str(get(gca, 'YTick')'));
     axisNotSoTight;
+    print(gcf, '-dpdf', sprintf('~/Data/%s/HDDM/summary/DICcomparison.pdf', datasets{d}));
     
     % ============================================ %
     % ADD RT AND PUPIL IN
@@ -226,22 +230,21 @@ for d = 2:length(datasets),
         = 'dc_pupil_seq_regress_joint';
     results.Properties.VariableNames{'v_prevrt_prevresp__regress_dc_prevresp_prevpupil_prevrt'} ...
         = 'dc_rt_seq_regress_joint';
-    results.Properties.VariableNames{'z_prevpupil_prevresp__regress_z_prevresp_prevpupil_prevrt'} ...
-        = 'z_pupil_seq_regress_joint';
-    results.Properties.VariableNames{'z_prevrt_prevresp__regress_dc_z_prevresp_prevpupil_prevrt'} ...
-        = 'z_rt_seq_regress_joint';
-    
     results.dc_seq_regress   = results.v_prevresp__regress_dc_prevresp_prevpupil_prevrt;
-    results.z_seq_regress    = results.z_prevresp__regress_z_prevresp_prevpupil_prevrt;
     
     close;
     corrplot(results, ...
-        {'dc_seq_regress_joint'}, ...
+        {'dc_seq_regress'}, ...
         {'dc_rt_seq_regress_joint', 'dc_pupil_seq_regress_joint'});
     
-    close;
-    corrplot(results, ...
-        {'z_seq_regress_joint'}, ...
-        {'z_rt_seq_regress_joint', 'z_pupil_seq_regress_joint'});
+    subplot(222);
+    plotBetasSwarm([results.dc_rt_seq_regress_joint results.dc_pupil_seq_regress_joint ...
+        nan(size( [results.dc_rt_seq_regress_joint results.dc_pupil_seq_regress_joint]))]);
+    set(gca, 'xtick', 1:2, 'xticklabel', {'RT x prevresp', 'Pupil x prevresp'}, 'xlim', [0.5 2.5]);
+    box off;
+    ylabel('Effect on drift criterion');
+    print(gcf, '-dpdf', sprintf('~/Data/%s/HDDM/summary/individualCorr_dc.pdf', datasets{d}));
+    
+    writetable(results, sprintf('~/Data/%s/HDDM/summary/allindividualresults_recoded.csv', datasets{d}));
     
 end
