@@ -13,87 +13,80 @@ set(groot, 'defaultaxesfontsize', 8, 'defaultaxestitlefontsizemultiplier', 1, ..
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 colormap viridis;
 
-results = readtable(sprintf('~/Data/%s/allindividualresults.csv', datasets));
-results.Properties.VariableNames{'v_prevresp__regress_dc_z_prevresp'}       = 'dc_seq_regress_joint';
-results.Properties.VariableNames{'z_prevresp__regress_dc_z_prevresp'}       = 'z_seq_regress_joint';
-results.Properties.VariableNames{'v_prevrt_prevresp__regress_dc_z_prevresp_prevpupil_prevrt'} ...
-    = 'dc_rt_seq_regress_joint';
-results.Properties.VariableNames{'z_prevrt_prevresp__regress_dc_z_prevresp_prevpupil_prevrt'} ...
-    = 'z_rt_seq_regress_joint';
+% ============================================ %
+% INDIVIDUAL POINT ESTIMATES
+% ============================================ %
+
+clear; close;
+dat = readtable('~/Data/Anke_2afc_sequential/HDDM/allindividualresults.csv');
+% graphics
+linspec = linspecer(3, 'qualitative');
+% linspec = linspec([3 2 1], :); % blue first
+subplot(331); hold on;
+tp = unique(dat.transprob);
+for t = 1:length(tp),
+    plot(dat.v_prevresp__regress_dc_z_prevresp(dat.transprob == tp(t)), ...
+        dat.v_prevpupil_prevresp__regress_dc_z_prevresp_prevpupil_prevrt(dat.transprob == tp(t)), ...
+        '.', 'color', linspec(t, :));
+end
+xlabel('Repetition (dc)'); ylabel('Pupil x repetition (dc)'); 
+axis square; axisNotSoTight; lsline;
+for t = 1:length(tp),
+    plot(dat.v_prevresp__regress_dc_z_prevresp(dat.transprob == tp(t)), ...
+        dat.v_prevpupil_prevresp__regress_dc_z_prevresp_prevpupil_prevrt(dat.transprob == tp(t)), ...
+        'o', 'markeredgecolor', 'w', 'markerfacecolor', linspec(t, :), 'markersize', 5);
+end
+
+subplot(332); hold on;
+tp = unique(dat.transprob);
+for t = 1:length(tp),
+    plot(dat.v_prevresp__regress_dc_z_prevresp(dat.transprob == tp(t)), ...
+        dat.v_prevrt_prevresp__regress_dc_z_prevresp_prevpupil_prevrt(dat.transprob == tp(t)), ...
+        '.', 'color', linspec(t, :));
+end
+xlabel('Repetition (dc)'); ylabel('RT x repetition (dc)'); 
+axis square; axisNotSoTight; lsline; 
+for t = 1:length(tp),
+    plot(dat.v_prevresp__regress_dc_z_prevresp(dat.transprob == tp(t)), ...
+        dat.v_prevrt_prevresp__regress_dc_z_prevresp_prevpupil_prevrt(dat.transprob == tp(t)), ...
+        'o', 'markeredgecolor', 'w', 'markerfacecolor', linspec(t, :), 'markersize', 5);
+end
+
+print(gcf, '-dpdf', sprintf('~/Data/%s/Figures/HDDMscatters.pdf', 'Anke_2afc_sequential/HDDM'));
+
 
 
 % recode starting point values
 z_link_func = @(x) 1 ./ (1 + exp(x));
-results.z_seq_regress_joint = ...
-    z_link_func(results.z_seq_regress_joint);
-results.z_rt_seq_regress_joint = ...
-    z_link_func(results.z_rt_seq_regress_joint);
-
-% recode drift criterion into positive = more repetition
 
 % ============================================ %
 % BETWEEN THE DIFFERENT TRANSITION PROBABILITY SESSIONS,
 % HOW DO PEOPLE BEHAVE?
 % ============================================ %
 
-transprob = [0.2 0.5 0.8];
+conditions = {'repetitive', 'neutral', 'alternating'};
+vars = {'v_prevresp', 'v_prevrt_prevresp', 'v_prevpupil_prevresp', ...
+    'z_prevresp', 'z_prevrt_prevresp', 'z_prevpupil_prevresp'};
+close;
+for v = 1:length(vars),
+    subplot(3,3,v);
+    hold on;
+    for c = 1:length(conditions),
+        dat = readtable(sprintf('~/Data/Anke_2afc_sequential/HDDM-%s/summary/regress_dc_z_prevresp_prevpupil_prevrt_all_traces_concat.csv', conditions{c}));
+        if strcmp(vars{v}(1), 'z'),
+            dat.(vars{v}) = z_link_func(dat.(vars{v}));
+        end
+        histogram(dat.(vars{v}), 'displaystyle', 'stairs', 'normalization', 'probability');
+    end
 
-clf;
-subplot(331); hold on;
-dc = [results.dc_seq_regress_joint(results.transprob == 0.2)'
-    results.dc_seq_regress_joint(results.transprob == 0.5)'
-    results.dc_seq_regress_joint(results.transprob == 0.8)']';
-tp        = repmat(transprob, size(dc, 1), 1);
-plot(transprob, dc, 'color', [0.8 0.8 0.8]);
-scatter(tp(:), dc(:), 10, tp(:));
-xlabel('Transition probability'); ylabel('Drift criterion'); axis square;
-box off; axisNotSoTight; set(gca, 'xtick', transprob);
-title('Prevresp');
-
-subplot(332); hold on;
-z = [results.z_seq_regress_joint(results.transprob == 0.2)'
-    results.z_seq_regress_joint(results.transprob == 0.5)'
-    results.z_seq_regress_joint(results.transprob == 0.8)']';
-plot(transprob, z, 'color', [0.8 0.8 0.8]);
-scatter(tp(:), z(:), 10, tp(:));
-xlabel('Transition probability'); ylabel('Starting point'); axis square;
-box off; axisNotSoTight; set(gca, 'xtick', transprob);
-title('Prevresp');
-
-subplot(333);
-scatter(results.dc_seq_regress_joint, results.z_seq_regress_joint, ...
-    10, results.transprob);
-axis square; axisNotSoTight;
-xlabel('Drift criterion'); ylabel('Starting point');
-lsline; title('Prevresp');
-title('Prevresp');
-
-% now the RT addition
-subplot(334); hold on;
-dc = [results.dc_rt_seq_regress_joint(results.transprob == 0.2)'
-    results.dc_rt_seq_regress_joint(results.transprob == 0.5)'
-    results.dc_rt_seq_regress_joint(results.transprob == 0.8)']';
-plot(transprob, dc, 'color', [0.8 0.8 0.8]);
-scatter(tp(:), dc(:), 10, tp(:));
-xlabel('Transition probability'); ylabel('Drift criterion'); axis square;
-box off; axisNotSoTight; set(gca, 'xtick', transprob);
-title('RT x prevresp');
-
-subplot(335); hold on;
-z = [results.z_rt_seq_regress_joint(results.transprob == 0.2)'
-    results.z_rt_seq_regress_joint(results.transprob == 0.5)'
-    results.z_rt_seq_regress_joint(results.transprob == 0.8)']';
-plot(transprob, z, 'color', [0.8 0.8 0.8]);
-scatter(tp(:), z(:), 10, tp(:));
-xlabel('Transition probability'); ylabel('Starting point'); axis square;
-box off; axisNotSoTight; set(gca, 'xtick', transprob);
-title('RT x prevresp');
-
-subplot(336);
-scatter(results.dc_rt_seq_regress_joint, results.z_rt_seq_regress_joint, ...
-    10, results.transprob);
-axis square; axisNotSoTight;
-xlabel('Drift criterion'); ylabel('Starting point');
-title('RT x prevresp');
+    if strcmp(vars{v}(1), 'v'),
+        vline(0, 'color', [0.5 0.5 0.5]);
+    elseif strcmp(vars{v}(1), 'z'),
+        vline(0.5, 'color', [0.5 0.5 0.5]);
+    end
+    xlabel(vars{v}, 'interpreter', 'none'); box off;
+    
+end
 
 print(gcf, '-dpdf', sprintf('~/Data/%s/Figures/HDDMoverview.pdf', datasets));
+

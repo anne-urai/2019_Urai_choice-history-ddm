@@ -23,7 +23,7 @@ set(groot, 'defaultaxesfontsize', 10, 'defaultaxestitlefontsizemultiplier', 1, .
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 1:length(datasets),
+for d = 2:length(datasets),
     results = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
     
     % ============================================ %
@@ -131,7 +131,7 @@ for d = 1:length(datasets),
     % STABILITY OF SERIAL CHOICE BIAS
     % ============================================ %
     
-    subjects    = unique(results.subjnr(results.session == 2));
+    subjects    = unique(results.subjnr(results.session == max(results.session)));
     
     results.repeat_s1 = nan(size(results.p_repeat));
     results.repeat_s1(results.session == 0 & ismember(results.subjnr, subjects)) = ...
@@ -169,7 +169,7 @@ for d = 1:length(datasets),
         subjects    = unique(results2.subjnr(results2.session == 2));
         
         clf; cnt = 1;
-        for v = [31 35 36 39 40],
+        for v = [39 40],
             subplot(3,3,cnt); cnt = cnt + 1;
             plot(results2.(vars{v})(results2.session == 1 & ismember(results2.subjnr, subjects)), ...
                 results2.(vars{v})(results2.session == 2 & ismember(results2.subjnr, subjects)), '.');
@@ -236,15 +236,45 @@ for d = 1:length(datasets),
     corrplot(results, ...
         {'dc_seq_regress'}, ...
         {'dc_rt_seq_regress_joint', 'dc_pupil_seq_regress_joint'});
-    
-    subplot(222);
-    plotBetasSwarm([results.dc_rt_seq_regress_joint results.dc_pupil_seq_regress_joint ...
-        nan(size( [results.dc_rt_seq_regress_joint results.dc_pupil_seq_regress_joint]))]);
-    set(gca, 'xtick', 1:2, 'xticklabel', {'RT x prevresp', 'Pupil x prevresp'}, 'xlim', [0.5 2.5]);
-    box off;
-    ylabel('Effect on drift criterion');
     print(gcf, '-dpdf', sprintf('~/Data/%s/HDDM/summary/individualCorr_dc.pdf', datasets{d}));
+
+    % USE TRACES FOR STATISTICS
+    dat = readtable(sprintf('~/Data/%s/HDDM/summary/regress_dc_prevresp_prevpupil_prevrt_all_traces_concat.csv', datasets{d}));
+    
+    close;
+    subplot(331);
+    histogram(dat.v_prevpupil_prevresp, 'displaystyle', 'stairs');
+    xlabel('Effect of pupil on repetition');
+    box off;
+    pval = mean(dat.v_prevpupil_prevresp > 0);
+    title(sprintf('p = %.3f', pval));
+    subplot(332);
+    histogram(dat.v_prevrt_prevresp, 'displaystyle', 'stairs');
+    xlabel('Effect of RT on repetition');
+    box off;
+    pval = mean(dat.v_prevrt_prevresp > 0);
+    title(sprintf('p = %.3f', pval));
+    print(gcf, '-dpdf', sprintf('~/Data/%s/HDDM/summary/pupilRT.pdf', datasets{d}));
     
     writetable(results, sprintf('~/Data/%s/HDDM/summary/allindividualresults_recoded.csv', datasets{d}));
+   
+    % ============================================ %
+    % ANY DIFFERENCE BETWEEN PHARMA GROUPS? 
+    % ============================================ %
     
+    close;
+    at = strcmp(results.drug, 'atomoxetine');
+    pl = strcmp(results.drug, 'placebo');
+    dp = strcmp(results.drug, 'donepezil');
+    
+    [~, pval] = ttest2(results.dc_seq_regress(at), results.dc_seq_regress(pl))
+    [~, pval] = ttest2(results.dc_seq_regress(dp), results.dc_seq_regress(pl))
+    
+    [~, pval] = ttest2(results.dc_rt_seq_regress_joint(at), results.dc_rt_seq_regress_joint(pl))
+    [~, pval] = ttest2(results.dc_rt_seq_regress_joint(dp), results.dc_rt_seq_regress_joint(pl))
+    
+    [~, pval] = ttest2(results.dc_pupil_seq_regress_joint(at), results.dc_pupil_seq_regress_joint(pl))
+    [~, pval] = ttest2(results.dc_pupil_seq_regress_joint(dp), results.dc_pupil_seq_regress_joint(pl))
+
+
 end

@@ -29,6 +29,7 @@ for d = 2; %3:length(datasets),
     % load data
     csvfile = dir(sprintf('~/Data/%s/*.csv', datasets{d}));
     alldata = readtable(sprintf('~/Data/%s/%s', datasets{d}, csvfile.name));
+    alldata.session = alldata.session + 1; % recode into 1 and 2
     
     % rename some things
     try
@@ -48,6 +49,15 @@ for d = 2; %3:length(datasets),
     
     % compute a bunch of basic things from Matlab
     results     = b3b_behaviouralMetrics(alldata);
+    
+    % get pharma groups
+    if d == 2,
+        cd /Users/anne/Dropbox/code/MEG
+        for sj = unique(results.subjnr)',
+            subjectdata = subjectspecifics(sj);
+            results.drug(results.subjnr == sj) = {subjectdata.drug};
+        end
+    end
     
     % get the summary results from HDDM
     hddmresults = readtable(sprintf('~/Data/%s/summary/individualresults.csv', datasets{d}));
@@ -92,7 +102,7 @@ for d = 2; %3:length(datasets),
             end
             
             % then, move the values over
-            tab.(newvar)(tab.session == s) = tab.(vars{v})(tab.session == 0);
+            tab.(newvar)(tab.session == s + 1) = tab.(vars{v})(tab.session == 0);
             % remove the old one
             % tab(:,{vars{v}}) = [];
         end
