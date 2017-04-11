@@ -187,9 +187,11 @@ for d = ds,
     % ============================================ %
 
     results = array2table(subjects', 'variablenames', {'subjnr'});
-    for m = 3,
+    for m = 1:length(mdls),
       try
+        disp(mdls{m});
         load(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'));
+        disp(mdls{m});
         flds = fieldnames(individuals);
         for p = 1:length(flds),
             if ~isempty(strfind(flds{p}, 'mean')),

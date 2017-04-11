@@ -2,7 +2,7 @@
 
 #PBS -o /home/aeurai/jobs
 #PBS -e /home/aeurai/jobs
-#PBS -lnodes=1 -lwalltime=80:00:00
+#PBS -lnodes=1 -lwalltime=120:00:00
 
 # load necessary modules
 module load stopos
@@ -19,7 +19,7 @@ for ((i=1; i<=ncores; i++)) ; do
 (
 
   for ((j=1; j<=1; j++)) ; do
-     stopos next -p pool
+     stopos next -p pool2
        if [ "$STOPOS_RC" != "OK" ]; then
         break
      fi
@@ -32,10 +32,10 @@ for ((i=1; i<=ncores; i++)) ; do
     i=${a[2]}
 
     # first, run the model
- 	  eval "python /home/aeurai/code/RT_RDK/b1_HDDM_run.py -d $d -v $v -i $i"
+ 	  eval "python /home/aeurai/code/RT_RDK/b1_HDDM_run.py -r 1 -d $d -v $v -i $i"
 
-    stopos remove -p pool
-stopos status -p pool
+    stopos remove -p pool2
+stopos status -p pool2
    done
  ) &
 done

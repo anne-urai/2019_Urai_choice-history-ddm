@@ -58,7 +58,7 @@ matplotlib.use('Agg') # to still plot even when no display is defined
 import matplotlib.pyplot as plt
 
 # ============================================ #
-# define the function that will do the workq
+# define the function that will do the work
 # ============================================ #
 
 def make_model(mypath, model_name, trace_id):
@@ -73,14 +73,13 @@ def make_model(mypath, model_name, trace_id):
     # get the csv file for this dataset
     filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-    # print mydata.head(n=5) # show the data
 
     # prepare link functions for the regression models
     def z_link_func(x, data=mydata):
         return 1 / (1 + np.exp(-(x.values.ravel())))
 
     # ============================================ #
-    # specify the model
+    # STIMCODING
     # ============================================ #
 
     if model_name == 'stimcoding':
@@ -113,6 +112,10 @@ def make_model(mypath, model_name, trace_id):
             include=('sv'), group_only_nodes=['sv'],
             depends_on={'v':['session'], 'z':['prevresp', 'session'], 'dc':['prevresp', 'session'], 'a':['session']})
 
+    # ============================================ #
+    # REGRESSION - DRIFT CRITERION
+    # ============================================ #
+
     elif model_name == 'regress_dc':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
 
@@ -144,6 +147,45 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
+    elif model_name == 'regress_dc_prevresp_prevpupil_prevrt_sessions':
+        # estimate a different drift rate, as well as serial choice bias and its modulation by pupil/RT for each session
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+
+        if 'prevpupil' in mydata.columns:
+            mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
+
+            # remove subjects who did not do all conditions
+            for i, sj in enumerate(mydata.subj_idx.unique()):
+                sessions = mydata[mydata.subj_idx == sj].session.unique()
+                if len(sessions) < len(mydata.session.unique()):
+                    mydata = mydata[mydata.subj_idx != sj] # drop this subject
+
+            # now specify the regression model with dummy-coded sessions
+            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp:C(session) +' \
+                'prevpupil:prevresp:C(session) + prevrt:prevresp:C(session)', 'link_func': lambda x:x}
+
+        else: # when using data without pupil responses
+            mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
+            # remove subjects who did not do all conditions
+            for i, sj in enumerate(mydata.subj_idx.unique()):
+                sessions = mydata[mydata.subj_idx == sj].session.unique()
+                if len(sessions) < len(mydata.session.unique()):
+                    mydata = mydata[mydata.subj_idx != sj] # drop this subject
+
+            # now specify the regression model with dummy-coded sessions
+            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp:C(session) +' \
+                'prevrt:prevresp:C(session)', 'link_func': lambda x:x}
+
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, v_reg,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    # ============================================ #
+    # REGRESSION - STARTING POINT
+    # ============================================ #
+
     elif model_name == 'regress_z_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
@@ -169,6 +211,10 @@ def make_model(mypath, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
+
+    # ============================================ #
+    # REGRESSION - BOTH
+    # ============================================ #
 
     elif model_name == 'regress_dc_z_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
@@ -198,19 +244,17 @@ def make_model(mypath, model_name, trace_id):
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=20000):
 
     # ============================================ #
     # do the actual sampling
     # ============================================ #
 
-    m.sample(nr_samples, burn=nr_samples/3, thin=2)
-
-    #, db='pickle',
-    #    dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
-    # m.print_stats() # just for display in command window
+    m.find_starting_values() # this should help the sampling
+    m.sample(nr_samples, burn=nr_samples/3, thin=2, db='pickle',
+        dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # specify a certain backend? pickle?
-    # m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
+    m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
 
     # ============================================ #
     # save the output values
@@ -245,56 +289,19 @@ def concat_models(mypath, model_name):
     from IPython import embed as shell
 
     # ============================================ #
-    # MANUALLY APPEND MODELS
-    # ============================================ #
-
-    # shell()
-
-    # if this was a regression model with a custom link function for z
-    if model_name.find('regress_z') > -1:
-
-        # # push z through the reverse logistic function to make sense
-        # def z_reverse_link_func(x):
-        #     import numpy as np
-        #     return 1 / (1 + np.exp(-(x)))
-        #     # return np.exp(x) / (1 + np.exp((x)))
-
-        allmodels = []
-        for trace_id in range(60): # 15 models were run
-
-            # manually this specific database (which has been pickled)
-            db_filename = os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id)
-            thism       = make_model(mypath, model_name, trace_id) # first, get the stuff we want
-            thism.load_db(db_filename, db='pickle')
-
-            # a = thism.get_stochastics() # pandas dataframe
-            # rownames = list(a.index)
-            # for idx, znode in enumerate(thism.get_stochastics().node):
-            #     # determine whether this node has z
-            #     if 'z' in rownames[idx]:
-            #         print(znode)
-            #         # print(rownames[idx])
-            #         znode.trace._trace[0] = z_reverse_link_func(znode.trace._trace[0])
-            #         thism.get_stochastics().node[idx] = znode
-
-            # then append as usual
-            allmodels.append(thism)
-
-    # ============================================ #
     # APPEND MODELS
     # ============================================ #
 
-    else:
-        allmodels = []
-        print "appending models"
-        for trace_id in range(60): # 15 models were run
-            model_filename              = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
-            modelExists                 = os.path.isfile(model_filename)
-            print model_filename
-            assert modelExists == True # if not, this model has to be rerun
-            thism                       = hddm.load(model_filename)
-            # now append
-            allmodels.append(thism)
+    allmodels = []
+    print "appending models"
+    for trace_id in range(30): # 15 models were run
+        model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
+        modelExists           = os.path.isfile(model_filename)
+        print model_filename
+        assert modelExists == True # if not, this model has to be rerun
+        thism                 = hddm.load(model_filename)
+        # now append
+        allmodels.append(thism)
 
     # ============================================ #
     # CHECK CONVERGENCE
@@ -318,31 +325,33 @@ def concat_models(mypath, model_name):
     # SAVE POINT ESTIMATES
     # ============================================ #
 
-    if model_name.find('regress_z') < 0:
+    # now actually concatenate them, see email Gilles
+    # THIS ONLY WORKS IF Z HAS BEEN TRANSFORMED!
+    m = kabuki.utils.concat_models(allmodels)
+    # m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
 
-        # now actually concatenate them, see email Gilles
-        # THIS ONLY WORKS IF Z HAS BEEN TRANSFORMED!
-        m = kabuki.utils.concat_models(allmodels)
-        # m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
+    results = m.gen_stats() # point estimate for each parameter and subject
+    results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
 
-        results = m.gen_stats() # point estimate for each parameter and subject
-        results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
+    # save the DIC for this model
+    text_file = open(os.path.join(mypath, model_name, 'DIC-combined.txt'), 'w')
+    text_file.write("Model {}: {}\n".format(trace_id, m.dic))
+    text_file.close()
 
-        # save the DIC for this model
-        text_file = open(os.path.join(mypath, model_name, 'DIC-combined.txt'), 'w')
-        text_file.write("Model {}: {}\n".format(trace_id, m.dic))
-        text_file.close()
+    # ============================================ #
+    # SAVE TRACES
+    # ============================================ #
 
-        # ============================================ #
-        # SAVE TRACES
-        # ============================================ #
+    # get the names for all nodes that are available here
+    group_traces = m.get_group_traces()
+    group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces.csv'))
 
-        # get the names for all nodes that are available here
-        group_traces = m.get_group_traces()
-        group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces.csv'))
+    all_traces = m.get_traces()
+    all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
-        all_traces = m.get_traces()
-        all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
+    # plot the traces and posteriors for each parameter
+    figpath = os.path.join(mypath, model_name, 'figures-concat')
+    m.plot_posteriors(save=True, path=figpath, format='pdf')
 
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
@@ -358,7 +367,8 @@ models = {0: 'stimcoding_prevresp_dc',
     6: 'regress_z_prevresp_prevpupil_prevrt',
     7: 'regress_dc_z_prevresp',
     8: 'regress_dc_z_prevresp_prevpupil_prevrt',
-    9: 'stimcoding_prevresp_dc_z_sessions'}
+    9: 'stimcoding_prevresp_dc_z_sessions',
+    10: 'regress_dc_prevresp_prevpupil_prevrt_sessions'}
 
 datasets = {0: 'RT_RDK', 1: 'MEG-PL', 2: 'MEG-PL-S1', 3: 'MEG-PL-S2',
     4: 'Anke-neutral', 5: 'Anke-repetitive', 6:'Anke-alternating', 7: 'MEG-alldata'}
@@ -385,7 +395,7 @@ for dx in d:
         if runMe == True:
             starttime = time.time()
             # get the model specification
-            m = make_model(mypath, models[vx], trace_id) # first, get the stuff we want
+            m = make_model(mypath, models[vx], trace_id)
             # now sample and save
             run_model(m, mypath, models[vx], trace_id)
             elapsed = time.time() - starttime
