@@ -74,154 +74,55 @@ def make_model(mypath, model_name, trace_id):
     filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
 
-    # prepare link functions for the regression models
+    # prepare link function for the regression models
     def z_link_func(x, data=mydata):
         return 1 / (1 + np.exp(-(x.values.ravel())))
 
     # ============================================ #
-    # STIMCODING
+    # STEP 1. DOES PREVRESP AFFECT DC OR Z?
     # ============================================ #
 
-    if model_name == 'stimcoding':
-        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-            drift_criterion=True, bias=True, p_outlier=0.05,
-            include=('sv'), group_only_nodes=['sv'],
-            depends_on={'v':['session']})
-
-    elif model_name == 'stimcoding_prevresp_dc':
-        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-            drift_criterion=True, bias=True, p_outlier=0.05,
-            include=('sv'), group_only_nodes=['sv'],
-            depends_on={'v':['session'], 'dc':['prevresp']})
-
-    elif model_name == 'stimcoding_prevresp_z':
-        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-            drift_criterion=True, bias=True, p_outlier=0.05,
-            include=('sv'), group_only_nodes=['sv'],
-            depends_on={'v':['session'], 'z':['prevresp']})
-
-    elif model_name == 'stimcoding_prevresp_dc_z':
-        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-            drift_criterion=True, bias=True, p_outlier=0.05,
-            include=('sv'), group_only_nodes=['sv'],
-            depends_on={'v':['session'], 'z':['prevresp'], 'dc':['prevresp']})
-
-    elif model_name == 'stimcoding_prevresp_dc_z_sessions':
-        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-            drift_criterion=True, bias=True, p_outlier=0.05,
-            include=('sv'), group_only_nodes=['sv'],
-            depends_on={'v':['session'], 'z':['prevresp', 'session'], 'dc':['prevresp', 'session'], 'a':['session']})
-
-    # ============================================ #
-    # REGRESSION - DRIFT CRITERION
-    # ============================================ #
-
-    elif model_name == 'regress_dc':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-
-        v_reg = {'model': 'v ~ 1 + stimulus*session', 'link_func': lambda x:x}
-
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, v_reg,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
-
-    elif model_name == 'regress_dc_prevresp':
+    if model_name == 'regress_dc_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp', 'link_func': lambda x:x}
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
 
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
-
-    elif model_name == 'regress_dc_prevresp_prevpupil_prevrt':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
-
-        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': lambda x:x}
-
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, v_reg,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
-
-    elif model_name == 'regress_dc_prevresp_prevpupil_prevrt_sessions':
-        # estimate a different drift rate, as well as serial choice bias and its modulation by pupil/RT for each session
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-
-        if 'prevpupil' in mydata.columns:
-            mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
-
-            # remove subjects who did not do all conditions
-            for i, sj in enumerate(mydata.subj_idx.unique()):
-                sessions = mydata[mydata.subj_idx == sj].session.unique()
-                if len(sessions) < len(mydata.session.unique()):
-                    mydata = mydata[mydata.subj_idx != sj] # drop this subject
-
-            # now specify the regression model with dummy-coded sessions
-            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp:C(session) +' \
-                'prevpupil:prevresp:C(session) + prevrt:prevresp:C(session)', 'link_func': lambda x:x}
-
-        else: # when using data without pupil responses
-            mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
-
-            # remove subjects who did not do all conditions
-            for i, sj in enumerate(mydata.subj_idx.unique()):
-                sessions = mydata[mydata.subj_idx == sj].session.unique()
-                if len(sessions) < len(mydata.session.unique()):
-                    mydata = mydata[mydata.subj_idx != sj] # drop this subject
-
-            # now specify the regression model with dummy-coded sessions
-            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp:C(session) +' \
-                'prevrt:prevresp:C(session)', 'link_func': lambda x:x}
-
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, v_reg,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
-
-    # ============================================ #
-    # REGRESSION - STARTING POINT
-    # ============================================ #
 
     elif model_name == 'regress_z_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-        z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus*session', 'link_func': lambda x:x}
+        if 'transitionprob' in mydata.columns:
+            z_reg = {'model': 'z ~ 1 + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+        else:
+            z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
+
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
-
-    elif model_name == 'regress_z_prevresp_prevpupil_prevrt':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
-
-        z_reg = {'model': 'z ~ 1 + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus*session', 'link_func': lambda x:x}
-        reg_both = [z_reg, v_reg]
-
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, reg_both,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
-
-    # ============================================ #
-    # REGRESSION - BOTH
-    # ============================================ #
 
     elif model_name == 'regress_dc_z_prevresp':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
         mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp or prevpupil
 
-        z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp', 'link_func': lambda x:x}
+        if 'transitionprob' in mydata.columns:
+            z_reg = {'model': 'z ~ 1 + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+        else:
+            z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -229,29 +130,68 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    elif model_name == 'regress_dc_z_prevresp_prevpupil_prevrt':
+    # ============================================ #
+    # STEP 2. SESSION-DEPENDENCE
+    # ============================================ #
+
+    if model_name == 'regress_dc_prevresp_sessions':
         mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp', 'prevpupil']) # dont use trials with nan in prevresp or prevpupil
+        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
-        z_reg = {'model': 'z ~ 1 + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus*session + prevresp + prevpupil:prevresp + prevrt:prevresp', 'link_func': lambda x:x}
-        reg_both = [z_reg, v_reg]
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp', 'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
+        reg_both = [v_reg, a_reg]
 
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    if model_name == 'regress_dc_prevresp_prevrt_prevpupil':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*prevrt*C(transitionprob) + prevresp*prevpupil*C(transitionprob)',
+                'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*prevrt + prevresp*prevpupil',
+                'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
+        reg_both = [v_reg, a_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    if model_name == 'regress_dc_prevresp_prevrt_prevpupil_sessions':
+        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
+        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
+        # boundary separation and drift rate will change over sessions
+        v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*prevrt*C(session) + prevresp*prevpupil*C(session)',
+            'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
+        reg_both = [v_reg, a_reg]
+
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=20000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
 
     # ============================================ #
     # do the actual sampling
     # ============================================ #
 
     m.find_starting_values() # this should help the sampling
-    m.sample(nr_samples, burn=nr_samples/3, thin=2, db='pickle',
+    m.sample(nr_samples, burn=nr_samples/4, thin=3, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # specify a certain backend? pickle?
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
@@ -294,7 +234,7 @@ def concat_models(mypath, model_name):
 
     allmodels = []
     print "appending models"
-    for trace_id in range(30): # 15 models were run
+    for trace_id in range(30): # how chains were run?
         model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
         modelExists           = os.path.isfile(model_filename)
         print model_filename
@@ -358,20 +298,14 @@ def concat_models(mypath, model_name):
 # ============================================ #
 
 # which model are we running at the moment?
-models = {0: 'stimcoding_prevresp_dc',
-    1: 'stimcoding_prevresp_z',
-    2: 'stimcoding_prevresp_dc_z',
-    3: 'regress_dc_prevresp',
-    4: 'regress_dc_prevresp_prevpupil_prevrt',
-    5: 'regress_z_prevresp',
-    6: 'regress_z_prevresp_prevpupil_prevrt',
-    7: 'regress_dc_z_prevresp',
-    8: 'regress_dc_z_prevresp_prevpupil_prevrt',
-    9: 'stimcoding_prevresp_dc_z_sessions',
-    10: 'regress_dc_prevresp_prevpupil_prevrt_sessions'}
+models = {0: 'regress_dc_prevresp',
+    1: 'regress_z_prevresp',
+    2: 'regress_dc_z_prevresp',
+    3: 'regress_dc_prevresp_sessions',
+    4: 'regress_dc_prevresp_prevrt_prevpupil',
+    5: 'regress_dc_prevresp_prevrt_prevpupil_sessions'}
 
-datasets = {0: 'RT_RDK', 1: 'MEG-PL', 2: 'MEG-PL-S1', 3: 'MEG-PL-S2',
-    4: 'Anke-neutral', 5: 'Anke-repetitive', 6:'Anke-alternating', 7: 'MEG-alldata'}
+datasets = {0: 'RT_RDK', 1: 'MEG', 2: 'Anke_serial'}
 
 # recode
 if isinstance(d, int):

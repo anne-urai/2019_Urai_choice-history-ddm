@@ -42,15 +42,19 @@ dlmwrite('allblocks', alldat, 'delimiter', ' ');
 % parameter file for HDDM
 % ============================================ #
 
-datasets   = [0]; % RT-RDK and MEG-PL
-models     = 10; % the nr of the models
-nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
+datasets   = [0 1 2]; % RT-RDK and MEG-PL
+models     = 0:5; % the nr of the models
+nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
-  for c = 0:nrTraces-1,
     for a = datasets,
       for b = models,
+        for c = 0:nrTraces-1,
+          % dont run Ankes data with the session version
+
+          if ~(a == 2 & b == 5),
       alldat = [alldat; a b c];
+    end
     end
   end
 end
