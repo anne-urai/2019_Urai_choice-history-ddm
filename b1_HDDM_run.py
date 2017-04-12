@@ -74,21 +74,31 @@ def make_model(mypath, model_name, trace_id):
     filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
 
+    # for regression models, recode stimuli into signed
+    mydata.ix[mydata['stimulus']==0,'stimulus'] = -1
+    mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
     # prepare link function for the regression models
     def z_link_func(x, data=mydata):
         return 1 / (1 + np.exp(-(x.values.ravel())))
+
+    def balance_designmatrix(mydata):
+        # remove subjects who did not do all conditions
+        for i, sj in enumerate(mydata.subj_idx.unique()):
+        	sessions = mydata[mydata.subj_idx == sj].session.unique()
+        	if len(sessions) < len(mydata.session.unique()):
+        		mydata = mydata[mydata.subj_idx != sj] # drop this subject
+        return mydata
 
     # ============================================ #
     # STEP 1. DOES PREVRESP AFFECT DC OR Z?
     # ============================================ #
 
     if model_name == 'regress_dc_prevresp':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
         # for Anke's data, also split by transition probability
         if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)', 'link_func': lambda x:x}
         else:
             v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
 
@@ -97,11 +107,9 @@ def make_model(mypath, model_name, trace_id):
         group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_z_prevresp':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
         if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob)', 'link_func': z_link_func}
         else:
             z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
 
@@ -114,12 +122,10 @@ def make_model(mypath, model_name, trace_id):
         group_only_regressors=False, p_outlier=0.05)
 
     elif model_name == 'regress_dc_z_prevresp':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp or prevpupil
 
         if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp*C(transitionprob)', 'link_func': lambda x:x}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob)', 'link_func': lambda x:x}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)', 'link_func': lambda x:x}
         else:
             z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
             v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
@@ -135,14 +141,52 @@ def make_model(mypath, model_name, trace_id):
     # ============================================ #
 
     if model_name == 'regress_dc_prevresp_sessions':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
+        # subselect data
+        mydata = balance_designmatrix(mydata)
 
         # boundary separation and drift rate will change over sessions
         if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*C(transitionprob)', 'link_func': lambda x:x}
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(transitionprob)', 'link_func': lambda x:x}
         else:
-            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp', 'link_func': lambda x:x}
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp', 'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
+        reg_both = [v_reg, a_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    if model_name == 'regress_dc_prevresp_prevrt':
+
+        # subselect data
+        mydata = balance_designmatrix(mydata)
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt*C(transitionprob)',
+                'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt',
+                'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
+        reg_both = [v_reg, a_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    if model_name == 'regress_dc_prevresp_prevrt_sessions':
+
+        # subselect data
+        mydata = balance_designmatrix(mydata)
+
+        if 'transitionprob' in mydata.columns:
+            raise ValueError('Do not fit session-specific serial bias on Anke''s data')
+
+        # boundary separation and drift rate will change over sessions
+        v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt*C(session)',
+            'link_func': lambda x:x}
         a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
         reg_both = [v_reg, a_reg]
 
@@ -151,15 +195,17 @@ def make_model(mypath, model_name, trace_id):
         group_only_regressors=False, p_outlier=0.05)
 
     if model_name == 'regress_dc_prevresp_prevrt_prevpupil':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
+        # subselect data
+        mydata = mydata.dropna(subset=['prevpupil'])
+        mydata = balance_designmatrix(mydata)
 
         # boundary separation and drift rate will change over sessions
         if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*prevrt*C(transitionprob) + prevresp*prevpupil*C(transitionprob)',
+            v_reg = {'model': 'v ~ 1 +  + prevresp*prevrt*C(transitionprob) + prevresp*prevpupil*C(transitionprob)',
                 'link_func': lambda x:x}
         else:
-            v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*prevrt + prevresp*prevpupil',
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt + prevresp*prevpupil',
                 'link_func': lambda x:x}
         a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
         reg_both = [v_reg, a_reg]
@@ -169,11 +215,16 @@ def make_model(mypath, model_name, trace_id):
         group_only_regressors=False, p_outlier=0.05)
 
     if model_name == 'regress_dc_prevresp_prevrt_prevpupil_sessions':
-        mydata.ix[mydata['stimulus']==0,'stimulus'] = -1         # recode the stimuli into signed
-        mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+
+        # subselect data
+        mydata = mydata.dropna(subset=['prevpupil'])
+        mydata = balance_designmatrix(mydata)
+
+        if 'transitionprob' in mydata.columns:
+            raise ValueError('Do not fit session-specific serial bias on Anke''s data')
 
         # boundary separation and drift rate will change over sessions
-        v_reg = {'model': 'v ~ 1 + stimulus*C(session) + prevresp*prevrt*C(session) + prevresp*prevpupil*C(session)',
+        v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt*C(session)+ prevpupil*prevrt*C(session)',
             'link_func': lambda x:x}
         a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
         reg_both = [v_reg, a_reg]
@@ -184,14 +235,14 @@ def make_model(mypath, model_name, trace_id):
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=15000):
 
     # ============================================ #
     # do the actual sampling
     # ============================================ #
 
     m.find_starting_values() # this should help the sampling
-    m.sample(nr_samples, burn=nr_samples/4, thin=3, db='pickle',
+    m.sample(nr_samples, burn=nr_samples/3, thin=2, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # specify a certain backend? pickle?
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
@@ -302,8 +353,10 @@ models = {0: 'regress_dc_prevresp',
     1: 'regress_z_prevresp',
     2: 'regress_dc_z_prevresp',
     3: 'regress_dc_prevresp_sessions',
-    4: 'regress_dc_prevresp_prevrt_prevpupil',
-    5: 'regress_dc_prevresp_prevrt_prevpupil_sessions'}
+    4: 'regress_dc_prevresp_prevrt',
+    5: 'regress_dc_prevresp_prevrt_sessions',
+    6: 'regress_dc_prevresp_prevrt_prevpupil',
+    7: 'regress_dc_prevresp_prevrt_prevpupil_sessions'}
 
 datasets = {0: 'RT_RDK', 1: 'MEG', 2: 'Anke_serial'}
 
