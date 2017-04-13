@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 """
-Anne Urai, 2016
+Anne Urai, 2017
 takes input arguments from stopos
 Important: on Cartesius, call module load python/2.7.9 before running
 (the only environment where HDDM is installed)
@@ -21,6 +21,14 @@ Important: on Cartesius, call module load python/2.7.9 before running
 # st    = inter-trial variability in non-decision time
 # sz    = inter-trial variability in starting-point
 
+# to avoid errors when plotting on cartesius
+# http://stackoverflow.com/questions/4706451/how-to-save-a-figure-remotely-with-pylab/4706614#4706614
+import matplotlib
+matplotlib.use('Agg') # to still plot even when no display is defined
+import matplotlib.pyplot as plt
+import numpy as np
+from IPython import embed as shell
+
 # ============================================ #
 # parse input arguments
 # ============================================ #
@@ -33,15 +41,15 @@ parser.add_option ( "-r", "--run",
         type = "int",
         help = "Force running the model?" )
 parser.add_option ( "-d", "--dataset",
-        default = range(0,1),
+        default = range(0,2),
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(0,8),
+        default = range(0,10),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
-        default = 1,
+        default = 0,
         type = "int",
         help = "Which trace to run, usually 0-60" )
 
@@ -51,12 +59,6 @@ d               = opts.dataset
 trace_id        = opts.trace_id
 runMe           = opts.run
 
-# to avoid errors when plotting on cartesius
-# http://stackoverflow.com/questions/4706451/how-to-save-a-figure-remotely-with-pylab/4706614#4706614
-import matplotlib
-matplotlib.use('Agg') # to still plot even when no display is defined
-import matplotlib.pyplot as plt
-
 # ============================================ #
 # define the function that will do the work
 # ============================================ #
@@ -65,7 +67,6 @@ def make_model(mypath, model_name, trace_id):
 
     import os, fnmatch
     import hddm
-    import numpy as np
 
     model_filename  = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
     print model_filename
@@ -73,7 +74,6 @@ def make_model(mypath, model_name, trace_id):
     # get the csv file for this dataset
     filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-    mydata      = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
     # prepare link function for the regression models
     def z_link_func(x, data=mydata):
@@ -87,29 +87,94 @@ def make_model(mypath, model_name, trace_id):
         		mydata = mydata[mydata.subj_idx != sj] # drop this subject
         return mydata
 
+    def recode_4stimcoding(mydata):
+        # split into coherence and stimulus identity
+        mydata['coherence'] = mydata.stimulus.abs()
+        mydata.stimulus  = np.sign(mydata.stimulus)
+        # for stimcoding, the two identities should be 0 and 1
+        mydata.ix[mydata['stimulus']==-1,'stimulus'] = 0
+        return mydata
+
     # ============================================ #
-    # STEP 1. DOES PREVRESP AFFECT DC OR Z?
+    # STEP 0. STIMCODING FOR POSTERIOR PREDICTIVE
     # ============================================ #
 
-    if model_name == 'regress_dc_prevresp':
+    if model_name == 'stimcoding_dc_prevresp_prevstim':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability and include coherence-dependence of drift rate
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevstim', 'transitionprob']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'dc':['prevresp', 'prevstim']})
+
+    elif model_name == 'stimcoding_z_prevresp_prevstim':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
 
         # for Anke's data, also split by transition probability
         if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)', 'link_func': lambda x:x}
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence'], 'z':['prevresp', 'prevstim', 'transitionprob']})
         else:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'z':['prevresp', 'prevstim']})
+
+    elif model_name == 'stimcoding_dc_z_prevresp_prevstim':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevstim', 'transitionprob'],
+                'z':['prevresp', 'prevstim', 'transitionprob']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'dc':['prevresp', 'prevstim'], 'z':['prevresp', 'prevstim']})
+
+    # ============================================ #
+    # STEP 1. DO PREVRESP/PREVSTIM AFFECT DC OR Z?
+    # ============================================ #
+
+    elif model_name == 'regress_dc_prevresp_prevstim':
+
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) +' \
+                'prevstim:C(transitionprob)', 'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim', 'link_func': lambda x:x}
 
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    elif model_name == 'regress_z_prevresp':
+    elif model_name == 'regress_z_prevresp_prevstim':
 
         if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob)', 'link_func': z_link_func}
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
+                'link_func': z_link_func}
         else:
-            z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
-
+            z_reg = {'model': 'z ~ 1 + prevresp + prevstim', 'link_func': z_link_func}
         v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
@@ -118,14 +183,16 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    elif model_name == 'regress_dc_z_prevresp':
+    elif model_name == 'regress_dc_z_prevresp_prevstim':
 
         if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob)', 'link_func': lambda x:x}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)', 'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
+                'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
+                'link_func': lambda x:x}
         else:
-            z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp + prevstim', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -135,18 +202,40 @@ def make_model(mypath, model_name, trace_id):
 
     # ============================================ #
     # STEP 2. SESSION-DEPENDENCE
+    # let drift rate and boundary separation vary by session
     # ============================================ #
 
-    if model_name == 'regress_dc_prevresp_sessions':
+    if model_name == 'regress_dc_prevresp_prevstim_sessions':
 
         # subselect data
         mydata = balance_designmatrix(mydata)
 
         # boundary separation and drift rate will change over sessions
         if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(transitionprob)', 'link_func': lambda x:x}
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(transitionprob) +' \
+                'prevstim:C(transitionprob)', 'link_func': lambda x:x}
         else:
-            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp', 'link_func': lambda x:x}
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp + prevstim', 'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x} # boundary separation as a function of sessions
+        reg_both = [v_reg, a_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    if model_name == 'regress_dc_prevresp_prevstim_prevrt':
+
+        # subselect data
+        mydata = balance_designmatrix(mydata)
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(transitionprob) +' \
+                'prevstim:C(transitionprob) + prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
+                'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp + prevstim + prevresp:prevrt + prevstim:prevrt',
+                'link_func': lambda x:x}
         a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
         reg_both = [v_reg, a_reg]
 
@@ -154,26 +243,7 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    if model_name == 'regress_dc_prevresp_prevrt':
-
-        # subselect data
-        mydata = balance_designmatrix(mydata)
-
-        # boundary separation and drift rate will change over sessions
-        if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt*C(transitionprob)',
-                'link_func': lambda x:x}
-        else:
-            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt',
-                'link_func': lambda x:x}
-        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
-        reg_both = [v_reg, a_reg]
-
-        m = hddm.HDDMRegressor(mydata, reg_both,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
-
-    if model_name == 'regress_dc_prevresp_prevrt_sessions':
+    if model_name == 'regress_dc_prevresp_prevstim_prevrt_sessions':
 
         # subselect data
         mydata = balance_designmatrix(mydata)
@@ -181,8 +251,9 @@ def make_model(mypath, model_name, trace_id):
         if 'transitionprob' in mydata.columns:
             raise ValueError('Do not fit session-specific serial bias on Anke''s data')
 
-        # boundary separation and drift rate will change over sessions
-        v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt*C(session)',
+        # allow serial choice bias to vary over sessions
+        v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(session) + ' \
+            'prevstim:C(session) + prevresp:prevrt:C(session) + prevstim:prevrt:C(session)',
             'link_func': lambda x:x}
         a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
         reg_both = [v_reg, a_reg]
@@ -191,7 +262,7 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    if model_name == 'regress_dc_prevresp_prevrt_prevpupil':
+    if model_name == 'regress_dc_prevresp_prevstim_prevrt_prevpupil':
 
         # subselect data
         mydata = mydata.dropna(subset=['prevpupil'])
@@ -199,10 +270,14 @@ def make_model(mypath, model_name, trace_id):
 
         # boundary separation and drift rate will change over sessions
         if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 +  + prevresp*prevrt*C(transitionprob) + prevresp*prevpupil*C(transitionprob)',
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + ' \
+                'prevresp:C(transitionprob) + prevstim:C(transitionprob) + ' \
+                'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob) +' \
+                'prevresp:prevpupil:C(transitionprob) + prevstim:prevpupil:C(transitionprob)',
                 'link_func': lambda x:x}
         else:
-            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt + prevresp*prevpupil',
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp + prevstim + ' \
+                'prevresp:prevrt + prevstim:prevrt + prevresp:prevpupil + prevstim:prevpupil',
                 'link_func': lambda x:x}
         a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
         reg_both = [v_reg, a_reg]
@@ -211,7 +286,7 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    if model_name == 'regress_dc_prevresp_prevrt_prevpupil_sessions':
+    if model_name == 'regress_dc_prevresp_prevstim_prevrt_prevpupil_sessions':
 
         # subselect data
         mydata = mydata.dropna(subset=['prevpupil'])
@@ -221,7 +296,9 @@ def make_model(mypath, model_name, trace_id):
             raise ValueError('Do not fit session-specific serial bias on Anke''s data')
 
         # boundary separation and drift rate will change over sessions
-        v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp*prevrt*C(session)+ prevpupil*prevrt*C(session)',
+        v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(session) + prevstim:C(session) + ' \
+            'prevresp:prevrt:C(session) + prevstim:prevrt:C(session) + ' \
+            'prevresp:prevpupil:C(session) + prevstim:prevpupil:C(session)', \
             'link_func': lambda x:x}
         a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x}
         reg_both = [v_reg, a_reg]
@@ -232,14 +309,14 @@ def make_model(mypath, model_name, trace_id):
 
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=15000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
 
     # ============================================ #
     # do the actual sampling
     # ============================================ #
 
     m.find_starting_values() # this should help the sampling
-    m.sample(nr_samples, burn=nr_samples/3, thin=2, db='pickle',
+    m.sample(nr_samples, burn=5000, thin=2, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # specify a certain backend? pickle?
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
@@ -282,14 +359,14 @@ def concat_models(mypath, model_name):
 
     allmodels = []
     print "appending models"
-    for trace_id in range(30): # how chains were run?
+    for trace_id in range(15): # how chains were run?
         model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
         modelExists           = os.path.isfile(model_filename)
-        print model_filename
-        assert modelExists == True # if not, this model has to be rerun
-        thism                 = hddm.load(model_filename)
-        # now append
-        allmodels.append(thism)
+        if modelExists == True: # if not, this model has to be rerun
+            print model_filename
+            thism                 = hddm.load(model_filename)
+            # now append
+            allmodels.append(thism)
 
     # ============================================ #
     # CHECK CONVERGENCE
@@ -309,14 +386,30 @@ def concat_models(mypath, model_name):
     text_file.close()
     print "written gelman rubin stats to file"
 
-    # ============================================ #
-    # SAVE POINT ESTIMATES
-    # ============================================ #
-
     # now actually concatenate them, see email Gilles
     # THIS ONLY WORKS IF Z HAS BEEN TRANSFORMED!
     m = kabuki.utils.concat_models(allmodels)
+    print "concatenated models"
     # m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
+
+    # ============================================ #
+    # POSTERIOR PREDICTIVE PLOTS
+    # ============================================ #
+
+    #size_plot   = len(mydata.subj_idx.unique()) / 3.0 * 1.5
+    #figsize=(6,size_plot),
+
+    figpath = os.path.join(mypath, model_name, 'figures-concat')
+    m.plot_posterior_predictive(save=True, path=figpath, format='pdf')
+    print "plotted posterior predictive RT distributions"
+
+    # plot the traces and posteriors for each parameter
+    m.plot_posteriors(save=True, path=figpath, format='pdf')
+    print "plotted traces and autocorrelation"
+
+    # ============================================ #
+    # SAVE POINT ESTIMATES
+    # ============================================ #
 
     results = m.gen_stats() # point estimate for each parameter and subject
     results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
@@ -337,25 +430,24 @@ def concat_models(mypath, model_name):
     all_traces = m.get_traces()
     all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
-    # plot the traces and posteriors for each parameter
-    figpath = os.path.join(mypath, model_name, 'figures-concat')
-    m.plot_posteriors(save=True, path=figpath, format='pdf')
-
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
 # ============================================ #
 
 # which model are we running at the moment?
-models = {0: 'regress_dc_prevresp',
-    1: 'regress_z_prevresp',
-    2: 'regress_dc_z_prevresp',
-    3: 'regress_dc_prevresp_sessions',
-    4: 'regress_dc_prevresp_prevrt',
-    5: 'regress_dc_prevresp_prevrt_sessions',
-    6: 'regress_dc_prevresp_prevrt_prevpupil',
-    7: 'regress_dc_prevresp_prevrt_prevpupil_sessions'}
+models = ['stimcoding_dc_prevresp_prevstim',
+    'stimcoding_z_prevresp_prevstim',
+    'stimcoding_dc_z_prevresp_prevstim',
+    'regress_dc_prevresp_prevstim',
+    'regress_z_prevresp_prevstim',
+    'regress_dc_z_prevresp_prevstim',
+    'regress_dc_prevresp_prevstim_sessions',
+    'regress_dc_prevresp_prevstim_prevrt',
+    'regress_dc_prevresp_prevstim_prevrt_sessions',
+    'regress_dc_prevresp_prevstim_prevrt_prevpupil',
+    'regress_dc_prevresp_prevstim_prevrt_prevpupil_sessions']
 
-datasets = {0: 'RT_RDK', 1: 'MEG', 2: 'Anke_serial'}
+datasets = ['RT_RDK', 'MEG', 'Anke_serial']
 
 # recode
 if isinstance(d, int):
@@ -383,7 +475,7 @@ for dx in d:
             # now sample and save
             run_model(m, mypath, models[vx], trace_id)
             elapsed = time.time() - starttime
-            print( "Elapsed time: %f seconds\n" %elapsed )
+            print( "Elapsed time for %s, %s: %f seconds\n" %(models[vx], datasets[dx], elapsed))
 
         else: # concatenate the different chains
             concat_models(mypath, models[vx])
