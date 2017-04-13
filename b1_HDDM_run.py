@@ -73,10 +73,7 @@ def make_model(mypath, model_name, trace_id):
     # get the csv file for this dataset
     filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-
-    # for regression models, recode stimuli into signed
-    mydata.ix[mydata['stimulus']==0,'stimulus'] = -1
-    mydata = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
+    mydata      = mydata.dropna(subset=['prevresp']) # dont use trials with nan in prevresp
 
     # prepare link function for the regression models
     def z_link_func(x, data=mydata):
