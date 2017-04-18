@@ -61,3 +61,19 @@ end
 % write to a file
 dlmwrite('hddmparams', alldat, 'delimiter', ' ');
 size(alldat)
+
+% also write a file for concatenation
+alldat = [];
+for a = datasets,
+    % dont run Ankes data with the session version
+    for b = models,
+      if ~(a == 2 & ismember(b, [6 8 10])),
+        alldat = [alldat; a b];
+      end
+    end
+  end
+end
+
+% write to a file
+dlmwrite('hddmparams_concat', alldat, 'delimiter', ' ');
+size(alldat)

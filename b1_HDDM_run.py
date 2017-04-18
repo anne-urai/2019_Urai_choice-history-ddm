@@ -26,8 +26,8 @@ Important: on Cartesius, call module load python/2.7.9 before running
 import matplotlib
 matplotlib.use('Agg') # to still plot even when no display is defined
 import matplotlib.pyplot as plt
-import numpy as np
 from IPython import embed as shell
+import numpy as np
 
 # ============================================ #
 # parse input arguments
@@ -116,7 +116,7 @@ def make_model(mypath, model_name, trace_id):
                 include=('sv'), group_only_nodes=['sv'],
                 depends_on={'dc':['prevresp', 'prevstim']})
 
-    elif model_name == 'stimcoding_z_prevresp_prevstim':
+    if model_name == 'stimcoding_z_prevresp_prevstim':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
@@ -133,7 +133,7 @@ def make_model(mypath, model_name, trace_id):
                 include=('sv'), group_only_nodes=['sv'],
                 depends_on={'z':['prevresp', 'prevstim']})
 
-    elif model_name == 'stimcoding_dc_z_prevresp_prevstim':
+    if model_name == 'stimcoding_dc_z_prevresp_prevstim':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
@@ -155,7 +155,7 @@ def make_model(mypath, model_name, trace_id):
     # STEP 1. DO PREVRESP/PREVSTIM AFFECT DC OR Z?
     # ============================================ #
 
-    elif model_name == 'regress_dc_prevresp_prevstim':
+    if model_name == 'regress_dc_prevresp_prevstim':
 
         # for Anke's data, also split by transition probability
         if 'transitionprob' in mydata.columns:
@@ -168,7 +168,7 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    elif model_name == 'regress_z_prevresp_prevstim':
+    if model_name == 'regress_z_prevresp_prevstim':
 
         if 'transitionprob' in mydata.columns:
             z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
@@ -183,7 +183,7 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    elif model_name == 'regress_dc_z_prevresp_prevstim':
+    if model_name == 'regress_dc_z_prevresp_prevstim':
 
         if 'transitionprob' in mydata.columns:
             z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
@@ -347,6 +347,7 @@ def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
     # plot the traces and posteriors for each parameter
     figpath = os.path.join(mypath, model_name, 'figures-md%d'%trace_id)
     m.plot_posteriors(save=True, path=figpath, format='pdf')
+    plt.close('all') # to avoid warnings
 
 def concat_models(mypath, model_name):
 
@@ -358,8 +359,8 @@ def concat_models(mypath, model_name):
     # ============================================ #
 
     allmodels = []
-    print "appending models"
-    for trace_id in range(15): # how chains were run?
+    print ("appending models for %s" %model_name)
+    for trace_id in range(15): # how many chains were run?
         model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
         modelExists           = os.path.isfile(model_filename)
         if modelExists == True: # if not, this model has to be rerun
@@ -382,7 +383,7 @@ def concat_models(mypath, model_name):
         # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
         # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
         if abs(p[1]-1) > 0.02:
-            print "non-convergence found, %s:%s\n" %p
+            print "non-convergence found, %s:%s" %p
     text_file.close()
     print "written gelman rubin stats to file"
 
@@ -390,21 +391,33 @@ def concat_models(mypath, model_name):
     # THIS ONLY WORKS IF Z HAS BEEN TRANSFORMED!
     m = kabuki.utils.concat_models(allmodels)
     print "concatenated models"
-    # m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
+    m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
 
     # ============================================ #
     # POSTERIOR PREDICTIVE PLOTS
     # ============================================ #
 
-    #size_plot   = len(mydata.subj_idx.unique()) / 3.0 * 1.5
-    #figsize=(6,size_plot),
+    from math import ceil
+    if datasets[dx] == 'MEG':
+        num_subj = 65
+    if datasets[dx] == 'RT_RDK':
+        num_subj = 25
+    if datasets[dx] == 'Anke_serial':
+        num_subj = 27
+    #size_plot   = ceil(num_subj / 4.0 * 1.5)
 
     figpath = os.path.join(mypath, model_name, 'figures-concat')
-    m.plot_posterior_predictive(save=True, path=figpath, format='pdf')
+    if not os.path.exists(figpath):
+        os.mkdir(figpath)
+
+    m.plot_posterior_predictive(save=True, path=figpath, format='pdf',
+        columns=ceil(num_subj/6))
+    plt.close('all') # to avoid warnings
     print "plotted posterior predictive RT distributions"
 
     # plot the traces and posteriors for each parameter
     m.plot_posteriors(save=True, path=figpath, format='pdf')
+    plt.close('all') # to avoid warnings
     print "plotted traces and autocorrelation"
 
     # ============================================ #

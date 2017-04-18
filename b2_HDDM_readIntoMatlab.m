@@ -12,16 +12,22 @@ switch usr
     case 'anne' % local
         datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL'};
     case 'aeurai' % lisa/cartesius
-        datasets = {'RT_RDK', 'MEG-PL', 'MEG-PL-S1', 'MEG-PL-S2', ...
-          'Anke-alternating', 'Anke-neutral', 'Anke-repetitive'};
+        datasets = {'RT_RDK', 'MEG', 'Anke_serial'};
 end
 
 for d = ds,
     usepath = sprintf('~/Data/%s/HDDM', datasets{d});
-    mdls = {'stimcoding_prevresp_dc', 'stimcoding_prevresp_z', 'stimcoding_prevresp_dc_z', ...
-      'regress_dc_prevresp', 'regress_dc_prevresp_prevpupil_prevrt', ...
-        'regress_z_prevresp', 'regress_z_prevresp_prevpupil_prevrt', ...
-        'regress_dc_z_prevresp', 'regress_dc_z_prevresp_prevpupil_prevrt',};
+    mdls = {'stimcoding_dc_prevresp_prevstim', ...
+        'stimcoding_z_prevresp_prevstim', ...
+        'stimcoding_dc_z_prevresp_prevstim', ...
+        'regress_dc_prevresp_prevstim', ...
+        'regress_z_prevresp_prevstim', ...
+        'regress_dc_z_prevresp_prevstim', ...
+        'regress_dc_prevresp_prevstim_sessions', ...
+        'regress_dc_prevresp_prevstim_prevrt', ...
+        'regress_dc_prevresp_prevstim_prevrt_sessions', ...
+        'regress_dc_prevresp_prevstim_prevrt_prevpupil', ...
+        'regress_dc_prevresp_prevstim_prevrt_prevpupil_sessions'};
     traces = {'group', 'all'};
 
     if ~exist(sprintf('%s/summary', usepath), 'dir'),
@@ -31,16 +37,16 @@ for d = ds,
     switch datasets{d}
         case 'RT_RDK',
             subjects = [3:15 17:25];
-        case {'MEG-PL', 'MEG-PL-S1', 'MEG-PL-S2'}
+        case {'MEG'}
             subjects = 2:65;
-        case {'Anke-repetitive', 'Anke-neutral', 'Anke-alternating'}
+        case {'Anke'}
             subjects = [1:7 9 11:16 18:21 23 24 26 27];
     end
 
     for m = ms,
         for t = ts,
 
-            chains = 0:29;
+            chains = 0:14;
             clear dat; clear alldat clear dic;
 
             % ============================================ %
@@ -60,25 +66,13 @@ for d = ds,
             end
 
             % ============================================ %
-            % CONCATENATE DIFFERENT CHAINS
+            % GET CONCATENATED CHAINS
             % ============================================ %
 
-            for c = 1:length(chains),
-                if exist(sprintf('%s/%s/%s_traces-md%d.csv', ...
-                        usepath, mdls{m}, traces{t}, chains(c)), 'file'),
-                    fprintf('%s/%s/%s_traces-md%d.csv \n', ...
-                        usepath, mdls{m}, traces{t}, chains(c));
-                    dat{c} = readtable(sprintf('%s/%s/%s_traces-md%d.csv', ...
-                        usepath, mdls{m}, traces{t}, chains(c)));
-                end
-            end
-
-            % skip if these models are not done at all
-            if ~exist('dat', 'var'),
-              continue;
-            end
-
-            alldat = cat(1, dat{:});
+            fprintf('%s/%s/%s_traces.csv \n', ...
+                usepath, mdls{m}, traces{t});
+            alldat = readtable(sprintf('%s/%s/%s_traces.csv', ...
+                usepath, mdls{m}, traces{t}));
 
             % ============================================ %
             % rename some variables to make more sense
