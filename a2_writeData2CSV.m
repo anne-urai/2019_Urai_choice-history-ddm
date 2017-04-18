@@ -56,20 +56,21 @@ for sj = subjects,
     load(sprintf('%s/P%02d_alleye.mat', datapath, sj)); % contains all data over sessions
     data.fsample    = 100;
     RT              = data.trialinfo(:,6);
-
-    % remove trials without a response
-    cfg             = [];
-    cfg.trials      = true(1, length(data.trial));
-    cfg.trials(find(isnan(data.trialinfo(:,4)))) = false;
-
-    % remove RT outliers
-    cfg.trials(find(RT > 2.99)) = false;
-    cfg.trials(find(RT < 0.15)) = false;
-    data            = ft_selectdata(cfg, data);
+    
+    %     % remove trials without a response
+    %     cfg             = [];
+    %     cfg.trials      = true(1, length(data.trial));
+    %     cfg.trials(find(isnan(data.trialinfo(:,4)))) = false;
+    %
+    %     % remove RT outliers
+    %     cfg.trials(find(RT > 2.99)) = false;
+    %     cfg.trials(find(RT < 0.15)) = false;
+    %     data            = ft_selectdata(cfg, data);
+    
     pupilchan       = find(strcmp(data.label, 'EyePupil')==1);
 
     assert(all(data.trialinfo(:,2)>50), 'wrongly coded stimulus');
-    assert(all(data.trialinfo(:,4)>50), 'wrongly coded stimulus');
+    assert(all(data.trialinfo(~isnan(data.trialinfo(:, 4)),4)>50), 'wrongly coded stimulus');
 
     % compute RT again
     RT          = data.trialinfo(:,6);
@@ -131,43 +132,53 @@ alldat2 = cat(1, alldat{:});
 % write to csv for all subjects
 t = array2table(alldat2, 'VariableNames', ...
     {'stimulus', 'response', 'rt', 'correct', ...
-    'trialnr', 'blocknr', 'session', 'subj_idx',  ...
+    'trial', 'block', 'session', 'subj_idx',  ...
     'baseline_pupil', 'response_pupil', 'decision_pupil', 'feedback_pupil'});
 
 % recode for HDDM
-t.stimulus(t.stimulus == 90) = 0;
-t.stimulus(t.stimulus == 270) = 1;
-t.response(t.response == 90) = 0;
-t.response(t.response == 270) = 1;
+t.stimulus(t.stimulus == 90)    = -1;
+t.stimulus(t.stimulus == 270)   = 1;
+t.response(t.response == 90)    = 0;
+t.response(t.response == 270) 	= 1;
 
-responseSigned = t.response;
-responseSigned(responseSigned == 0) = -1;
-t.prevresp  = circshift(responseSigned, 1);
-t.prevrt    = circshift(log(t.rt), 1);
+% dont use very slow or fast RTs
+t.rt(t.rt > 2.99) = NaN;
+t.rt(t.rt < 0.15) = NaN;
+
+% both signed
+t.prevresp  = circshift(sign(t.response - 0.5), 1);
+t.prevstim  = circshift(t.stimulus, 1);
+
+% sort so that findgroups returns the right order
+t = sortrows(t, {'subj_idx', 'session', 'block'});
+
+% zscore RT per block
+t.rt(t.rt == 0) = NaN; % will lead to Inf log
+assert(all(~isinf(abs(log(t.rt)))), 'zero RTs');
+
+normalize   = @(x) {(x - nanmean(x)) ./ nanstd(x)};
+rtnorm      = splitapply(normalize, log(t.rt), ...
+    findgroups(t.subj_idx, t.session, t.block));
+rtnorm      = cat(1, rtnorm{:});
+t.prevrt    = circshift(rtnorm, 1); % use this normalized version
+
+% pupil has already been zscored during preprocessing
 t.prevpupil = circshift(t.decision_pupil, 1);
 
-% normalise pupil and rt within each block
-nanzscore = @(x) (x - nanmean(x)) ./ nanstd(x);
-
-for sj = unique(t.subj_idx)',
-  for session = unique(t.session)',
-    t.prevrt(find(t.subj_idx == sj & t.session == session)) = ...
-    nanzscore(t.prevrt(find(t.subj_idx == sj & t.session == session)));
-    t.prevpupil(find(t.subj_idx == sj & t.session == session)) = ...
-    nanzscore(t.prevpupil(find(t.subj_idx == sj & t.session == session)));
-  end
-end
-
 % remove trials where the previous trial was not immediately preceding
-wrongtrls               = find([NaN; diff(t.trialnr)] ~= 1);
-t.prevresp(wrongtrls)   = NaN;
-t.prevrt(wrongtrls)     = NaN;
-t.prevpupil(wrongtrls)  = NaN;
+wrongtrls               = find([NaN; diff(t.trial)] ~= 1);
+t(wrongtrls, :)         = [];
 
 % correct some session nrss
 t.session(t.session == 0) = 1;
 t.session(t.subj_idx == 17 & t.session == 5) = 4;
 
-t.session = t.session - 1; % start at 0 for python
+% remove irrelevant variables
+t = t(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', ...
+    'response', 'rt', 'prevstim', 'prevresp', 'prevrt', 'prevpupil'});
+
+% remove trials with any NaN left in them
+nanidx = find(isnan(mean(t{:, :}, 2)));
+t(nanidx, :) = [];
 
 writetable(t, sprintf('%s/HDDM/rtrdk_data_allsj.csv', datapath));
