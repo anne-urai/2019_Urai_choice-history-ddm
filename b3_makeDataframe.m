@@ -12,10 +12,7 @@ warning off;
 usr = getenv('USER');
 switch usr
     case 'anne' % local
-        datasets = {'RT_RDK/HDDM', 'projects/0/neurodec/Data/MEG-PL/HDDM', ...
-            'projects/0/neurodec/Data/MEG-PL/HDDM-S1', 'projects/0/neurodec/Data/MEG-PL/HDDM-S2', ...
-            'Anke_2afc_sequential/HDDM-alternating', 'Anke_2afc_sequential/HDDM-neutral', ...
-            'Anke_2afc_sequential/HDDM-repetitive'};
+        datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential'};
     case 'aeurai' % lisa/cartesius
         datasets = {'RT_RDK', 'MEG-PL'};
 end
@@ -24,40 +21,14 @@ set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ..
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 2; %3:length(datasets),
+for d = 1:length(datasets),
     
     % load data
-    csvfile = dir(sprintf('~/Data/%s/*.csv', datasets{d}));
-    alldata = readtable(sprintf('~/Data/%s/%s', datasets{d}, csvfile.name));
-    alldata.session = alldata.session + 1; % recode into 1 and 2
-    
-    % rename some things
-    try
-        alldata.Properties.VariableNames{'trialnr'}     = 'trial';
-        alldata.Properties.VariableNames{'blocknr'}     = 'block';
-        
-        alldata.session = alldata.session + 1; % start at 1
-        % session 0 means the average of all sessions
-    catch
-        try
-            alldata.Properties.VariableNames{'subjnr'}   = 'subj_idx';
-            alldata.Properties.VariableNames{'stim'}     = 'stimulus';
-            alldata.Properties.VariableNames{'resp'}     = 'response';
-            alldata.prevrt = circshift(alldata.rt, 1);
-        end
-    end
+    csvfile = dir(sprintf('~/Data/%s/HDDM/*.csv', datasets{d}));
+    alldata = readtable(sprintf('~/Data/%s/HDDM/%s', datasets{d}, csvfile.name));
     
     % compute a bunch of basic things from Matlab
     results     = b3b_behaviouralMetrics(alldata);
-    
-    % get pharma groups
-    if d == 2,
-        cd /Users/anne/Dropbox/code/MEG
-        for sj = unique(results.subjnr)',
-            subjectdata = subjectspecifics(sj);
-            results.drug(results.subjnr == sj) = {subjectdata.drug};
-        end
-    end
     
     % get the summary results from HDDM
     hddmresults = readtable(sprintf('~/Data/%s/summary/individualresults.csv', datasets{d}));

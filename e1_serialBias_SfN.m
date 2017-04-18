@@ -111,5 +111,28 @@ suplabel('Regression models', 'x');
 print(gcf, '-dpdf', '~/Data/serialHDDM/DIC.pdf');
 
 % ============================================ %
+% SANITY CHECK; DOES DRIFT RATE CORRELATE WITH D'?
+% ============================================ %
+
+% ANKE'S DATA WITH DIFFERENT COHERENCE LEVELS
+
+clf;
+mdls = {'regress_dc_prevresp_prevstim_sessions'};
+for d = 1:length(datasets),
+    % load data
+    csvfile = dir(sprintf('~/Data/%s/HDDM/*.csv', datasets{d}));
+    alldata = readtable(sprintf('~/Data/%s/HDDM/%s', datasets{d}, csvfile.name));
+    % compute a bunch of basic things from Matlab
+    results     = b3b_behaviouralMetrics(alldata);
+    
+    % get point estimates from results
+    hddmresults = readtable(sprintf('~/Data/%s/HDDM/%s/results-combined.csv', datasets{d}, mdls{1}));
+    
+    subplot(3,3,d);
+    scatter(results.dprime(results.session == 0), hddmresults.dprime);
+    
+end
+% ============================================ %
 % DIC COMPARISON BETWEEN DC, Z AND BOTH
 % ============================================ %
+
