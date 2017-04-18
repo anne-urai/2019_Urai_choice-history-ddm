@@ -414,14 +414,14 @@ def make_model(mypath, model_name, trace_id):
     # END OF FUNCTION THAT CREATES THE MODEL
     return m
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
+def run_model(m, mypath, model_name, trace_id, nr_samples=5000):
 
     # ============================================ #
     # do the actual sampling
     # ============================================ #
 
     m.find_starting_values() # this should help the sampling
-    m.sample(nr_samples, burn=5000, thin=2, db='pickle',
+    m.sample(nr_samples, burn=1000, thin=2, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # specify a certain backend? pickle?
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
@@ -594,10 +594,13 @@ for dx in d:
 
         if runMe == True:
             starttime = time.time()
-            # get the model specification
-            m = make_model(mypath, models[vx], trace_id)
-            # now sample and save
-            run_model(m, mypath, models[vx], trace_id)
+            model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
+            # do not repeat model fits!
+            if not os.path.isfile(model_filename):
+                # get the model specification
+                m = make_model(mypath, models[vx], trace_id)
+                # now sample and save
+                run_model(m, mypath, models[vx], trace_id)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s: %f seconds\n" %(models[vx], datasets[dx], elapsed))
 

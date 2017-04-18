@@ -43,14 +43,14 @@ dlmwrite('allblocks', alldat, 'delimiter', ' ');
 % ============================================ #
 
 datasets   = [0 1 2]; % RT-RDK and MEG-PL
-models     = 11:16; % the nr of the models
+models     = 1:17; % the nr of the models
 nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
-for c = 0:nrTraces-1,
 for a = datasets,
     % dont run Ankes data with the session version
     for b = models,
+      for c = 0:nrTraces-1, % put all chains of same model together on a node
       if ~(a == 2 & ismember(b, [6 8 10])),
         alldat = [alldat; a b c];
       end
@@ -66,7 +66,7 @@ size(alldat)
 alldat = [];
 for a = datasets,
     % dont run Ankes data with the session version
-    for b = models,
+    for b = 0:max(models),
       if ~(a == 2 & ismember(b, [6 8 10])),
         alldat = [alldat; a b];
       end
