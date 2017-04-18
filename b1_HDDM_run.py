@@ -307,8 +307,6 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
-    return m
-
     # ============================================ #
     # STIMCODING WITH ONLY PREVRESP
     # ============================================ #
@@ -413,6 +411,8 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
+    # END OF FUNCTION THAT CREATES THE MODEL
+    return m
 
 def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
 
