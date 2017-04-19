@@ -61,10 +61,11 @@ if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'prevrt'))),
     end
 end
 
-
 % recode correct
-if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'correct')))
-    alldata.correct = (alldata.stimulus == alldata.response);
+if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'correct'))),
+    tmpstim = (alldata.stimulus > 0);
+    tmpresp = (alldata.response > 0);
+    alldata.correct = (tmpstim == tmpresp);
 end
 
 % only MEG-PL data has starthand
@@ -103,6 +104,7 @@ for sj = subjects,
         icnt                    = icnt + 1;
         results.subjnr(icnt)    = sj;
         results.session(icnt)   = s;
+   
         
         switch s
             case 0
@@ -117,6 +119,15 @@ for sj = subjects,
         if isempty(data),
             fprintf('skipping sj %d, session %d \n', sj, s);
             continue;
+        end
+        
+        if any(~cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'transitionprob'))),
+            if all(cellfun(@isempty, strfind(results.Properties.VariableNames, 'transitionprob'))),
+                results.transitionprob = nan(size(results.session));
+            end
+            try
+            results.transitionprob(icnt) = unique(data.transitionprob);
+            end
         end
         
         % ========================================== %
@@ -137,6 +148,7 @@ for sj = subjects,
                 results.(['dprime_c' num2str(cohlevels(c)*100)])(icnt) = ...
                     dprime(data.stimulus(data.coherence == cohlevels(c)), ...
                     data.response(data.coherence == cohlevels(c)));
+                assert(~isnan(results.(['dprime_c' num2str(cohlevels(c)*100)])(icnt)));
             end
         end
         

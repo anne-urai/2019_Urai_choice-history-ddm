@@ -79,26 +79,23 @@ function b2_HDDM_readIntoMatlab()
 
       % ALSO GET THE ONE FROM THE CONCATENATED MODEL
       fileid = sprintf('%s/%s/DIC-combined.txt', ...
-      usepath, mdls{m});
+          usepath, mdls{m});
       if exist(fileid, 'file'),
-        txtfile = fopen(fileid);
-        txtread = textscan(txtfile, 'Model %d: %.3f');
-        dic.full = double(txtread{2});
-        if dic.full == 0, dic.full = NaN;
-        end
-        fclose(txtfile);
+          txtfile = fopen(fileid);
+          txtread = textscan(txtfile, 'Model %d: %.3f');
+          dic.full = double(txtread{2});
+          if dic.full == 0, dic.full = NaN;
+          end
+          fclose(txtfile);
       end
-
-      try
-        plot(bsxfun(@minus, dic.chains, dic.full), 'o');
-        hline(mean(dic.chains) - dic.full, 'b');
-        xlabel('Chains'); ylabel('DIC');
-        if abs(mean(dic.chains) - dic.full) < 1, ...
-          warning('DIC values differ between chains');
-        end
-      end
-      % waitforbuttonpress; close;
-
+            
+      %       plot(bsxfun(@minus, dic.chains, dic.full), 'o');
+      %       hline(mean(dic.chains) - dic.full, 'b');
+      %       xlabel('Chains'); ylabel('DIC');
+      %       if abs(mean(dic.chains) - dic.full) < 1, ...
+      %               warning('DIC values differ between chains');
+      %       end
+      
       % ============================================ %
       % ALSO GET POINT ESTIMATES FROM RESULTS FILE
       % ============================================ %
@@ -131,17 +128,17 @@ function b2_HDDM_readIntoMatlab()
 
           % some crazy rounding errors
           % recode transition probabilities in Anke's data
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.2[0]*1\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.8[0]*4\)', '_repetitive');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.2\)', '_alternating');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.2[0]*1\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.8[0]*4\)', '_alternating');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.2\)', '_repetitive');
           varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.5\)', '_neutral');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.8\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.8\)', '_alternating');
 
-          varnames{v} = regexprep(varnames{v}, '0.2[0]*1\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '0.8[0]*4\)', '_repetitive');
-          varnames{v} = regexprep(varnames{v}, '0.2\)', '_alternating');
+          varnames{v} = regexprep(varnames{v}, '0.2[0]*1\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '0.8[0]*4\)', '_alternating');
+          varnames{v} = regexprep(varnames{v}, '0.2\)', '_repetitive');
           varnames{v} = regexprep(varnames{v}, '0.5\)', '_neutral');
-          varnames{v} = regexprep(varnames{v}, '0.8\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '0.8\)', '_alternating');
 
         end
         assert(isempty(strfind(varnames{v}, 'transitionprob')), 'no correct parsing')
