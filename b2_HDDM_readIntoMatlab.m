@@ -1,7 +1,7 @@
 function b2_HDDM_readIntoMatlab()
 
   addpath(genpath('~/code/Tools'));
-  % warning verbose;
+  warning off;
   close all; clc;
 
   getTraces = false; % ca
@@ -52,7 +52,9 @@ function b2_HDDM_readIntoMatlab()
       % skip if this model is empty
       stuff = dir(sprintf('%s/%s', usepath, mdls{m}));
       stuff = stuff(arrayfun(@(x) ~strcmp(x.name(1),'.'),stuff)); % remove hidden stuff
-      if isempty(stuff), continue;
+      if isempty(stuff),
+        disp('skipping');
+        continue;
       end
 
       disp(mdls{m});
