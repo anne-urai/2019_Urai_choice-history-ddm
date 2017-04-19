@@ -21,14 +21,14 @@ set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ..
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 3:length(datasets),
+for d = 1:length(datasets),
     disp(datasets{d});
-    
+
     % load data
     csvfile = dir(sprintf('~/Data/%s/HDDM/*.csv', datasets{d}));
     csvfile = csvfile(arrayfun(@(x) ~strcmp(x.name(1),'.'), csvfile)); % remove hidden files
     alldata = readtable(sprintf('~/Data/%s/HDDM/%s', datasets{d}, csvfile.name));
-    
+
     % recode Anke's stimulus into stim and coh
     if d == 3,
         alldata.coherence   = abs(alldata.stimulus);
@@ -36,31 +36,31 @@ for d = 3:length(datasets),
         alldata.stimulus2(alldata.coherence == 0) = sign(alldata.motionenergy(alldata.coherence == 0));
         alldata.stimulus    = alldata.stimulus2;
     end
-    
+
     % compute a bunch of basic things from Matlab
     results     = b3b_behaviouralMetrics(alldata);
-    
+
     % get the summary results from HDDM
     hddmresults = readtable(sprintf('~/Data/%s/HDDM/summary/individualresults.csv', datasets{d}));
-    
+
     % most parameters will go under session 0
     hddmresults.session = zeros(size(hddmresults.subjnr));
-    
+
     % will only keep session 0 stuff
     allresults = innerjoin(results, hddmresults);
-    
+
     % now add back all the stuff from the different sessions
     allresults2 = tableAppend(allresults, results);
-    
+
     % remove duplicate rows, save only those with HDDM info
     % http://stackoverflow.com/questions/27547463/matlab-delete-duplicate-table-entries-on-multiple-columns
     [~, ind] = unique(allresults2(:, [1 2]), 'rows');
     tab      = allresults2(ind,:);
-    
+
     % ============================================ %
     % RECODE SESSION-SPECIFIC PARAMETERS
     % ============================================ %
-    
+
     % manually recode the drift rate parameters to match the specific session
     switch d
         case 1 % RT-RDK dataset
@@ -70,13 +70,13 @@ for d = 3:length(datasets),
         case 3 % Anke
             sessions = 1:6;
     end
-    
+
     varidx = find(~cellfun(@isempty, strfind(tab.Properties.VariableNames, sprintf('_s%d_', 1))));
     vars   = tab.Properties.VariableNames(varidx);
-    
+
     for v = 1:length(vars),
         for s = sessions,
-            
+
             % if this is the first session, make a new column for
             % the overall drift rate (which will then be repopulated per
             % session)
@@ -87,7 +87,7 @@ for d = 3:length(datasets),
             else
                 thisvar = regexprep(vars{v}, '_s1_', sprintf('_s%d_', s));
             end
-            
+
             % then, move the values over
             try
                 tab.(newvar)(tab.session == s) = tab.(thisvar)(tab.session == 0);
@@ -97,11 +97,11 @@ for d = 3:length(datasets),
             % tab(:,{vars{v}}) = [];
         end
     end
-    
+
     % remove sessions where no data was recorded
     skippedSession = (isnan(nanmean(tab{:, 3:11}, 2)));
     tab(skippedSession, :) = [];
-    
+
     writetable(tab, sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
-    
+
 end
