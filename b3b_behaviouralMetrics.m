@@ -125,10 +125,20 @@ for sj = subjects,
         
         [d, c] = dprime(data.stimulus, data.response);
         results.dprime(icnt)        = d;
+        assert(~isnan(d), 'dprime cannot be NaN');
         results.criterion(icnt)     = c;
         results.abscriterion(icnt)  = abs(c);
         results.accuracy(icnt)      = nanmean(data.correct);
         results.rt(icnt)            = nanmedian(data.rt);
+    
+        if sum(strcmp(data.Properties.VariableNames, 'coherence')) > 0,
+            cohlevels = unique(data.coherence);
+            for c = 1:length(cohlevels),
+                results.(['dprime_c' num2str(cohlevels(c)*100)])(icnt) = ...
+                    dprime(data.stimulus(data.coherence == cohlevels(c)), ...
+                    data.response(data.coherence == cohlevels(c)));
+            end
+        end
         
         % measure of repetition behaviour
         data.repeat = [~(abs(diff(data.response)) > 0); NaN];
