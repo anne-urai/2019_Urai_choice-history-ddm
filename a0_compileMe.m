@@ -43,7 +43,7 @@ dlmwrite('allblocks', alldat, 'delimiter', ' ');
 % ============================================ #
 
 datasets   = [3]; % RT-RDK and MEG-PL
-models     = [0:5 11:16]; % the nr of the models
+models     = [0:2 11:13]; % the nr of the models
 nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
