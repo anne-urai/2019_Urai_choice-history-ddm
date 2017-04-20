@@ -10,7 +10,7 @@ function b2_HDDM_readIntoMatlab()
   case 'anne' % local
     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential'};
   case 'aeurai' % lisa/cartesius
-    datasets = {'RT_RDK', 'MEG', 'Anke_serial'};
+    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral'};
   end
 
   for d = 1:length(datasets),

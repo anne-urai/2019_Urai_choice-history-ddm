@@ -540,7 +540,8 @@ def concat_models(mypath, model_name):
         num_subj = 25
     if datasets[dx] == 'Anke_serial':
         num_subj = 27
-    #size_plot   = ceil(num_subj / 4.0 * 1.5)
+    if datasets[dx] == 'Anke_neutral':
+        num_subj = 27
 
     figpath = os.path.join(mypath, model_name, 'figures-concat')
     if not os.path.exists(figpath):

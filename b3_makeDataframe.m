@@ -14,7 +14,7 @@ switch usr
     case 'anne' % local
         datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential'};
     case 'aeurai' % lisa/cartesius
-        datasets = {'RT_RDK', 'MEG', 'Anke_serial'};
+        datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral'};
 end
 
 set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
@@ -30,7 +30,7 @@ for d = 1:length(datasets),
     alldata = readtable(sprintf('~/Data/%s/HDDM/%s', datasets{d}, csvfile.name));
 
     % recode Anke's stimulus into stim and coh
-    if d == 3,
+    if d > 2,
         alldata.coherence   = abs(alldata.stimulus);
         alldata.stimulus2   = sign(alldata.stimulus);
         alldata.stimulus2(alldata.coherence == 0) = sign(alldata.motionenergy(alldata.coherence == 0));
