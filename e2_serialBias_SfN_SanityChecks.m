@@ -1,8 +1,8 @@
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames
-datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential'};
-datasetnames = {'RT', '2IFC', 'Anke'};
+datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_neutral', 'Anke_2afc_sequential'};
+datasetnames = {'RT', '2IFC', 'Anke neutral', 'Anke all'};
 
 set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
@@ -11,6 +11,7 @@ set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, 
 % ========================================== %
 % DOES DRIFT RATE CORRELATE WITH D'?
 % ========================================== %
+
 cnt = 1;
 for d = 1:2,
     
@@ -93,6 +94,7 @@ allcohs = repmat([0 5 10 20 40 60], size(alldrift, 1), 1);
 g = gscatter(alldprime(:), alldrift(:), allcohs(:), plasma(numel(unique(allcohs))), '.', 8, 'off');
 xlabel('d'''); ylabel('v ~ stimulus');
 
+
 box off;
 l = legend(g, {'0', '5', '10', '20', '40', '60'});
 l.Position(1) = l.Position(1) + 0.08;
@@ -109,6 +111,10 @@ title(datasetnames{d});
 % ======================================================= %
 % ANKE'S DATA - correlate accuracy with serial bias
 % ======================================================= %
+
+d = 4;
+dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
+    datasets{d}));
 
 % get the sessions separately per condition
 subplot(4,4,11);

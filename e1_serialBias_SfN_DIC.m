@@ -3,10 +3,10 @@ function e1_serialBias_SfN_DIC()
 addpath(genpath('~/code/Tools'));
 warning off; close all;
 global datasets datasetnames
-datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential'};
-datasetnames = {'RT', '2IFC', 'Anke'};
+datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_neutral', 'Anke_2afc_sequential'};
+datasetnames = {'RT', '2IFC', 'Anke neutral', 'Anke all'};
 
-set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1.1, ...
+set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
@@ -22,17 +22,17 @@ for s = 1:2
     mdls = {'dc_prevresp', 'z_prevresp', ...
         'dc_z_prevresp'};
     for d = 1:length(datasets),
-        subplot(4,4,d);
+        subplot(5,5,d);
         getPlotDIC(mdls, types{s}, d);
         title(['Data: ' datasetnames{d}]);
     end
     
-    subplot(4,4,d+1);
+    subplot(5,5,d+1);
     switch types{s}
         case 'stimcoding'
-            text(0, 0.5, {'Stimcoding models' 'prevresp'}, 'fontsize', 6);
+            text(-0.2, 0.5, {'Stimcoding models' 'prevresp'}, 'fontsize', 6);
         case 'regress'
-            text(0, 0.7, {'Regression models', ...
+            text(-0.2, 0.6, {'Regression models', ...
                 'v ~ 1 + stimulus + prevresp', ...
                 'z ~ 1 + prevresp'}, 'fontsize', 6);
     end
@@ -42,15 +42,15 @@ for s = 1:2
     mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
         'dc_z_prevresp_prevstim'};
     for d = 1:length(datasets),
-        subplot(4,4,d+4);
+        subplot(5,5,d+5);
         getPlotDIC(mdls, types{s}, d);
     end
-    subplot(4,4,d+5);
+    subplot(5,5,d+6);
     switch types{s}
         case 'stimcoding'
-            text(0, 0.5, {'Stimcoding models' 'prevresp + prevstim'}, 'fontsize', 6);
+            text(-0.2, 0.5, {'Stimcoding models' 'prevresp + prevstim'}, 'fontsize', 6);
         case 'regress'
-            text(0, 0.7, {'Regression models', ...
+            text(-0.2, 0.6, {'Regression models', ...
                 'v ~ 1 + stimulus + prevresp + prevstim', ...
                 'z ~ 1 + prevresp + prevstim'}, 'fontsize', 6);
     end
@@ -67,6 +67,7 @@ end
 
 function getPlotDIC(mdls, s, d)
 global datasets
+axis square;
 
 mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
@@ -91,21 +92,20 @@ bar(mdldic(1:2), 'facecolor', linspecer(1));
 %# Add a text string above/below each bin
 for i = 1:2,
     if mdldic(i) < 0,
-        text(i, mdldic(i) - 0.05*range(get(gca, 'ylim')), ...
+        text(i, mdldic(i) - 0.06*range(get(gca, 'ylim')), ...
             num2str(round(mdldic(i))), ...
             'VerticalAlignment', 'top', 'FontSize', 6, 'horizontalalignment', 'center');
     elseif mdldic(i) > 0,
-        text(i, mdldic(i) + 0.1*range(get(gca, 'ylim')), ...
+        text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
             num2str(round(mdldic(i))), ...
             'VerticalAlignment', 'top', 'FontSize', 6, 'horizontalalignment', 'center');
     end
 end
 
 box off;
-ylabel('\Delta DIC (from full model)');
+ylabel('\Delta DIC (from full)');
 set(gca, 'xticklabel', {'dc', 'z'});
 % set(gca, 'YTickLabel', num2str(get(gca, 'YTick')'));
-axis square;
 xlim([0 3]);
 
 end

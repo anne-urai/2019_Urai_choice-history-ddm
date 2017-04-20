@@ -51,7 +51,7 @@ for d = 1:length(datasets),
     end
 end
 
-print(gcf, '-dpdf', '~/Data/serialHDDM/fig2_driftrate.pdf');
+print(gcf, '-dpdf', '~/Data/serialHDDM/fig4_RTdistributions.pdf');
 
 end
 
