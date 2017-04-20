@@ -118,7 +118,7 @@ try
         varnames{v} = regexprep(varnames{v}, '\[', '(');
         varnames{v} = regexprep(varnames{v}, '\]', ')');
 
-        if d == 3,
+        if d > 2,
 
           varnames{v} = regexprep(varnames{v}, '1.0', '1');
 
