@@ -21,8 +21,7 @@ for d = 1:2,
     
     % find the v_stimulus variable
     varnames = find(~cellfun(@isempty, ...
-        regexp(dat.Properties.VariableNames, 'v_stimulus__regressdcprev')));
-    
+        regexp(dat.Properties.VariableNames, 'v_stimulus__regressdcprevrespstimrt')));
     % find the one with the most values (i.e. one per session)
     tmpdat          = dat{:, varnames};
     nrdatapoints    = sum(~isnan(tmpdat), 1);
