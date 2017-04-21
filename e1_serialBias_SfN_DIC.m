@@ -3,8 +3,8 @@ function e1_serialBias_SfN_DIC()
 addpath(genpath('~/code/Tools'));
 warning off; close all;
 global datasets datasetnames
-datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_neutral'}; %, 'Anke_2afc_sequential'};
-datasetnames = {'RT', '2IFC', 'Anke neutral', 'Anke all'};
+datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral', 'Anke_2afc_sequential'};
+datasetnames = {'RT', '2IFC',  'NatComm', 'Anke neutral', 'Anke all'};
 
 set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
@@ -64,12 +64,12 @@ end
 % DIC COMPARISON BETWEEN DC, Z AND BOTH
 % ============================================ %
 
-clf;
+clf; nrsubpl = length(datasets);
 mdls = {'dc_prevresp', 'dc_prevresp_prevstim', 'dc_prevresp_prevstim_prevrt', ...
     'dc_prevresp_prevstim_prevrt_prevpupil', 'dc_prevresp_prevstim_prevrt_prevpupil_sessions', ...
     'dc_prevresp_prevstim_sessions'};
 for d = 1:length(datasets),
-    subplot(nrsubpl, nrsubpl,d);
+    subplot(nrsubpl, nrsubpl, d);
     getPlotDIC(mdls, types{s}, d);
     set(gca, 'xtick', 1:5, 'xticklabel',...
         {'[1]', '[2]', '[4]', '[5]', '[6]'});
@@ -85,7 +85,8 @@ text(-0.2, 0.6, {'Regression models', ...
     '[5] ... + prevpupil*prevresp + prevpupil*prevstim', ...
     '[6] ... + serialbias:session', ...
     }, 'fontsize', 6); axis off;
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_prevresp_prevstim.pdf'));
+subplot(5,5,11); plot(1,1, 'w.'); axis off;
+print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig1_DIC_prevresp_prevstim.eps'));
 
 end
 
@@ -101,7 +102,7 @@ mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
     if ~exist(sprintf('~/Data/%s/HDDM/summary/%s_%s_all.mat', ...
             datasets{d}, s, mdls{m}), 'file'),
-        return;
+        continue;
     end
     
     load(sprintf('~/Data/%s/HDDM/summary/%s_%s_all.mat', ...
@@ -114,7 +115,9 @@ for m = 1:length(mdls),
 end
 
 % if there are two, take the mean
-if numel(mdldic) == 2, mdldic(3) = nanmean(mdldic(1:2)); end
+if numel(mdldic) == 2 | isnan(mdldic(3)), 
+    mdldic(3) = nanmean(mdldic(1:2));
+end
 
 % everything relative to the full mdoel
 mdldic = bsxfun(@minus, mdldic, mdldic(end));

@@ -162,8 +162,12 @@ rtnorm      = splitapply(normalize, log(t.rt), ...
 rtnorm      = cat(1, rtnorm{:});
 t.prevrt    = circshift(rtnorm, 1); % use this normalized version
 
+pupilnorm   = splitapply(normalize, t.decision_pupil, ...
+    findgroups(t.subj_idx, t.session, t.block));
+pupilnorm   = cat(1, pupilnorm{:});
+
 % pupil has already been zscored during preprocessing
-t.prevpupil = circshift(t.decision_pupil, 1);
+t.prevpupil = circshift(pupilnorm, 1);
 
 % remove trials where the previous trial was not immediately preceding
 wrongtrls               = find([NaN; diff(t.trial)] ~= 1);
