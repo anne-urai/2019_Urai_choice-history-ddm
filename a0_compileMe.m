@@ -66,7 +66,7 @@ size(alldat)
 alldat = [];
 for a = datasets,
     % dont run Ankes data with the session version
-    for b = 0:max(models),
+    for b = models,
       %if ~(a == 2 & ismember(b, [6 8 10])),
         alldat = [alldat; a b];
     %  end
