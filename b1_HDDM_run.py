@@ -542,6 +542,8 @@ def concat_models(mypath, model_name):
         num_subj = 27
     if datasets[dx] == 'Anke_neutral':
         num_subj = 27
+    if datasets[dx] == 'NatComm':
+        num_subj = 27
 
     figpath = os.path.join(mypath, model_name, 'figures-concat')
     if not os.path.exists(figpath):
@@ -603,7 +605,7 @@ models = ['stimcoding_dc_prevresp_prevstim', # 0
     'regress_z_prevresp', # 15
     'regress_dc_z_prevresp'] # 16
 
-datasets = ['RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral']
+datasets = ['RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm']
 
 # recode
 if isinstance(d, int):

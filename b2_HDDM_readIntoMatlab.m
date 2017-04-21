@@ -8,9 +8,9 @@ function b2_HDDM_readIntoMatlab()
   usr = getenv('USER');
   switch usr
   case 'anne' % local
-    datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential'};
+    datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
   case 'aeurai' % lisa/cartesius
-    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral'};
+    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm'};
   end
 
   for d = 1:length(datasets),
