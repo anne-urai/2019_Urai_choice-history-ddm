@@ -7,9 +7,9 @@ function b2_HDDM_readIntoMatlab()
   getTraces = false; % ca
   usr = getenv('USER');
   switch usr
-  case 'anne' % local
+    case 'anne' % local
     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
-  case 'aeurai' % lisa/cartesius
+    case 'aeurai' % lisa/cartesius
     datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm'};
   end
 
@@ -39,15 +39,18 @@ function b2_HDDM_readIntoMatlab()
     end
 
     switch d
-    case 1 % RT-RDK
+      case 1 % RT-RDK
       subjects = [3:15 17:25];
-    case 2 % MEG
+      case 2 % MEG
       subjects = 2:65;
-    case 3 % Anke
+      case 3 % Anke
       subjects = [1:7 9 11:16 18:21 23 24 26 27];
+      case 4 % NatComm
+      subjects = 1:27;
     end
 
     for m = 1:length(mdls),
+      disp(mdls{m});
 
       % skip if this model is empty
       stuff = dir(sprintf('%s/%s', usepath, mdls{m}));
@@ -57,7 +60,6 @@ function b2_HDDM_readIntoMatlab()
         continue;
       end
 
-      disp(mdls{m});
       chains = 0:14;
       clear dat alldat dic;
 
@@ -103,7 +105,12 @@ function b2_HDDM_readIntoMatlab()
       % ALSO GET POINT ESTIMATES FROM RESULTS FILE
       % ============================================ %
 
-try
+      if ~exist(sprintf('%s/%s/results-combined.csv', ...
+        usepath, mdls{m}), 'file'),
+        disp('skipping');
+        continue;
+      end
+
       % compare with results
       pointestimates = readtable(sprintf('%s/%s/results-combined.csv', ...
       usepath, mdls{m}), 'readrownames', 1);
@@ -118,10 +125,24 @@ try
         varnames{v} = regexprep(varnames{v}, '\[', '(');
         varnames{v} = regexprep(varnames{v}, '\]', ')');
 
-        if d > 2,
+        switch datasets{d},
+
+          case 'NatComm'
 
           varnames{v} = regexprep(varnames{v}, '1.0', '1');
 
+          % recode coherence levels
+          varnames{v} = regexprep(varnames{v}, '\(0.00625\)', '_c0_0625');
+          varnames{v} = regexprep(varnames{v}, '\(0.0125\)', '_c1_25');
+          varnames{v} = regexprep(varnames{v}, '\(0.025\)', '_c2_5');
+          varnames{v} = regexprep(varnames{v}, '\(0.05\)', '_c5');
+          varnames{v} = regexprep(varnames{v}, '\(0.1\)', '_c10');
+          varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
+          varnames{v} = regexprep(varnames{v}, '\(0.3\)', '_c30');
+
+          case {'Anke_neutral', 'Anke_serial'}
+
+          varnames{v} = regexprep(varnames{v}, '1.0', '1');
           % recode coherence levels in Anke's data
           varnames{v} = regexprep(varnames{v}, '\(0.0\)', '_c0');
           varnames{v} = regexprep(varnames{v}, '\(0.05\)', '_c5');
@@ -143,8 +164,8 @@ try
           varnames{v} = regexprep(varnames{v}, '0.2\)', '_alternating');
           varnames{v} = regexprep(varnames{v}, '0.5\)', '_neutral');
           varnames{v} = regexprep(varnames{v}, '0.8\)', '_repetitive');
-
         end
+
         assert(isempty(strfind(varnames{v}, 'transitionprob')), 'no correct parsing')
 
         % recode some stuff
@@ -208,16 +229,16 @@ try
       savefast(sprintf('%s/summary/%s_all.mat', ...
       usepath, mdls{m}), 'group', 'individuals', 'dic');
       toc;
-end
+
     end % mdls
 
     % ============================================ %
     % ONE LARGE TABLE FOR THIS DATASET
     % ============================================ %
 
+    disp('making table');
     results = array2table(subjects', 'variablenames', {'subjnr'});
     for m = 1:length(mdls),
-      disp(mdls{m});
       if exist(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'), 'file'),
         load(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'));
         flds = fieldnames(individuals);

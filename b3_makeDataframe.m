@@ -69,6 +69,8 @@ for d = 1:length(datasets),
             sessions = 1:5;
         case 3 % Anke
             sessions = 1:6;
+        case 4 % NatComm
+            sessions = 2:6;
     end
 
     varidx = find(~cellfun(@isempty, strfind(tab.Properties.VariableNames, sprintf('_s%d_', 1))));
