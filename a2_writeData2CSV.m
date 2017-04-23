@@ -17,15 +17,15 @@ if ~exist('subjects', 'var'), subjects = [3:15 17:25]; end % 16 was excluded
 
 for sj = subjects,
     clearvars -except subjects sj datapath;
-
+    
     if exist(sprintf('%s/P%02d_alleye.mat', datapath, sj), 'file'),
         continue;
     end
-
+    
     % check if the full dataset is not there yet
     cd(sprintf('%s/P%02d/pupil', datapath, sj));
     eyelinkfiles = dir(sprintf('P%02d*_eyeclean.mat', sj));
-
+    
     % make sure these are in the right order!
     % otherwise, indexing of trials will go awry
     for f = 1:length(eyelinkfiles),
@@ -35,7 +35,7 @@ for sj = subjects,
     [sorted, sortidx]   = sort(snum(:,1)); % sort by session
     sorted(:,2)         = snum(sortidx, 2); % sort by block
     eyelinkfiles        = eyelinkfiles(sortidx);
-
+    
     cfg             = [];
     cfg.inputfile   = {eyelinkfiles.name};
     cfg.outputfile  = sprintf('%s/P%02d_alleye.mat', datapath, sj);
@@ -51,7 +51,7 @@ end
 
 clearvars -except subjects datapath
 for sj = subjects,
-
+    
     clearvars -except sj subjects alldat datapath;
     load(sprintf('%s/P%02d_alleye.mat', datapath, sj)); % contains all data over sessions
     data.fsample    = 100;
@@ -68,42 +68,42 @@ for sj = subjects,
     %     data            = ft_selectdata(cfg, data);
     
     pupilchan       = find(strcmp(data.label, 'EyePupil')==1);
-
+    
     assert(all(data.trialinfo(:,2)>50), 'wrongly coded stimulus');
     assert(all(data.trialinfo(~isnan(data.trialinfo(:, 4)),4)>50), 'wrongly coded stimulus');
-
+    
     % compute RT again
     RT          = data.trialinfo(:,6);
-
+    
     % trialinfo matrix as it is
     baseline_pupil      = nan(length(data.trial), 1);
     response_pupil      = nan(length(data.trial), 1);
     decision_pupil      = nan(length(data.trial), 1);
     feedback_pupil      = nan(length(data.trial), 1);
-
+    
     for t = 1:length(data.trial),
-
+        
         % baseline
         stimstart = data.trialinfo(t,3)-data.trialinfo(t,1);
         baseline_pupil(t)  = mean(data.trial{t}(pupilchan, stimstart-0.5*data.fsample : stimstart));
-
+        
         % dilation 1.5s after decision - subtract pretrial baseline
         responseonset  = data.trialinfo(t,7) - data.trialinfo(t,1);
         response_pupil(t) = mean(data.trial{t}(pupilchan, responseonset : responseonset+1.5*data.fsample)) - baseline_pupil(t);
-
+        
         % dilation before feedback - subtract pretrial baseline
         fbonset  = data.trialinfo(t,9) - data.trialinfo(t,1);
         decision_pupil(t) = mean(data.trial{t}(pupilchan, fbonset - 0.5*data.fsample : fbonset)) - baseline_pupil(t);
-
+        
         % dilation after feedback - subtract pretrial baseline
         feedback_pupil(t) = mean(data.trial{t}(pupilchan, fbonset : fbonset+1.5*data.fsample)) - baseline_pupil(t);
-
+        
     end
-
+    
     alldat{sj} = [data.trialinfo(:,2) data.trialinfo(:,4) RT data.trialinfo(:,5) ...
         data.trialinfo(:, [10 11 12]) sj*ones(size(RT)) ...
         baseline_pupil response_pupil decision_pupil feedback_pupil];
-
+    
     switch sj
         case {3, 5, 15, 18}
             alldat{sj}(:, 7) = alldat{sj}(:, 7) - 1; % start at session 1
@@ -118,9 +118,9 @@ for sj = subjects,
         otherwise
             assert(isequal(unique(alldat{sj}(:, 7))', 1:5), 'did not find 5 sessions');
     end
-
+    
     fprintf('\n subject %d, sessions %d %d %d %d %d %d %d \n\n', sj, unique(alldat{sj}(:, 7))');
-
+    
     subplot(5,5,find(sj==subjects));
     plot(baseline_pupil, response_pupil, '.'); %l = lsline; set(l, 'color', 'k');
     axis tight; axis square; set(gca, 'tickdir', 'out');
@@ -149,6 +149,11 @@ t.rt(t.rt < 0.15) = NaN;
 t.prevresp  = circshift(sign(t.response - 0.5), 1);
 t.prevstim  = circshift(t.stimulus, 1);
 
+t.prev2resp  = circshift(sign(t.response - 0.5), 2);
+t.prev2stim  = circshift(t.stimulus, 2);
+t.prev3resp  = circshift(sign(t.response - 0.5), 3);
+t.prev3stim  = circshift(t.stimulus, 3);
+
 % sort so that findgroups returns the right order
 t = sortrows(t, {'subj_idx', 'session', 'block'});
 
@@ -161,6 +166,8 @@ rtnorm      = splitapply(normalize, log(t.rt), ...
     findgroups(t.subj_idx, t.session, t.block));
 rtnorm      = cat(1, rtnorm{:});
 t.prevrt    = circshift(rtnorm, 1); % use this normalized version
+t.prev2rt    = circshift(rtnorm, 2); % use this normalized version
+t.prev3rt    = circshift(rtnorm, 3); % use this normalized version
 
 pupilnorm   = splitapply(normalize, t.decision_pupil, ...
     findgroups(t.subj_idx, t.session, t.block));
@@ -168,6 +175,8 @@ pupilnorm   = cat(1, pupilnorm{:});
 
 % pupil has already been zscored during preprocessing
 t.prevpupil = circshift(pupilnorm, 1);
+t.prev2pupil = circshift(pupilnorm, 2);
+t.prev3pupil = circshift(pupilnorm, 3);
 
 % remove trials where the previous trial was not immediately preceding
 wrongtrls               = find([NaN; diff(t.trial)] ~= 1);
@@ -179,7 +188,8 @@ t.session(t.subj_idx == 17 & t.session == 5) = 4;
 
 % remove irrelevant variables
 t = t(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', ...
-    'response', 'rt', 'prevstim', 'prevresp', 'prevrt', 'prevpupil'});
+    'response', 'rt', 'prevstim', 'prevresp', 'prevrt', 'prevpupil', ...
+    'prev2resp', 'prev3resp', 'prev2stim', 'prev3stim', 'prev2rt', 'prev3rt', 'prev2pupil', 'prev3pupil'});
 
 % remove trials with any NaN left in them
 nanidx = find(isnan(mean(t{:, :}, 2)));

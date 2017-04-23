@@ -52,7 +52,10 @@ function e6_serialBias_SfN_modelFree_fromPython
     end
     
     savefast(sprintf('~/Data/serialHDDM/fig4_PostPredPython_%s_modes.mat', ...
-    datasets{d}), 'distmodes');
+        datasets{d}), 'distmodes');
+    
+    % plot distributions of the modes
+    % sj, stimulus, param, prevresp, choice
   end
 end
 
