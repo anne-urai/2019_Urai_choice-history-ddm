@@ -324,6 +324,50 @@ def make_model(mypath, model_name, trace_id):
         group_only_regressors=False, p_outlier=0.05)
 
     # ============================================ #
+    # INCLUDE LAGS FURTHER INTO THE PAST
+    # ============================================ #
+
+    if model_name == 'regress_dc_prev2resp_prev2stim':
+
+        # subselect data
+        mydata = balance_designmatrix(mydata)
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(transitionprob) +' \
+                'prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob)',
+                'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp + prev2resp + prevstim + prev2stim', 'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x} # boundary separation as a function of sessions
+        reg_both = [v_reg, a_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    if model_name == 'regress_dc_prev3resp_prev3stim':
+
+        # subselect data
+        mydata = balance_designmatrix(mydata)
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp:C(transitionprob) +' \
+                'prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob) + ' \
+                'prev3resp:C(transitionprob) + prev3stim:C(transitionprob)',
+                'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus:C(session) + prevresp + prev2resp + ' \
+            'prevstim + prev2stim + prev3resp + prev3stim', 'link_func': lambda x:x}
+        a_reg = {'model': 'a ~ 1 + C(session)', 'link_func': lambda x:x} # boundary separation as a function of sessions
+        reg_both = [v_reg, a_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
+    # ============================================ #
     # STIMCODING WITH ONLY PREVRESP
     # ============================================ #
 
@@ -638,7 +682,9 @@ models = ['stimcoding_dc_prevresp_prevstim', # 0
     'stimcoding_dc_z_prevresp', # 13
     'regress_dc_prevresp', # 14
     'regress_z_prevresp', # 15
-    'regress_dc_z_prevresp'] # 16
+    'regress_dc_z_prevresp', # 16
+    'regress_dc_prev2resp_prev2stim', # 17
+    'regress_dc_prev3resp_prev3stim'] # 18
 
 datasets = ['RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm']
 
