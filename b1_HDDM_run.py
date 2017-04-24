@@ -582,9 +582,7 @@ def concat_models(mypath, model_name):
         num_subj = 65
     if datasets[dx] == 'RT_RDK':
         num_subj = 25
-    if datasets[dx] == 'Anke_serial':
-        num_subj = 27
-    if datasets[dx] == 'Anke_neutral':
+    if datasets[dx] in ['Anke_serial', 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating']:
         num_subj = 27
     if datasets[dx] == 'NatComm':
         num_subj = 27
@@ -686,7 +684,13 @@ models = ['stimcoding_dc_prevresp_prevstim', # 0
     'regress_dc_prev2resp_prev2stim', # 17
     'regress_dc_prev3resp_prev3stim'] # 18
 
-datasets = ['RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm']
+datasets = ['RT_RDK', # 0
+    'MEG', # 1
+    'Anke_serial', # 2
+    'Anke_neutral', # 3
+    'NatComm', # 4
+    'Anke_repetitive', # 5
+    'Anke_alternating'] # 6
 
 # recode
 if isinstance(d, int):

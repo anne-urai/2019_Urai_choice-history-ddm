@@ -10,10 +10,11 @@ function b2_HDDM_readIntoMatlab()
     case 'anne' % local
     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
     case 'aeurai' % lisa/cartesius
-    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm'};
+    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm', ...
+      'Anke_repetitive', 'Anke_alternating'};
   end
 
-  for d = 1:length(datasets),
+  for d = 6:7, %1:length(datasets),
     usepath = sprintf('~/Data/%s/HDDM', datasets{d});
     disp(usepath);
     mdls = {'stimcoding_dc_prevresp_prevstim', ...
@@ -38,14 +39,14 @@ function b2_HDDM_readIntoMatlab()
       cd(usepath); mkdir('summary');
     end
 
-    switch d
-      case 1 % RT-RDK
+    switch datasets{d}
+      case 'RT_RDK'
       subjects = [3:15 17:25];
-      case 2 % MEG
+      case 'MEG'
       subjects = 2:65;
-      case 3 % Anke
+      case {'Anke_serial', 'Anke_neutral', 'Anke_repetitive', 'Anke_altenating'},
       subjects = [1:7 9 11:16 18:21 23 24 26 27];
-      case 4 % NatComm
+      case 'NatComm'
       subjects = 1:27;
     end
 
@@ -140,7 +141,7 @@ function b2_HDDM_readIntoMatlab()
           varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
           varnames{v} = regexprep(varnames{v}, '\(0.3\)', '_c30');
 
-          case {'Anke_neutral', 'Anke_serial'}
+          case {'Anke_neutral', 'Anke_serial', 'Anke_repetitive', 'Anke_alternating'}
 
           varnames{v} = regexprep(varnames{v}, '1.0', '1');
           % recode coherence levels in Anke's data

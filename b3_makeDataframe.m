@@ -14,14 +14,15 @@ switch usr
     case 'anne' % local
         datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
     case 'aeurai' % lisa/cartesius
-        datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm'};
-end
+    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm', ...
+      'Anke_repetitive', 'Anke_alternating'};
+    end
 
 set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 1:length(datasets),
+for d = 6:7, %1:length(datasets),
     disp(datasets{d});
 
     % load data
@@ -62,15 +63,15 @@ for d = 1:length(datasets),
     % ============================================ %
 
     % manually recode the drift rate parameters to match the specific session
-    switch d
-        case 1 % RT-RDK dataset
-            sessions = 1:5;
-        case 2 % MEG
-            sessions = 1:5;
-        case 3 % Anke
-            sessions = 1:6;
-        case 4 % NatComm
-            sessions = 2:6;
+    switch datasets{d}
+      case 'RT_RDK'
+      sessions = 1:5;
+      case 'MEG'
+      sessions = 1:5;
+      case {'Anke_serial', 'Anke_neutral', 'Anke_repetitive', 'Anke_altenating'},
+      sessions = 1:6;
+      case 'NatComm'
+      sessions = 1:5;
     end
 
     varidx = find(~cellfun(@isempty, strfind(tab.Properties.VariableNames, sprintf('_s%d_', 1))));
