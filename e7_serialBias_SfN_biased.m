@@ -2,10 +2,20 @@
 % ANKE'S DATA - which parameter changes with transprob?
 % ======================================================= %
 
+% test that z indeed means more repetition in stimcoding
+
 close all; clear; clc;
 
 traces = readtable(sprintf('~/Data/Anke_2afc_sequential/HDDM/regress_dc_z_prevresp_prevstim/group_traces.csv'));
 colors = flipud(linspecer(3));
+
+% correlate higher z with more repetition
+z_link_func = @(x) 1./(1+exp(x))';
+trvars = traces.Properties.VariableNames;
+zcells = find(~cellfun(@isempty, strfind(trvars, 'z_')));
+for z = zcells,
+    traces.(trvars{z}) = z_link_func(traces.(trvars{z}))';
+end
 
 % recode some stuff
 params = {'v', 'z'};
@@ -35,9 +45,9 @@ for p = 1:length(params),
     
 end
 
-l = legend({'Repetitive', 'Neutral', 'Alternating'});
+l             = legend({'Repetitive', 'Neutral', 'Alternating'});
 l.Position(2) = l.Position(2) - 0.25;
-l.Box = 'off';
+l.Box         = 'off';
 
 print(gcf, '-dpdf', '~/Data/serialHDDM/fig7_Anke_conditions.pdf');
 
@@ -48,6 +58,14 @@ print(gcf, '-dpdf', '~/Data/serialHDDM/fig7_Anke_conditions.pdf');
 close all; clear; clc;
 dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
     'Anke_2afc_sequential'));
+
+% correlate higher z with more repetition
+z_link_func = @(x) 1./(1+exp(x))';
+trvars = dat.Properties.VariableNames;
+zcells = find(~cellfun(@isempty, strfind(trvars, 'z_')));
+for z = zcells,
+    dat.(trvars{z}) = z_link_func(dat.(trvars{z}))';
+end
 
 % recode some stuff
 params = {'v', 'z'};
@@ -62,7 +80,6 @@ for p = 1:length(params),
             dat.(sprintf('%s_prevstim_%s__regressdczprevrespstim', params{p}, tp{t}));
     end
 end
-
 
 params = {'v_prevresp', 'v_prevstim', 'z_prevresp', 'z_prevstim', ...
     'v_prevcorrect', 'v_preverror', 'z_prevcorrect', 'z_preverror' };
@@ -80,8 +97,11 @@ for p = 1:length(params),
     allcondition = repmat([0.2 0.5 0.8], size(allserialbias, 1), 1);
     g = gscatter(allserialbias(:),  allaccuracy(:), allcondition(:), flipud(linspecer(3)), '.', 8, 'off');
     xlabel(regexprep(params{p}, '\_', ' ~ ')); ylabel('p(repeat)');
+    axis tight;
     lsline;
-    hline(0.5); vline(0);
+    hline(0.5);
+    
+    % vline(0);
     
     axisNotSoTight; axis square; box off;
     
@@ -89,12 +109,55 @@ for p = 1:length(params),
     %     for i = 1:3,
     %         [rho(i), pval(i)] = corr(allaccuracy(:, i), allserialbias(:, i), 'type', 'spearman');
     %     end
-
+    
 end
 l = legend({'Repetitive', 'Neutral', 'Alternating'});
 l.Position(2) = l.Position(2) - 0.25;
 l.Box = 'off';
 print(gcf, '-dpdf', '~/Data/serialHDDM/fig7_Anke_conditions2.pdf');
+
+% ======================================================= %
+% ANKE'S DATA - correlate with stimcoding model
+% ======================================================= %
+
+close all; clc;
+params = {'z', 'dc'};
+
+for p = 1:length(params),
+    
+    subplot(4,4,p);
+    allaccuracy     = [splitapply(@nanmean, dat.repetition(dat.transitionprob == 0.2), ....
+        findgroups(dat.subjnr(dat.transitionprob == 0.2))),  ...
+        splitapply(@nanmean, dat.repetition(dat.transitionprob == 0.5), ...
+        findgroups(dat.subjnr(dat.transitionprob == 0.5))) ...
+        splitapply(@nanmean, dat.repetition(dat.transitionprob == 0.8), ...
+        findgroups(dat.subjnr(dat.transitionprob == 0.8)))];
+    
+    allserialbias  = dat{dat.session == 0, ...
+        {sprintf('%s_1_alternating__stimcodingdczprevresp', params{p}), ...
+        sprintf('%s_2_alternating__stimcodingdczprevresp', params{p}), ...
+        sprintf('%s_1_neutral__stimcodingdczprevresp', params{p}), ...
+        sprintf('%s_2_neutral__stimcodingdczprevresp', params{p}), ...
+        sprintf('%s_1_repetitive__stimcodingdczprevresp', params{p}), ...
+        sprintf('%s_2_repetitive__stimcodingdczprevresp', params{p})}};
+    allserialbias = [allserialbias(:, 1) - allserialbias(:, 2) ...
+        allserialbias(:, 3) - allserialbias(:, 4) ...
+        allserialbias(:, 5) - allserialbias(:, 6)];
+    
+    allcondition = repmat([0.2 0.5 0.8], size(allserialbias, 1), 1);
+    g = gscatter(allserialbias(:),  allaccuracy(:), allcondition(:), flipud(linspecer(3)), '.', 8, 'off');
+    xlabel(regexprep(params{p}, '\_', ' ~ ')); ylabel('p(repeat)');
+    axis tight;
+    lsline;
+    hline(0.5);
+    axisNotSoTight; axis square; box off;
+    
+end
+l = legend({'Repetitive', 'Neutral', 'Alternating'});
+l.Position(2) = l.Position(2) - 0.25;
+l.Box = 'off';
+print(gcf, '-dpdf', '~/Data/serialHDDM/fig7_Anke_conditions2_stimcoding.pdf');
+
 
 % ======================================================= %
 % ANKE'S DATA - correlate accuracy with serial bias

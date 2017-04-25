@@ -8,7 +8,7 @@ warning off;
 % ========================================== %
 
 % preallocate variables
-varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'abscriterion', 'rt', ...
+varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'bias', 'abscriterion', 'rt', ...
     'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error', ...
     'rt_valid_slow_correct', 'rt_valid_fast_correct', 'rt_invalid_slow_correct', 'rt_invalid_fast_correct', ...
     'rt_valid_slow_error', 'rt_valid_fast_error', 'rt_invalid_slow_error', 'rt_invalid_fast_error', ...
@@ -141,6 +141,7 @@ for sj = subjects,
         results.abscriterion(icnt)  = abs(c);
         results.accuracy(icnt)      = nanmean(data.correct);
         results.rt(icnt)            = nanmedian(data.rt);
+        results.bias(icnt)          = nanmean(data.response);
 
         if sum(strcmp(data.Properties.VariableNames, 'coherence')) > 0,
             cohlevels = unique(data.coherence);

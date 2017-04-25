@@ -22,14 +22,14 @@ for s = 1:2
     clf;
     mdls = {'dc_prevresp', 'z_prevresp', ...
         'dc_z_prevresp'};
-    for d = 1:length(datasets),
-        subplot(nrsubpl, nrsubpl, d);
+    for d = 1:3,
+        subplot(4, 4, d);
         getPlotDIC(mdls, types{s}, d, 1);
         title(['Data: ' datasetnames{d}]);
         set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
     end
     
-    subplot(nrsubpl,nrsubpl,d+1);
+    subplot(4,4,4);
     switch types{s}
         case 'stimcoding'
             text(-0.2, 0.5, {'Stimcoding models' 'prevresp'}, 'fontsize', 6);
@@ -64,20 +64,21 @@ end
 % % ============================================ %
 % DIC COMPARISON BETWEEN DC, Z AND BOTH
 % ============================================ %
-clf; nrsubpl = length(datasets)-1;
+
+clf; nrsubpl = 4;
 mdls = {'dc_prevresp', 'dc_prevresp_prevstim',  ...
     'dc_prevresp_prevstim_sessions', 'dc_prevresp_prevstim_prevrt', ...
     'dc_prevresp_prevstim_prevrt_prevpupil', ...
     'dc_prevresp_prevstim_prevrt_prevpupil_sessions'};
 
-for d = 1:length(datasets)-1,
+for d = 1:length(datasets)-2,
     subplot(nrsubpl, nrsubpl, d);
     getPlotDIC(mdls, types{s}, d, 1);
     set(gca, 'xtick', 1:6, 'xticklabel',...
         {'[1]', '[2]', '[3]', '[4]', '[5]', '[6]'});
     title(['Data: ' datasetnames{d}]);
 end
-subplot(nrsubpl, nrsubpl, d+1);
+subplot(nrsubpl, nrsubpl, 5);
 text(0, 0.2, {'Regression models', ...
     '[1] v ~ 1 + stimulus + prevresp', ...
     '[2] v ~ 1 + stimulus + prevresp + prevstim', ...
@@ -93,6 +94,25 @@ text(0, 0.2, {'Regression models', ...
 axis off;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_prevresp_prevstim.pdf'));
 
+% % ============================================ %
+% DIC COMPARISON BETWEEN DC, Z AND BOTH
+% ============================================ %
+
+clf;
+datasets = {'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
+datasetnames = {'Anke neutral', 'Anke repetitive', 'Anke alternating'};
+
+mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
+    'dc_z_prevresp_prevstim'};
+
+for d = 1:length(datasets),
+    subplot(4, 4, d);
+    getPlotDIC(mdls, types{s}, d, 1);
+    set(gca, 'xtick', 1:3, 'xticklabel',...
+        {'dc', 'z', 'both'});
+    title(['Data: ' datasetnames{d}]);
+end
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_biased.pdf'));
 
 end
 
