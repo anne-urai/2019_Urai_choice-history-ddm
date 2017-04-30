@@ -17,14 +17,19 @@ results     = readtable(sprintf('%s/HDDM/summary/allindividualresults.csv', usep
 subjects    = results.subjnr(results.session == 2);
 
 % learning rate
-t.driftrate_learn = results.v_stimulus_session__regress_dc_z_prevresp(results.session == 0 ...
+t.driftrate_learn = results.v_stimulus_s5__regressdcprevrespstimrtpupil(results.session == 0 ...
+    & ismember(results.subjnr, subjects)) - ...
+    results.v_stimulus_s1__regressdcprevrespstimrtpupil(results.session == 0 ...
+    & ismember(results.subjnr, subjects));
+t.boundaryseparation_learn = results.a_s5__regressdcprevrespstimrtpupil(results.session == 0 ...
+    & ismember(results.subjnr, subjects)) - ...
+    results.a_Intercept__regressdcprevrespstimrtpupil(results.session == 0 ...
     & ismember(results.subjnr, subjects));
 
 % also compute dprime ratio
-
-t.dprime_s1 = results.dprime(results.session == 1 & ismember(results.subjnr, subjects));
-t.dprime_s2 = results.dprime(results.session == 2 & ismember(results.subjnr, subjects));
-t.dprime_learn = t.dprime_s2 - t.dprime_s1;
+t.dprime_s1     = results.dprime(results.session == 1 & ismember(results.subjnr, subjects));
+t.dprime_s2     = results.dprime(results.session == 2 & ismember(results.subjnr, subjects));
+t.dprime_learn  = t.dprime_s2 - t.dprime_s1;
 
 % TO DO: get error bars from the posterior traces?
 

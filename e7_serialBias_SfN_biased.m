@@ -9,13 +9,13 @@ close all; clear; clc;
 traces = readtable(sprintf('~/Data/Anke_2afc_sequential/HDDM/regress_dc_z_prevresp_prevstim/group_traces.csv'));
 colors = flipud(linspecer(3));
 
-% correlate higher z with more repetition
-z_link_func = @(x) 1./(1+exp(x))';
-trvars = traces.Properties.VariableNames;
-zcells = find(~cellfun(@isempty, strfind(trvars, 'z_')));
-for z = zcells,
-    traces.(trvars{z}) = z_link_func(traces.(trvars{z}))';
-end
+% % correlate higher z with more repetition
+% z_link_func = @(x) 1./(1+exp(x))';
+% trvars = traces.Properties.VariableNames;
+% zcells = find(~cellfun(@isempty, strfind(trvars, 'z_')));
+% for z = zcells,
+%     traces.(trvars{z}) = z_link_func(traces.(trvars{z}))';
+% end
 
 % recode some stuff
 params = {'v', 'z'};
@@ -59,13 +59,13 @@ close all; clear; clc;
 dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
     'Anke_2afc_sequential'));
 
-% correlate higher z with more repetition
-z_link_func = @(x) 1./(1+exp(x))';
-trvars = dat.Properties.VariableNames;
-zcells = find(~cellfun(@isempty, strfind(trvars, 'z_')));
-for z = zcells,
-    dat.(trvars{z}) = z_link_func(dat.(trvars{z}))';
-end
+% % correlate higher z with more repetition
+% z_link_func = @(x) 1./(1+exp(x))';
+% trvars = dat.Properties.VariableNames;
+% zcells = find(~cellfun(@isempty, strfind(trvars, 'z_')));
+% for z = zcells,
+%     dat.(trvars{z}) = z_link_func(dat.(trvars{z}))';
+% end
 
 % recode some stuff
 params = {'v', 'z'};
@@ -99,16 +99,8 @@ for p = 1:length(params),
     xlabel(regexprep(params{p}, '\_', ' ~ ')); ylabel('p(repeat)');
     axis tight;
     lsline;
-    hline(0.5);
-    
-    % vline(0);
-    
+    hline(0.5);    
     axisNotSoTight; axis square; box off;
-    
-    %     % make correlations
-    %     for i = 1:3,
-    %         [rho(i), pval(i)] = corr(allaccuracy(:, i), allserialbias(:, i), 'type', 'spearman');
-    %     end
     
 end
 l = legend({'Repetitive', 'Neutral', 'Alternating'});
