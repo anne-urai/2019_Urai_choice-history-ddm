@@ -14,7 +14,7 @@ function b2_HDDM_readIntoMatlab()
       'Anke_repetitive', 'Anke_alternating'};
   end
 
-  for d = 6:7, %1:length(datasets),
+  for d = 1:length(datasets),
     usepath = sprintf('~/Data/%s/HDDM', datasets{d});
     disp(usepath);
     mdls = {'stimcoding_dc_prevresp_prevstim', ...
@@ -33,7 +33,9 @@ function b2_HDDM_readIntoMatlab()
     'stimcoding_dc_z_prevresp', ...
     'regress_dc_prevresp', ...
     'regress_z_prevresp', ...
-    'regress_dc_z_prevresp'};
+    'regress_dc_z_prevresp', ...
+    'regress_dc_prev2resp_prev2stim', ...
+    'regress_dc_prev3resp_prev3stim'};
 
     if ~exist(sprintf('%s/summary', usepath), 'dir'),
       cd(usepath); mkdir('summary');

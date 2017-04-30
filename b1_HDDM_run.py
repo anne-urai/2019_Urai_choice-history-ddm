@@ -486,6 +486,36 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, p_outlier=0.05)
 
+    # ============================================ #
+    # NO HISTORY FOR MODEL COMPARISON
+    # ============================================ #
+
+    if model_name == 'stimcoding_nohist':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if len(mydata.coherence.unique()) > 1: # Ankes neutral condition
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'])
+
+    if model_name == 'regress_nohist':
+
+        # only stimulus dependence
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
+
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, v_reg,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, p_outlier=0.05)
+
     # END OF FUNCTION THAT CREATES THE MODEL
     return m
 
@@ -682,7 +712,9 @@ models = ['stimcoding_dc_prevresp_prevstim', # 0
     'regress_z_prevresp', # 15
     'regress_dc_z_prevresp', # 16
     'regress_dc_prev2resp_prev2stim', # 17
-    'regress_dc_prev3resp_prev3stim'] # 18
+    'regress_dc_prev3resp_prev3stim', # 18
+    'stimcoding_nohist', # 19
+    'regress_nohist'] # 20
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1

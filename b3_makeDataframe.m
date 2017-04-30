@@ -22,7 +22,7 @@ set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ..
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 6:7, %1:length(datasets),
+for d = 1:length(datasets),
     disp(datasets{d});
 
     % load data
