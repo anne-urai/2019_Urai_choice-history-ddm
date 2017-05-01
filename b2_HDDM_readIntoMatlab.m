@@ -1,8 +1,8 @@
 function b2_HDDM_readIntoMatlab()
 
   addpath(genpath('~/code/Tools'));
-  warning off;
   close all; clc;
+  warning off MATLAB:table:ModifiedVarnames % skip this warning
 
   getTraces = false; % ca
   usr = getenv('USER');
@@ -53,7 +53,7 @@ function b2_HDDM_readIntoMatlab()
       subjects = 1:27;
     end
 
-    for m = 20:length(mdls),
+    for m = 1:length(mdls),
       disp(mdls{m});
 
       % skip if this model is empty
@@ -95,15 +95,30 @@ function b2_HDDM_readIntoMatlab()
         fclose(txtfile);
       end
 
-      try
-        plot(bsxfun(@minus, dic.chains, dic.full), 'o');
-        hline(mean(dic.chains) - dic.full, 'b');
-        xlabel('Chains'); ylabel('DIC');
-        if abs(mean(dic.chains) - dic.full) < 1, ...
-          warning('DIC values differ between chains');
-        end
+      if ~isempty(dic.full),
+        % CHECK THAT THE DICS HAVE CONVERGED
+        assert(all(abs(bsxfun(@minus, dic.chains, dic.full))) < 5, ...
+        'chains differ in DIC');
+      else
+        assert(all(abs(bsxfun(@minus, dic.chains, nanmean(dic.chains)))) < 5, ...
+        'chains differ in DIC');
       end
-      % waitforbuttonpress; close;
+
+      % ============================================ %
+      % CHECK R-HAT GELMAN-RUBIN STATISTIC
+      % ============================================ %
+
+      try
+      rhat = readtable(sprintf('%s/%s/gelman_rubin.txt', usepath, mdls{m}));
+      notConverged = rhat(find(abs(rhat.Var2 - 1) > 0.02), :);
+      % ignore single-subject convergence or std
+      notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'subj'))), :) = [];
+      notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'std'))), :) = [];
+      if ~isempty(notConverged),
+        warning('not all group parameters have converged');
+        disp(notConverged);
+      end
+    end
 
       % ============================================ %
       % ALSO GET POINT ESTIMATES FROM RESULTS FILE

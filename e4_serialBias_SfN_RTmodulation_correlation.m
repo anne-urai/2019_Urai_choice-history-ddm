@@ -42,6 +42,7 @@ for d = 1:4; %length(datasets),
     title(datasetnames{d}); axis square;
   %  axis tight;
 
+if 0,
     % add the quantiles on the axes
     sz = [5 10 15 10 5];
     xlm = min(get(gca, 'xlim'));
@@ -52,6 +53,7 @@ for d = 1:4; %length(datasets),
     scatter(group.v_prevresp_prct, ones(1,5) * ylm, ...
         sz, 'k', '^');
     axis tight;
+end
 
     % also pupil
     subplot(4,4,cnt+4); cnt = cnt + 1; hold on;
@@ -67,6 +69,7 @@ for d = 1:4; %length(datasets),
     title(datasetnames{d}); axis square;
     %axis tight;
 
+if 0,
     % add the quantiles on the axes
     xlm = min(get(gca, 'xlim'));
     ylm = min(get(gca, 'ylim'));
@@ -75,6 +78,8 @@ for d = 1:4; %length(datasets),
     scatter(group.v_prevresp_prct, ones(1,5) * ylm, ...
         sz, 'k', '^');
     axis tight;
+  end
 end
 
-print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig3_RTmodulation.eps'));
+print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig3_RTmodulation_correlation.eps'));
+disp('printed')

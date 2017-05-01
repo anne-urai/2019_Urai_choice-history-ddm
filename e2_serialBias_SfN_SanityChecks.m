@@ -13,7 +13,7 @@ datasetnames = {'RT', '2IFC',  'NatComm', 'Anke neutral', 'Anke repetitive', 'An
 
 set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
-    'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
+    'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', 'defaultaxestickdir', 'out');
 
 % ========================================== %
 % DOES DRIFT RATE CORRELATE WITH D'?
@@ -39,7 +39,7 @@ for d = 1:length(datasets),
         varname         = dat.Properties.VariableNames{varnames(varidx)};
 
         % scatterplot
-        s = gscatter(dat.dprime, dat.(varname), dat.session, viridis(numel(unique(dat.session))), '.', 8, 'off');
+        s = gscatter(dat.dprime, dat.(varname), dat.session, viridis(numel(unique(dat.session))), '.', 5, 'off');
         box off;
         xlabel('d'''); ylabel('v ~ stimulus');
         title(datasetnames{d});
@@ -72,14 +72,14 @@ for d = 1:length(datasets),
         cohvars = regexprep(cohvars, '_', '.');
         cohs    = cellfun(@sscanf, cohvars, repmat({'dprime.c%f'}, length(cohvars), 1));
         allcohs = repmat(cohs', size(alldrift, 1), 1);
-        g       = gscatter(alldprime(:), alldrift(:), allcohs(:), plasma(numel(unique(allcohs))), '.', 8, 'off');
+        g       = gscatter(alldprime(:), alldrift(:), allcohs(:), plasma(numel(unique(allcohs))), '.', 5, 'off');
         xlabel('d'''); ylabel('v ~ stimulus');
 
         box off;
         l = legend(g, arrayfun(@num2str, cohs, 'un', 0));
         l.Position(1) = l.Position(1) + 0.1;
         l.Box = 'off';
-        text(7, 4.5, '% coherence', 'fontsize', 6);
+        text(10, 4.5, '% coherence', 'fontsize', 6);
 
         axis tight; axis square;
         xlim([floor(min(get(gca, 'xlim'))) ceil(max(get(gca, 'xlim')))]);

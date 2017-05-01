@@ -593,7 +593,7 @@ def concat_models(mypath, model_name):
         # save
         text_file = open(os.path.join(mypath, model_name, 'gelman_rubin.txt'), 'w')
         for p in gr.items():
-            text_file.write("%s:%s\n" % p)
+            text_file.write("%s,%s\n" % p)
             # print a warning when non-convergence is detected
             # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
             # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
