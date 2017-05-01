@@ -88,8 +88,8 @@ function b2_HDDM_readIntoMatlab()
       usepath, mdls{m});
       if exist(fileid, 'file'),
         txtfile = fopen(fileid);
-        txtread = textscan(txtfile, 'Model %d: %.3f');
-        dic.full = double(txtread{2});
+        txtread = textscan(txtfile, 'Combined model: %.3f');
+        dic.full = double(txtread{1});
         if dic.full == 0, dic.full = NaN;
         end
         fclose(txtfile);
