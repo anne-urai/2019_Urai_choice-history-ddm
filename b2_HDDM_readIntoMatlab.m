@@ -35,7 +35,8 @@ function b2_HDDM_readIntoMatlab()
     'regress_z_prevresp', ...
     'regress_dc_z_prevresp', ...
     'regress_dc_prev2resp_prev2stim', ...
-    'regress_dc_prev3resp_prev3stim'};
+    'regress_dc_prev3resp_prev3stim', ...
+    'regress_nohist', 'stimcoding_nohist'};
 
     if ~exist(sprintf('%s/summary', usepath), 'dir'),
       cd(usepath); mkdir('summary');
@@ -52,7 +53,7 @@ function b2_HDDM_readIntoMatlab()
       subjects = 1:27;
     end
 
-    for m = 1:length(mdls),
+    for m = 20:length(mdls),
       disp(mdls{m});
 
       % skip if this model is empty

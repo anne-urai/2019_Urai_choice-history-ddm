@@ -561,47 +561,69 @@ def run_model(m, mypath, model_name, trace_id, nr_samples=5000):
 
 def concat_models(mypath, model_name):
 
-    import os, hddm, time, kabuki
+    import os, hddm, time, kabuki, glob
     from IPython import embed as shell
 
-    # ============================================ #
-    # APPEND MODELS
-    # ============================================ #
+    # CHECK IF COMBINED MODEL EXISTS
+    if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
+        m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
+    else:
 
-    allmodels = []
-    print ("appending models for %s" %model_name)
-    for trace_id in range(15): # how many chains were run?
-        model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
-        modelExists           = os.path.isfile(model_filename)
-        if modelExists == True: # if not, this model has to be rerun
-            print model_filename
-            thism                 = hddm.load(model_filename)
-            # now append
-            allmodels.append(thism)
+        # ============================================ #
+        # APPEND MODELS
+        # ============================================ #
 
-    # ============================================ #
-    # CHECK CONVERGENCE
-    # ============================================ #
+        allmodels = []
+        print ("appending models for %s" %model_name)
+        for trace_id in range(15): # how many chains were run?
+            model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
+            modelExists           = os.path.isfile(model_filename)
+            if modelExists == True: # if not, this model has to be rerun
+                print model_filename
+                thism                 = hddm.load(model_filename)
+                # now append
+                allmodels.append(thism)
 
-    gr = hddm.analyze.gelman_rubin(allmodels)
+        # ============================================ #
+        # CHECK CONVERGENCE
+        # ============================================ #
 
-    # save
-    text_file = open(os.path.join(mypath, model_name, 'gelman_rubin.txt'), 'w')
-    for p in gr.items():
-        text_file.write("%s:%s\n" % p)
-        # print a warning when non-convergence is detected
-        # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
-        # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
-        if abs(p[1]-1) > 0.02:
-            print "non-convergence found, %s:%s" %p
-    text_file.close()
-    print "written gelman rubin stats to file"
+        gr = hddm.analyze.gelman_rubin(allmodels)
 
-    # now actually concatenate them, see email Gilles
-    # THIS ONLY WORKS IF Z HAS BEEN TRANSFORMED!
-    m = kabuki.utils.concat_models(allmodels)
-    print "concatenated models"
-    m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
+        # save
+        text_file = open(os.path.join(mypath, model_name, 'gelman_rubin.txt'), 'w')
+        for p in gr.items():
+            text_file.write("%s:%s\n" % p)
+            # print a warning when non-convergence is detected
+            # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
+            # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
+            if abs(p[1]-1) > 0.02:
+                print "non-convergence found, %s:%s" %p
+        text_file.close()
+        print "written gelman rubin stats to file"
+
+        # now actually concatenate them, see email Gilles
+        m = kabuki.utils.concat_models(allmodels)
+        print "concatenated models"
+        m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
+
+        # ============================================ #
+        # DELETE FILES
+        # ============================================ #
+
+        if len(allmodels) == 15:
+            print "deleting separate chains"
+            for fl in glob.glob(os.path.join(mypath, model_name, 'modelfit-md*.model')):
+                os.remove(fl)
+
+            for fl in glob.glob(os.path.join(mypath, model_name, 'all_traces-md*.csv')):
+                os.remove(fl)
+
+            for fl in glob.glob(os.path.join(mypath, model_name, 'modelfit-md*.db')):
+                os.remove(fl)
+
+            for fl in glob.glob(os.path.join(mypath, model_name, 'results-md*.csv')):
+                os.remove(fl)
 
     # ============================================ #
     # POSTERIOR PREDICTIVE PLOTS
@@ -675,7 +697,7 @@ def concat_models(mypath, model_name):
 
     # save the DIC for this model
     text_file = open(os.path.join(mypath, model_name, 'DIC-combined.txt'), 'w')
-    text_file.write("Model {}: {}\n".format(trace_id, m.dic))
+    text_file.write("Combined model: {}\n".format(m.dic))
     text_file.close()
 
     # ============================================ #
