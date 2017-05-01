@@ -17,11 +17,11 @@ nrsubpl = length(datasets) + 1;
 
 types = {'stimcoding', 'regress'};
 
-for s = 1:2
+for s = 1:2,
     % 1. STIMCODING, only prevresp
     clf;
-    mdls = {'dc_prevresp', 'z_prevresp', ...
-        'dc_z_prevresp'};
+    mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
+        'dc_z_prevresp_prevstim', 'nohist'};
     for d = 1:3,
         subplot(4, 4, d);
         getPlotDIC(mdls, types{s}, d, 1);
@@ -39,24 +39,6 @@ for s = 1:2
                 'z ~ 1 + prevresp'}, 'fontsize', 6);
     end
     axis off;
-    
-    %     % 2. STIMCODING, PREVRESP + PREVSTIM
-    %     mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
-    %         'dc_z_prevresp_prevstim'};
-    %     for d = 1:length(datasets),
-    %         subplot(nrsubpl,nrsubpl,d+nrsubpl);
-    %         getPlotDIC(mdls, types{s}, d);
-    %     end
-    %     subplot(nrsubpl,nrsubpl,d+nrsubpl+1);
-    %     switch types{s}
-    %         case 'stimcoding'
-    %             text(-0.2, 0.5, {'Stimcoding models', 'prevresp + prevstim'}, 'fontsize', 6);
-    %         case 'regress'
-    %             text(-0.2, 0.6, {'Regression models', ...
-    %                 'v ~ 1 + stimulus + prevresp + prevstim', ...
-    %                 'z ~ 1 + prevresp + prevstim'}, 'fontsize', 6);
-    %     end
-    %     axis off;
     print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig1_DIC_%s.eps', types{s}));
     
 end
@@ -69,7 +51,7 @@ clf; nrsubpl = 4;
 mdls = {'dc_prevresp', 'dc_prevresp_prevstim',  ...
     'dc_prevresp_prevstim_sessions', 'dc_prevresp_prevstim_prevrt', ...
     'dc_prevresp_prevstim_prevrt_prevpupil', ...
-    'dc_prevresp_prevstim_prevrt_prevpupil_sessions'};
+    'dc_prevresp_prevstim_prevrt_prevpupil_sessions', 'nohist'};
 
 for d = 1:length(datasets)-2,
     subplot(nrsubpl, nrsubpl, d);
@@ -103,7 +85,7 @@ datasets = {'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'
 datasetnames = {'Anke neutral', 'Anke repetitive', 'Anke alternating'};
 
 mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
-    'dc_z_prevresp_prevstim'};
+    'dc_z_prevresp_prevstim', 'nohist'};
 
 for d = 1:length(datasets),
     subplot(4, 4, d);
@@ -112,7 +94,7 @@ for d = 1:length(datasets),
         {'dc', 'z', 'both'});
     title(['Data: ' datasetnames{d}]);
 end
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_biased.pdf'));
+print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig1_DIC_biased.eps'));
 
 end
 
@@ -134,19 +116,24 @@ for m = 1:length(mdls),
     load(sprintf('~/Data/%s/HDDM/summary/%s_%s_all.mat', ...
         datasets{d}, s, mdls{m}));
     
-    if isnan(dic.full) && ~all(isnan(dic.chains)),
+    if (isempty(dic.full) || isnan(dic.full)) && ~all(isnan(dic.chains)),
         dic.full = nanmean(dic.chains);
     end
     mdldic(m) = dic.full;
+    allfull(m, :) = dic.chains;
 end
 
 % if there are two, take the mean
-if numel(mdldic) == 2 || isnan(mdldic(3)),
-    mdldic(3) = nanmean(mdldic(1:2));
+if numel(mdldic) == 3 || isnan(mdldic(4)),
+    mdldic(4) = nanmean(mdldic(1:3));
+    mdldic(4) = 290618;
 end
 
-% everything relative to the full mdoel
-mdldic = bsxfun(@minus, mdldic, nanmean(mdldic));
+% everything relative to the last model
+mdldic = bsxfun(@minus, mdldic, mdldic(end));
+mdldic = mdldic(1:end-1);
+
+% now plot
 bar(mdldic, 'facecolor', linspecer(1), 'barwidth', 0.4);
 
 %# Add a text string above/below each bin
@@ -172,10 +159,10 @@ if plotBest,
 end
 
 box off;
-ylabel('\Delta DIC (from average)');
+ylabel('\Delta DIC (from nohist)');
 set(gca, 'xticklabel', {'dc', 'z'});
 % set(gca, 'YTickLabel', num2str(get(gca, 'YTick')'));
-xlim([0 length(mdls)+0.5]);
+xlim([0 length(mdls)-0.5]);
 axis square;
 ylim(1.1*get(gca, 'ylim'));
 

@@ -195,4 +195,8 @@ t = t(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', ...
 nanidx = find(isnan(mean(t{:, :}, 2)));
 t(nanidx, :) = [];
 
+% remove those subjects who started with wrongly codes stimulus sequence
+t = readtable(sprintf('%s/HDDM/rtrdk_data_allsj.csv', datapath));
+t.stimrepeat = [NaN; diff(t.stimulus) ~= 0];
+stimrep = splitapply(@nanmean, t.stimrepeat, findgroups(t.subj_idx, t.session, t.block));
 writetable(t, sprintf('%s/HDDM/rtrdk_data_allsj.csv', datapath));
