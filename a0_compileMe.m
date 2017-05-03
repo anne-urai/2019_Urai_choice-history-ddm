@@ -43,7 +43,7 @@ function [] = compileMe(fname)
     % ============================================ #
 
     datasets   = [0:6]; % RT-RDK and MEG-PL
-    models     = [19:20]; % the nr of the models
+    models     = [0:18]; % the nr of the models
     nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
     alldat = [];
