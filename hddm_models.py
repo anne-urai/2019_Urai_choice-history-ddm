@@ -10,6 +10,7 @@ Important: on Cartesius, call module load python/2.7.9 before running
 import numpy as np
 import os, fnmatch
 import hddm
+from IPython import embed as shell
 
 # ============================================ #
 # define the function that will do the work
@@ -39,9 +40,11 @@ def make_model(mypath, model_name, trace_id):
     def recode_4stimcoding(mydata):
         # split into coherence and stimulus identity
         mydata['coherence'] = mydata.stimulus.abs()
-        mydata.stimulus  = np.sign(mydata.stimulus)
+        mydata.stimulus     = np.sign(mydata.stimulus)
         # for stimcoding, the two identities should be 0 and 1
         mydata.ix[mydata['stimulus']==-1,'stimulus'] = 0
+        if len(mydata.stimulus.unique()) != 2,
+            raise ValueError('Stimcoding needs 2 stimulus types')
         return mydata
 
     # ============================================ #
@@ -357,6 +360,8 @@ def make_model(mypath, model_name, trace_id):
 
         # subselect data
         mydata = mydata.dropna(subset=['prevpupil'])
+        if len(mydata.session.unique()) < max(mydata.session.unique()):
+            mydata["session"] = mydata["session"].map({1:1, 5:2})
         mydata = balance_designmatrix(mydata)
 
         # boundary separation and drift rate will change over sessions
@@ -400,6 +405,9 @@ def make_model(mypath, model_name, trace_id):
 
         # subselect data
         mydata = mydata.dropna(subset=['prevpupil'])
+        if len(mydata.session.unique()) < max(mydata.session.unique()):
+            mydata["session"] = mydata["session"].map({1:1, 5:2})
+
         mydata = balance_designmatrix(mydata)
 
         # boundary separation and drift rate will change over sessions

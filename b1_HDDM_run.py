@@ -67,7 +67,7 @@ d               = opts.dataset
 trace_id        = opts.trace_id
 runMe           = opts.run
 
-def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
+def run_model(m, mypath, model_name, trace_id):
 
     # ============================================ #
     # do the actual sampling
@@ -77,7 +77,7 @@ def run_model(m, mypath, model_name, trace_id, nr_samples=10000):
     m.find_starting_values() # this should help the sampling
 
     print "begin sampling"
-    m.sample(nr_samples, burn=5000, thin=3, db='pickle',
+    m.sample(100, burn=10, thin=2, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     # specify a certain backend? pickle?
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
