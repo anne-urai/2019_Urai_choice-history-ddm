@@ -1,40 +1,41 @@
-dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
-    'projects/0/neurodec/Data/MEG-PL'));
 
-close;
-subplot(441); scatter(dat.bias, ...
-    dat.z__stimcodingdcprevresp, 10, dat.session);
-xlabel('P(resp 1)'); ylabel('z'); title('Stimcoding');
-axis square;
-subplot(442); scatter(dat.bias, ...
-    (dat.dc__stimcodingzprevresp), 10, dat.session);
-xlabel('P(resp 1)'); ylabel('dc'); title('Stimcoding');
-axis square;
+datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
+datasetnames = {'RT', '2IFC',  'NatComm', 'Anke neutral', 'Anke repetitive', 'Anke alternating'};
 
-subplot(443); scatter(dat.criterion, ...
-    dat.z__regressdcprevresp, 10, dat.session);
-xlabel('P(resp 1)'); ylabel('z'); title('Regression');
-axis square;
+% ============================================ %
+% test correlation between dc-rep and z-rep
+% ============================================ %
 
-subplot(444); scatter(dat.bias, ...
-    (dat.dc__stimcodingzprevresp), 10, dat.session);
-xlabel('P(resp 1)'); ylabel('dc'); title('Regression');
-axis square;
+for d = 1:length(datasets),
+    dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
+        datasets{d}));
+    
+    % recode from stimcoding, always use 1 - 2
+    dat.dc_rep__stimcodingdczprevresp = dat.dc_1__stimcodingdczprevresp - dat.dc_2__stimcodingdczprevresp;
+    dat.z_rep__stimcodingdczprevresp = dat.z_1__stimcodingdczprevresp - dat.z_2__stimcodingdczprevresp;
+    
+    close;
+    corrplot(dat, {'dc_rep__stimcodingdczprevresp', 'z_rep__stimcodingdczprevresp', ...
+        'v_prevresp__regressdczprevresp', 'z_prevresp__regressdczprevresp'});
+    suplabel(datasetnames{d}, 't');
+    
+    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/biasDirectionTest_d%d.eps', d));
+    
+end
 
-% against each other
-subplot(445); scatter(dat.z__stimcodingdczprevresp, ...
-    dat.dc__stimcodingdczprevresp, 10, dat.session);
-xlabel('z'); ylabel('dc'); title('Stimcoding');
-axis square;
+% ============================================ %
+% is this push-pull also present at the intercept?
+% ============================================ %
 
-% what is the correct link function?
-z_link_func = @(x) log(1 ./ (1-x));
-z_link_func = @(x) 1./(1+exp(-x))';
-
-subplot(446); 
-scatter(dat.v_prevresp__regressdczprevresp, ...
-   dat.dc_1__stimcodingdczprevresp - dat.dc_2__stimcodingdczprevresp, 10, dat.session);
-xlabel('z'); ylabel('dc'); title('Regression');
-axis square;
-
-
+for d = 1:length(datasets),
+    dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
+        datasets{d}));
+    
+    close;
+    corrplot(dat, {'v_Intercept__regressnohist', 'dc__stimcodingnohist', ...
+        'z__regressnohist', 'z__stimcodingnohist'});
+    suplabel(datasetnames{d}, 't');
+    
+    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/overallBiasDirectionTest_d%d.eps', d));
+    
+end
