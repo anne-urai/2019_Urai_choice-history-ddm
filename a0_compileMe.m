@@ -42,21 +42,24 @@ function [] = compileMe(fname)
     % parameter file for HDDM
     % ============================================ #
 
+    nsmp       = [5000 10000]
     datasets   = [0:6]; % RT-RDK and MEG-PL
-    models     = [0:21]; % the nr of the models
+    models     = [0:25]; % the nr of the models
     nrTraces   = 1; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
     alldat = [];
+    for n = nsmp,
     for b = models,
     for a = datasets,
       % dont run Ankes data with the session version
         for c = 0:nrTraces-1, % put all chains of same model together on a node
           %  if ~(a == 2 & ismember(b, [6 8 10])),
-          alldat = [alldat; a b c];
+          alldat = [alldat; a b c n];
           %  end
         end
       end
     end
+   end
 
     % write to a file
     dlmwrite('hddmparams', alldat, 'delimiter', ' ');

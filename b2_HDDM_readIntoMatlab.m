@@ -47,7 +47,7 @@ function b2_HDDM_readIntoMatlab()
       subjects = [3:15 17:25];
       case 'MEG'
       subjects = 2:65;
-      case {'Anke_serial', 'Anke_neutral', 'Anke_repetitive', 'Anke_altenating'},
+      case {'Anke_serial', 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating'},
       subjects = [1:7 9 11:16 18:21 23 24 26 27];
       case 'NatComm'
       subjects = 1:27;
@@ -163,7 +163,7 @@ function b2_HDDM_readIntoMatlab()
 
           varnames{v} = regexprep(varnames{v}, '1.0', '1');
           % recode coherence levels in Anke's data
-          varnames{v} = regexprep(varnames{v}, '\(0.0\)', '_c0');
+          varnames{v} = regexprep(varnames{v}, '\(0.001\)', '_c0');
           varnames{v} = regexprep(varnames{v}, '\(0.05\)', '_c5');
           varnames{v} = regexprep(varnames{v}, '\(0.1\)', '_c10');
           varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
@@ -172,17 +172,13 @@ function b2_HDDM_readIntoMatlab()
 
           % some crazy rounding errors
           % recode transition probabilities in Anke's data
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.2[0]*1\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.8[0]*4\)', '_repetitive');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.2\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.5\)', '_neutral');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(0.8\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(20.0\)', '_alternating');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(50.0\)', '_neutral');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(80.0\)', '_repetitive');
 
-          varnames{v} = regexprep(varnames{v}, '0.2[0]*1\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '0.8[0]*4\)', '_repetitive');
-          varnames{v} = regexprep(varnames{v}, '0.2\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '0.5\)', '_neutral');
-          varnames{v} = regexprep(varnames{v}, '0.8\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '20.0\)', '_alternating');
+          varnames{v} = regexprep(varnames{v}, '50.0\)', '_neutral');
+          varnames{v} = regexprep(varnames{v}, '80.0\)', '_repetitive');
         end
 
         assert(isempty(strfind(varnames{v}, 'transitionprob')), 'no correct parsing')
