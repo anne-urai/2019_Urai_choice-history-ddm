@@ -78,24 +78,23 @@ def run_model(m, mypath, model_name, trace_id, n_samples):
     # do the actual sampling
     # ============================================ #
 
-    if not os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)):
-        print "finding starting values"
-        m.find_starting_values() # this should help the sampling
+    print "finding starting values"
+    m.find_starting_values() # this should help the sampling
 
-        print "begin sampling"
-        m.sample(n_samples, burn=n_samples/2, thin=2, db='pickle',
-            dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
-        # specify a certain backend? pickle?
-        m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
+    print "begin sampling"
+    m.sample(n_samples, burn=n_samples/2, thin=2, db='pickle',
+        dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
+    # specify a certain backend? pickle?
+    m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
 
-        # ============================================ #
-        # save the output values
-        # ============================================ #
+    # ============================================ #
+    # save the output values
+    # ============================================ #
 
-        # save the DIC for this model
-        text_file = open(os.path.join(mypath, model_name, 'DIC-md%d.txt'%trace_id), 'w')
-        text_file.write("Model {}: {}\n".format(trace_id, m.dic))
-        text_file.close()
+    # save the DIC for this model
+    text_file = open(os.path.join(mypath, model_name, 'DIC-md%d.txt'%trace_id), 'w')
+    text_file.write("Model {}: {}\n".format(trace_id, m.dic))
+    text_file.close()
 
 def concat_models(mypath, model_name):
 
@@ -304,7 +303,7 @@ for dx in d:
             m = make_model(mypath, models[vx], trace_id)
 
             # now sample and save
-            # run_model(m, mypath, models[vx], trace_id, n_samples)
+            run_model(m, mypath, models[vx], trace_id, n_samples)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
