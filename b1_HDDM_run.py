@@ -139,7 +139,7 @@ def concat_models(mypath, model_name):
         m = kabuki.utils.concat_models(allmodels)
         print "concatenated models"
         m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
-        m.save(os.path.join(mypath, model_name, 'modelfit-combined.pickle')) # save the model to disk
+        # m.save(os.path.join(mypath, model_name, 'modelfit-combined.pickle')) # save the model to disk
 
         # ============================================ #
         # DELETE FILES to save space
@@ -148,7 +148,12 @@ def concat_models(mypath, model_name):
         if len(allmodels) == 15:
             print "deleting separate chains"
             for fl in glob.glob(os.path.join(mypath, model_name, 'modelfit-md*.model')):
-                os.remove(fl)
+                    os.remove(fl)
+            for fl in glob.glob(os.path.join(mypath, model_name, 'modelfit-md*.db')):
+                if not '-md0.db' in fl:
+                    os.remove(fl)
+        else:
+            print "not deleting individual model chains"
 
     # ============================================ #
     # POSTERIOR PREDICTIVE PLOTS
@@ -272,9 +277,9 @@ models = ['stimcoding_nohist', # 0
 datasets = ['RT_RDK', # 0
     'MEG', # 1
     'NatComm', # 2
-    'Anke_neutral', # 4
-    'Anke_repetitive', # 5
-    'Anke_alternating',
+    'Anke_neutral', # 3
+    'Anke_repetitive', # 4
+    'Anke_alternating', # 5
     'Anke_serial'] # 6
 
 # recode
@@ -303,7 +308,13 @@ for dx in d:
             m = make_model(mypath, models[vx], trace_id)
 
             # now sample and save
-            run_model(m, mypath, models[vx], trace_id, n_samples)
+            if os.path.exists(model_filename):
+                pass
+            elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
+                pass
+            else:
+                # only run if this hasnt been done, and there is no concatenated master model present
+                run_model(m, mypath, models[vx], trace_id, n_samples)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
