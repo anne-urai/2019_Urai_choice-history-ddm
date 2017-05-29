@@ -42,7 +42,7 @@ function [] = compileMe(fname)
     % parameter file for HDDM
     % ============================================ #
 
-    nsmp       = [5000 10000]
+    nsmp       = [10000]
     datasets   = [0:6]; % RT-RDK and MEG-PL
     models     = [0:25]; % the nr of the models
     nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)

@@ -10,7 +10,7 @@ function b2_HDDM_readIntoMatlab()
     case 'anne' % local
     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
     case 'aeurai' % lisa/cartesius
-    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm', ...
+    datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_serial', 'Anke_neutral', ...
       'Anke_repetitive', 'Anke_alternating'};
   end
 
@@ -18,12 +18,12 @@ function b2_HDDM_readIntoMatlab()
     usepath = sprintf('~/Data/%s/HDDM', datasets{d});
     disp(usepath);
     mdls = {'stimcoding_nohist', ...
-        'regress_nohist', #...
+        'regress_nohist', ...
         'stimcoding_dc_prevresp', ...
         'stimcoding_z_prevresp', ...
         'stimcoding_dc_z_prevresp', ...
         'stimcoding_dc_prevresp_prevstim', ...
-        'stimcoding_z_prevresp_prevstim', #...
+        'stimcoding_z_prevresp_prevstim', ...
         'stimcoding_dc_z_prevresp_prevstim', ...
         'regress_dc_prevresp', ...
         'regress_z_prevresp', ...
@@ -99,6 +99,8 @@ function b2_HDDM_readIntoMatlab()
         if dic.full == 0, dic.full = NaN;
         end
         fclose(txtfile);
+      else
+      dic.full = NaN;
       end
 
       if ~isempty(dic.full),
@@ -178,13 +180,13 @@ function b2_HDDM_readIntoMatlab()
 
           % some crazy rounding errors
           % recode transition probabilities in Anke's data
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(20.0\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(50.0\)', '_neutral');
-          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(80.0\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(20.0\)', '_alt');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(50.0\)', '_neu');
+          varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(80.0\)', '_rep');
 
-          varnames{v} = regexprep(varnames{v}, '20.0\)', '_alternating');
-          varnames{v} = regexprep(varnames{v}, '50.0\)', '_neutral');
-          varnames{v} = regexprep(varnames{v}, '80.0\)', '_repetitive');
+          varnames{v} = regexprep(varnames{v}, '20.0\)', '_alt');
+          varnames{v} = regexprep(varnames{v}, '50.0\)', '_neu');
+          varnames{v} = regexprep(varnames{v}, '80.0\)', '_rep');
         end
 
         assert(isempty(strfind(varnames{v}, 'transitionprob')), 'no correct parsing')

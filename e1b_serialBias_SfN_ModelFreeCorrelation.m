@@ -13,13 +13,12 @@ warning off;
 
 usr = getenv('USER');
 switch usr
-    case 'anne' % local
-        datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
-        datasetnames = {'RT', '2IFC', 'NatComm', 'Anke neutral'};
-
-    case 'aeurai' % lisa/cartesius
-        datasets = {'RT_RDK', 'MEG-PL'};
+case 'anne' % local
+  datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
+case 'aeurai' % lisa/cartesius
+  datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating'};
 end
+datasetnames = {'RT', '2IFC',  'NatComm', 'Anke neutral', 'Anke repetitive', 'Anke alternating'};
 
 set(groot, 'defaultaxesfontsize', 8, 'defaultaxestitlefontsizemultiplier', 1, ...
     'defaultaxestitlefontweight', 'bold', ...
@@ -27,30 +26,30 @@ set(groot, 'defaultaxesfontsize', 8, 'defaultaxestitlefontsizemultiplier', 1, ..
 
 for d = 1:length(datasets),
     results = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
-    
+
     % ============================================ %
     % compute repetition parameters from separate HDDM models
     % ============================================ %
-    
+
     results.dc_prevresp__stimcodingdczprevresp = ...
         results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
-    
+
     results.z_prevresp__stimcodingdczprevresp = ...
         results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
-    
+
     % ============================================ %
     % RENAME PARAMETERS
     % ============================================ %
-    
+
     results.Properties.VariableNames{'dc_prevresp__stimcodingdczprevresp'}      = 'dc_seq_stimcoding';
     results.Properties.VariableNames{'v_prevresp__regressdczprevresp'}          = 'dc_seq_regress';
     results.Properties.VariableNames{'z_prevresp__stimcodingdczprevresp'}       = 'z_seq_stimcoding';
     results.Properties.VariableNames{'z_prevresp__regressdczprevresp'}          = 'z_seq_regress';
-    
+
     % ============================================ %
     % SEPARATE OR JOINT FIT
     % ============================================ %
-    
+
     close;
     corrplot(results, {'dc_seq_stimcoding', ...
         'z_seq_stimcoding', 'dc_seq_regress', ...
@@ -58,18 +57,18 @@ for d = 1:length(datasets),
         {'repetition'});
     suplabel(sprintf('%s', datasetnames{d}), 't');
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/%s_correlation.pdf', datasetnames{d}));
-    
+
     % ============================================ %
     % STIMCODING VS REGRESSION MODELS
 %     % ============================================ %
-%     
+%
 %     close;
 %     corrplot(results, {'dc_seq_regress', ...
 %         'z_seq_regress'}, ...
 %         {'repetition'});
 %     suplabel(sprintf('%s, regression', datasetnames{d}), 't');
 %     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/%s_correlation_regress.pdf', datasetnames{d}));
-%     
+%
     % ============================================ %
     % STABILITY OF SERIAL CHOICE BIAS
     % ============================================ %
@@ -218,6 +217,6 @@ for d = 1:length(datasets),
     %
     %     [~, pval] = ttest2(results.dc_pupil_seq_regress_joint(at), results.dc_pupil_seq_regress_joint(pl))
     %     [~, pval] = ttest2(results.dc_pupil_seq_regress_joint(dp), results.dc_pupil_seq_regress_joint(pl))
-    
-    
+
+
 end

@@ -1,7 +1,15 @@
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
-datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL'};
-datasetnames = {'RT', '2IFC', 'Anke'};
+
+
+usr = getenv('USER');
+switch usr
+case 'anne' % local
+  datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
+case 'aeurai' % lisa/cartesius
+  datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating'};
+end
+datasetnames = {'RT', '2IFC',  'NatComm', 'Anke neutral', 'Anke repetitive', 'Anke alternating'};
 
 set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
@@ -17,20 +25,20 @@ for d = 1:2,
         datasets{d}));
     subplot(4,4,cnt); cnt = cnt + 1;
     scatter(dat.session, ...
-        dat.v_prevresp__regressdcprevrespstimrtpupilsess, 30, dat.subjnr, '.', ...
+        dat.v_prevresp__regressdcprevrespstimvasessprevrtpupil, 30, dat.subjnr, '.', ...
         'jitter','on', 'jitterAmount',0.1);
     xlabel('Sessions'); ylabel('v ~ prevresp');
     set(gca, 'xtick', unique(dat.session), 'xlim', [0.5 max(dat.session)]);
     title(datasetnames{d});
-    
+
     subplot(4,4,cnt); cnt = cnt + 1;
     scatter(dat.session, ...
-        dat.v_prevrespprevrt__regressdcprevrespstimrtpupilsess, 30, dat.subjnr, '.', ...
+        dat.v_prevrespprevrt__regressdcprevrespstimvasessprevrtpupil, 30, dat.subjnr, '.', ...
         'jitter','on', 'jitterAmount',0.1);
     xlabel('Sessions'); ylabel('v ~ prevresp * prevrt');
     set(gca, 'xtick', unique(dat.session), 'xlim', [0.5 max(dat.session)]);
     title(datasetnames{d});
-    
+
 end
 
 print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig4_stability.eps'));
