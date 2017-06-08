@@ -189,7 +189,13 @@ print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig2_repetitionprobability_dcVz.
 % TEST CORRELATION BETWEEN DC AND Z CORR
 % ========================================== %
 
-datasets = { 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating'};
+switch usr
+    case 'anne' % local
+        datasets = { 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
+    case 'aeurai' % lisa/cartesius
+        datasets = { 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating'};
+end
+
 for d = 1:length(datasets),
     dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
         datasets{d}));
