@@ -101,7 +101,7 @@ def concat_models(mypath, model_name):
     # CHECK IF COMBINED MODEL EXISTS
     if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
-        m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
+    #    m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
     else:
 
         # ============================================ #
@@ -161,30 +161,30 @@ def concat_models(mypath, model_name):
         else:
             print "not deleting individual model chains"
 
-    # ============================================ #
-    # SAVE POINT ESTIMATES
-    # ============================================ #
+        # ============================================ #
+        # SAVE POINT ESTIMATES
+        # ============================================ #
 
-    print "saving stats"
-    results = m.gen_stats() # point estimate for each parameter and subject
-    results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
+        print "saving stats"
+        results = m.gen_stats() # point estimate for each parameter and subject
+        results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
 
-    # save the DIC for this model
-    text_file = open(os.path.join(mypath, model_name, 'DIC-combined.txt'), 'w')
-    text_file.write("Combined model: {}\n".format(m.dic))
-    text_file.close()
+        # save the DIC for this model
+        text_file = open(os.path.join(mypath, model_name, 'DIC-combined.txt'), 'w')
+        text_file.write("Combined model: {}\n".format(m.dic))
+        text_file.close()
 
-    # ============================================ #
-    # SAVE TRACES
-    # ============================================ #
+        # ============================================ #
+        # SAVE TRACES
+        # ============================================ #
 
-    print "saving traces"
-    # get the names for all nodes that are available here
-    group_traces = m.get_group_traces()
-    group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces.csv'))
+        print "saving traces"
+        # get the names for all nodes that are available here
+        group_traces = m.get_group_traces()
+        group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces.csv'))
 
-    all_traces = m.get_traces()
-    all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
+        all_traces = m.get_traces()
+        all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
     # # ============================================ #
     # # POSTERIOR PREDICTIVE PLOTS
