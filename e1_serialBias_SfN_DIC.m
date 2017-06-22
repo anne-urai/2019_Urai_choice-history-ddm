@@ -11,7 +11,7 @@ function e1_serialBias_SfN_DIC()
   case 'aeurai' % lisa/cartesius
     datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating'};
   end
-  datasetnames = {'RT', '2IFC',  'NatComm', 'Anke neutral', 'Anke repetitive', 'Anke alternating'};
+  datasetnames = {'RT', '2IFC',  'Urai et al. 2016', 'Braun et al. 2017'};
 
   set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...
@@ -32,7 +32,7 @@ function e1_serialBias_SfN_DIC()
     for d = 1:length(datasets),
       subplot(4, 4, d);
       getPlotDIC(mdls, types{s}, d, 1);
-      title(['Data: ' datasetnames{d}]);
+      title(datasetnames{d});
       set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
     end
 
@@ -46,7 +46,7 @@ function e1_serialBias_SfN_DIC()
       'z ~ 1 + prevresp + prevstim'}, 'fontsize', 6);
     end
     axis off;
-    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig1_DIC_%s.eps', types{s}));
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_%s.pdf', types{s}));
   end
 
   % % ============================================ %
@@ -59,7 +59,7 @@ function e1_serialBias_SfN_DIC()
   case 'aeurai' % lisa/cartesius
     datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_neutral', 'Anke_serial'};
   end
-  datasetnames = {'RT', '2IFC',  'NatComm', 'Anke neutral', 'Anke all'};
+  datasetnames = {'RT', '2IFC',  'Urai et al. 2016', 'Braun et al. 2017', 'Anke all'};
 
   clf; nrsubpl = 5;
   mdls = {'dc_prevresp', 'dc_prevresp_prevstim',  ...
@@ -72,7 +72,7 @@ function e1_serialBias_SfN_DIC()
     getPlotDIC(mdls, types{s}, d, 1);
     set(gca, 'xtick', 1:6, 'xticklabel',...
     {'[1]', '[2]', '[3]', '[4]', '[5]', '[6]'});
-    title(['Data: ' datasetnames{d}]);
+    title(datasetnames{d});
   end
   subplot(nrsubpl, nrsubpl, d+1);
   text(0, -0.2, {'Regression models', ...
@@ -88,7 +88,7 @@ function e1_serialBias_SfN_DIC()
   '     a ~ 1 + session', ...
   }, 'fontsize', 6); axis off;
   axis off;
-  print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig1_DIC_prevresp_prevstim.eps'));
+  print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_prevresp_prevstim.pdf'));
 end
 
 % ============================================ %
