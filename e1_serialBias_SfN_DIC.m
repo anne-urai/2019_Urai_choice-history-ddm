@@ -9,13 +9,15 @@ function e1_serialBias_SfN_DIC()
   case 'anne' % local
     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
   case 'aeurai' % lisa/cartesius
-    datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating'};
+    datasets = {'NatComm', 'MEG', 'Anke_neutral', 'RT_RDK'};
   end
-  datasetnames = {'RT', '2IFC',  'Urai et al. 2016', 'Braun et al. 2017'};
+  datasetnames = {'2IFC (Urai et al. 2016)', '2IFC (MEG)', '2AFC (Braun et al.)', '2AFC (RT)'};
 
   set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...
-  'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
+  'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'opengl', ...
+  'DefaultAxesBox', 'off', ...
+  'DefaultAxesTickLength', [0.02 0.05]);
   nrsubpl = length(datasets) + 1;
 
   % ============================================ %
@@ -36,17 +38,17 @@ function e1_serialBias_SfN_DIC()
       set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
     end
 
-    subplot(4,4,8);
+    subplot(4,4,6);
     switch types{s}
     case 'stimcoding'
-      text(-0.2, 0.5, {'Stimcoding models' 'prevresp + prevstim'}, 'fontsize', 6);
+      text(-0.2, 0.5, {'Stimcoding models' 'prevresp + prevstim'}, 'fontsize', 8);
     case 'regress'
       text(-0.2, 0.6, {'Regression models', ...
       'v ~ 1 + stimulus + prevresp + prevstim', ...
-      'z ~ 1 + prevresp + prevstim'}, 'fontsize', 6);
+      'z ~ 1 + prevresp + prevstim'}, 'fontsize', 8);
     end
     axis off;
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_%s.pdf', types{s}));
+    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig1_DIC_%s.eps', types{s}));
   end
 
   % % ============================================ %
@@ -88,7 +90,7 @@ function e1_serialBias_SfN_DIC()
   '     a ~ 1 + session', ...
   }, 'fontsize', 6); axis off;
   axis off;
-  print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/fig1_DIC_prevresp_prevstim.pdf'));
+  print(gcf, '-depsc', sprintf('~/Data/serialHDDM/fig1_DIC_prevresp_prevstim.eps'));
 end
 
 % ============================================ %
@@ -121,16 +123,17 @@ if isnan(mdldic(end)), assert(1==0); end
   mdldic = bsxfun(@minus, mdldic, mdldic(end));
   mdldic = mdldic(1:end-1);
 
-  bar(mdldic, 'facecolor', linspecer(1), 'barwidth', 0.4);
+  b = bar(1:length(mdldic), mdldic, 'facecolor', linspecer(1), 'barwidth', 0.5, 'BaseValue', 100);
+  b.BaseValue = 0; drawnow;
 
   %# Add a text string above/below each bin
   for i = 1:length(mdldic),
     if mdldic(i) < 0,
-      text(i, mdldic(i) - 0.06*range(get(gca, 'ylim')), ...
+      text(i, mdldic(i) - 0.07*range(get(gca, 'ylim')), ...
       num2str(round(mdldic(i))), ...
       'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
     elseif mdldic(i) > 0,
-      text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
+      text(i, mdldic(i) + 0.14*range(get(gca, 'ylim')), ...
       num2str(round(mdldic(i))), ...
       'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
     end
@@ -141,17 +144,17 @@ if isnan(mdldic(end)), assert(1==0); end
   if plotBest,
     [~, idx] = min(mdldic);
     hold on;
-    disp(idx);
-    bar(idx, mdldic(idx), 'facecolor', bestcolor(3, :), 'barwidth', 0.4);
+  %  disp(idx);
+  bar(idx, mdldic(idx), 'basevalue', 0, 'facecolor', bestcolor(3, :), 'barwidth', 0.5, 'BaseValue', 0);
   end
 
   box off;
-  ylabel('\Delta DIC (from nohist)');
+  ylabel({'\Delta DIC (from nohist)'});
   set(gca, 'xticklabel', {'dc', 'z'}, 'tickdir', 'out');
-  set(gca, 'YTickLabel', num2str(get(gca, 'YTick')'));
-  xlim([0 length(mdls)-0.5]);
+  % set(gca, 'YTickLabel', num2str(get(gca, 'YTick')'));
   axis square; axis tight;
-  ylim(1.5*get(gca, 'ylim'));
-  xlim([0 length(mdls)-0.5]);
-
+  ylim(1.8*get(gca, 'ylim'));
+  xlim([0.7 length(mdls)-1+0.5]);
+  offsetAxes;
+  set(gca, 'xcolor', 'k', 'ycolor', 'k');
 end
