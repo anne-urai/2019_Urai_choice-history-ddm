@@ -112,16 +112,13 @@ def concat_models(mypath, model_name):
 
         allmodels = []
         print ("appending models for %s" %model_name)
-        for trace_id in range(15): # how many chains were run?
+        for trace_id in range(3): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
             modelExists           = os.path.isfile(model_filename)
             if modelExists == True: # if not, this model has to be rerun
                 print model_filename
-                try:
-                    thism                 = hddm.load(model_filename)
-                    allmodels.append(thism) # now append into a list
-                except:
-                    pass
+                thism                 = hddm.load(model_filename)
+                allmodels.append(thism) # now append into a list
 
         # ============================================ #
         # CHECK CONVERGENCE
@@ -176,11 +173,6 @@ def concat_models(mypath, model_name):
         text_file.write("Combined model: {}\n".format(m.dic))
         text_file.close()
 
-        print "computing ppc"
-        ppc = hddm.utils.post_pred_gen(m, append_data=True, compute_stats=False)
-        # save as pandas dataframe
-        ppc.to_csv(os.path.join(mypath, model_name, 'preds', 'ppq_%s.csv'%tag), index=True)
-
         # ============================================ #
         # SAVE TRACES
         # ============================================ #
@@ -201,6 +193,7 @@ def concat_models(mypath, model_name):
     ppc = hddm.utils.post_pred_gen(m, append_data=True, compute_stats=False)
     # save as pandas dataframe
     ppc.to_csv(os.path.join(mypath, model_name, 'preds', 'ppq_%s.csv'%tag), index=True)
+    print "done"
 
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
