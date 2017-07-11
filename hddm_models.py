@@ -80,7 +80,7 @@ def make_model(mypath, model_name, trace_id):
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, v_reg,
             include=['z', 'sv'], group_only_nodes=['sv'],
-            group_only_regressors=False, p_outlier=0.05)
+            group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # STIMCODING PREVRESP
@@ -239,7 +239,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True, p_outlier=0.05)
 
     elif model_name == 'regress_z_prevresp':
 
@@ -254,7 +254,7 @@ def make_model(mypath, model_name, trace_id):
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True, p_outlier=0.05)
 
     elif model_name == 'regress_dc_z_prevresp':
 
@@ -271,7 +271,7 @@ def make_model(mypath, model_name, trace_id):
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # REGRESS PREVRESP + PREVSTIM
@@ -288,7 +288,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_z_prevresp_prevstim':
 
@@ -303,7 +303,7 @@ def make_model(mypath, model_name, trace_id):
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_z_prevresp_prevstim':
 
@@ -320,7 +320,7 @@ def make_model(mypath, model_name, trace_id):
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # RT AND PUPIL MODULATION onto DC
@@ -347,7 +347,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevstim_prevrt':
 
@@ -366,7 +366,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevstim_prevrt_prevpupil':
 
@@ -391,7 +391,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # RT AND PUPIL MODULATION onto DC and Z
@@ -415,7 +415,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_z_prevresp_prevstim_prevpupil':
 
@@ -445,7 +445,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt':
 
@@ -471,7 +471,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt_prevpupil':
 
@@ -504,7 +504,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # SESSION DEPENDENCE
@@ -525,7 +525,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevstim_vasessions_prevrespsessions':
 
@@ -542,7 +542,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevstim_vasessions_prevpupil':
 
@@ -567,7 +567,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevstim_vasessions_prevrt':
 
@@ -588,7 +588,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     elif model_name == 'regress_dc_prevresp_prevstim_vasessions_prevrt_prevpupil':
 
@@ -615,7 +615,7 @@ def make_model(mypath, model_name, trace_id):
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, p_outlier=0.05)
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # END OF FUNCTION THAT CREATES THE MODEL

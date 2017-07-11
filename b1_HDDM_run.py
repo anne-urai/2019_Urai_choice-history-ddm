@@ -102,6 +102,8 @@ def concat_models(mypath, model_name):
     if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
         m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
+        print "loaded this model"
+
     else:
 
         # ============================================ #
@@ -174,6 +176,11 @@ def concat_models(mypath, model_name):
         text_file.write("Combined model: {}\n".format(m.dic))
         text_file.close()
 
+        print "computing ppc"
+        ppc = hddm.utils.post_pred_gen(m, append_data=True, compute_stats=False)
+        # save as pandas dataframe
+        ppc.to_csv(os.path.join(mypath, model_name, 'preds', 'ppq_%s.csv'%tag), index=True)
+
         # ============================================ #
         # SAVE TRACES
         # ============================================ #
@@ -190,73 +197,10 @@ def concat_models(mypath, model_name):
     # POSTERIOR PREDICTIVES TO ASSESS MODEL FIT
     # ============================================ #
 
-    ppc = hddm.utils.post_pred_gen(m, append_data=True)
+    print "computing ppc"
+    ppc = hddm.utils.post_pred_gen(m, append_data=True, compute_stats=False)
     # save as pandas dataframe
     ppc.to_csv(os.path.join(mypath, model_name, 'preds', 'ppq_%s.csv'%tag), index=True)
-
-    # # ============================================ #
-    # # POSTERIOR PREDICTIVE PLOTS
-    # # ============================================ #
-    #
-    # print "posterior predictive plots"
-    # if datasets[dx] == 'MEG':
-    #     num_subj = 65
-    # if datasets[dx] == 'RT_RDK':
-    #     num_subj = 25
-    # if datasets[dx] in ['Anke_serial', 'Anke_neutral', 'Anke_repetitive', 'Anke_alternating']:
-    #     num_subj = 27
-    # if datasets[dx] == 'NatComm':
-    #     num_subj = 27
-    #
-    # figpath = os.path.join(mypath, model_name, 'figures-concat')
-    # if not os.path.exists(figpath):
-    #     os.mkdir(figpath)
-    #
-    # m.plot_posterior_predictive(save=True, path=figpath, format='pdf',
-    #     columns=ceil(num_subj/6))
-    # plt.close('all') # to avoid warnings
-    # print "plotted posterior predictive RT distributions"
-    #
-    # # plot the traces and posteriors for each parameter
-    # m.plot_posteriors(save=True, path=figpath, format='pdf')
-    # plt.close('all') # to avoid warnings
-    # print "plotted traces and autocorrelation"
-    #
-    # # ======================================================================================== #
-    # # plot my own version of the posterior predictive with overlaid conditions
-    # # ======================================================================================== #
-    #
-    # if 'stimcoding' in model_name:
-    #     print "exporting posterior predictives"
-    #     from kabuki.analyze import _plot_posterior_pdf_node
-    #
-    #     if not os.path.exists(os.path.join(mypath, model_name, 'preds')):
-    #         os.mkdir(os.path.join(mypath, model_name, 'preds'))
-    #     observeds = m.get_observeds()
-    #
-    #     # Plot different conditions (new figure for each)
-    #     for tag, nodes in observeds.groupby('tag'):
-    #         # retrieve individual subjects
-    #         for subj_i, (node_name, bottom_node) in enumerate(nodes.iterrows()):
-    #             fig = plt.figure()
-    #             ax  = fig.add_subplot(2,2,1)
-    #             #    fig.suptitle(utils.pretty_tag(tag), fontsize=8)
-    #             fig.subplots_adjust(top=0.9, hspace=.4, wspace=.3)
-    #
-    #             if not hasattr(bottom_node['node'], 'pdf'):
-    #                 continue # skip nodes that do not define the required_method
-    #             y = _plot_posterior_pdf_node(bottom_node['node'], ax,
-    #                 value_range=np.linspace(-3,3,100))
-    #             rtvals = bottom_node['node'].value.values
-    #
-    #             # save this figure
-    #             fig.savefig(os.path.join(mypath, model_name, 'preds', 'ppq_%s_subj%d.pdf'%(str(tag),subj_i)))
-    #             plt.close()
-    #
-    #             # now save to a file so that I can plot it in matlab
-    #             np.savetxt(os.path.join(mypath, model_name, 'preds', 'ppq_y_%s_subj%d.csv'%(str(tag),subj_i)), y, delimiter=",")
-    #             np.savetxt(os.path.join(mypath, model_name, 'preds', 'ppq_rt_%s_subj%d.csv'%(str(tag),subj_i)), rtvals, delimiter=",")
-
 
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
