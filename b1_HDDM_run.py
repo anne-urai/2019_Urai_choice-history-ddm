@@ -101,7 +101,7 @@ def concat_models(mypath, model_name):
     # CHECK IF COMBINED MODEL EXISTS
     if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
-    #    m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
+        m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
     else:
 
         # ============================================ #
@@ -186,6 +186,14 @@ def concat_models(mypath, model_name):
         all_traces = m.get_traces()
         all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
+    # ============================================ #
+    # POSTERIOR PREDICTIVES TO ASSESS MODEL FIT
+    # ============================================ #
+
+    ppc = hddm.utils.post_pred_gen(m, append_data=True)
+    # save as pandas dataframe
+    ppc.to_csv(os.path.join(mypath, model_name, 'preds', 'ppq_%s.csv'%tag), index=True)
+
     # # ============================================ #
     # # POSTERIOR PREDICTIVE PLOTS
     # # ============================================ #
@@ -248,6 +256,7 @@ def concat_models(mypath, model_name):
     #             # now save to a file so that I can plot it in matlab
     #             np.savetxt(os.path.join(mypath, model_name, 'preds', 'ppq_y_%s_subj%d.csv'%(str(tag),subj_i)), y, delimiter=",")
     #             np.savetxt(os.path.join(mypath, model_name, 'preds', 'ppq_rt_%s_subj%d.csv'%(str(tag),subj_i)), rtvals, delimiter=",")
+
 
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
