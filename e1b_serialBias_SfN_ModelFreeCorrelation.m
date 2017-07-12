@@ -15,7 +15,7 @@ function e1b_serialBias_SfN_ModelFreeCorrelation
   plots = {'neutral', 'biased'};
   types = {'regress', 'stimcoding'};
 
-  set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1, ...
+  set(groot, 'defaultaxesfontsize', 5, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...
   'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', ...
   'DefaultAxesBox', 'off', ...
@@ -68,6 +68,7 @@ function e1b_serialBias_SfN_ModelFreeCorrelation
         end
 
         results = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
+        results = results(results.session == 0, :);
 
         % use the stimcoding difference
         switch types{s}
@@ -81,14 +82,25 @@ function e1b_serialBias_SfN_ModelFreeCorrelation
         end
 
         subplot(4,4,d); hold on;
-        plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.57, plotColor);
+        rho1 = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.57, plotColor);
         title(datasetnames{d});
         xlabel('dc ~ prevresp');
 
         subplot(4,4,d+4); hold on;
-        plotScatter(-1*results.z_prevresp__regressdczprevresp, results.repetition, 0.2, plotColor);
+        rho2 = plotScatter(-1*results.z_prevresp__regressdczprevresp, results.repetition, 0.57, plotColor);
         xlabel('z ~ prevresp');
 
+        % compute the difference in correlation
+        rho3 = corr(results.v_prevresp__regressdczprevresp,-results.z_prevresp__regressdczprevresp, ...
+        'rows', 'complete', 'type', 'pearson');
+        [rhodiff, cihilow, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
+        disp(numel(~isnan(results.repetition)));
+
+        txt = sprintf('\\Deltar = %.3f, p = %.3f', rhodiff, pval);
+        if pval < 0.001,
+          txt = sprintf('\\Deltar = %.3f, p < 0.001', rhodiff);
+        end
+        title({' '; txt}, 'fontweight', 'normal');
       end
 
       print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_%s_%s.pdf', plots{p}, types{s}));
@@ -97,7 +109,7 @@ function e1b_serialBias_SfN_ModelFreeCorrelation
   end
 end
 
-function plotScatter(x,y, legendWhere, plotColor);
+function rho = plotScatter(x,y, legendWhere, plotColor);
 
   plot(x,y, '.');
   axis square;

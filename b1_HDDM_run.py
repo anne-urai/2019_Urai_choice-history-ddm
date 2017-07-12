@@ -271,7 +271,7 @@ for dx in d:
             print "computing ppc"
 
             # specify how many samples are needed
-            m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
+            m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
             ppc = hddm.utils.post_pred_gen(m, append_data=True)
 
             # save as pandas dataframe
