@@ -101,18 +101,14 @@ def concat_models(mypath, model_name):
     # CHECK IF COMBINED MODEL EXISTS
     if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
-        m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
-        print "loaded this model"
-
     else:
-
         # ============================================ #
         # APPEND MODELS
         # ============================================ #
 
         allmodels = []
         print ("appending models for %s" %model_name)
-        for trace_id in range(3): # how many chains were run?
+        for trace_id in range(15): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
             modelExists           = os.path.isfile(model_filename)
             if modelExists == True: # if not, this model has to be rerun
@@ -185,16 +181,6 @@ def concat_models(mypath, model_name):
         all_traces = m.get_traces()
         all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
-    # ============================================ #
-    # POSTERIOR PREDICTIVES TO ASSESS MODEL FIT
-    # ============================================ #
-
-    print "computing ppc"
-    ppc = hddm.utils.post_pred_gen(m, append_data=True, compute_stats=False)
-    # save as pandas dataframe
-    ppc.to_csv(os.path.join(mypath, model_name, 'preds', 'ppq_%s.csv'%tag), index=True)
-    print "done"
-
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
 # ============================================ #
@@ -260,7 +246,7 @@ for dx in d:
         if not os.path.exists(thispath):
             os.mkdir(thispath)
 
-        if runMe == True:
+        if runMe == 1:
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
             # get the model specification
@@ -277,5 +263,23 @@ for dx in d:
             elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
-        else: # concatenate the different chains
+        elif runMe == 2:
+            # ============================================ #
+            # POSTERIOR PREDICTIVES TO ASSESS MODEL FIT
+            # ============================================ #
+            starttime = time.time()
+            print "computing ppc"
+
+            # specify how many samples are needed
+            m = hddm.load(os.path.join(mypath, model_name, 'modelfit-combined.model'))
+            ppc = hddm.utils.post_pred_gen(m, append_data=True)
+
+            # save as pandas dataframe
+            ppc.to_csv(os.path.join(mypath, models[vx], 'preds', 'ppq_data.csv'), index=True)
+            elapsed = time.time() - starttime
+            print( "Elapsed time for %s %s, PPC: %f seconds\n" %(models[vx], datasets[dx], elapsed))
+
+        elif runMe == 0:
+
+            # concatenate the different chains
             concat_models(mypath, models[vx])
