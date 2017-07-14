@@ -272,10 +272,13 @@ for dx in d:
 
             # specify how many samples are needed
             m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
-            ppc = hddm.utils.post_pred_gen(m, append_data=True)
+            ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=100)
+
+            # make the csv smaller, save disk space
+            ppc = ppc[['rt','rt_sampled']]
 
             # save as pandas dataframe
-            ppc.to_csv(os.path.join(mypath, models[vx], 'preds', 'ppq_data.csv'), index=True)
+            ppc.to_csv(os.path.join(mypath, models[vx], 'ppq_data.csv'), index=True)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s %s, PPC: %f seconds\n" %(models[vx], datasets[dx], elapsed))
 

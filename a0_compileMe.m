@@ -79,3 +79,19 @@ function [] = compileMe(fname)
     % write to a file
     dlmwrite('hddmparams_concat', alldat, 'delimiter', ' ');
     size(alldat)
+
+
+    %% PPC
+    alldat = [];
+    for a = [0 1 2 6],
+      % dont run Ankes data with the session version
+      for b = [1 11], % regress, with and without dc history
+        %if ~(a == 2 & ismember(b, [6 8 10])),
+        alldat = [alldat; a b];
+        %  end
+      end
+    end
+
+    % write to a file
+    dlmwrite('hddmparams_ppc', alldat, 'delimiter', ' ');
+    size(alldat)
