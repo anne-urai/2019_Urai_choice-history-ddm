@@ -45,6 +45,7 @@ for p = 1:length(plots),
         
         % get traces for the model with pupil and rt modulation
         ppc = readtable(sprintf('~/Data/%s/HDDM/regress_dc_z_prevresp_prevstim/ppq_data.csv', datasets{d}));
+        ppc = readtable('~/Data/ppq_data.csv');
         % ppc = ppc(:, {'rt', 'rt_sampled'}); % save some memory
         
         % plot the pupil and RT traces
