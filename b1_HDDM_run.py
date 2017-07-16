@@ -187,13 +187,13 @@ def concat_models(mypath, model_name):
 
 # which model are we running at the moment?
 models = ['stimcoding_nohist', # 0
-    'regress_nohist', # 1
     'stimcoding_dc_prevresp', # 2
     'stimcoding_z_prevresp', # 3
     'stimcoding_dc_z_prevresp', # 4
     'stimcoding_dc_prevresp_prevstim', # 5
     'stimcoding_z_prevresp_prevstim', # 6
     'stimcoding_dc_z_prevresp_prevstim', # 7
+    'regress_nohist', # 1
     'regress_dc_prevresp', # 8
     'regress_z_prevresp', # 9
     'regress_dc_z_prevresp', # 10
@@ -212,8 +212,10 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_prevresp_prevstim_vasessions_prevpupil', # 23
     'regress_dc_prevresp_prevstim_vasessions_prevrt', # 24
     'regress_dc_prevresp_prevstim_vasessions_prevrt_prevpupil', # 25
-    'regress_dc_prev2resp_prev2stim', # 26
-    'regress_dc_prev3resp_prev3stim'] # 27
+    'regress_dc_prevcorrect', # 26
+    'regress_dc_prevcorrect_prevpupil', # 27
+    'regress_dc_prevcorrect_prevrt', # 28
+    'regress_dc_prevcorrect_prevrt_prevpupil'] # 29
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1

@@ -44,7 +44,7 @@ function [] = compileMe(fname)
 
     nsmp       = [10000]
     datasets   = [0:10]; % RT-RDK and MEG-PL
-    models     = [0:25]; % the nr of the models
+    models     = [26:29]; % the nr of the models
     nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
     alldat = [];
