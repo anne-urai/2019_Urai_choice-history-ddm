@@ -13,113 +13,104 @@ function e1_serialBias_SfN_DIC()
   'defaultfigurecolormap', [1 1 1], 'defaultTextInterpreter','tex');
   usr = getenv('USER');
 
-types = {'regress', 'stimcoding'};
-for s = 1:2,
-  plots = {'neutral', 'biased'};
+  types = {'regress', 'stimcoding'};
+  for s = 1:2,
+    plots = {'neutral', 'biased'};
 
-  for p = 1:length(plots),
+    for p = 1:length(plots),
 
-    switch p
+      switch p
       case 1
 
-      switch usr
+        switch usr
         case 'anne' % local
-        datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
+          datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
         case 'aeurai' % lisa/cartesius
-        datasets = {'NatComm', 'MEG', 'Anke_neutral', 'RT_RDK'};
-      end
-      datasetnames = {'2IFC (Urai et al. 2016)', '2IFC (MEG)', '2AFC (Braun et al.)', '2AFC (RT)'};
+          datasets = {'NatComm', 'MEG', 'Anke_neutral', 'RT_RDK'};
+        end
+        datasetnames = {'2IFC (Urai et al. 2016)', '2IFC (MEG)', '2AFC (Braun et al.)', '2AFC (RT)'};
 
       case 2
-      switch usr
+        switch usr
         case 'aeurai' % lisa/cartesius
-        datasets = {'Anke_alternating', 'Anke_neutral', 'Anke_repetitive', 'Anke_serial'};
+          datasets = {'Anke_alternating', 'Anke_neutral', 'Anke_repetitive', 'Anke_serial'};
+        end
+        datasetnames = {'2AFC alternating', '2AFC neutral', '2AFC repetitive', '2AFC all'};
       end
-      datasetnames = {'2AFC alternating', '2AFC neutral', '2AFC repetitive', '2AFC all'};
+
+      % ============================================ %
+      % DIC COMPARISON BETWEEN DC, Z AND BOTH
+      % ============================================ %
+
+      % 1. STIMCODING, only prevresp
+      clf;
+      mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
+      'dc_z_prevresp_prevstim', 'nohist'};
+      for d = 1:length(datasets),
+        subplot(4, 4, d);
+        getPlotDIC(mdls, types{s}, d, 1);
+        title(datasetnames{d});
+        set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
+      end
+
+      % can you please add the full diffusion equation on top of the regression models? So akin to the eq we put into JW’s figure,
+      % only here we would also have to add z. For specifics, take a look at the first few equations in Bogasz’ paper...
+      
+      drawnow;
+      print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s.eps', plots{p}, types{s}));
+      print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s.pdf', plots{p}, types{s}));
+
+      % % ============================================ %
+      % DIC COMPARISON BETWEEN DC, Z AND BOTH
+      % ============================================ %
+
+      % build up models
+      % 'regress_nohist' % should go last, will be baseline
+      % 'regress_dc_prevresp'
+      % 'regress_dc_prevresp_prevstim'
+      % regress_dc_prevresp_prevstim_vasessions # add learning effects
+      % then add modulation
+      % then also add multiple responses into the past
+
+      clf; nrsubpl = length(datasets);
+      mdls = {'dc_prevresp', ...
+      'dc_prevresp_prevstim',  ...
+      'dc_prevresp_prevstim_prevrt', ...
+      'dc_prevresp_prevstim_prevrt_prevpupil', ...
+      'dc_prevresp_prevstim_vasessions',  ...
+      'dc_prevresp_prevstim_vasessions_prevrt', ...
+      'dc_prevresp_prevstim_vasessions_prevrt_prevpupil', ...
+      'nohist'};
+
+      for d = 1:length(datasets),
+        subplot(nrsubpl, nrsubpl, d);
+        getPlotDIC(mdls, types{s}, d, 1);
+        set(gca, 'xtick', 1:length(mdls)-1);
+        title(datasetnames{d});
+      end
+
+      switch types{s}
+      case 'regress'
+
+        subplot(nrsubpl, nrsubpl, nrsubpl+1);
+        text(0, -0.2, {'Regression models', ...
+        '[1] v ~ 1 + stimulus + prevresp', ...
+        '[2] v ~ 1 + stimulus + prevresp + prevstim', ...
+        '[3] v ~ 1 + stimulus + prevresp*prevrt + prevstim*prevrt', ...
+        '[4] v ~ 1 + stimulus*session + prevresp*prevrt + prevstim*prevrt + prevresp*prevpupil + prevstim*prevpupil', ...
+        '[5] v ~ 1 + stimulus*session + prevresp + prevstim', ...
+        '    a ~ 1 + session', ...
+        '[6] v ~ 1 + session*stimulus + prevresp*prevrt + prevstim*prevrt', ...
+        '     a ~ 1 + session', ...
+        '[7] v ~ 1 + session*stimulus + prevresp*prevrt + prevstim*prevrt + prevresp*prevpupil + prevstim*prevpupil', ...
+        '     a ~ 1 + session', ...
+        }, 'fontsize', 6); axis off;
+      end
+
+      print(gcf, '-depsc', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.eps', plots{p}, types{s}));
+      print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.pdf', plots{p}, types{s}));
     end
-
-    % ============================================ %
-    % DIC COMPARISON BETWEEN DC, Z AND BOTH
-    % ============================================ %
-
-    % 1. STIMCODING, only prevresp
-    clf;
-    mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
-    'dc_z_prevresp_prevstim', 'nohist'};
-    for d = 1:length(datasets),
-      subplot(4, 4, d);
-      getPlotDIC(mdls, types{s}, d, 1);
-      title(datasetnames{d});
-      set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
-    end
-
-    % can you please add the full diffusion equation on top of the regression models? So akin to the eq we put into JW’s figure,
-    % only here we would also have to add z. For specifics, take a look at the first few equations in Bogasz’ paper...
-
-    % subplot(4,4,6);
-    % switch types{s}
-    % case 'regress'
-    %   text(-0.2, 0.6, {'Regression models', ...
-    %   'dc: dy = s*v*dt + dc \cdot dt + cdW, x', ...
-    %   'z ~ 1 + prevresp + prevstim'}, 'fontsize', 8);
-    % case 'stimcoding'
-    % end
-    % axis off;
-
-    drawnow;
-    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s.eps', plots{p}, types{s}));
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s.pdf', plots{p}, types{s}));
-
-  % % ============================================ %
-  % DIC COMPARISON BETWEEN DC, Z AND BOTH
-  % ============================================ %
-
-% build up models
-% 'regress_nohist' % should go last, will be baseline
-% 'regress_dc_prevresp'
-% 'regress_dc_prevresp_prevstim'
-% regress_dc_prevresp_prevstim_vasessions # add learning effects
-% then add modulation
-% then also add multiple responses into the past
-
-  clf; nrsubpl = length(datasets);
-  mdls = {'dc_prevresp', ...
-  'dc_prevresp_prevstim',  ...
-  'dc_prevresp_prevstim_prevrt', ...
-  'dc_prevresp_prevstim_prevrt_prevpupil', ...
-  'dc_prevresp_prevstim_vasessions',  ...
-  'dc_prevresp_prevstim_vasessions_prevrt', ...
-  'dc_prevresp_prevstim_vasessions_prevrt_prevpupil', ...
-  'nohist'};
-
-  for d = 1:length(datasets),
-    subplot(nrsubpl, nrsubpl, d);
-    getPlotDIC(mdls, types{s}, d, 1);
-    set(gca, 'xtick', 1:6, 'xticklabel',...
-    {'[1]', '[2]', '[3]', '[4]', '[5]', '[6]'});
-    title(datasetnames{d});
   end
-
-  switch types{s}
-  case 'regress'
-
-  subplot(nrsubpl, nrsubpl, nrsubpl*3);
-  text(0, -0.2, {'Regression models', ...
-  '[1] v ~ 1 + stimulus + prevresp', ...
-  '[2] v ~ 1 + stimulus + prevresp + prevstim', ...
-  '[3] v ~ 1 + stimulus + prevresp*prevrt + prevstim*prevrt', ...
-  '[4] v ~ 1 + stimulus*session + prevresp*prevrt + prevstim*prevrt + prevresp*prevpupil + prevstim*prevpupil', ...
-  '[5] v ~ 1 + stimulus*session + prevresp + prevstim', ...
-  '    a ~ 1 + session', ...
-  '[6] v ~ 1 + session*(stimulus + prevresp*prevrt + prevstim*prevrt + prevresp*prevpupil + prevstim*prevpupil)', ...
-  '     a ~ 1 + session', ...
-  }, 'fontsize', 6); axis off;
-  end
-
-  print(gcf, '-depsc', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.eps', plots{p}, types{s}));
-  print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.pdf', plots{p}, types{s}));
-end
-end
 end
 
 % ============================================ %
@@ -152,7 +143,7 @@ function getPlotDIC(mdls, s, d, plotBest)
     mdldic = bsxfun(@minus, mdldic, mdldic(end));
     mdldic = mdldic(1:end-1);
 
-    b = bar(1:length(mdldic), mdldic, 'facecolor', [0.7 0.7 0.7], 'barwidth', 0.5, 'BaseValue', 100);
+    b = bar(1:length(mdldic), mdldic, 'facecolor', [0.7 0.7 0.7], 'barwidth', 0.5, 'BaseValue', 0);
     b.BaseValue = 0; drawnow;
 
     %# Add a text string above/below each bin
@@ -176,14 +167,5 @@ function getPlotDIC(mdls, s, d, plotBest)
       %  disp(idx);
       bar(idx, mdldic(idx), 'basevalue', 0, 'facecolor', bestcolor(1, :), 'barwidth', 0.5, 'BaseValue', 0);
     end
-
-    box off;
-    ylabel({'\Delta DIC (from nohist)'});
-    set(gca, 'xticklabel', {'dc', 'z'}, 'tickdir', 'out');
-    % set(gca, 'YTickLabel', num2str(get(gca, 'YTick')'));
-    axis square; axis tight;
-    ylim(1.8*get(gca, 'ylim'));
-    xlim([0.7 length(mdls)-1+0.5]);
-    offsetAxes;
-    set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    xlim([0.5 length(mdldic)+0.5])
   end
