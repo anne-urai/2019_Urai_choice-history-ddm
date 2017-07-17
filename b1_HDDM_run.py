@@ -224,11 +224,11 @@ models = ['stimcoding_nohist', # 0
 datasets = ['RT_RDK', # 0
     'MEG', # 1
     'NatComm', # 2
-    'Anke_neutral', # 3
-    'Anke_repetitive', # 4
-    'Anke_alternating', # 5
-    'Anke_serial', # 6
-    'MEG_repeaters_allsessions',
+    'Anke_2afc_neutral', # 3
+    'Anke_2afc_repetitive', # 4
+    'Anke_2afc_alternating', # 5
+    'Anke_2afc_serial', # 6
+    'MEG_allsessions',
     'MEG_alternators_allsessions',
     'MEG_repeaters_megsessions',
     'MEG_alternators_megsessions'] # 6
