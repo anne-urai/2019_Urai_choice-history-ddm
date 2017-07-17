@@ -32,6 +32,8 @@ def recode_4stimcoding(mydata):
     mydata.ix[mydata['stimulus']==-1,'stimulus'] = 0
     if len(mydata.stimulus.unique()) != 2:
         raise ValueError('Stimcoding needs 2 stimulus types')
+
+    # also create a binary prevcorrect
     return mydata
 
 # ============================================ #
