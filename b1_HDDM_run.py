@@ -53,7 +53,7 @@ parser.add_option ( "-d", "--dataset",
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(0,25),
+        default = range(0,10),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
@@ -61,7 +61,7 @@ parser.add_option ( "-i", "--trace_id",
         type = "int",
         help = "Which trace to run, usually 0-60" )
 parser.add_option ( "-s", "--samples",
-        default = 100,
+        default = 50,
         type = "int",
         help = "How many samples to use" )
 
@@ -187,35 +187,39 @@ def concat_models(mypath, model_name):
 
 # which model are we running at the moment?
 models = ['stimcoding_nohist', # 0
-    'stimcoding_dc_prevresp', # 2
-    'stimcoding_z_prevresp', # 3
-    'stimcoding_dc_z_prevresp', # 4
-    'stimcoding_dc_prevresp_prevstim', # 5
-    'stimcoding_z_prevresp_prevstim', # 6
-    'stimcoding_dc_z_prevresp_prevstim', # 7
-    'regress_nohist', # 1
-    'regress_dc_prevresp', # 8
-    'regress_z_prevresp', # 9
-    'regress_dc_z_prevresp', # 10
-    'regress_dc_prevresp_prevstim', # 11
-    'regress_z_prevresp_prevstim', # 12
-    'regress_dc_z_prevresp_prevstim', # 13
-    'regress_dc_prevresp_prevstim_vasessions', # 14
-    'regress_dc_prevresp_prevstim_prevpupil', # 15
-    'regress_dc_prevresp_prevstim_prevrt', # 16
-    'regress_dc_prevresp_prevstim_prevrt_prevpupil', # 17
-    'regress_dc_z_prevresp_prevstim_vasessions', # 18
-    'regress_dc_z_prevresp_prevstim_prevpupil', # 18
-    'regress_dc_z_prevresp_prevstim_prevrt', # 20
-    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 21
-    'regress_dc_prevresp_prevstim_vasessions_prevrespsessions', # 22
-    'regress_dc_prevresp_prevstim_vasessions_prevpupil', # 23
-    'regress_dc_prevresp_prevstim_vasessions_prevrt', # 24
-    'regress_dc_prevresp_prevstim_vasessions_prevrt_prevpupil', # 25
-    'regress_dc_prevcorrect', # 26
-    'regress_dc_prevcorrect_prevpupil', # 27
-    'regress_dc_prevcorrect_prevrt', # 28
-    'regress_dc_prevcorrect_prevrt_prevpupil'] # 29
+    'stimcoding_dc_prevresp', # 1
+    'stimcoding_z_prevresp', # 2
+    'stimcoding_dc_z_prevresp', # 3
+    'stimcoding_dc_prevcorrect', # 4
+    'stimcoding_z_prevcorrect', # 5
+    'stimcoding_dc_z_prevcorrect', # 6
+    'stimcoding_dc_z_prev2correct', # 7
+    'stimcoding_dc_z_prev3correct', # 8
+    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil'] # 9
+
+
+    # 'regress_nohist', # 1
+    # 'regress_dc_prevresp', # 8
+    # 'regress_z_prevresp', # 9
+    # 'regress_dc_z_prevresp', # 10
+    # 'regress_dc_prevresp_prevstim', # 11
+    # 'regress_z_prevresp_prevstim', # 12
+    # 'regress_dc_z_prevresp_prevstim', # 13
+    # 'regress_dc_prevresp_prevstim_vasessions', # 14
+    # 'regress_dc_prevresp_prevstim_prevpupil', # 15
+    # 'regress_dc_prevresp_prevstim_prevrt', # 16
+    # 'regress_dc_z_prevresp_prevstim_vasessions', # 18
+    # 'regress_dc_z_prevresp_prevstim_prevpupil', # 18
+    # 'regress_dc_z_prevresp_prevstim_prevrt', # 20
+    # 'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 21
+    # 'regress_dc_prevresp_prevstim_vasessions_prevrespsessions', # 22
+    # 'regress_dc_prevresp_prevstim_vasessions_prevpupil', # 23
+    # 'regress_dc_prevresp_prevstim_vasessions_prevrt', # 24
+    # 'regress_dc_prevresp_prevstim_vasessions_prevrt_prevpupil', # 25
+    # 'regress_dc_prevcorrect', # 26
+    # 'regress_dc_prevcorrect_prevpupil', # 27
+    # 'regress_dc_prevcorrect_prevrt', # 28
+    # 'regress_dc_prevcorrect_prevrt_prevpupil'] # 29
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1
@@ -238,7 +242,7 @@ if isinstance(model_version, int):
 for dx in d:
 
     # find path depending on location and dataset
-    mypath = os.path.realpath(os.path.expanduser('~/Data/%s/HDDM'%datasets[dx]))
+    mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
 
     for vx in model_version:
         time.sleep(trace_id) # to avoid different jobs trying to make the same folder
@@ -249,6 +253,7 @@ for dx in d:
             os.mkdir(thispath)
 
         if runMe == 1:
+
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
             # get the model specification
@@ -266,6 +271,7 @@ for dx in d:
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
         elif runMe == 2:
+
             # ============================================ #
             # POSTERIOR PREDICTIVES TO ASSESS MODEL FIT
             # ============================================ #

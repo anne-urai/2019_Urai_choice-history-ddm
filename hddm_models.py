@@ -34,6 +34,19 @@ def recode_4stimcoding(mydata):
         raise ValueError('Stimcoding needs 2 stimulus types')
 
     # also create a binary prevcorrect
+    mydata['prevcorrect']     = mydata.prevresp
+    mydata.prevcorrect[mydata.prevresp != mydata.prevstim] = 0
+    mydata.prevcorrect[mydata.prevresp == mydata.prevstim] = 1
+
+    # also create a binary prevcorrect
+    mydata['prev2correct']     = mydata.prevresp
+    mydata.prev2correct[mydata.prev2resp != mydata.prev2stim] = 0
+    mydata.prev2correct[mydata.prev2resp == mydata.prev2stim] = 1
+    # also create a binary prevcorrect
+    mydata['prev3correct']     = mydata.prevresp
+    mydata.prev3correct[mydata.prev3resp != mydata.prev3stim] = 0
+    mydata.prev3correct[mydata.prev3resp == mydata.prev3stim] = 1
+
     return mydata
 
 # ============================================ #
@@ -48,17 +61,12 @@ def make_model(mypath, model_name, trace_id):
     # get the csv file for this dataset
     filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
     mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
+    # print mydata.head()
 
     # correct a weirdness in Anke's data
     if 'transitionprob' in mydata.columns:
         mydata.transitionprob = mydata.transitionprob * 100;
         mydata.transitionprob = mydata.transitionprob.round();
-
-    # recode for correct and error
-    mydata['preverror']     = mydata.prevresp
-    mydata.preverror[mydata.prevresp == mydata.prevstim] = 0
-    mydata['prevcorrect']   = mydata.prevresp
-    mydata.prevcorrect[mydata.prevresp != mydata.prevstim] = 0
 
     # ============================================ #
     # NO HISTORY FOR MODEL COMPARISON
@@ -162,10 +170,10 @@ def make_model(mypath, model_name, trace_id):
                 depends_on={'dc':['prevresp'], 'z':['prevresp']})
 
     # ============================================ #
-    # STIMCODING PREVRESP + PREVSTIM
+    # STIMCODING PREVRESP + PREVCORRECT
     # ============================================ #
 
-    elif model_name == 'stimcoding_dc_prevresp_prevstim':
+    elif model_name == 'stimcoding_dc_prevcorrect':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
@@ -175,20 +183,20 @@ def make_model(mypath, model_name, trace_id):
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevstim', 'transitionprob']})
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect', 'transitionprob']})
         elif len(mydata.coherence.unique()) > 1:
             print "splitting by coherence"
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevstim']})
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect']})
         else:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'dc':['prevresp', 'prevstim']})
+                depends_on={'dc':['prevresp', 'prevcorrect']})
 
-    elif model_name == 'stimcoding_z_prevresp_prevstim':
+    elif model_name == 'stimcoding_z_prevcorrect':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
@@ -198,19 +206,19 @@ def make_model(mypath, model_name, trace_id):
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v': ['coherence'], 'z':['prevresp', 'prevstim', 'transitionprob']})
+                depends_on={'v': ['coherence'], 'z':['prevresp', 'prevcorrect', 'transitionprob']})
         elif len(mydata.coherence.unique()) > 1:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v': ['coherence'], 'z':['prevresp', 'prevstim']})
+                depends_on={'v': ['coherence'], 'z':['prevresp', 'prevcorrect']})
         else:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'z':['prevresp', 'prevstim']})
+                depends_on={'z':['prevresp', 'prevcorrect']})
 
-    elif model_name == 'stimcoding_dc_z_prevresp_prevstim':
+    elif model_name == 'stimcoding_dc_z_prevcorrect':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
@@ -220,18 +228,111 @@ def make_model(mypath, model_name, trace_id):
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevstim', 'transitionprob'],
-                'z':['prevresp', 'prevstim', 'transitionprob']})
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect', 'transitionprob'],
+                'z':['prevresp', 'prevcorrect', 'transitionprob']})
         elif len(mydata.coherence.unique()) > 1:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevstim'], 'z':['prevresp', 'prevstim']})
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect'], 'z':['prevresp', 'prevcorrect']})
         else:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
-                depends_on={'dc':['prevresp', 'prevstim'], 'z':['prevresp', 'prevstim']})
+                depends_on={'dc':['prevresp', 'prevcorrect'], 'z':['prevresp', 'prevcorrect']})
+
+    # ============================================ #
+    # MULTIPLE LAGS
+    # ============================================ #
+
+    elif model_name == 'stimcoding_dc_z_prev2correct':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect', 'transitionprob', 'prev2resp', 'prev2correct'],
+                'z':['prevresp', 'prevcorrect', 'transitionprob','prev2resp', 'prev2correct']})
+        elif len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct'], 'z':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'dc':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct'], 'z':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct']})
+
+    elif model_name == 'stimcoding_dc_z_prev3correct':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect', 'transitionprob', 'prev2resp', 'prev2correct', 'prev3resp', 'prev3correct'],
+                'z':['prevresp', 'prevcorrect', 'transitionprob','prev2resp', 'prev2correct', 'prev3resp', 'prev3correct']})
+        elif len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct', 'prev3resp', 'prev3correct'], 'z':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct', 'prev3resp', 'prev3correct']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'dc':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct'], 'z':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct']})
+
+    # ============================================ #
+    # MODULATION BY PUPIL AND RT
+    # ============================================ #
+
+    elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt_prevpupil':
+
+        # subselect data
+        mydata = mydata.dropna(subset=['prevpupil'])
+        if len(mydata.session.unique()) < max(mydata.session.unique()):
+            mydata["session"] = mydata["session"].map({1:1, 5:2})
+        mydata = balance_designmatrix(mydata)
+
+        # also create a binary prevcorrect
+        mydata['prevcorrect']     = mydata.prevresp
+        mydata['preverror']       = mydata.prevresp
+        mydata.prevcorrect[mydata.prevresp != mydata.prevstim] = 0
+        mydata.preverror[mydata.prevresp == mydata.prevstim] = 0
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus + ' \
+            'prevcorrect:C(transitionprob) + preverror:C(transitionprob) + ' \
+            'prevcorrect:prevpupil:C(transitionprob) + preverror:prevpupil:C(transitionprob) + ' \
+            'prevcorrect:prevrt:C(transitionprob) + preverror:prevrt:C(transitionprob)',
+            'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevcorrect:C(transitionprob) + preverror:C(transitionprob) +' \
+            'prevcorrect:prevpupil:C(transitionprob) + preverror:prevpupil:C(transitionprob) +' \
+            'prevcorrect:prevrt:C(transitionprob) + preverror:prevrt:C(transitionprob)',
+            'link_func': z_link_func}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevcorrect + preverror + ' \
+            'prevcorrect:prevrt + preverror:prevrt + prevcorrect:prevpupil + preverror:prevpupil',
+            'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevcorrect + preverror +' \
+            'prevcorrect:prevpupil + preverror:prevpupil +' \
+            'prevcorrect:prevrt + preverror:prevrt',
+            'link_func': z_link_func}
+        reg_both = [v_reg, z_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # REGRESS PREVRESP
@@ -461,38 +562,6 @@ def make_model(mypath, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
-    elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt_prevpupil':
-
-        # subselect data
-        mydata = mydata.dropna(subset=['prevpupil'])
-        if len(mydata.session.unique()) < max(mydata.session.unique()):
-            mydata["session"] = mydata["session"].map({1:1, 5:2})
-        mydata = balance_designmatrix(mydata)
-
-        # boundary separation and drift rate will change over sessions
-        if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus + ' \
-            'prevresp:C(transitionprob) + prevstim:C(transitionprob) + ' \
-            'prevresp:prevpupil:C(transitionprob) + prevstim:prevpupil:C(transitionprob) + ' \
-            'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
-            'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) +' \
-            'prevresp:prevpupil:C(transitionprob) + prevstim:prevpupil:C(transitionprob) +' \
-            'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
-            'link_func': z_link_func}
-        else:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + ' \
-            'prevresp:prevrt + prevstim:prevrt + prevresp:prevpupil + prevstim:prevpupil',
-            'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevresp+ prevstim +' \
-            'prevresp:prevpupil + prevstim:prevpupil +' \
-            'prevresp:prevrt + prevstim:prevrt',
-            'link_func': z_link_func}
-        reg_both = [v_reg, z_reg]
-
-        m = hddm.HDDMRegressor(mydata, reg_both,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # SESSION DEPENDENCE
@@ -708,7 +777,6 @@ def make_model(mypath, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
-
 
     # ============================================ #
     # END OF FUNCTION THAT CREATES THE MODEL
