@@ -261,9 +261,9 @@ for dx in d:
 
             # now sample and save
             if os.path.exists(model_filename):
-                pass
+                pass # skip if this model i has been run
             elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
-                pass
+                pass # skip if this model has been concatenated
             else:
                 # only run if this hasnt been done, and there is no concatenated master model present
                 run_model(m, mypath, models[vx], trace_id, n_samples)
