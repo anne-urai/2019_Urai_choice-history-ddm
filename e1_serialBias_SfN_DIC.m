@@ -16,28 +16,28 @@ usr = getenv('USER');
 types = {'stimcoding'};
 for s = 1:length(types),
     plots = {'neutral', 'biased'};
-    
+
     for p = 1:length(plots),
-        
+
         % neutral vs biased plots
         switch p
             case 1
-                
+
                 switch usr
                     case 'anne' % local
                         datasets = {'RT_RDK', 'Anke_2afc_neutral', 'NatComm', 'projects/0/neurodec/Data/MEG-PL'};
                     case 'aeurai' % lisa/cartesius
-                        datasets = {'RT_RDK', 'Anke_neutral', 'NatComm', 'MEG'};
+                        datasets = {'RT_RDK', 'Anke_2afc_neutral', 'NatComm', 'MEG'};
                 end
                 datasetnames = { {'2AFC, RT', 'n = 22'}, {'2AFC, Braun et al. 2017 bioRxiv', 'n = 22'}, ...
                     {'2IFC, Urai et al. 2017 NatComm', 'n = 27'}, {'2IFC, replication', 'n = 61'}};
-                
+
             case 2
                 switch usr
                     case 'anne' % local
                         datasets = {'Anke_2afc_alternating', 'Anke_2afc_neutral', 'Anke_2afc_repetitive'};
                     case 'aeurai' % lisa/cartesius
-                        datasets = {'Anke_alternating', 'Anke_neutral', 'Anke_repetitive', 'Anke_serial'};
+                      datasets = {'Anke_2afc_alternating', 'Anke_2afc_neutral', 'Anke_2afc_repetitive'};
                 end
                 datasetnames = {'2AFC alternating', '2AFC neutral', '2AFC repetitive', '2AFC all'};
                 datasetnames =  {{'2AFC, Braun et al. 2017 bioRxiv', 'Alternating'}, ...
@@ -45,34 +45,34 @@ for s = 1:length(types),
                     {'2AFC, Braun et al. 2017 bioRxiv', 'Repetitive'}, ...
                     {'2AFC, Braun et al. 2017 bioRxiv', 'All'}};
         end
-        
+
         % ============================================ %
         % DIC COMPARISON BETWEEN DC, Z AND BOTH
         % ============================================ %
-        
+
         % 1. STIMCODING, only prevresp
         close all;
-        mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
-            'dc_z_prevresp_prevstim', 'nohist'};
+        mdls = {'dc_prevcorrect', 'z_prevcorrect', ...
+            'dc_z_prevcorrect', 'nohist'};
         for d = 1:length(datasets),
             subplot(4, 4, d);
             getPlotDIC(mdls, types{s}, d, 1);
             title(datasetnames{d});
             set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
-            xlabel({'Modulation by', 'previous response & stimulus'});
+            xlabel({'Modulation by', 'previous response'});
         end
-        
+
         % can you please add the full diffusion equation on top of the regression models? So akin to the eq we put into JW???s figure,
         % only here we would also have to add z. For specifics, take a look at the first few equations in Bogasz??? paper...
-        
+
         drawnow; tightfig;
-        print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s_prevresp_prevstim.eps', plots{p}, types{s}));
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s_prevresp_prevstim.pdf', plots{p}, types{s}));
-        
-        % % ============================================ %
+      %  print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s_prevresp_prevstim.eps', plots{p}, types{s}));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s_prevcorrect.pdf', plots{p}, types{s}));
+
+        % ============================================ %
         % DIC COMPARISON BETWEEN DC, Z AND BOTH
         % ============================================ %
-        
+
         % build up models
         % 'regress_nohist' % should go last, will be baseline
         % 'regress_dc_prevresp'
@@ -80,27 +80,25 @@ for s = 1:length(types),
         % regress_dc_prevresp_prevstim_vasessions # add learning effects
         % then add modulation
         % then also add multiple responses into the past
-        
+
         close all; nrsubpl = length(datasets);
-        mdls = {'dc_prevresp', ...
-            'dc_prevresp_prevstim',  ...
-            'dc_prevresp_prevstim_prevrt', ...
-            'dc_prevresp_prevstim_prevrt_prevpupil', ...
-            'dc_prevresp_prevstim_vasessions',  ...
-            'dc_prevresp_prevstim_vasessions_prevrt', ...
-            'dc_prevresp_prevstim_vasessions_prevrt_prevpupil', ...
+        mdls = {'dc_z_prevresp', ...
+            'dc_z_prevresp_prevstim',  ...
+            'dc_z_prevcorrect', ...
+            'dc_z_prev2correct', ...
+            'dc_z_prev3correct',  ...
             'nohist'};
-        
+
         for d = 1:length(datasets),
             subplot(nrsubpl, nrsubpl, d);
             getPlotDIC(mdls, types{s}, d, 1);
             set(gca, 'xtick', 1:length(mdls)-1);
             title(datasetnames{d});
         end
-        
+
         switch types{s}
             case 'regress'
-                
+
                 subplot(nrsubpl, nrsubpl, nrsubpl+1);
                 text(0, -0.2, {'Regression models', ...
                     '[1] v ~ 1 + stimulus + prevresp', ...
@@ -115,7 +113,7 @@ for s = 1:length(types),
                     '     a ~ 1 + session', ...
                     }, 'fontsize', 6); axis off;
         end
-        
+
         tightfig;
         print(gcf, '-depsc', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.eps', plots{p}, types{s}));
          print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.pdf', plots{p}, types{s}));
@@ -134,14 +132,15 @@ axis square;
 
 mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
-    if ~exist(sprintf('~/Data/%s/HDDM/summary/%s_%s_all.mat', ...
+    if ~exist(sprintf('~/Data/HDDM/%s/summary/%s_%s_all.mat', ...
             datasets{d}, s, mdls{m}), 'file'),
+        disp('cant find this model')
         continue;
     end
-    
-    load(sprintf('~/Data/%s/HDDM/summary/%s_%s_all.mat', ...
+
+    load(sprintf('~/Data/HDDM/%s/summary/%s_%s_all.mat', ...
         datasets{d}, s, mdls{m}));
-    
+
     if (isnan(dic.full) || isempty(dic.full)) && ~all(isnan(dic.chains)),
         dic.full = nanmean(dic.chains);
     end

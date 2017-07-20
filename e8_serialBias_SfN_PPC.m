@@ -19,10 +19,10 @@ usr = getenv('USER');
 
 plots = {'neutral', 'biased'};
 for p = 1:length(plots),
-    
+
     switch p
         case 1
-            
+
             switch usr
                 case 'anne' % local
                     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
@@ -30,7 +30,7 @@ for p = 1:length(plots),
                     datasets = {'NatComm', 'MEG', 'Anke_neutral', 'RT_RDK'};
             end
             datasetnames = {'2IFC (Urai et al. 2016)', '2IFC (MEG)', '2AFC (Braun et al.)', '2AFC (RT)'};
-            
+
         case 2
             switch usr
                 case 'aeurai' % lisa/cartesius
@@ -38,15 +38,14 @@ for p = 1:length(plots),
             end
             datasetnames = {'2AFC alternating', '2AFC neutral', '2AFC repetitive'};
     end
-    
+
     close all;
     cnt = 1;
     for d = 1:length(datasets),
-        
+
         try
             % get traces for the model with pupil and rt modulation
             ppc = readtable(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}));
-            % ppc = readtable('~/Desktop/ppq_data.csv');
             
             % make sure errors are negative
             ppc.correct = (ppc.stimulus == ppc.response);
@@ -55,11 +54,11 @@ for p = 1:length(plots),
             ppc.rt_sampled(ppc.correct == 1)   = abs(ppc.rt_sampled(ppc.correct == 1));
             ppc.rt_sampled(ppc.correct == 0)   = -abs(ppc.rt_sampled(ppc.correct == 0));
             % ppc = ppc(:, {'rt', 'rt_sampled'}); % save some memory
-            
+
             % plot the pupil and RT traces
             subplot(4,4,cnt); hold on; cnt = cnt + 1;
             h1 = histogram_smooth(ppc.rt, ppc.rt_sampled, [0.6 0.6 0.6], [0 0 0]);
-            
+
             axis tight; axis square;
             title(datasetnames{d}); xlabel('RT (s)');
             offsetAxes_y;

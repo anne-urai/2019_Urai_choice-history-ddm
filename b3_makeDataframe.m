@@ -14,8 +14,8 @@ switch usr
     case 'anne' % local
         datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
     case 'aeurai' % lisa/cartesius
-    datasets = {'RT_RDK', 'MEG', 'Anke_serial', 'Anke_neutral', 'NatComm', ...
-      'Anke_repetitive', 'Anke_alternating'};
+      datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
+        'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
     end
 
 set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
@@ -26,9 +26,9 @@ for d = 1:length(datasets),
     disp(datasets{d});
 
     % load data
-    csvfile = dir(sprintf('~/Data/%s/HDDM/*.csv', datasets{d}));
+    csvfile = dir(sprintf('~/Data/HDDM/%s/*.csv', datasets{d}));
     csvfile = csvfile(arrayfun(@(x) ~strcmp(x.name(1),'.'), csvfile)); % remove hidden files
-    alldata = readtable(sprintf('~/Data/%s/HDDM/%s', datasets{d}, csvfile.name));
+    alldata = readtable(sprintf('~/Data/HDDM/%s/%s', datasets{d}, csvfile.name));
 
     % recode Anke's stimulus into stim and coh
     if d > 2,
@@ -42,7 +42,10 @@ for d = 1:length(datasets),
     results     = b3b_behaviouralMetrics(alldata);
 
     % get the summary results from HDDM
-    hddmresults = readtable(sprintf('~/Data/%s/HDDM/summary/individualresults.csv', datasets{d}));
+    if ~exist(sprintf('~/Data/HDDM/%s/summary', datasets{d}), 'dir'),
+      mkdir(sprintf('~/Data/HDDM/%s/summary', datasets{d}));
+    end
+    hddmresults = readtable(sprintf('~/Data/HDDM/%s/summary/individualresults.csv', datasets{d}));
 
     % most parameters will go under session 0
     hddmresults.session = zeros(size(hddmresults.subjnr));
@@ -68,7 +71,7 @@ for d = 1:length(datasets),
       sessions = 1:5;
       case 'MEG'
       sessions = 1:5;
-      case {'Anke_serial', 'Anke_neutral', 'Anke_repetitive', 'Anke_altenating'},
+    case {'Anke_2afc_serial', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_altenating'},
       sessions = 1:6;
       case 'NatComm'
       sessions = 1:5;
@@ -105,6 +108,6 @@ for d = 1:length(datasets),
     skippedSession = (isnan(nanmean(tab{:, 3:11}, 2)));
     tab(skippedSession, :) = [];
 
-    writetable(tab, sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
+    writetable(tab, sprintf('~/Data/HDDM/%s/summary/allindividualresults.csv', datasets{d}));
 
 end
