@@ -112,8 +112,10 @@ for s = 1:length(types),
             title({' '; txt}, 'fontweight', 'normal');
         end
         
-      %  print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_%s_%s.pdf', plots{p}, types{s}));
+        tightfig;
         print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_%s_%s.eps', plots{p}, types{s}));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_%s_%s.pdf', plots{p}, types{s}));
+
     end
 end
 end

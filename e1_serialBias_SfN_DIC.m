@@ -5,7 +5,7 @@ warning off; close all;
 global datasets datasetnames
 
 
-set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1, ...
+set(groot, 'defaultaxesfontsize', 5, 'defaultaxestitlefontsizemultiplier', 1, ...
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', ...
     'DefaultAxesBox', 'off', ...
@@ -51,7 +51,7 @@ for s = 1:length(types),
         % ============================================ %
         
         % 1. STIMCODING, only prevresp
-        clf;
+        close all;
         mdls = {'dc_prevresp_prevstim', 'z_prevresp_prevstim', ...
             'dc_z_prevresp_prevstim', 'nohist'};
         for d = 1:length(datasets),
@@ -65,9 +65,9 @@ for s = 1:length(types),
         % can you please add the full diffusion equation on top of the regression models? So akin to the eq we put into JW???s figure,
         % only here we would also have to add z. For specifics, take a look at the first few equations in Bogasz??? paper...
         
-        drawnow;
+        drawnow; tightfig;
         print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s_prevresp_prevstim.eps', plots{p}, types{s}));
-        % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s.pdf', plots{p}, types{s}));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_%s_prevresp_prevstim.pdf', plots{p}, types{s}));
         
         % % ============================================ %
         % DIC COMPARISON BETWEEN DC, Z AND BOTH
@@ -81,7 +81,7 @@ for s = 1:length(types),
         % then add modulation
         % then also add multiple responses into the past
         
-        clf; nrsubpl = length(datasets);
+        close all; nrsubpl = length(datasets);
         mdls = {'dc_prevresp', ...
             'dc_prevresp_prevstim',  ...
             'dc_prevresp_prevstim_prevrt', ...
@@ -116,8 +116,9 @@ for s = 1:length(types),
                     }, 'fontsize', 6); axis off;
         end
         
+        tightfig;
         print(gcf, '-depsc', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.eps', plots{p}, types{s}));
-        % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.pdf', plots{p}, types{s}));
+         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.pdf', plots{p}, types{s}));
     end
 end
 end
@@ -153,7 +154,7 @@ if isnan(mdldic(end)), assert(1==0); end
 mdldic = bsxfun(@minus, mdldic, mdldic(end));
 mdldic = mdldic(1:end-1);
 
-b = bar(1:length(mdldic), mdldic, 'facecolor', [0.7 0.7 0.7], 'barwidth', 0.5, 'BaseValue', 0);
+b = bar(1:length(mdldic), mdldic, 'facecolor', [0.8 0.8 0.8], 'barwidth', 0.5, 'BaseValue', 0);
 
 % indicate which one is best
 bestcolor = linspecer(3);
@@ -161,7 +162,7 @@ if plotBest,
     [~, idx] = min(mdldic);
     hold on;
     %  disp(idx);
-    bar(idx, mdldic(idx), 'basevalue', 0, 'facecolor', bestcolor(1, :), 'barwidth', 0.5, 'BaseValue', 0);
+    bar(idx, mdldic(idx), 'basevalue', 0, 'facecolor', [0.6 0.6 0.6], 'barwidth', 0.5, 'BaseValue', 0);
 end
 
 %# Add a text string above/below each bin
@@ -169,15 +170,16 @@ for i = 1:length(mdldic),
     if mdldic(i) < 0,
         text(i, mdldic(i) + 0.14*range(get(gca, 'ylim')), ...
             num2str(round(mdldic(i))), ...
-            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
+            'VerticalAlignment', 'top', 'FontSize', 3, 'horizontalalignment', 'center');
     elseif mdldic(i) > 0,
         text(i, mdldic(i) + 0.14*range(get(gca, 'ylim')), ...
             num2str(round(mdldic(i))), ...
-            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
+            'VerticalAlignment', 'top', 'FontSize', 3, 'horizontalalignment', 'center');
     end
 end
 xlim([0.5 length(mdldic)+0.5]);
 ylabel('\Delta DIC (from nohist)', 'interpreter', 'tex');
 offsetAxes; box off;
+axis square;
 
 end
