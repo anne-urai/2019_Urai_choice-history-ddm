@@ -5,7 +5,7 @@ addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames
 
-set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1, ...
+set(groot, 'defaultaxesfontsize', 5, 'defaultaxestitlefontsizemultiplier', 1, ...
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', ...
     'DefaultAxesBox', 'off', ...
@@ -19,10 +19,10 @@ usr = getenv('USER');
 
 plots = {'neutral', 'biased'};
 for p = 1:length(plots),
-    
+
     switch p
         case 1
-            
+
             switch usr
                 case 'anne' % local
                     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
@@ -30,7 +30,7 @@ for p = 1:length(plots),
                     datasets = {'NatComm', 'MEG', 'Anke_neutral', 'RT_RDK'};
             end
             datasetnames = {'2IFC (Urai et al. 2016)', '2IFC (MEG)', '2AFC (Braun et al.)', '2AFC (RT)'};
-            
+
         case 2
             switch usr
                 case 'aeurai' % lisa/cartesius
@@ -38,27 +38,29 @@ for p = 1:length(plots),
             end
             datasetnames = {'2AFC alternating', '2AFC neutral', '2AFC repetitive'};
     end
-    
+
     close all;
     cnt = 1;
     for d = 1:length(datasets),
-        
+
+      try
         % get traces for the model with pupil and rt modulation
-        ppc = readtable(sprintf('~/Data/%s/HDDM/regress_dc_z_prevresp_prevstim/ppq_data.csv', datasets{d}));
-        ppc = readtable('~/Data/ppq_data.csv');
+        ppc = readtable(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}));
+        % ppc = readtable('~/Data/ppq_data.csv');
         % ppc = ppc(:, {'rt', 'rt_sampled'}); % save some memory
-        
+
         % plot the pupil and RT traces
         blues = cbrewer('seq', 'Blues', 3);
-        
+
         subplot(4,4,cnt); hold on; cnt = cnt + 1;
         h1 = histogram_smooth(ppc.rt, ppc.rt_sampled, blues(1, :), [0 0 0]);
-        
+
         axis tight; axis square;
         title(datasetnames{d}); xlabel('RT (s)');
         offsetAxes_y;
+      end
     end
-    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/PPC_%s.eps', plots{p}));
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_%s.pdf', plots{p}));
 end
 end
 

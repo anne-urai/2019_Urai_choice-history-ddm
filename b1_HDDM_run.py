@@ -99,7 +99,8 @@ def run_model(m, mypath, model_name, trace_id, n_samples):
 def concat_models(mypath, model_name):
 
     # CHECK IF COMBINED MODEL EXISTS
-    if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
+    # if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and i
+    if (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
     else:
         # ============================================ #
@@ -280,10 +281,11 @@ for dx in d:
 
             # specify how many samples are needed
             m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
+            print os.path.join(mypath, models[vx], 'modelfit-combined.model')
             ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=100)
 
             # make the csv smaller, save disk space
-            ppc = ppc[['rt','rt_sampled']]
+            # ppc = ppc[['rt','rt_sampled']]
 
             # save as pandas dataframe
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppq_data.csv'), index=True)
