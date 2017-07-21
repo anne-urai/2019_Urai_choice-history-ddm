@@ -109,7 +109,7 @@ def concat_models(mypath, model_name):
 
         allmodels = []
         print ("appending models for %s" %model_name)
-        for trace_id in range(15): # how many chains were run?
+        for trace_id in range(7): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
             modelExists           = os.path.isfile(model_filename)
             if modelExists == True: # if not, this model has to be rerun
@@ -196,7 +196,9 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_dc_z_prevcorrect', # 6
     'stimcoding_dc_z_prev2correct', # 7
     'stimcoding_dc_z_prev3correct', # 8
-    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil'] # 9
+    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 9
+    'stimcoding_nohist_sv_sz', # 10
+    'stimcoding_nohist_sv_sz_st'] # 11
 
 
     # 'regress_nohist', # 1

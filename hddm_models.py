@@ -72,7 +72,39 @@ def make_model(mypath, model_name, trace_id):
     # NO HISTORY FOR MODEL COMPARISON
     # ============================================ #
 
-    if model_name == 'stimcoding_nohist':
+    if model_name == 'stimcoding_nohist_sv_sz_st':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz', 'st'), group_only_nodes=['sv', 'sz', 'st'],
+                depends_on={'v': ['coherence']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz', 'st'), group_only_nodes=['sv', 'sz', 'st'])
+
+    elif model_name == 'stimcoding_nohist_sv_sz':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'])
+
+    elif model_name == 'stimcoding_nohist':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
