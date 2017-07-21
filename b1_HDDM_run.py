@@ -109,7 +109,7 @@ def concat_models(mypath, model_name):
 
         allmodels = []
         print ("appending models for %s" %model_name)
-        for trace_id in range(7): # how many chains were run?
+        for trace_id in range(15): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
             modelExists           = os.path.isfile(model_filename)
             if modelExists == True: # if not, this model has to be rerun
