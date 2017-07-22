@@ -53,7 +53,7 @@ parser.add_option ( "-d", "--dataset",
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(0,10),
+        default = range(0,6),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
@@ -99,8 +99,7 @@ def run_model(m, mypath, model_name, trace_id, n_samples):
 def concat_models(mypath, model_name):
 
     # CHECK IF COMBINED MODEL EXISTS
-    # if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and i
-    if (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
+    if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and  (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
     else:
         # ============================================ #
@@ -109,7 +108,7 @@ def concat_models(mypath, model_name):
 
         allmodels = []
         print ("appending models for %s" %model_name)
-        for trace_id in range(7): # how many chains were run?
+        for trace_id in range(15): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
             modelExists           = os.path.isfile(model_filename)
             if modelExists == True: # if not, this model has to be rerun
@@ -194,35 +193,11 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_dc_prevcorrect', # 4
     'stimcoding_z_prevcorrect', # 5
     'stimcoding_dc_z_prevcorrect', # 6
-    'stimcoding_dc_z_prev2correct', # 7
-    'stimcoding_dc_z_prev3correct', # 8
-    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 9
-    'stimcoding_nohist_sv_sz', # 10
-    'stimcoding_nohist_sv_sz_st'] # 11
-
-
-    # 'regress_nohist', # 1
-    # 'regress_dc_prevresp', # 8
-    # 'regress_z_prevresp', # 9
-    # 'regress_dc_z_prevresp', # 10
-    # 'regress_dc_prevresp_prevstim', # 11
-    # 'regress_z_prevresp_prevstim', # 12
-    # 'regress_dc_z_prevresp_prevstim', # 13
-    # 'regress_dc_prevresp_prevstim_vasessions', # 14
-    # 'regress_dc_prevresp_prevstim_prevpupil', # 15
-    # 'regress_dc_prevresp_prevstim_prevrt', # 16
-    # 'regress_dc_z_prevresp_prevstim_vasessions', # 18
-    # 'regress_dc_z_prevresp_prevstim_prevpupil', # 18
-    # 'regress_dc_z_prevresp_prevstim_prevrt', # 20
-    # 'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 21
-    # 'regress_dc_prevresp_prevstim_vasessions_prevrespsessions', # 22
-    # 'regress_dc_prevresp_prevstim_vasessions_prevpupil', # 23
-    # 'regress_dc_prevresp_prevstim_vasessions_prevrt', # 24
-    # 'regress_dc_prevresp_prevstim_vasessions_prevrt_prevpupil', # 25
-    # 'regress_dc_prevcorrect', # 26
-    # 'regress_dc_prevcorrect_prevpupil', # 27
-    # 'regress_dc_prevcorrect_prevrt', # 28
-    # 'regress_dc_prevcorrect_prevrt_prevpupil'] # 29
+    'regress_dc_z_prevresp_prevstim', # 7
+    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 8
+    'regress_dc_z_prevresp_prevstim_prevrt', # 9
+    'regress_dc_z_prev2resp_prev2stim', # 10
+    'regress_dc_z_prev3resp_prev3stim'] # 11
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1
@@ -230,7 +205,7 @@ datasets = ['RT_RDK', # 0
     'Anke_2afc_neutral', # 3
     'Anke_2afc_repetitive', # 4
     'Anke_2afc_alternating', # 5
-    'Anke_2afc_serial', # 6
+    'Anke_2afc_sequential', # 6
     'MEG_allsessions',
     'MEG_alternators_allsessions',
     'MEG_repeaters_megsessions',
@@ -256,6 +231,12 @@ for dx in d:
             os.mkdir(thispath)
 
         if runMe == 1:
+
+            # use the new path on project space
+            mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
+            thispath = os.path.join(mypath, models[vx])
+            if not os.path.exists(thispath):
+                os.mkdir(thispath)
 
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)

@@ -9,18 +9,19 @@ global datasets datasetnames
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
 for d = 1:length(datasets),
-    
+
     if ~exist(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}), 'file'),
+      fprintf('cannot find ~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv \n', datasets{d});
         continue;
     end
-    
+
     close all; subplot(4,4,1); hold on;
     title(datasetnames{d});
     xlabel('RT (s)');
-    
+
     % get traces for the model with pupil and rt modulation
     ppc = readtable(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}));
-    
+
     % make sure errors are negative
     ppc.correct = (ppc.stimulus == ppc.response);
     ppc.rt(ppc.correct == 1)           = abs(ppc.rt(ppc.correct == 1));
@@ -28,18 +29,18 @@ for d = 1:length(datasets),
     ppc.rt_sampled(ppc.correct == 1)   = abs(ppc.rt_sampled(ppc.correct == 1));
     ppc.rt_sampled(ppc.correct == 0)   = -abs(ppc.rt_sampled(ppc.correct == 0));
     ppc = ppc(:, {'rt', 'rt_sampled', 'correct'}); % save some memory
-    
+
     % plot the pupil and RT traces
     bestcolor = linspecer(4, 'qualitative');
     histogram_smooth(ppc.rt, ppc.rt_sampled, bestcolor(3, :), bestcolor(2, :));
-    
+
     axis tight; axis square; xlim([-4 4]);
     offsetAxes_y; ylabel('Probability');
-    
+
     %% also show a histogram of the rt error
     sp2 = subplot(445);
     error = (ppc.rt - ppc.rt_sampled);
-    
+
     % then the line
     violinPlot(error, 'histOpt', 1, 'showMM', 0, 'color', [0.5 0.5 0.5]);
     ylim([-4 4]);
@@ -49,14 +50,14 @@ for d = 1:length(datasets),
     ylabel('$$RT-\widehat{RT}$$','Interpreter','Latex');
     sp2.Position(2) = sp2.Position(2) - 0.01;
     tightfig;
-    
+
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));
 end
 end
 
 function h = histogram_smooth(x1, x2, color1, color2)
 
-% manually count so i can plot myself 
+% manually count so i can plot myself
 [n, edges] = histcounts(x1, 100, 'normalization', 'pdf');
 
 posidx = find(edges > 0); posidx(posidx > length(n)) = [];

@@ -72,39 +72,7 @@ def make_model(mypath, model_name, trace_id):
     # NO HISTORY FOR MODEL COMPARISON
     # ============================================ #
 
-    if model_name == 'stimcoding_nohist_sv_sz_st':
-
-        # get the right variable coding
-        mydata = recode_4stimcoding(mydata)
-
-        # for Anke's data, also split by transition probability
-        if len(mydata.coherence.unique()) > 1:
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz', 'st'), group_only_nodes=['sv', 'sz', 'st'],
-                depends_on={'v': ['coherence']})
-        else:
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz', 'st'), group_only_nodes=['sv', 'sz', 'st'])
-
-    elif model_name == 'stimcoding_nohist_sv_sz':
-
-        # get the right variable coding
-        mydata = recode_4stimcoding(mydata)
-
-        # for Anke's data, also split by transition probability
-        if len(mydata.coherence.unique()) > 1:
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
-                depends_on={'v': ['coherence']})
-        else:
-            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-                drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'])
-
-    elif model_name == 'stimcoding_nohist':
+    if model_name == 'stimcoding_nohist':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
@@ -274,7 +242,128 @@ def make_model(mypath, model_name, trace_id):
                 depends_on={'dc':['prevresp', 'prevcorrect'], 'z':['prevresp', 'prevcorrect']})
 
     # ============================================ #
+    # REGRESSION MODULATION
+    # ============================================ #
+
+    elif model_name == 'regress_dc_z_prevresp_prevstim':
+
+        if 'transitionprob' in mydata.columns:
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
+            'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
+            'link_func': lambda x:x}
+        else:
+            z_reg = {'model': 'z ~ 1 + prevresp + prevstim', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim', 'link_func': lambda x:x}
+        reg_both = [z_reg, v_reg]
+
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
+
+    # ============================================ #
+    # MODULATION BY PUPIL AND RT
+    # ============================================ #
+
+    elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt':
+
+        # subselect data
+        mydata = balance_designmatrix(mydata)
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus+ ' \
+                'prevresp:C(transitionprob) + prevstim:C(transitionprob) + ' \
+                'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
+                'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) +' \
+                'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
+                'link_func': z_link_func}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prevresp:prevrt + prevstim:prevrt',
+            'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp + prevstim +' \
+            'prevresp:prevrt + prevstim:prevrt',
+            'link_func': z_link_func}
+        reg_both = [v_reg, z_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
+
+    elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt_prevpupil':
+
+        # subselect data
+        mydata = mydata.dropna(subset=['prevpupil'])
+        if len(mydata.session.unique()) < max(mydata.session.unique()):
+            mydata["session"] = mydata["session"].map({1:1, 5:2})
+        mydata = balance_designmatrix(mydata)
+
+        # boundary separation and drift rate will change over sessions
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus + ' \
+            'prevresp:C(transitionprob) + prevstim:C(transitionprob) + ' \
+            'prevresp:prevpupil:C(transitionprob) + prevstim:prevpupil:C(transitionprob) + ' \
+            'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
+            'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) +' \
+            'prevresp:prevpupil:C(transitionprob) + prevstim:prevpupil:C(transitionprob) +' \
+            'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
+            'link_func': z_link_func}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + ' \
+            'prevresp:prevrt + prevstim:prevrt + prevresp:prevpupil + prevstim:prevpupil',
+            'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp + prevstim +' \
+            'prevresp:prevpupil + prevstim:prevpupil +' \
+            'prevresp:prevrt + prevstim:prevrt',
+            'link_func': z_link_func}
+        reg_both = [v_reg, z_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
+
+    # ============================================ #
     # MULTIPLE LAGS
+    # ============================================ #
+
+    elif model_name == 'regress_dc_z_prev2resp_prev2stim':
+
+        if 'transitionprob' in mydata.columns:
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob)',
+            'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob)',
+            'link_func': lambda x:x}
+        else:
+            z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim', 'link_func': lambda x:x}
+        reg_both = [z_reg, v_reg]
+
+        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
+
+    elif model_name == 'regress_dc_z_prev3resp_prev3stim':
+
+        if 'transitionprob' in mydata.columns:
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob) + prev3resp:C(transitionprob) + prev3stim:C(transitionprob)',
+            'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob) + prev3resp:C(transitionprob) + prev3stim:C(transitionprob)',
+            'link_func': lambda x:x}
+        else:
+            z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': lambda x:x}
+        reg_both = [z_reg, v_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
+
+    # ============================================ #
+    # DONT USE after this
     # ============================================ #
 
     elif model_name == 'stimcoding_dc_z_prev2correct':
@@ -322,49 +411,6 @@ def make_model(mypath, model_name, trace_id):
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'],
                 depends_on={'dc':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct'], 'z':['prevresp', 'prevcorrect', 'prev2resp', 'prev2correct']})
-
-    # ============================================ #
-    # MODULATION BY PUPIL AND RT
-    # ============================================ #
-
-    elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt_prevpupil':
-
-        # subselect data
-        mydata = mydata.dropna(subset=['prevpupil'])
-        if len(mydata.session.unique()) < max(mydata.session.unique()):
-            mydata["session"] = mydata["session"].map({1:1, 5:2})
-        mydata = balance_designmatrix(mydata)
-
-        # also create a binary prevcorrect
-        mydata['prevcorrect']     = mydata.prevresp
-        mydata['preverror']       = mydata.prevresp
-        mydata.prevcorrect[mydata.prevresp != mydata.prevstim] = 0
-        mydata.preverror[mydata.prevresp == mydata.prevstim] = 0
-
-        # boundary separation and drift rate will change over sessions
-        if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus + ' \
-            'prevcorrect:C(transitionprob) + preverror:C(transitionprob) + ' \
-            'prevcorrect:prevpupil:C(transitionprob) + preverror:prevpupil:C(transitionprob) + ' \
-            'prevcorrect:prevrt:C(transitionprob) + preverror:prevrt:C(transitionprob)',
-            'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevcorrect:C(transitionprob) + preverror:C(transitionprob) +' \
-            'prevcorrect:prevpupil:C(transitionprob) + preverror:prevpupil:C(transitionprob) +' \
-            'prevcorrect:prevrt:C(transitionprob) + preverror:prevrt:C(transitionprob)',
-            'link_func': z_link_func}
-        else:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevcorrect + preverror + ' \
-            'prevcorrect:prevrt + preverror:prevrt + prevcorrect:prevpupil + preverror:prevpupil',
-            'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevcorrect + preverror +' \
-            'prevcorrect:prevpupil + preverror:prevpupil +' \
-            'prevcorrect:prevrt + preverror:prevrt',
-            'link_func': z_link_func}
-        reg_both = [v_reg, z_reg]
-
-        m = hddm.HDDMRegressor(mydata, reg_both,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
     # ============================================ #
     # REGRESS PREVRESP
@@ -439,23 +485,6 @@ def make_model(mypath, model_name, trace_id):
         else:
             z_reg = {'model': 'z ~ 1 + prevresp + prevstim', 'link_func': z_link_func}
         v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
-        reg_both = [z_reg, v_reg]
-
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
-        m = hddm.HDDMRegressor(mydata, reg_both,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
-
-    elif model_name == 'regress_dc_z_prevresp_prevstim':
-
-        if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
-            'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
-            'link_func': lambda x:x}
-        else:
-            z_reg = {'model': 'z ~ 1 + prevresp + prevstim', 'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -567,33 +596,6 @@ def make_model(mypath, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
-
-    elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt':
-
-        # subselect data
-        mydata = balance_designmatrix(mydata)
-
-        # boundary separation and drift rate will change over sessions
-        if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus+ ' \
-                'prevresp:C(transitionprob) + prevstim:C(transitionprob) + ' \
-                'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
-                'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) +' \
-                'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
-                'link_func': z_link_func}
-        else:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prevresp:prevrt + prevstim:prevrt',
-            'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevresp + prevstim +' \
-            'prevresp:prevrt + prevstim:prevrt',
-            'link_func': z_link_func}
-        reg_both = [v_reg, z_reg]
-
-        m = hddm.HDDMRegressor(mydata, reg_both,
-        include=['z', 'sv'], group_only_nodes=['sv'],
-        group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
-
 
     # ============================================ #
     # SESSION DEPENDENCE
