@@ -6,153 +6,105 @@ function e1b_serialBias_SfN_ModelFreeCorrelation
 
 clear; close all; clc;
 addpath(genpath('~/code/Tools'));
-warning off;
+
+global mypath datasets datasetnames
 
 % ============================================ %
 % TWO DIFFERENT DATASETS
 % ============================================ %
 
-set(groot, 'defaultaxesfontsize', 5, 'defaultaxestitlefontsizemultiplier', 1, ...
-    'defaultaxestitlefontweight', 'bold', ...
-    'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', ...
-    'DefaultAxesBox', 'off', ...
-    'DefaultAxesTickLength', [0.02 0.05], 'defaultaxestickdir', 'out', 'DefaultAxesTickDirMode', 'manual', ...
-    'defaultfigurecolormap', [1 1 1], 'defaultTextInterpreter','tex');
-usr = getenv('USER');
+% ============================================ %
+% ONE LARGE PLOT WITH PANEL FOR EACH DATASET
+% ============================================ %
 
-plots = {'neutral', 'biased'};
-types = {'stimcoding'};
-
-for s = 1:length(types),
-    for p = 1:length(plots),
-        
-        % neutral vs biased plots
-        switch p
-            case 1
-                
-                switch usr
-                    case 'anne' % local
-                        datasets = {'RT_RDK', 'Anke_2afc_neutral', 'NatComm', 'projects/0/neurodec/Data/MEG-PL'};
-                    case 'aeurai' % lisa/cartesius
-                        datasets = {'RT_RDK', 'Anke_neutral', 'NatComm', 'MEG'};
-                end
-                datasetnames = { {'2AFC, RT', 'n = 22'}, {'2AFC, Braun et al. 2017 bioRxiv', 'n = 22'}, ...
-                    {'2IFC, Urai et al. 2017 NatComm', 'n = 27'}, {'2IFC, replication', 'n = 61'}};
-                
-            case 2
-                switch usr
-                    case 'anne' % local
-                        datasets = {'Anke_2afc_alternating', 'Anke_2afc_neutral', 'Anke_2afc_repetitive'};
-                    case 'aeurai' % lisa/cartesius
-                        datasets = {'Anke_alternating', 'Anke_neutral', 'Anke_repetitive', 'Anke_serial'};
-                end
-                datasetnames = {'2AFC alternating', '2AFC neutral', '2AFC repetitive', '2AFC all'};
-                datasetnames =  {{'2AFC, Braun et al. 2017 bioRxiv', 'Alternating'}, ...
-                    {'2AFC, Braun et al. 2017 bioRxiv', 'Neutral'}, ...w
-                    {'2AFC, Braun et al. 2017 bioRxiv', 'Repetitive'}, ...
-                    {'2AFC, Braun et al. 2017 bioRxiv', 'All'}};
-        end
-        
-        % ============================================ %
-        % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
-        % ============================================ %
-        
-        close all;
-        for d = 1:length(datasets),
-            
-            if p == 2,
-                colors = linspecer(3); % red blue green
-                switch datasets{d}
-                    case 'Anke_2afc_alternating'
-                        plotColor = colors(1, :);
-                    case 'Anke_2afc_repetitive',
-                        plotColor = colors(3, :);
-                    case 'Anke_2afc_neutral'
-                        plotColor = colors(2, :);
-                end
-            else
-                plotColor = [0.4 0.4 0.4];
-            end
-            
-            results = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', datasets{d}));
-            results = results(results.session == 0, :);
-            disp(datasets{d}); disp(numel(unique(results.subjnr)));
-            
-            
-            % use the stimcoding difference
-            switch types{s}
-                case 'stimcoding'
-                    results.z_prevresp__regressdczprevresp = ...
-                       invlogit( results.z_1__stimcodingdczprevresp) - invlogit(results.z_2__stimcodingdczprevresp);
-                     
-                    results.v_prevresp__regressdczprevresp = ...
-                        results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
-                 
-            end
-            
-            subplot(4,4,d); hold on;
-            rho1 = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.57, plotColor);
-            title(datasetnames{d});
-            xlabel('dc ~ prevresp');
-            
-            subplot(4,4,d+4); hold on;
-            rho2 = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.57, plotColor);
-            xlabel('z ~ prevresp');
-            
-            % compute the difference in correlation
-            rho3 = corr(results.v_prevresp__regressdczprevresp, results.z_prevresp__regressdczprevresp, ...
-                'rows', 'complete', 'type', 'pearson');
-            [rhodiff, cihilow, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
-            % disp(rho3);
-            
-            txt = sprintf('\\Deltar = %.3f, p = %.3f', rhodiff, pval);
-            if pval < 0.001,
-                txt = sprintf('\\Deltar = %.3f, p < 0.001', rhodiff);
-            end
-            title({' '; txt}, 'fontweight', 'normal');
-        end
-        
-        tightfig;
-        print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_%s_%s.eps', plots{p}, types{s}));
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_%s_%s.pdf', plots{p}, types{s}));
-
+close all;
+for d = 1:length(datasets),
+    
+    colors = linspecer(5); % red blue green
+    
+    results = readtable(sprintf('%s/%s/summary/allindividualresults.csv', mypath, datasets{d}));
+    results = results(results.session == 0, :);
+    disp(datasets{d}); disp(numel(unique(results.subjnr)));
+    
+    % use the stimcoding difference
+    
+    results.z_prevresp__regressdczprevresp = ...
+        invlogit( results.z_1__stimcodingdczprevresp) - invlogit(results.z_2__stimcodingdczprevresp);
+    results.v_prevresp__regressdczprevresp = ...
+        results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
+    
+    close all;
+    subplot(4,4,1); hold on;
+    rho1 = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.57, colors(4, :));
+    title(datasetnames{d});
+    ll = xlabel('dc ~ previous response');
+    offsetAxes;
+    
+     switch d
+        case {1, 5}
+            ylabel('P(repeat)');
+        case 2
+            set(gca, 'ytick', 0.46:0.04:0.58);
     end
+    
+    sp2 = subplot(4,4,5); hold on;
+    rho2 = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.57, colors(5, :));
+    xlabel('z ~ previous response');
+    
+    switch d
+        case {1, 5}
+            ylabel('P(repeat)');
+        case 2
+            set(gca, 'ytick', 0.46:0.04:0.58);
+    end
+    
+    % compute the difference in correlation
+    rho3 = corr(results.v_prevresp__regressdczprevresp, results.z_prevresp__regressdczprevresp, ...
+        'rows', 'complete', 'type', 'pearson');
+    [rhodiff, cihilow, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
+    % disp(rho3);
+    
+    txt = sprintf('\\Deltar = %.3f, p = %.3f', rhodiff, pval);
+    if pval < 0.001,
+        txt = sprintf('\\Deltar = %.3f, p < 0.001', rhodiff);
+    end
+    title({' '; txt}, 'fontweight', 'normal', 'fontsize', 5);
+    offsetAxes; drawnow;
+  %  sp2.Position(2) = sp2.Position(2) - 0.01;
+    
+    tightfig;
+    
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf',d));
 end
+close all;
+
 end
 
 function rho = plotScatter(x,y, legendWhere, plotColor);
 
 plot(x,y, '.');
 axis square;
-% axis tight;
-% % ylim([0.39 0.67]);
-% ticks = 0:0.1:1;
-% ticks(ticks < min(get(gca, 'ylim'))) = NaN;
-% ticks(ticks > max(get(gca, 'ylim'))) = NaN;
-% set(gca, 'ytick', ticks(~isnan(ticks)));
 axisNotSoTight;
 [rho, pval] = corr(x,y, 'type', 'pearson', 'rows', 'complete');
 l = lsline;
-try
-    l.Color = 'k';
-    l.LineWidth = 0.5;
-    if pval < 0.05,
-        l.LineStyle = '-';
-    else
-        l.LineStyle = ':';
-    end
+
+l.Color = 'k';
+l.LineWidth = 0.5;
+if pval < 0.05,
+    l.LineStyle = '-';
+else
+    l.LineStyle = ':';
 end
+
 % show lines to indicate origin
 xlims = [min(get(gca, 'xlim')) max(get(gca, 'xlim'))];
 ylims = [min(get(gca, 'ylim')) max(get(gca, 'ylim'))];
 plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
 plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
-offsetAxes;
 
-scatter(x,y, 10, ...
-    'LineWidth', 0.01, ...
+scatter(x,y, 15, ...
+    'LineWidth', 0.001, ...
     'markeredgecolor', 'w', 'markerfacecolor', plotColor);
-ylabel('P(repeat)');
 
 txt = {sprintf('r = %.3f', rho) sprintf('p = %.3f', pval)};
 if pval < 0.001,
@@ -161,4 +113,5 @@ end
 text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
     min(get(gca, 'ylim')) + 0.15*(range(get(gca, 'ylim'))), ...
     txt, 'fontsize', 5);
+
 end

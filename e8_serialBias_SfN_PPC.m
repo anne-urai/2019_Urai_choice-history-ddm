@@ -5,75 +5,69 @@ addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames
 
-set(groot, 'defaultaxesfontsize', 5, 'defaultaxestitlefontsizemultiplier', 1, ...
-    'defaultaxestitlefontweight', 'bold', ...
-    'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', ...
-    'DefaultAxesBox', 'off', ...
-    'DefaultAxesTickLength', [0.02 0.05], 'defaultaxestickdir', 'out', 'DefaultAxesTickDirMode', 'manual', ...
-    'defaultfigurecolormap', [1 1 1], 'defaultTextInterpreter','tex');
-usr = getenv('USER');
-
 % ========================================== %
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
-
-plots = {'neutral', 'biased'};
-for p = 1:length(plots),
-
-    switch p
-        case 1
-
-            switch usr
-                case 'anne' % local
-                    datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'NatComm', 'Anke_2afc_neutral'};
-                case 'aeurai' % lisa/cartesius
-                    datasets = {'NatComm', 'MEG', 'Anke_neutral', 'RT_RDK'};
-            end
-            datasetnames = {'2IFC (Urai et al. 2016)', '2IFC (MEG)', '2AFC (Braun et al.)', '2AFC (RT)'};
-
-        case 2
-            switch usr
-                case 'aeurai' % lisa/cartesius
-                    datasets = {'Anke_alternating', 'Anke_neutral', 'Anke_repetitive'};
-            end
-            datasetnames = {'2AFC alternating', '2AFC neutral', '2AFC repetitive'};
+for d = 1:length(datasets),
+    
+    if ~exist(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}), 'file'),
+        continue;
     end
-
-    close all;
-    cnt = 1;
-    for d = 1:length(datasets),
-
-        try
-            % get traces for the model with pupil and rt modulation
-            ppc = readtable(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}));
-            
-            % make sure errors are negative
-            ppc.correct = (ppc.stimulus == ppc.response);
-            ppc.rt(ppc.correct == 1)           = abs(ppc.rt(ppc.correct == 1));
-            ppc.rt(ppc.correct == 0)           = -abs(ppc.rt(ppc.correct == 0));
-            ppc.rt_sampled(ppc.correct == 1)   = abs(ppc.rt_sampled(ppc.correct == 1));
-            ppc.rt_sampled(ppc.correct == 0)   = -abs(ppc.rt_sampled(ppc.correct == 0));
-            % ppc = ppc(:, {'rt', 'rt_sampled'}); % save some memory
-
-            % plot the pupil and RT traces
-            subplot(4,4,cnt); hold on; cnt = cnt + 1;
-            h1 = histogram_smooth(ppc.rt, ppc.rt_sampled, [0.6 0.6 0.6], [0 0 0]);
-
-            axis tight; axis square;
-            title(datasetnames{d}); xlabel('RT (s)');
-            offsetAxes_y;
-        end
-    end
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_%s.pdf', plots{p}));
+    
+    close all; subplot(4,4,1); hold on;
+    title(datasetnames{d});
+    xlabel('RT (s)');
+    
+    % get traces for the model with pupil and rt modulation
+    ppc = readtable(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}));
+    
+    % make sure errors are negative
+    ppc.correct = (ppc.stimulus == ppc.response);
+    ppc.rt(ppc.correct == 1)           = abs(ppc.rt(ppc.correct == 1));
+    ppc.rt(ppc.correct == 0)           = -abs(ppc.rt(ppc.correct == 0));
+    ppc.rt_sampled(ppc.correct == 1)   = abs(ppc.rt_sampled(ppc.correct == 1));
+    ppc.rt_sampled(ppc.correct == 0)   = -abs(ppc.rt_sampled(ppc.correct == 0));
+    ppc = ppc(:, {'rt', 'rt_sampled', 'correct'}); % save some memory
+    
+    % plot the pupil and RT traces
+    bestcolor = linspecer(4, 'qualitative');
+    histogram_smooth(ppc.rt, ppc.rt_sampled, bestcolor(3, :), bestcolor(2, :));
+    
+    axis tight; axis square; xlim([-4 4]);
+    offsetAxes_y; ylabel('Probability');
+    
+    %% also show a histogram of the rt error
+    sp2 = subplot(445);
+    error = (ppc.rt - ppc.rt_sampled);
+    
+    % then the line
+    violinPlot(error, 'histOpt', 1, 'showMM', 0, 'color', [0.5 0.5 0.5]);
+    ylim([-4 4]);
+    xlim([0 2]); set(gca, 'xtick', [0.5 1.5], 'xticklabel', []);
+    set(gca, 'xcolor', 'w');
+    axis square;
+    ylabel('$$RT-\widehat{RT}$$','Interpreter','Latex');
+    sp2.Position(2) = sp2.Position(2) - 0.01;
+    tightfig;
+    
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));
 end
 end
 
 function h = histogram_smooth(x1, x2, color1, color2)
-[f,xi] = ksdensity(x1);
-area(xi, f, 'edgecolor', 'none', 'facecolor', color1);
+
+% manually count so i can plot myself 
+[n, edges] = histcounts(x1, 100, 'normalization', 'pdf');
+
+posidx = find(edges > 0); posidx(posidx > length(n)) = [];
+negidx = find(edges < 0);
+
+bar(edges(posidx), n(posidx), 'edgecolor', 'none', 'facecolor', color1, 'barwidth', 1);
+bar(edges(negidx), n(negidx), 'edgecolor', 'none', 'facecolor', color2, 'barwidth', 1);
+
 % then the line
 [f,xi] = ksdensity(x2);
-h = plot(xi, f, 'color', color2, 'linewidth', 1);
+h = plot(xi, f, 'color', 'k', 'linewidth', 0.5);
 end
 
 function offsetAxes_y()
