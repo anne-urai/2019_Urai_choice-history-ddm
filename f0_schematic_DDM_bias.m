@@ -1,24 +1,45 @@
 function f0_schematic_DDM_bias
 close all;
 
+% use code by Peter Murphy to compute RT distributions
+addpath('/Users/anne/Drive/Dropbox/code/analyticalDDM/DDM');
 colors = linspecer(5);
 
-fz = 6;
+tmax = 0.7;
+%% make 3 sets of distributions
+% without any bias
+pm = [0.02 0 0.1 0.001 0.05];
+[gC_nobias,gE_nobias,ts] = fpt_regular_DDM(pm, tmax);
+plot(ts, gC_nobias, ts, gE_nobias);
+
+% biased drift towards option 1
+pm(1) = pm(1) * 3;
+[gC_dc,gE_dc,ts] = fpt_regular_DDM(pm, tmax);
+plot(ts, gC_dc, ts, gE_dc);
+
+% biased starting point towards option 1
+pm = [0.02 0 0.1 0.001 0.05];
+pm(5) = pm(5) * 1.1;
+[gC_z,gE_z,ts] = fpt_regular_DDM(pm, tmax);
+plot(ts, gC_z, ts, gE_z);
+
+fz = 8;
 %% set parameters
 cfg.timestep = 0.01; % 100 ms
-cfg.time     = 0:cfg.timestep:1; % in seconds
+cfg.time     = cfg.timestep:cfg.timestep:tmax;
 cfg.a        = 1; % bound with, z = 0
 cfg.cdW      = 0.1; % variance of normally distributed noise
-cfg.v        = 1.25*cfg.timestep; % drift rate per timestep
+cfg.v        = 2*cfg.timestep; % drift rate per timestep
 cfg.z        = 0; % drift rate per timestep
-cfg.seed     = 8;
+cfg.seed     = 19;
+defcfg = cfg;
 
 %% make an overview of the two biasing mechanisms in the DDM
 
-subplot(441); hold on;
-arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'color', 'k', 'length', 5);
-y = ddm(cfg);
-plot(cfg.time, y, 'color', [0.5 0.5 0.5]);
+subplot(331); hold on;
+arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'color', 'k', 'length', 6);
+y1 = ddm(cfg);
+plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % show the unbiased average drift towards two stimuli
 cfg.cdW = 0;
@@ -29,7 +50,7 @@ y = ddm(cfg);
 plot(cfg.time, y,'k');
 
 % now with drift criterion bias
-cfg.dc = 0.3*cfg.timestep;
+cfg.dc = 0.6*cfg.timestep;
 cfg.v = cfg.v+cfg.dc;
 y = ddm(cfg);
 plot(cfg.time, y, 'color', colors(4, :));
@@ -37,29 +58,36 @@ cfg.v = -cfg.v + 2*cfg.dc; % flip around drift rate
 y = ddm(cfg);
 plot(cfg.time, y,'k', 'color', colors(4, :));
 
-%%  layout
-ylim([-cfg.a cfg.a]);
-set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
-text(0.83, -0.2, 'Time', 'fontsize', fz-1);
-title('Biased drift');
-plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
-box off; set(gca, 'xticklabel', [], 'xtick', []);
+% add distributions at the top!
+scaling = 300;
+plot(ts, -scaling*gE_z - cfg.a, 'color', colors(5, :), 'linestyle', ':');
+plot(ts, scaling*gC_z + cfg.a, 'color', colors(5, :), 'linestyle', ':');
 
+plot(ts, scaling*gC_nobias + cfg.a, 'k');
+plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :));
+plot(ts, -scaling*gE_nobias - cfg.a, 'k');
+plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :));
+
+%%  layout
+%ylim([-cfg.a cfg.a]); 
+axis tight;
+set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
+text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', fz-1);
+title('Biased drift', 'fontsize', fz+1);
+% add two axes manually
+plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
+plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
+box off; 
+ax = gca;
+addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
+set(ax, 'xcolor', 'w');
+xlim([min(cfg.time) max(cfg.time)]);
 
 %% now change in starting point
-
-cfg.timestep = 0.01; % 100 ms
-cfg.time     = 0:cfg.timestep:1; % in seconds
-cfg.a        = 1; % bound with, z = 0
-cfg.cdW      = 0.1; % variance of normally distributed noise
-cfg.v        = 1.25*cfg.timestep; % drift rate per timestep
-cfg.z        = 0; % drift rate per timestep
-cfg.seed     = 8;
-
-subplot(442); hold on;
-arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'color', 'k', 'length', 5);
-y = ddm(cfg);
-plot(cfg.time, y, 'color', [0.5 0.5 0.5]);
+cfg = defcfg;
+subplot(332); hold on;
+arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'color', 'k', 'length', 6);
+plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % show the unbiased average drift towards two stimuli
 cfg.cdW = 0;
@@ -77,24 +105,39 @@ cfg.v = -cfg.v;
 y = ddm(cfg);
 plot(cfg.time, y,'k', 'color', colors(5, :));
 
+% add distributions at the top!
+plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :), 'linestyle', ':');
+plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :), 'linestyle', ':');
+
+plot(ts, scaling*gC_nobias + cfg.a, 'k');
+plot(ts, scaling*gC_z + cfg.a, 'color', colors(5, :));
+plot(ts, -scaling*gE_nobias - cfg.a, 'k');
+plot(ts, -scaling*gE_z - cfg.a, 'color', colors(5, :));
+
 % layout
-ylim([-cfg.a cfg.a]);
+%ylim([-cfg.a cfg.a]);
+axis tight;
 set(gca, 'ytick', [-cfg.a 0 cfg.a], 'yticklabel', {'0', 'z', 'a'});
-text(0.83, -0.2, 'Time', 'fontsize', fz-1);
-title('Biased starting point');
-set(gca, 'xticklabel', [], 'xtick', []);
+text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', fz-1);
+title('Biased starting point', 'fontsize', fz+1);
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
+plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
+
 box off;
+ax = gca;
+addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
+set(ax, 'xcolor', 'w');
+xlim([min(cfg.time) max(cfg.time)]);
 
 %% now add the equations!
 
-subplot(445);
+subplot(334);
 xoffset = 0.02;
-text(xoffset, 1.15, 'dy = (sv + \bf{dc}\rm{)dt + cdW}', 'fontsize', fz);
+text(xoffset, 1.15, 'dy = (sv+\bf{dc}\rm{)dt + cdW}', 'fontsize', fz);
 text(xoffset, 1, 'y(0) = 0', 'fontsize', fz);
 axis off;
 
-subplot(446);
+subplot(335);
 text(xoffset, 1.15, 'dy = svdt + cdW', 'fontsize', fz);
 text(xoffset, 1, 'y(0) = \bf{z}', 'fontsize', fz);
 axis off;
@@ -103,7 +146,8 @@ axis off;
 % offsetAxes;
 tightfig;
 print(gcf, '-depsc', sprintf('~/Data/serialHDDM/DDMschematic.eps'));
-close all;
+%close all;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic.pdf'));
 
 end
 
@@ -121,5 +165,17 @@ noisyevidence = evidence + noise;
 
 integratedevidence = cumsum(noisyevidence);
 y = integratedevidence;
+y(y > cfg.a) = NaN;
+y(y < -cfg.a) = NaN;
+
+end
+
+
+function resetVertex ( ax )
+% extract the x axis vertext data
+
+% repeat for Y (set 2nd row)
+ax.YRuler.Axle.VertexData(2,1) = min(get(ax, 'Ytick'));
+ax.YRuler.Axle.VertexData(2,2) = max(get(ax, 'Ytick'));
 
 end
