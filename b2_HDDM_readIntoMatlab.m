@@ -15,7 +15,7 @@ function b2_HDDM_readIntoMatlab()
   end
 
   for d = 1; %:length(datasets),
-    usepath = sprintf('~/Data/HDDM/%s/', datasets{d});
+    usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
     disp(usepath);
     mdls = {'stimcoding_nohist', ...
         'stimcoding_nohist_sv_sz', ...

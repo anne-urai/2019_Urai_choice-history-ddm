@@ -29,7 +29,7 @@ datasetnames = { {'2AFC, RT', 'n = 22'}, ...
 %% start the actual plots
 
 disp('starting');
-e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+%e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
 %f0_schematic_DDM_bias; % figure 3a
 e1_serialBias_SfN_DIC; % figure 3b & c

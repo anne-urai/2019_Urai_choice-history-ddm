@@ -9,9 +9,8 @@ module load stopos
 source activate python27 # use anaconda
 
 # determine how many parallel jobs we can run on this node
-ncores=`sara-get-num-cores`
-((ncores -= 1)) # subtract one for system processes
-#ncores=15 # for some reason the getnumcores fails
+ncores=`sara-get-num-cores` # 16 in total on LISA normal nodes
+((ncores -= 1)) # subtract one for system processes, will have 15
 echo "ncores = $ncores"
 
 # loop over the cores available

@@ -110,6 +110,7 @@ def concat_models(mypath, model_name):
         print ("appending models for %s" %model_name)
         for trace_id in range(15): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
+
             modelExists           = os.path.isfile(model_filename)
             if modelExists == True: # if not, this model has to be rerun
                 print model_filename
@@ -206,10 +207,7 @@ datasets = ['RT_RDK', # 0
     'Anke_2afc_repetitive', # 4
     'Anke_2afc_alternating', # 5
     'Anke_2afc_sequential', # 6
-    'MEG_allsessions',
-    'MEG_alternators_allsessions',
-    'MEG_repeaters_megsessions',
-    'MEG_alternators_megsessions'] # 6
+    'MEG_MEGsessions'] # 7
 
 # recode
 if isinstance(d, int):
@@ -230,13 +228,13 @@ for dx in d:
         if not os.path.exists(thispath):
             os.mkdir(thispath)
 
-        if runMe == 1:
+        # use the new path on project space
+        mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
+        thispath = os.path.join(mypath, models[vx])
+        if not os.path.exists(thispath):
+            os.mkdir(thispath)
 
-            # use the new path on project space
-            mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
-            thispath = os.path.join(mypath, models[vx])
-            if not os.path.exists(thispath):
-                os.mkdir(thispath)
+        if runMe == 1:
 
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
@@ -254,11 +252,33 @@ for dx in d:
             elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
+            # ================================================= #
+            # important, concat after running to save disk space
+            # ================================================= #
+
+            if trace_id == 14:
+                # https://stackoverflow.com/questions/35795452/checking-if-a-list-of-files-exists-before-proceeding
+                filelist = []
+                for t in range(14):
+                    filelist.append(os.path.join(mypath, models[vx], 'modelfit-md%d.model'%t))
+
+                print filelist
+                # wait until all the files are present
+                while True:
+                    if all([os.path.isfile(f) for f in filelist]):
+                        break
+                    else: # wait
+                        time.sleep(60)
+
+                # concatenate the different chains, will save disk space
+                concat_models(mypath, models[vx])
+
         elif runMe == 2:
 
             # ============================================ #
             # POSTERIOR PREDICTIVES TO ASSESS MODEL FIT
             # ============================================ #
+
             starttime = time.time()
             print "computing ppc"
 
