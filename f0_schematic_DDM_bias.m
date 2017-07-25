@@ -1,5 +1,9 @@
-function f0_schematic_DDM_bias
-close all;
+function f0_schematic_DDM_bias(seed)
+close all; clc;
+
+% random seed will determine how the drifting timecourse looks
+if ~exist('seed', 'var'), seed = 100; end
+disp(seed);
 
 % use code by Peter Murphy to compute RT distributions
 addpath('/Users/anne/Drive/Dropbox/code/analyticalDDM/DDM');
@@ -13,13 +17,13 @@ pm = [0.02 0 0.1 0.001 0.05];
 plot(ts, gC_nobias, ts, gE_nobias);
 
 % biased drift towards option 1
-pm(1) = pm(1) * 3;
+pm(1) = pm(1) * 5;
 [gC_dc,gE_dc,ts] = fpt_regular_DDM(pm, tmax);
 plot(ts, gC_dc, ts, gE_dc);
 
 % biased starting point towards option 1
 pm = [0.02 0 0.1 0.001 0.05];
-pm(5) = pm(5) * 1.1;
+pm(5) = pm(5) * 1.2;
 [gC_z,gE_z,ts] = fpt_regular_DDM(pm, tmax);
 plot(ts, gC_z, ts, gE_z);
 
@@ -29,15 +33,15 @@ cfg.timestep = 0.01; % 100 ms
 cfg.time     = cfg.timestep:cfg.timestep:tmax;
 cfg.a        = 1; % bound with, z = 0
 cfg.cdW      = 0.1; % variance of normally distributed noise
-cfg.v        = 2*cfg.timestep; % drift rate per timestep
+cfg.v        = 2.5*cfg.timestep; % drift rate per timestep
 cfg.z        = 0; % drift rate per timestep
-cfg.seed     = 19;
+cfg.seed     = seed;
 defcfg = cfg;
 
 %% make an overview of the two biasing mechanisms in the DDM
 
 subplot(331); hold on;
-arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'color', 'k', 'length', 6);
+arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 6);
 y1 = ddm(cfg);
 plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
@@ -60,8 +64,8 @@ plot(cfg.time, y,'k', 'color', colors(4, :));
 
 % add distributions at the top!
 scaling = 300;
-plot(ts, -scaling*gE_z - cfg.a, 'color', colors(5, :), 'linestyle', ':');
-plot(ts, scaling*gC_z + cfg.a, 'color', colors(5, :), 'linestyle', ':');
+plot(ts, -scaling*gE_z - cfg.a, 'color', colors(5, :), 'linestyle', '-.');
+plot(ts, scaling*gC_z + cfg.a, 'color', colors(5, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
 plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :));
@@ -86,7 +90,7 @@ xlim([min(cfg.time) max(cfg.time)]);
 %% now change in starting point
 cfg = defcfg;
 subplot(332); hold on;
-arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'color', 'k', 'length', 6);
+arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 6);
 plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % show the unbiased average drift towards two stimuli
@@ -106,8 +110,8 @@ y = ddm(cfg);
 plot(cfg.time, y,'k', 'color', colors(5, :));
 
 % add distributions at the top!
-plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :), 'linestyle', ':');
-plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :), 'linestyle', ':');
+plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :), 'linestyle', '-.');
+plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
 plot(ts, scaling*gC_z + cfg.a, 'color', colors(5, :));
@@ -133,20 +137,19 @@ xlim([min(cfg.time) max(cfg.time)]);
 
 subplot(334);
 xoffset = 0.02;
-text(xoffset, 1.15, 'dy = (sv+\bf{dc}\rm{)dt + cdW}', 'fontsize', fz);
-text(xoffset, 1, 'y(0) = 0', 'fontsize', fz);
+text(xoffset, 1.15, 'dy = (s\cdotv+\bf{v_{bias}}\rm{)dt + cdW}', 'fontsize', fz);
+text(xoffset, 1, 'y(0) = z = a/2', 'fontsize', fz);
 axis off;
 
 subplot(335);
-text(xoffset, 1.15, 'dy = svdt + cdW', 'fontsize', fz);
-text(xoffset, 1, 'y(0) = \bf{z}', 'fontsize', fz);
+text(xoffset, 1.15, 'dy = s\cdotv\cdotdt + cdW', 'fontsize', fz);
+text(xoffset, 1, 'y(0) = z = a/2 + \bf{z_{bias}}', 'fontsize', fz);
 axis off;
 
-%% save
+% save
 % offsetAxes;
 tightfig;
 print(gcf, '-depsc', sprintf('~/Data/serialHDDM/DDMschematic.eps'));
-%close all;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic.pdf'));
 
 end
@@ -165,6 +168,8 @@ noisyevidence = evidence + noise;
 
 integratedevidence = cumsum(noisyevidence);
 y = integratedevidence;
+firstPassage = find(y > cfg.a);
+y(firstPassage:end) = NaN;
 y(y > cfg.a) = NaN;
 y(y < -cfg.a) = NaN;
 
