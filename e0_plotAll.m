@@ -15,7 +15,7 @@ switch usr
     case 'anne'
         mypath = '~/Data/HDDM';
     case 'aeurai'
-        mypath  = '~/Data/HDDM';
+        mypath  = '/nfs/aeurai/HDDM';
 end
 
 % neutral vs biased plots
@@ -33,9 +33,6 @@ disp('starting');
 
 %f0_schematic_DDM_bias; % figure 3a
 e1_serialBias_SfN_DIC; % figure 3b & c
-
-assert(1==0);
-
 e1b_serialBias_SfN_ModelFreeCorrelation; % figure 4
 e3_serialBias_SfN_Posteriors; % figure 4c
 e9_prevCorrect; % error vs correct

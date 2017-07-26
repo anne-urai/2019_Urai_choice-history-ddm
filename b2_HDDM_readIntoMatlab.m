@@ -10,33 +10,35 @@ function b2_HDDM_readIntoMatlab()
     case 'anne' % local
     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
     case 'aeurai' % lisa/cartesius
-    datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
+    datasets = {'RT_RDK', 'MEG', 'MEG_MEGsessions', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
       'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
   end
 
-  for d = 1; %:length(datasets),
+  for d = 1:length(datasets),
     usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
     disp(usepath);
     mdls = {'stimcoding_nohist', ...
-        'stimcoding_nohist_sv_sz', ...
         'stimcoding_dc_prevresp', ...
         'stimcoding_z_prevresp', ...
         'stimcoding_dc_z_prevresp', ...
         'stimcoding_dc_prevcorrect', ...
         'stimcoding_z_prevcorrect', ...
         'stimcoding_dc_z_prevcorrect', ...
-        'stimcoding_dc_z_prev2correct', ...
-        'stimcoding_dc_z_prev3correct', ...
-        'regress_dc_z_prevresp_prevstim_prevrt_prevpupil'};
+        'regress_dc_z_prevresp_prevstim', ...
+        'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', ...
+        'regress_dc_z_prevresp_prevstim_prevrt', ...
+        'regress_dc_z_prev2resp_prev2stim', ...
+        'regress_dc_z_prev3resp_prev3stim'};
 
+    currpath = pwd;
     if ~exist(sprintf('%s/summary', usepath), 'dir'),
-      cd(usepath); mkdir('summary');
+      cd(usepath); mkdir('summary'); cd(currpath);
     end
 
     switch datasets{d}
       case 'RT_RDK'
       subjects = [3:15 17:25];
-      case 'MEG'
+    case {'MEG', 'MEG_MEGsessions'}
       subjects = 2:65;
     case {'Anke_2afc_serial', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'},
       subjects = [1:7 9 11:16 18:21 23 24 26 27];
@@ -45,13 +47,12 @@ function b2_HDDM_readIntoMatlab()
     end
 
     for m = 1:length(mdls),
-      disp(mdls{m});
 
       % skip if this model is empty
       stuff = dir(sprintf('%s/%s', usepath, mdls{m}));
       stuff = stuff(arrayfun(@(x) ~strcmp(x.name(1),'.'),stuff)); % remove hidden stuff
       if isempty(stuff),
-        disp('skipping');
+        disp(['skipping ' mdls{m}]);
         continue;
       end
 
@@ -108,8 +109,8 @@ function b2_HDDM_readIntoMatlab()
       notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'subj'))), :) = [];
       notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'std'))), :) = [];
       if ~isempty(notConverged),
-        warning('not all group parameters have converged');
-        disp(notConverged);
+        % warning('not all group parameters have converged');
+        %disp(notConverged);
       end
     end
 
@@ -152,7 +153,7 @@ function b2_HDDM_readIntoMatlab()
           varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
           varnames{v} = regexprep(varnames{v}, '\(0.3\)', '_c30');
 
-          case {'Anke_2afc_neutral', 'Anke_2afc_serial', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'}
+        case {'Anke_2afc_neutral', 'Anke_2afc_sequential', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'}
 
           varnames{v} = regexprep(varnames{v}, '1.0', '1');
           % recode coherence levels in Anke's data

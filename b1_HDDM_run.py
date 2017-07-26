@@ -218,18 +218,12 @@ if isinstance(model_version, int):
 for dx in d:
 
     # find path depending on location and dataset
-    mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
+    mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
 
     for vx in model_version:
         time.sleep(trace_id) # to avoid different jobs trying to make the same folder
 
         # make a folder for the outputs, combine name and time
-        thispath = os.path.join(mypath, models[vx])
-        if not os.path.exists(thispath):
-            os.mkdir(thispath)
-
-        # use the new path on project space
-        mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
         thispath = os.path.join(mypath, models[vx])
         if not os.path.exists(thispath):
             os.mkdir(thispath)
@@ -259,7 +253,7 @@ for dx in d:
             if trace_id == 14:
                 # https://stackoverflow.com/questions/35795452/checking-if-a-list-of-files-exists-before-proceeding
                 filelist = []
-                for t in range(14):
+                for t in range(15):
                     filelist.append(os.path.join(mypath, models[vx], 'modelfit-md%d.model'%t))
 
                 print filelist

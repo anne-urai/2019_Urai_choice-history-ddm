@@ -14,7 +14,7 @@ switch usr
     case 'anne' % local
         datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
     case 'aeurai' % lisa/cartesius
-      datasets = {'RT_RDK', 'MEG', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
+      datasets = {'RT_RDK', 'MEG', 'MEG_MEGsessions', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
         'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
     end
 
@@ -22,16 +22,16 @@ set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ..
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-for d = 1; %:length(datasets),
+for d = 1:length(datasets),
     disp(datasets{d});
 
     % load data
-    csvfile = dir(sprintf('~/Data/HDDM/%s/*.csv', datasets{d}));
+    csvfile = dir(sprintf('/nfs/aeurai/HDDM/%s/*.csv', datasets{d}));
     csvfile = csvfile(arrayfun(@(x) ~strcmp(x.name(1),'.'), csvfile)); % remove hidden files
-    alldata = readtable(sprintf('~/Data/HDDM/%s/%s', datasets{d}, csvfile.name));
+    alldata = readtable(sprintf('/nfs/aeurai/HDDM/%s/%s', datasets{d}, csvfile.name));
 
     % recode Anke's stimulus into stim and coh
-    if d > 2,
+    if d > 3,
         alldata.coherence   = abs(alldata.stimulus);
         alldata.stimulus2   = sign(alldata.stimulus);
         alldata.stimulus2(alldata.coherence == 0) = sign(alldata.motionenergy(alldata.coherence == 0));
@@ -42,10 +42,10 @@ for d = 1; %:length(datasets),
     results     = b3b_behaviouralMetrics(alldata);
 
     % get the summary results from HDDM
-    if ~exist(sprintf('~/Data/HDDM/%s/summary', datasets{d}), 'dir'),
-      mkdir(sprintf('~/Data/HDDM/%s/summary', datasets{d}));
+    if ~exist(sprintf('/nfs/aeurai/HDDM/%s/summary', datasets{d}), 'dir'),
+      mkdir(sprintf('/nfs/aeurai/HDDM/%s/summary', datasets{d}));
     end
-    hddmresults = readtable(sprintf('~/Data/HDDM/%s/summary/individualresults.csv', datasets{d}));
+    hddmresults = readtable(sprintf('/nfs/aeurai/HDDM/%s/summary/individualresults.csv', datasets{d}));
 
     % most parameters will go under session 0
     hddmresults.session = zeros(size(hddmresults.subjnr));
@@ -69,7 +69,7 @@ for d = 1; %:length(datasets),
     switch datasets{d}
       case 'RT_RDK'
       sessions = 1:5;
-      case 'MEG'
+    case {'MEG', 'MEG_MEGsessions'};
       sessions = 1:5;
     case {'Anke_2afc_serial', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_altenating'},
       sessions = 1:6;
@@ -108,6 +108,7 @@ for d = 1; %:length(datasets),
     skippedSession = (isnan(nanmean(tab{:, 3:11}, 2)));
     tab(skippedSession, :) = [];
 
-    writetable(tab, sprintf('~/Data/HDDM/%s/summary/allindividualresults.csv', datasets{d}));
+    writetable(tab, sprintf('/nfs/aeurai/HDDM/%s/summary/allindividualresults.csv', datasets{d}));
+    fprintf('/nfs/aeurai/HDDM/%s/summary/allindividualresults.csv \n', datasets{d});
 
 end

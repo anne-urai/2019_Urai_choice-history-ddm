@@ -6,11 +6,11 @@ global datasets datasetnames mypath
 
 types = {'stimcoding'};
 for s = 1:length(types),
-   
+
    % ============================================ %
    % DIC COMPARISON BETWEEN DC, Z AND BOTH
     % ============================================ %
-    
+
     % 1. STIMCODING, only prevresps
     mdls = {'dc_prevcorrect', 'z_prevcorrect', ...
         'dc_z_prevcorrect', 'nohist'};
@@ -20,15 +20,16 @@ for s = 1:length(types),
         getPlotDIC(mdls, types{s}, d, 1);
         title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
-        
+
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf', types{s}, d));
+        fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf \n', types{s}, d);
     end
-    
+
     % ============================================ %
     % DIC COMPARISON BETWEEN DC, Z AND BOTH
     % ============================================ %
-    
+
     % build up models
     % 'regress_nohist' % should go last, will be baseline
     % 'regress_dc_prevresp'
@@ -36,7 +37,7 @@ for s = 1:length(types),
     % regress_dc_prevresp_prevstim_vasessions # add learning effects
     % then add modulation
     % then also add multiple responses into the past
-    
+
     close all; nrsubpl = length(datasets);
     mdls = {'dc_z_prevresp', ...
         'dc_z_prevresp_prevstim',  ...
@@ -44,17 +45,17 @@ for s = 1:length(types),
         'dc_z_prev2correct', ...
         'dc_z_prev3correct',  ...
         'nohist'};
-    
+
     for d = 1:length(datasets),
         subplot(nrsubpl, nrsubpl, d);
         getPlotDIC(mdls, types{s}, d, 1);
         set(gca, 'xtick', 1:length(mdls)-1);
         title(datasetnames{d});
     end
-    
+
     switch types{s}
         case 'regress'
-            
+
             subplot(nrsubpl, nrsubpl, nrsubpl+1);
             text(0, -0.2, {'Regression models', ...
                 '[1] v ~ 1 + stimulus + prevresp', ...
@@ -69,7 +70,7 @@ for s = 1:length(types),
                 '     a ~ 1 + session', ...
                 }, 'fontsize', 6); axis off;
     end
-    
+
     tightfig;
     % print(gcf, '-depsc', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.eps', plots{p}, types{s}));
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s.pdf',types{s}));
@@ -90,15 +91,15 @@ axis square; hold on;
 
 mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
-    if ~exist(sprintf('~/Data/HDDM/%s/summary/%s_%s_all.mat', ...
+    if ~exist(sprintf('/nfs/aeurai/HDDM/%s/summary/%s_%s_all.mat', ...
             datasets{d}, s, mdls{m}), 'file'),
         disp('cant find this model')
         continue;
     end
-    
-    load(sprintf('~/Data/HDDM/%s/summary/%s_%s_all.mat', ...
+
+    load(sprintf('/nfs/aeurai/HDDM/%s/summary/%s_%s_all.mat', ...
         datasets{d}, s, mdls{m}));
-    
+
     if (isnan(dic.full) || isempty(dic.full)) && ~all(isnan(dic.chains)),
         dic.full = nanmean(dic.chains);
     end
