@@ -19,51 +19,51 @@ global mypath datasets datasetnames
 
 close all;
 for d = 1:length(datasets),
-    
+
     colors = linspecer(5); % red blue green
-    
+
     results = readtable(sprintf('%s/%s/summary/allindividualresults.csv', mypath, datasets{d}));
     results = results(results.session == 0, :);
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
-    
+
     % use the stimcoding difference
-    
+
     results.z_prevresp__regressdczprevresp = ...
-        invlogit( results.z_1__stimcodingdczprevresp) - invlogit(results.z_2__stimcodingdczprevresp);
+        results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
     results.v_prevresp__regressdczprevresp = ...
         results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
-    
+
     close all;
     subplot(4,4,1); hold on;
     rho1 = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.57, colors(4, :));
     title(datasetnames{d});
     ll = xlabel('dc ~ previous response');
     offsetAxes;
-    
+
      switch d
         case {1, 5}
             ylabel('P(repeat)');
         case 2
             set(gca, 'ytick', 0.46:0.04:0.58);
     end
-    
+
     sp2 = subplot(4,4,5); hold on;
     rho2 = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.57, colors(5, :));
     xlabel('z ~ previous response');
-    
+
     switch d
         case {1, 5}
             ylabel('P(repeat)');
         case 2
             set(gca, 'ytick', 0.46:0.04:0.58);
     end
-    
+
     % compute the difference in correlation
     rho3 = corr(results.v_prevresp__regressdczprevresp, results.z_prevresp__regressdczprevresp, ...
         'rows', 'complete', 'type', 'pearson');
     [rhodiff, cihilow, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
     % disp(rho3);
-    
+
     txt = sprintf('\\Deltar = %.3f, p = %.3f', rhodiff, pval);
     if pval < 0.001,
         txt = sprintf('\\Deltar = %.3f, p < 0.001', rhodiff);
@@ -71,9 +71,9 @@ for d = 1:length(datasets),
     title({' '; txt}, 'fontweight', 'normal', 'fontsize', 5);
     offsetAxes; drawnow;
   %  sp2.Position(2) = sp2.Position(2) - 0.01;
-    
+
     tightfig;
-    
+
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf',d));
 end
 close all;

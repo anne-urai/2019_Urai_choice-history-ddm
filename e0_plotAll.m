@@ -19,12 +19,12 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'RT_RDK', 'NatComm', 'MEG', 'Anke_2afc_alternating', 'Anke_2afc_neutral', 'Anke_2afc_repetitive'};
+datasets = {'RT_RDK', 'NatComm', 'MEG', 'Anke_2afc_alternating', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'MEG_MEGsessions'};
 datasetnames = { {'2AFC, RT', 'n = 22'}, ...
     {'2IFC, Urai et al. 2017', 'n = 27'}, {'2IFC, replication', 'n = 61'}, ...
     {'2AFC, Braun et al. 2017', 'Alternating'}, ...
     {'2AFC, Braun et al. 2017', 'Neutral'}, ...
-    {'2AFC, Braun et al. 2017', 'Repetitive'}};
+    {'2AFC, Braun et al. 2017', 'Repetitive'}, {'2IFC, replication', 'MEG sessions'}};
 
 %% start the actual plots
 

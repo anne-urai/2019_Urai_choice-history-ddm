@@ -4,7 +4,6 @@ function b2_HDDM_readIntoMatlab()
   close all; clc;
   warning off MATLAB:table:ModifiedVarnames % skip this warning
 
-  getTraces = false; % ca
   usr = getenv('USER');
   switch usr
     case 'anne' % local
@@ -128,7 +127,7 @@ function b2_HDDM_readIntoMatlab()
       pointestimates = readtable(sprintf('%s/%s/results-combined.csv', ...
       usepath, mdls{m}), 'readrownames', 1);
 
-      varnames = pointestimates.Properties.RowNames;
+      varnames     = pointestimates.Properties.RowNames;
       varnamesOrig = pointestimates.Properties.RowNames;
 
       for v = 1:length(varnames),
@@ -181,6 +180,12 @@ function b2_HDDM_readIntoMatlab()
         varnames{v} = regexprep(varnames{v}, '[().]', '_');
         varnames{v} = regexprep(varnames{v}, '_-1(?=_)', '_2');
         varnames{v} = regexprep(varnames{v}, '_$', '');
+
+        % correct z
+        if strcmp(varnames{v}(1), 'z'),
+          invlogit = @(x) 1 ./ (1 + exp(x));
+          pointestimates{v, :} = invlogit(pointestimates{v, :});
+        end
 
         if strfind(varnames{v}, 'session'),
           varnames{v} = regexprep(varnames{v}, 'C[a-zA-Z_]+(?=\d)', '_s');

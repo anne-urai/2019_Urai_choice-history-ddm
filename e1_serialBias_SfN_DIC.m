@@ -17,6 +17,7 @@ for s = 1:length(types),
     for d = 1:length(datasets),
         close all;
         subplot(4, 4, 1);
+        try
         getPlotDIC(mdls, types{s}, d, 1);
         title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
@@ -24,6 +25,7 @@ for s = 1:length(types),
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf', types{s}, d));
         fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf \n', types{s}, d);
+      end
     end
 
     % ============================================ %
