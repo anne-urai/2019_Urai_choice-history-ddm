@@ -75,6 +75,7 @@ for s = 1:length(types),
 
     tightfig;
     % print(gcf, '-depsc', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s_%s.eps', plots{p}, types{s}));
+    figure('color', 'none')
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/suppfigure1b_HDDM_DIC_allmodels_%s.pdf',types{s}));
 end
 
@@ -137,5 +138,6 @@ xlim([0.5 length(mdldic)+0.5]);
 ylabel('\Delta DIC (from nohist)', 'interpreter', 'tex');
 offsetAxes; box off;
 axis square;
+set(gca, 'color', 'none');
 
 end
