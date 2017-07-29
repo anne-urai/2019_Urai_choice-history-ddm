@@ -10,15 +10,12 @@ addpath(genpath('~/code/Tools'));
 global mypath datasets datasetnames
 
 % ============================================ %
-% TWO DIFFERENT DATASETS
-% ============================================ %
-
-% ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
 close all;
 for d = 1:length(datasets),
+  disp(datasets{d});
 
     colors = linspecer(5); % red blue green
 
@@ -35,9 +32,9 @@ for d = 1:length(datasets),
 
     close all;
     subplot(4,4,1); hold on;
-    rho1 = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.57, colors(4, :));
+    rho1 = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.15, colors(4, :));
     title(datasetnames{d});
-    ll = xlabel('dc ~ previous response');
+    ll = xlabel('\Deltadc');
     offsetAxes;
 
      switch d
@@ -48,8 +45,8 @@ for d = 1:length(datasets),
     end
 
     sp2 = subplot(4,4,5); hold on;
-    rho2 = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.57, colors(5, :));
-    xlabel('z ~ previous response');
+    rho2 = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.7, colors(5, :));
+    xlabel('\Deltaz');
 
     switch d
         case {1, 5}
@@ -64,14 +61,12 @@ for d = 1:length(datasets),
     [rhodiff, cihilow, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
     % disp(rho3);
 
-    txt = sprintf('\\Deltar = %.3f, p = %.3f', rhodiff, pval);
+    txt = {sprintf('\\Deltar = %.3f', rhodiff); sprintf('p = %.3f', pval)};
     if pval < 0.001,
-        txt = sprintf('\\Deltar = %.3f, p < 0.001', rhodiff);
+      txt = {sprintf('\\Deltar = %.3f', rhodiff); sprintf('p < 0.001')};
     end
-    title({' '; txt}, 'fontweight', 'normal', 'fontsize', 5);
+    title(txt, 'fontweight', 'bold', 'fontsize', 5, 'horizontalalignment', 'left');
     offsetAxes; drawnow;
-  %  sp2.Position(2) = sp2.Position(2) - 0.01;
-
     tightfig;
 
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf',d));
@@ -110,8 +105,8 @@ txt = {sprintf('r = %.3f', rho) sprintf('p = %.3f', pval)};
 if pval < 0.001,
     txt = {sprintf('r = %.3f', rho) sprintf('p < 0.001')};
 end
-text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
-    min(get(gca, 'ylim')) + 0.15*(range(get(gca, 'ylim'))), ...
+text(min(get(gca, 'xlim')) + 0.57*(range(get(gca, 'xlim'))), ...
+    min(get(gca, 'ylim')) + legendWhere*(range(get(gca, 'ylim'))), ...
     txt, 'fontsize', 5);
 
 end
