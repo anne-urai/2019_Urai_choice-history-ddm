@@ -68,7 +68,6 @@ for d = 1:length(datasets),
     title(txt, 'fontweight', 'bold', 'fontsize', 5, 'horizontalalignment', 'left');
     offsetAxes; drawnow;
     tightfig;
-
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf',d));
 end
 close all;
@@ -108,5 +107,6 @@ end
 text(min(get(gca, 'xlim')) + 0.57*(range(get(gca, 'xlim'))), ...
     min(get(gca, 'ylim')) + legendWhere*(range(get(gca, 'ylim'))), ...
     txt, 'fontsize', 5);
+    set(gca, 'color', 'none');
 
 end
