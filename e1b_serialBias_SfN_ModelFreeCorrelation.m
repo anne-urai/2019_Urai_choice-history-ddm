@@ -73,7 +73,6 @@ for d = 1:length(datasets),
   %  sp2.Position(2) = sp2.Position(2) - 0.01;
 
     tightfig;
-
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf',d));
 end
 close all;
@@ -113,5 +112,6 @@ end
 text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
     min(get(gca, 'ylim')) + 0.15*(range(get(gca, 'ylim'))), ...
     txt, 'fontsize', 5);
+    set(gca, 'color', 'none');
 
 end

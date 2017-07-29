@@ -12,10 +12,10 @@ global datasets datasetnames mypath
 parameters = {'dc', 'z'};
 for pa = 1:length(parameters),
     for d = 1:length(datasets),
-        
+
         % get traces for the model with pupil and rt modulation
         traces = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/all_traces.csv', mypath, datasets{d}));
-        
+
         switch parameters{pa}
             case 'dc'
                 dat1 = traces.dc_1_;
@@ -25,23 +25,23 @@ for pa = 1:length(parameters),
                 dat1 = invlogit(traces.z_trans_1_);
                 dat2 = invlogit(traces.z_trans__1_);
         end
-        
+
         % plot the pupil and RT traces
         colors = linspecer(9, 'sequential');
-        
+
         close all;
         subplot(4,4,1); hold on;
         h1 = histogram_smooth(dat1, colors(3, :));
         h2 = histogram_smooth(dat2, colors(2, :));
-        
+
         % show if these are significant - two sided
         % https://github.com/jwdegee/2017_eLife/blob/master/hddm_regression.py, line 273
         pvalD    = min([mean(dat2 > dat1) mean(dat2 < dat1)]);
-        
+
         axis tight; axis square;
         ylims = get(gca, 'ylim');
         ylim([ylims(1) ylims(2)*1.2]);
-        
+
         txt = sprintf('p = %.3f', pvalD);
         if pvalD < 0.001,
             txt = sprintf('p < 0.001');
@@ -49,7 +49,7 @@ for pa = 1:length(parameters),
         text(min(get(gca, 'xlim')) + 0.75*(range(get(gca, 'xlim'))), ...
             min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
             txt, 'fontsize', 5);
-        
+
         if pa == 1,
             title(datasetnames{d});
         end
@@ -76,6 +76,7 @@ a1 = area(xi, f, 'edgecolor', 'none', 'facecolor', color2, 'facealpha', 0.4);
 
 % area
 h = plot(xi, f, 'color', color2, 'linewidth', 1);
+set(gca, 'color', 'none');
 
 end
 

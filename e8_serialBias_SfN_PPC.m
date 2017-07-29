@@ -15,21 +15,21 @@ datasetnames = { {'2AFC, RT', 'n = 22'}, ...
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
 for d = [1 2 4 3],
-    
+
     if ~exist(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}), 'file'),
         fprintf('cannot find ~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv \n', datasets{d});
         continue;
     else
         disp(datasets{d});
     end
-    
+
     close all; subplot(4,4,1); hold on;
     title(datasetnames{d});
     xlabel('RT (s)');
-    
+
     % get traces for the model with pupil and rt modulation
     ppc = readtable(sprintf('~/Data/HDDM/%s/stimcoding_nohist/ppq_data.csv', datasets{d}));
-    
+
     % make sure errors are negative
     ppc.correct = (ppc.stimulus == ppc.response);
     ppc.rt(ppc.correct == 1)           = abs(ppc.rt(ppc.correct == 1));
@@ -37,12 +37,12 @@ for d = [1 2 4 3],
     ppc.rt_sampled(ppc.correct == 1)   = abs(ppc.rt_sampled(ppc.correct == 1));
     ppc.rt_sampled(ppc.correct == 0)   = -abs(ppc.rt_sampled(ppc.correct == 0));
     ppc = ppc(:, {'rt', 'rt_sampled', 'correct'}); % save some memory
-    
+
     % plot the pupil and RT traces
     bestcolor = linspecer(4, 'qualitative');
     histogram_smooth(ppc.rt, ppc.rt_sampled, bestcolor(3, :), bestcolor(2, :));
-    
-    axis tight; axis square; 
+
+    axis tight; axis square;
     offsetAxes_y;
     xlim([-3 3]); set(gca, 'xtick', [-3 0 3]);
     if d > 1,
@@ -52,10 +52,10 @@ for d = [1 2 4 3],
     end
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));
-    
+
     % keep info about the distribution of errors
     errors{d} = ppc.rt - ppc.rt_sampled;
-    
+
 end
 
 %% also show a histogram of the rt error
@@ -99,7 +99,7 @@ bar(edges(negidx), n(negidx), 'edgecolor', 'none', 'facecolor', color2, 'barwidt
 % then the line
 [f,xi] = ksdensity(x2);
 h = plot(xi, f, 'color', 'k', 'linewidth', 1);
-
+set(gca, 'color', 'none');
 end
 
 function offsetAxes_y()
