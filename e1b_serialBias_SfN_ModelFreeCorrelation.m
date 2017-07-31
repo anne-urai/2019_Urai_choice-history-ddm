@@ -19,7 +19,7 @@ for d = 1:length(datasets),
 
     colors = linspecer(5); % red blue green
 
-    results = readtable(sprintf('%s/%s/summary/allindividualresults.csv', mypath, datasets{d}));
+    results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     results = results(results.session == 0, :);
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
 

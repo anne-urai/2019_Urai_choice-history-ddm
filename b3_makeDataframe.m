@@ -42,10 +42,7 @@ for d = 1:length(datasets),
     results     = b3b_behaviouralMetrics(alldata);
 
     % get the summary results from HDDM
-    if ~exist(sprintf('/nfs/aeurai/HDDM/%s/summary', datasets{d}), 'dir'),
-      mkdir(sprintf('/nfs/aeurai/HDDM/%s/summary', datasets{d}));
-    end
-    hddmresults = readtable(sprintf('/nfs/aeurai/HDDM/%s/summary/individualresults.csv', datasets{d}));
+    hddmresults = readtable(sprintf('/nfs/aeurai/HDDM/summary/%s/individualresults.csv', datasets{d}));
 
     % most parameters will go under session 0
     hddmresults.session = zeros(size(hddmresults.subjnr));
@@ -108,7 +105,7 @@ for d = 1:length(datasets),
     skippedSession = (isnan(nanmean(tab{:, 3:11}, 2)));
     tab(skippedSession, :) = [];
 
-    writetable(tab, sprintf('/nfs/aeurai/HDDM/%s/summary/allindividualresults.csv', datasets{d}));
-    fprintf('/nfs/aeurai/HDDM/%s/summary/allindividualresults.csv \n', datasets{d});
+    writetable(tab, sprintf('/nfs/aeurai/HDDM/summary/%s/allindividualresults.csv', datasets{d}));
+    fprintf('/nfs/aeurai/HDDM/summary/%s/allindividualresults.csv \n', datasets{d});
 
 end

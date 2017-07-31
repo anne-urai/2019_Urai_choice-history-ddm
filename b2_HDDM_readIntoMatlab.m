@@ -15,6 +15,12 @@ function b2_HDDM_readIntoMatlab()
 
   for d = 1:length(datasets),
     usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
+    savepath = sprintf('/nfs/aeurai/HDDM/summary/%s', datasets{d});
+    if ~exist(savepath, 'dir'),
+      cp = pwd; cd('/nfs/aeurai/HDDM/summary');
+      mkdir(datasets{d}); cd(cp);
+    end
+
     disp(usepath);
     mdls = {'stimcoding_nohist', ...
         'stimcoding_dc_prevresp', ...
@@ -28,11 +34,6 @@ function b2_HDDM_readIntoMatlab()
         'regress_dc_z_prevresp_prevstim_prevrt', ...
         'regress_dc_z_prev2resp_prev2stim', ...
         'regress_dc_z_prev3resp_prev3stim'};
-
-    currpath = pwd;
-    if ~exist(sprintf('%s/summary', usepath), 'dir'),
-      cd(usepath); mkdir('summary'); cd(currpath);
-    end
 
     switch datasets{d}
       case 'RT_RDK'
@@ -240,8 +241,8 @@ function b2_HDDM_readIntoMatlab()
       end
 
       tic;
-      savefast(sprintf('%s/summary/%s_all.mat', ...
-      usepath, mdls{m}), 'group', 'individuals', 'dic');
+      savefast(sprintf('%s/%s_all.mat', ...
+      savepath, mdls{m}), 'group', 'individuals', 'dic');
       toc;
 
     end % mdls
@@ -253,8 +254,8 @@ function b2_HDDM_readIntoMatlab()
     disp('making table');
     results = array2table(subjects', 'variablenames', {'subjnr'});
     for m = 1:length(mdls),
-      if exist(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'), 'file'),
-        load(sprintf('%s/summary/%s_%s.mat', usepath, mdls{m}, 'all'));
+      if exist(sprintf('%s/%s_%s.mat', savepath, mdls{m}, 'all'), 'file'),
+        load(sprintf('%s/%s_%s.mat', savepath, mdls{m}, 'all'));
         flds = fieldnames(individuals);
         for p = 1:length(flds),
           if ~isempty(strfind(flds{p}, 'mean')),
@@ -272,7 +273,7 @@ function b2_HDDM_readIntoMatlab()
       end
     end
 
-    writetable(results, sprintf('%s/summary/individualresults.csv', usepath));
+    writetable(results, sprintf('%s/individualresults.csv', savepath));
 
   end % datasets
 end

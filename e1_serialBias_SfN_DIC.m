@@ -94,13 +94,13 @@ axis square; hold on;
 
 mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
-    if ~exist(sprintf('/nfs/aeurai/HDDM/%s/summary/%s_%s_all.mat', ...
+    if ~exist(sprintf('/nfs/aeurai/HDDM/summary/%s/%s_%s_all.mat', ...
             datasets{d}, s, mdls{m}), 'file'),
         disp('cant find this model')
         continue;
     end
 
-    load(sprintf('/nfs/aeurai/HDDM/%s/summary/%s_%s_all.mat', ...
+    load(sprintf('/nfs/aeurai/HDDM/summary/%s/%s_%s_all.mat', ...
         datasets{d}, s, mdls{m}));
 
     if (isnan(dic.full) || isempty(dic.full)) && ~all(isnan(dic.chains)),
