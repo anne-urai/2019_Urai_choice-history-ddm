@@ -341,6 +341,9 @@ def make_model(mypath, model_name, trace_id):
             v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
+        # subselect data
+        mydata = mydata.dropna(subset=['prev2resp', 'prev2stim'])
+
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
@@ -357,6 +360,8 @@ def make_model(mypath, model_name, trace_id):
             z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
             v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
+
+        mydata = mydata.dropna(subset=['prev2resp', 'prev2stim', 'prev3resp', 'prev3stim'])
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],

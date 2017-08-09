@@ -43,8 +43,8 @@ function [] = compileMe(fname)
     % ============================================ #
 
     nsmp       = [5000]
-    datasets   = [0:7]; % RT-RDK and MEG-PL
-    models     = [0:11]; % the nr of the models
+    datasets   = [7]; % RT-RDK and MEG-PL
+    models     = [10:11]; % the nr of the models
     nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
     alldat = [];
@@ -79,8 +79,6 @@ function [] = compileMe(fname)
     % write to a file
     dlmwrite('hddmparams_concat', alldat, 'delimiter', ' ');
     size(alldat)
-
-
 
     % PPC
         alldat = [];
