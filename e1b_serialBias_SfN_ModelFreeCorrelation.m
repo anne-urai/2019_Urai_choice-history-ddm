@@ -15,66 +15,83 @@ global mypath datasets datasetnames
 
 close all;
 for d = 1:length(datasets),
-  disp(datasets{d});
-
+    disp(datasets{d});
+    
     colors = linspecer(5); % red blue green
-
+    
     results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     results = results(results.session == 0, :);
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
-
+    
     % use the stimcoding difference
-
-    results.z_prevresp__regressdczprevresp = ...
-        results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
-    results.v_prevresp__regressdczprevresp = ...
-        results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
-
+    try
+        results.z_prevresp__regressdczprevresp = ...
+            results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
+        results.v_prevresp__regressdczprevresp = ...
+            results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
+    catch
+        results.z_prevresp__regressdczprevresp = ...
+            results.z_1_0__stimcodingdczprevresp - results.z_2_0__stimcodingdczprevresp;
+        results.v_prevresp__regressdczprevresp = ...
+            results.dc_1_0__stimcodingdczprevresp - results.dc_2_0__stimcodingdczprevresp;
+    end
+    
     close all;
     subplot(4,4,1); hold on;
-    rho1 = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.15, colors(4, :));
-    title(datasetnames{d});
-    ll = xlabel('\Deltadc');
+    [rho1, tt1] = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.585, colors(5, :));
+    xlabel('History shift in z');
+    ylabel('P(repeat)');
+    
     offsetAxes;
-
-     switch d
-        case {1, 5}
-            ylabel('P(repeat)');
-        case 2
-            set(gca, 'ytick', 0.46:0.04:0.58);
-    end
-
-    sp2 = subplot(4,4,5); hold on;
-    rho2 = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.7, colors(5, :));
-    xlabel('\Deltaz');
-
+    
     switch d
         case {1, 5}
             ylabel('P(repeat)');
         case 2
             set(gca, 'ytick', 0.46:0.04:0.58);
     end
-
+    
+    sp2 = subplot(4,4,2); hold on;
+    [rho2, tt2] = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.05, colors(4, :));
+    xlabel('History shift in v');
+    
+    switch d
+        case {1, 5}
+        case 2
+            set(gca, 'ytick', 0.46:0.04:0.58);
+    end
+    set(gca, 'yticklabel', []);
+    
     % compute the difference in correlation
     rho3 = corr(results.v_prevresp__regressdczprevresp, results.z_prevresp__regressdczprevresp, ...
         'rows', 'complete', 'type', 'pearson');
-    [rhodiff, cihilow, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
-    % disp(rho3);
-
-    txt = {sprintf('\\Deltar = %.3f', rhodiff); sprintf('p = %.3f', pval)};
-    if pval < 0.001,
-      txt = {sprintf('\\Deltar = %.3f', rhodiff); sprintf('p < 0.001')};
-    end
-    title(txt, 'fontweight', 'bold', 'fontsize', 5, 'horizontalalignment', 'left');
+    [rhodiff, ~, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
     offsetAxes; drawnow;
+    
+    % move together
+    sp2.Position(1) = sp2.Position(1) - 0.08;
+    try
+        ss = suplabel(cat(2, datasetnames{d}{1}, ' - ', datasetnames{d}{2}), 't');
+    catch
+        ss = suplabel(datasetnames{d}{1}, 't');
+    end
+    set(ss, 'fontweight', 'normal');
+    ss.FontWeight = 'normal';
+    ss.Position(2) = ss.Position(2) - 0.007;
     tightfig;
+    
+    %% add line between the two correlation coefficients
+    txt = {sprintf('\\Deltar_{%d} = %.3f, p = %.3f', length(find(~isnan(results.v_prevresp__regressdczprevresp)))-3, rhodiff, pval)};
+    if pval < 0.001,
+        txt = {sprintf('\\Deltar_{%d} = %.3f, p < 0.001', length(find(~isnan(results.v_prevresp__regressdczprevresp)))-3,  rhodiff)};
+    end
+    title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf',d));
 end
-close all;
 
 end
 
-function rho = plotScatter(x,y, legendWhere, plotColor);
+function [rho, tt] = plotScatter(x,y, legendWhere, plotColor);
 
 plot(x,y, '.');
 axis square;
@@ -100,13 +117,13 @@ scatter(x,y, 15, ...
     'LineWidth', 0.001, ...
     'markeredgecolor', 'w', 'markerfacecolor', plotColor);
 
-txt = {sprintf('r = %.3f', rho) sprintf('p = %.3f', pval)};
+txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
 if pval < 0.001,
-    txt = {sprintf('r = %.3f', rho) sprintf('p < 0.001')};
+    txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
 end
-text(min(get(gca, 'xlim')) + 0.57*(range(get(gca, 'xlim'))), ...
-    min(get(gca, 'ylim')) + legendWhere*(range(get(gca, 'ylim'))), ...
+tt = text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
+    min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
     txt, 'fontsize', 5);
-    set(gca, 'color', 'none');
+set(gca, 'color', 'none');
 
 end

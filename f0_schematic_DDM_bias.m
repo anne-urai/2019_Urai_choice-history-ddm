@@ -43,10 +43,9 @@ defcfg = cfg;
 subplot(331); hold on;
 arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 6);
 y1 = ddm(cfg);
-plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % show the unbiased average drift towards two stimuli
-cfg.cdW = 0;
+cfg.cdW = 0;5
 y = ddm(cfg);
 plot(cfg.time, y,'k');
 cfg.v = -cfg.v; % flip around drift rate
@@ -61,6 +60,9 @@ plot(cfg.time, y, 'color', colors(4, :));
 cfg.v = -cfg.v + 2*cfg.dc; % flip around drift rate
 y = ddm(cfg);
 plot(cfg.time, y,'k', 'color', colors(4, :));
+
+% plot the drift on top 
+plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % add distributions at the top!
 scaling = 300;
@@ -77,7 +79,7 @@ plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :));
 axis tight;
 set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', fz-1);
-title('Biased drift', 'fontsize', fz+1);
+title('Biased drift', 'fontsize', fz+2);
 % add two axes manually
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
 plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
@@ -91,7 +93,6 @@ xlim([min(cfg.time) max(cfg.time)]);
 cfg = defcfg;
 subplot(332); hold on;
 arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 6);
-plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % show the unbiased average drift towards two stimuli
 cfg.cdW = 0;
@@ -109,6 +110,9 @@ cfg.v = -cfg.v;
 y = ddm(cfg);
 plot(cfg.time, y,'k', 'color', colors(5, :));
 
+% drifting particle
+plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
+
 % add distributions at the top!
 plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :), 'linestyle', '-.');
 plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :), 'linestyle', '-.');
@@ -123,7 +127,7 @@ plot(ts, -scaling*gE_z - cfg.a, 'color', colors(5, :));
 axis tight;
 set(gca, 'ytick', [-cfg.a 0 cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', fz-1);
-title('Biased starting point', 'fontsize', fz+1);
+title('Biased starting point', 'fontsize', fz+2);
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
 plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
 

@@ -20,7 +20,7 @@ for s = 1:length(types),
         try
         getPlotDIC(mdls, types{s}, d, 1);
         title(datasetnames{d});
-        set(gca, 'xtick', 1:3, 'xticklabel', {'dc', 'z', 'both'});
+        set(gca, 'xtick', 1:3, 'xticklabel', {'v_{bias}', 'z_{bias}', 'both'});
 
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf', types{s}, d));
@@ -89,19 +89,19 @@ end
 
 function getPlotDIC(mdls, s, d, plotBest)
 
-global datasets
+global datasets mypath
 axis square; hold on;
 
 mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
-    if ~exist(sprintf('/nfs/aeurai/HDDM/summary/%s/%s_%s_all.mat', ...
-            datasets{d}, s, mdls{m}), 'file'),
+    if ~exist(sprintf('%s/summary/%s/%s_%s_all.mat', ...
+           mypath, datasets{d}, s, mdls{m}), 'file'),
         disp('cant find this model')
         continue;
     end
 
-    load(sprintf('/nfs/aeurai/HDDM/summary/%s/%s_%s_all.mat', ...
-        datasets{d}, s, mdls{m}));
+    load(sprintf('%s/summary/%s/%s_%s_all.mat', ...
+       mypath, datasets{d}, s, mdls{m}));
 
     if (isnan(dic.full) || isempty(dic.full)) && ~all(isnan(dic.chains)),
         dic.full = nanmean(dic.chains);
