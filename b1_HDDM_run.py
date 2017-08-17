@@ -267,6 +267,8 @@ for dx in d:
                     if all([os.path.isfile(f) for f in filelist]):
                         break
                     else: # wait
+                        print("waiting for files")
+                        raise ValueError('Not all files present')
                         time.sleep(60)
 
                 # concatenate the different chains, will save disk space

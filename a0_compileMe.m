@@ -92,3 +92,7 @@ function [] = compileMe(fname)
         % write to a file
         dlmwrite('hddmparams_PPC', alldat, 'delimiter', ' ');
         size(alldat)
+
+        cdat = [];
+        cdat = [1 7]
+        dlmwrite('hddmparams_concat', alldat, 'delimiter', ' ');

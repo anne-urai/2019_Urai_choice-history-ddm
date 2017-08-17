@@ -183,9 +183,9 @@ function b2_HDDM_readIntoMatlab()
         varnames{v} = regexprep(varnames{v}, '_$', '');
 
         % correct z
-        if strcmp(varnames{v}(1), 'z'),
-          invlogit = @(x) 1 ./ (1 + exp(x));
-          pointestimates{v, :} = invlogit(pointestimates{v, :});
+        if (isempty(strfind(mdls{m}, 'stimcoding')) & ~isempty(strfind(varnames{v}, 'z_Intercept'))) || ...
+          (~isempty(strfind(mdls{m}, 'stimcoding')) & ~isempty(strfind(varnames{v}(1), 'z'))),
+          pointestimates{v, :} = 1 ./ (1 + exp(pointestimates{v, :}));
         end
 
         if strfind(varnames{v}, 'session'),
