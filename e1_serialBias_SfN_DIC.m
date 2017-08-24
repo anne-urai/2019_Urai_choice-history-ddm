@@ -22,6 +22,9 @@ for s = 1:length(types),
         title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'v_{bias}', 'z_{bias}', 'both'});
 
+        if ismember(d, [1,5]),
+            ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
+        end
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf', types{s}, d));
         fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf \n', types{s}, d);
@@ -135,7 +138,6 @@ for i = 1:length(mdldic),
     end
 end
 xlim([0.5 length(mdldic)+0.5]);
-ylabel('\Delta DIC (from nohist)', 'interpreter', 'tex');
 offsetAxes; box off;
 axis square;
 set(gca, 'color', 'none');
