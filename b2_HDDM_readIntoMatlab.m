@@ -34,6 +34,7 @@ function b2_HDDM_readIntoMatlab()
         'regress_dc_z_prevresp_prevstim_prevrt', ...
         'regress_dc_z_prev2resp_prev2stim', ...
         'regress_dc_z_prev3resp_prev3stim'};
+    %    mdls = {'stimcoding_nohist'}
 
     switch datasets{d}
       case 'RT_RDK'
@@ -104,13 +105,13 @@ function b2_HDDM_readIntoMatlab()
 
       try
       rhat = readtable(sprintf('%s/%s/gelman_rubin.txt', usepath, mdls{m}));
-      notConverged = rhat(find(abs(rhat.Var2 - 1) > 0.02), :);
+      notConverged = rhat(find(abs(rhat.Var2 - 1) > 0.001), :);
       % ignore single-subject convergence or std
       notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'subj'))), :) = [];
       notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'std'))), :) = [];
       if ~isempty(notConverged),
         % warning('not all group parameters have converged');
-        %disp(notConverged);
+        disp(notConverged);
       end
     end
 
@@ -185,7 +186,7 @@ function b2_HDDM_readIntoMatlab()
         % correct z
         if (isempty(strfind(mdls{m}, 'stimcoding')) & ~isempty(strfind(varnames{v}, 'z_Intercept'))) || ...
           (~isempty(strfind(mdls{m}, 'stimcoding')) & ~isempty(strfind(varnames{v}(1), 'z'))),
-          pointestimates{v, :} = 1 ./ (1 + exp(pointestimates{v, :}));
+          % pointestimates{v, :} = 1 ./ (1 + exp(pointestimates{v, :}));
         end
 
         if strfind(varnames{v}, 'session'),
@@ -240,10 +241,10 @@ function b2_HDDM_readIntoMatlab()
         end
       end
 
-      tic;
+      %tic;
       savefast(sprintf('%s/%s_all.mat', ...
       savepath, mdls{m}), 'group', 'individuals', 'dic');
-      toc;
+      %toc;
 
     end % mdls
 

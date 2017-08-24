@@ -88,6 +88,38 @@ def make_model(mypath, model_name, trace_id):
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv'), group_only_nodes=['sv'])
 
+    if model_name == 'stimcoding_nohist_onlyz':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                bias=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'])
+
+    elif model_name == 'stimcoding_nohist_onlydc':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'],
+                depends_on={'v': ['coherence']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, p_outlier=0.05,
+                include=('sv'), group_only_nodes=['sv'])
+
     elif model_name == 'regress_nohist':
 
         # only stimulus dependence
