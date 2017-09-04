@@ -1,15 +1,15 @@
 function e3_serialBias_SfN_Posteriors
 
 addpath(genpath('~/code/Tools'));
-warning off; close all; clear;
-global mypath
+warning off; close all; 
+global mypath datasets datasetnames
 
 % neutral vs biased plots
-datasets = {'Anke_2afc_alternating', ...
-    'Anke_2afc_neutral', 'Anke_2afc_repetitive'};
-datasetnames = {{'2AFC, Braun et al. 2017', 'Alternating'}, ...
-    {'2AFC, Braun et al. 2017', 'Neutral'}, ...
-    {'2AFC, Braun et al. 2017', 'Repetitive'}};
+% datasets = {'Anke_2afc_alternating', ...
+%     'Anke_2afc_neutral', 'Anke_2afc_repetitive'};
+% datasetnames = {{'2AFC, Braun et al. 2017', 'Alternating'}, ...
+%     {'2AFC, Braun et al. 2017', 'Neutral'}, ...
+%     {'2AFC, Braun et al. 2017', 'Repetitive'}};
 
 % ========================================== %
 % MODULATION OF SERIAL CHOICE BIAS
@@ -79,6 +79,26 @@ for pa = 1:length(parameters),
         tightfig;
         
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure2_posteriors_%s_d%d.pdf', parameters{pa}, d));
+    
+        %% correlate against each other
+        
+        histdc = traces.dc__1_ - traces.dc_1_;
+        histz  = invlogit(traces.z_trans__1_) - invlogit(traces.z_trans_1_);
+      
+        close all
+        subplot(441);
+        scatter(histdc, histz, '.');
+        xlabel('History bias in dc');
+        ylabel('History bias in z');
+        
+        [rho, pval] = corr(histdc, histz);
+        title({datasetnames{d}{end} sprintf('r = %.3f, p = %.3f', rho, pval)});
+        lsline;
+        axis square;
+        tightfig;
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/posteriors_correlation_d%d.pdf',  d));
+        
+    
     end
 end
 close all;

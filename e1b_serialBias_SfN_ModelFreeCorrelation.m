@@ -19,77 +19,120 @@ for d = 1:length(datasets),
     
     colors = linspecer(5); % red blue green
     
-    results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-    results = results(results.session == 0, :);
+    switch d
+        case {1, 2, 3}
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+            results = results(results.session == 0, :);
+            
+            % use the stimcoding difference
+            results.z_prevresp = ...
+                results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
+            results.v_prevresp = ...
+                results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
+            
+        case 4 % Alternating
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, 'Anke_2afc_sequential'));
+            results = results(results.session == 0, :);
+            
+            % use the stimcoding difference only from alternating
+            z_prevresp = ...
+                results.z_1_alt__stimcodingdczprevresp - results.z_2_alt__stimcodingdczprevresp;
+            v_prevresp = ...
+                results.dc_1_alt__stimcodingdczprevresp - results.dc_2_alt__stimcodingdczprevresp;
+            
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+            results = results(results.session == 0, :);
+            
+            results.z_prevresp = z_prevresp;
+            results.v_prevresp = v_prevresp;
+            
+        case 5
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, 'Anke_2afc_sequential'));
+            results = results(results.session == 0, :);
+            
+            % use the stimcoding difference only from alternating
+            z_prevresp = ...
+                results.z_1_neu__stimcodingdczprevresp - results.z_2_neu__stimcodingdczprevresp;
+            v_prevresp = ...
+                results.dc_1_neu__stimcodingdczprevresp - results.dc_2_neu__stimcodingdczprevresp;
+            
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+            results = results(results.session == 0, :);
+            
+            results.z_prevresp = z_prevresp;
+            results.v_prevresp = v_prevresp;
+            
+        case 6
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, 'Anke_2afc_sequential'));
+            results = results(results.session == 0, :);
+            
+            % use the stimcoding difference only from alternating
+            results.z_prevresp = ...
+                results.z_1_rep__stimcodingdczprevresp - results.z_2_rep__stimcodingdczprevresp;
+            results.v_prevresp = ...
+                results.dc_1_rep__stimcodingdczprevresp - results.dc_2_rep__stimcodingdczprevresp;
+            
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+            results = results(results.session == 0, :);
+            
+            results.z_prevresp = z_prevresp;
+            results.v_prevresp = v_prevresp;
+    end
+    
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
     
     % instead of repetition, use criterion shift
     results.repetition = results.criterionshift;
     
-    % use the stimcoding difference
-    try
-        results.z_prevresp__regressdczprevresp = ...
-            results.z_2__stimcodingdczprevresp - results.z_1__stimcodingdczprevresp;
-        results.v_prevresp__regressdczprevresp = ...
-            results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
-    catch
-        results.z_prevresp__regressdczprevresp = ...
-            results.z_2_0__stimcodingdczprevresp - results.z_1_0__stimcodingdczprevresp;
-        results.v_prevresp__regressdczprevresp = ...
-            results.dc_1_0__stimcodingdczprevresp - results.dc_2_0__stimcodingdczprevresp;
-    end
-    
     close all;
     subplot(4,4,1); hold on;
-    [rho1, tt1] = plotScatter(results.z_prevresp__regressdczprevresp, results.repetition, 0.585, colors(5, :));
-   %  [rho1, tt1] = plotScatter(results.z__stimcodingnohist, results.bias, 0.05, colors(5, :));
+    [rho1, tt1] = plotScatter(results.z_prevresp, results.repetition, 0.585, colors(5, :));
     xlabel('History bias in z', 'interpreter', 'tex');
     ylabel('P(repeat)');
     offsetAxes;
     if d == 2,
         set(gca, 'xtick', get(gca, 'xtick'), 'xticklabel', get(gca, 'xtick'));
     elseif d == 3 % avoid 10^-3 in the axis
-        set(gca, 'xtick', get(gca, 'xtick'), 'xticklabel', {'', '0', '', '', '0.015'});
+        %   set(gca, 'xtick', get(gca, 'xtick'), 'xticklabel', {'', '0', '', '', '0.015'});
     end
     
     ylabel('\Deltac');
     ylabel('History bias in c');
     
     sp2 = subplot(4,4,2); hold on;
-    [rho2, tt2] = plotScatter(results.v_prevresp__regressdczprevresp, results.repetition, 0.05, colors(4, :));
-   %  [rho2, tt2] = plotScatter(results.dc__stimcodingnohist, results.bias, 0.05, colors(4, :));
+    [rho2, tt2] = plotScatter(results.v_prevresp, results.repetition, 0.05, colors(4, :));
     xlabel('History bias in v', 'interpreter', 'tex', 'fontweight', 'normal');
     set(gca, 'yticklabel', []);
     
-    try
-        % compute the difference in correlation
-        rho3 = corr(results.v_prevresp__regressdczprevresp, results.z_prevresp__regressdczprevresp, ...
-            'rows', 'complete', 'type', 'pearson');
-        [rhodiff, ~, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
-        offsetAxes; drawnow;
-        
-        % move together
-        sp2.Position(1) = sp2.Position(1) - 0.08;
-        try
-            ss = suplabel(cat(2, datasetnames{d}{1}, ' - ', datasetnames{d}{2}), 't');
-        catch
-            ss = suplabel(datasetnames{d}{1}, 't');
-        end
-        set(ss, 'fontweight', 'normal');
-        ss.FontWeight = 'normal';
-        ss.Position(2) = ss.Position(2) - 0.007;
-        tightfig;
-        
-        %% add line between the two correlation coefficients
-        txt = {sprintf('\\Deltar_{%d} = %.3f, p = %.3f', length(find(~isnan(results.v_prevresp__regressdczprevresp)))-3, rhodiff, pval)};
-        if pval < 0.001,
-            txt = {sprintf('\\Deltar_{%d} = %.3f, p < 0.001', length(find(~isnan(results.v_prevresp__regressdczprevresp)))-3,  rhodiff)};
-        end
-        title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
+    % compute the difference in correlation
+    [rho3, pval3] = corr(results.v_prevresp, results.z_prevresp, ...
+        'rows', 'complete', 'type', 'pearson');
+    if pval3 < 0.05,
+        fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
     end
+    [rhodiff, ~, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.repetition)), 0.05);
+    offsetAxes; drawnow;
+    
+    % move together
+    sp2.Position(1) = sp2.Position(1) - 0.08;
+    try
+        ss = suplabel(cat(2, datasetnames{d}{1}, ' - ', datasetnames{d}{2}), 't');
+    catch
+        ss = suplabel(datasetnames{d}{1}, 't');
+    end
+    set(ss, 'fontweight', 'normal');
+    ss.FontWeight = 'normal';
+    ss.Position(2) = ss.Position(2) - 0.007;
+    
+    %% add line between the two correlation coefficients
+    txt = {sprintf('\\Deltar_{%d} = %.3f, p = %.3f', length(find(~isnan(results.v_prevresp)))-3, rhodiff, pval)};
+    if pval < 0.001,
+        txt = {sprintf('\\Deltar_{%d} = %.3f, p < 0.001', length(find(~isnan(results.v_prevresp)))-3,  rhodiff)};
+    end
+    title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
+    tightfig;
     
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf',d));
-    
 end
 
 end

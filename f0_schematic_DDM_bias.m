@@ -190,3 +190,5 @@ ax.YRuler.Axle.VertexData(2,1) = min(get(ax, 'Ytick'));
 ax.YRuler.Axle.VertexData(2,2) = max(get(ax, 'Ytick'));
 
 end
+
+%% additional plots
