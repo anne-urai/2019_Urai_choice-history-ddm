@@ -215,7 +215,10 @@ datasets = ['RT_RDK', # 0
     'Anke_2afc_alternating', # 5
     'Anke_2afc_sequential', # 6
     'MEG_MEGsessions',#7
-    'JW_yesno'] #8
+    'JW_yesno', #8
+    'Bharath_fMRI', #9
+    'Anke_MEG', #10
+    'Anke_merged'] #11
 
 # recode
 if isinstance(d, int):
