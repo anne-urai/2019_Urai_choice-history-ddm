@@ -4,15 +4,9 @@ function b2_HDDM_readIntoMatlab()
   close all; clc;
   warning off MATLAB:table:ModifiedVarnames % skip this warning
 
-  usr = getenv('USER');
-  switch usr
-  case 'anne' % local
-    datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
-  case 'aeurai' % lisa/cartesius
     datasets = {'RT_RDK', 'MEG', 'MEG_MEGsessions', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
     'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
-      datasets = {'JW_yesno'};
-  end
+      datasets = {'Anke_MEG'};
 
   for d = 1:length(datasets),
     usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});

@@ -17,15 +17,15 @@ function b3_makeDataframe(ds)
   case 'aeurai' % lisa/cartesius
     mypath = '/nfs/aeurai/HDDM';
   end
-  datasets = {'RT_RDK', 'MEG', 'MEG_MEGsessions', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
-  'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
-   datasets = {'JW_yesno'};
+  datasets = {'RT_RDK', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
+  'Anke_2afc_repetitive', 'Anke_2afc_alternating', 'Anke_MEG'}
+
   set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...
   'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
 if ~exist('ds', 'var'), ds = 1:length(datasets); end
-  
+
   for d = ds,
     disp(datasets{d});
 
@@ -35,10 +35,10 @@ if ~exist('ds', 'var'), ds = 1:length(datasets); end
     alldata = readtable(sprintf('%s/%s/%s', mypath, datasets{d}, csvfile.name));
 
     % recode Anke's stimulus into stim and coh
-    if d > 3,
+    if ~isempty(strfind(datasets{d}, 'Anke')) | ~isempty(strfind(datasets{d}, 'NatComm')),
       alldata.coherence   = abs(alldata.stimulus);
       alldata.stimulus2   = sign(alldata.stimulus);
-      alldata.stimulus2(alldata.coherence == 0) = sign(alldata.motionenergy(alldata.coherence == 0));
+      try; alldata.stimulus2(alldata.coherence == 0) = sign(alldata.motionenergy(alldata.coherence == 0)); end
       alldata.stimulus    = alldata.stimulus2;
     end
 

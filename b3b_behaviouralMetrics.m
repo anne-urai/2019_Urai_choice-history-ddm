@@ -20,6 +20,17 @@ results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, lengt
 results.drug    = repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
 results.criterionshift_prct = nan(height(results), 2); % will contain two points for error bars
 
+
+if any(~cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'transitionprob'))),
+  results.criterionshift_neutral = nan(size(results.criterionshift));
+  results.criterionshift_alternating = nan(size(results.criterionshift));
+  results.criterionshift_repetitive = nan(size(results.criterionshift));
+
+  results.repetition_neutral = nan(size(results.criterionshift));
+  results.repetition_alternating = nan(size(results.criterionshift));
+  results.repetition_repetitive = nan(size(results.criterionshift));
+end
+
 % measures that are modulated by previous trial RT or pupil
 metrics = {'dprime', 'criterion', 'abscriterion', 'accuracy', 'repetition', ...
     'stimrepetition', 'repetitioncrit', 'criterionshift', 'handshift', ...
@@ -122,15 +133,6 @@ for sj = subjects,
             continue;
         end
 
-        if any(~cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'transitionprob'))),
-            if all(cellfun(@isempty, strfind(results.Properties.VariableNames, 'transitionprob'))),
-                results.transitionprob = nan(size(results.session));
-            end
-            try
-                results.transitionprob(icnt) = unique(data.transitionprob);
-            end
-        end
-
         % ========================================== %
         % GENERAL STUFF
         % ========================================== %
@@ -177,9 +179,9 @@ for sj = subjects,
         results.criterionshift(icnt)    = criterionshift(data.response, data.nextstim, data.nextresp);
 
         % add: a bootstrapped measure of criterionshift for error bars in correlation plot
-        % 05.09.2017, after talk with JW
-        bootstat = bootstrp(1000, @criterionshift,data.response,data.nextstim, data.nextresp);
-        results.criterionshift_prct(icnt, :) = prctile(bootstat, [0.25 0.75]);
+        % 05.09.2017, after talk with JW - this takes forever!
+        %bootstat = bootstrp(1000, @criterionshift,data.response,data.nextstim, data.nextresp);
+        %results.criterionshift_prct(icnt, :) = prctile(bootstat, [0.25 0.75]);
 
         if s == 0,
             thispersonsbias = results.repetition(icnt) - results.stimrepetition(icnt);
@@ -196,6 +198,25 @@ for sj = subjects,
 
         results.rt_error(icnt)          = nanmedian(data.rt(data.correct == 0));
         results.rt_correct(icnt)        = nanmedian(data.rt(data.correct == 1));
+
+        % ========================================== %
+        %   for data with transition probability, compute criterionshift separately
+        % ========================================== %
+
+        if s == 0 & any(~cellfun(@isempty, strfind(data.Properties.VariableNames, 'transitionprob'))),
+
+          results.criterionshift_neutral(icnt) = criterionshift(data.response(data.transitionprob == 0.5), ...
+          data.nextstim(data.transitionprob == 0.5), data.nextresp(data.transitionprob == 0.5));
+          results.criterionshift_alternating(icnt) = criterionshift(data.response(data.transitionprob == 0.2), ...
+          data.nextstim(data.transitionprob == 0.2), data.nextresp(data.transitionprob == 0.2));
+          results.criterionshift_repetitive(icnt) = criterionshift(data.response(data.transitionprob == 0.8), ...
+          data.nextstim(data.transitionprob == 0.8), data.nextresp(data.transitionprob == 0.8));
+
+          results.repetition_neutral(icnt) = nanmean(data.repeat(data.transitionprob == 0.5));
+          results.repetition_alternating(icnt) = nanmean(data.repeat(data.transitionprob == 0.2));
+          results.repetition_repetitive(icnt) = nanmean(data.repeat(data.transitionprob == 0.8));
+
+        end
 
         % ========================================== %
         % MULDER ET AL. 2012
