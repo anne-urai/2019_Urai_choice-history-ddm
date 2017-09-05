@@ -5,12 +5,6 @@ addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames
 
-% neutral vs biased plots
-datasets = {'RT_RDK', 'NatComm', 'MEG', 'Anke_2afc_sequential'};
-datasetnames = { {'2AFC, RT'}, ...
-    {'2IFC, Urai et al. 2017'}, {'2IFC, replication'}, ...
-    {'2AFC, Braun et al. 2017'}};
-
 % ========================================== %
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %

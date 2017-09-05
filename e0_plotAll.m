@@ -20,14 +20,13 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'RT_RDK', 'NatComm', 'MEG', 'Anke_2afc_alternating', ...
-    'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'MEG_MEGsessions', 'JW_yesno'};
+datasets = {'RT_RDK', 'NatComm', 'MEG', 'Anke_2afc_sequential', ...
+    'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'Anke_MEG'};
 datasetnames = { {'2AFC, RT'}, ...
     {'2IFC, Urai et al. 2017'}, {'2IFC, replication'}, ...
-    {'2AFC, Braun et al. 2017', 'Alternating'}, ...
-    {'2AFC, Braun et al. 2017', 'Neutral'}, ...
-    {'2AFC, Braun et al. 2017', 'Repetitive'}, {'2IFC, replication', 'MEG sessions'}, ...
-    {'Auditory yes-no'}};
+    {'2AFC, Braun et al. 2017'}, ...
+    {'2IFC, replication', 'MEG sessions'}, ...
+    {'Auditory yes-no'}, {'Bharath fMRI'}, {'Anke MEG'}};
 
 %% start the actual plots
 
@@ -39,10 +38,10 @@ e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 f0_schematic_DDM_bias; % figure 3a
 e1_serialBias_SfN_DIC; % figure 3b & c
 
-e3_serialBias_SfN_Posteriors; % figure 4c
 e1b_serialBias_SfN_ModelFreeCorrelation; % figure 4
 
 e9_prevCorrect; % error vs correct
+e3_serialBias_SfN_Posteriors; % figure 4c
 
 % to add (from regression models)
 % - RT modulation

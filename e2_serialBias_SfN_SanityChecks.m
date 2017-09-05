@@ -1,17 +1,11 @@
 function e2_serialBias_SfN_SanityChecks
 
-global mypath
+global mypath datasets datasetnames
 addpath(genpath('~/code/Tools'));
 warning off; close all;
 
 cmap = viridis(256);
 colormap(cmap);
-
-% neutral vs biased plots
-datasets = {'RT_RDK', 'NatComm', 'MEG', 'Anke_2afc_sequential'};
-datasetnames = { {'2AFC, RT'}, ...
-    {'2IFC, Urai et al. 2017'}, {'2IFC, replication'}, ...
-    {'2AFC, Braun et al. 2017'}};
 
 % ========================================== %
 % DOES DRIFT RATE CORRELATE WITH D'?
@@ -44,7 +38,7 @@ for d = 1:length(datasets),
         vars    = dat.Properties.VariableNames';
         cohvars = vars(~cellfun(@isempty, strfind(vars, 'dprime_c')));
         alldprime = dat{dat.session == 0, cohvars};
-        driftvars = regexp(vars, 'v_c\w+__stimcodingnohist', 'match');
+        driftvars = regexp(vars, 'v_c\w+__stimcodingnohist$', 'match');
         driftvars = vars((~cellfun(@isempty, driftvars)));
         alldrift  = dat{dat.session == 0, driftvars};
         
@@ -55,6 +49,7 @@ for d = 1:length(datasets),
         colors  = cbrewer('seq', 'PuBuGn', numel(unique(allcohs(:))) + 5);
         colors  = colors([3:end-4 end], :);
         g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
+        
         box off;
         for gi = 1:length(g),
             g(gi).Marker = 'o';
@@ -149,7 +144,7 @@ for d = 1:length(datasets),
         
         % export_fig(handles, sprintf('~/Data/serialHDDM/figure1b_legend_d%d.pdf',d));
         axis off;
-       % tightfig;
+        % tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_legend_d%d.pdf',d));
         
     end
