@@ -6,11 +6,12 @@ function b2_HDDM_readIntoMatlab()
 
   usr = getenv('USER');
   switch usr
-    case 'anne' % local
+  case 'anne' % local
     datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_sequential', 'NatComm'};
-    case 'aeurai' % lisa/cartesius
+  case 'aeurai' % lisa/cartesius
     datasets = {'RT_RDK', 'MEG', 'MEG_MEGsessions', 'NatComm', 'Anke_2afc_sequential', 'Anke_2afc_neutral', ...
-      'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
+    'Anke_2afc_repetitive', 'Anke_2afc_alternating'};
+      datasets = {'JW_yesno'};
   end
 
   for d = 1:length(datasets),
@@ -23,28 +24,36 @@ function b2_HDDM_readIntoMatlab()
 
     disp(usepath);
     mdls = {'stimcoding_nohist', ...
-        'stimcoding_dc_prevresp', ...
-        'stimcoding_z_prevresp', ...
-        'stimcoding_dc_z_prevresp', ...
-        'stimcoding_dc_prevcorrect', ...
-        'stimcoding_z_prevcorrect', ...
-        'stimcoding_dc_z_prevcorrect', ...
-        'regress_dc_z_prevresp_prevstim', ...
-        'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', ...
-        'regress_dc_z_prevresp_prevstim_prevrt', ...
-        'regress_dc_z_prev2resp_prev2stim', ...
-        'regress_dc_z_prev3resp_prev3stim', ...
-        'stimcoding_nohist_onlyz', 'stimcoding_nohist_onlydc'}
+    'stimcoding_dc_prevresp', ...
+    'stimcoding_z_prevresp', ...
+    'stimcoding_dc_z_prevresp', ...
+    'stimcoding_dc_prevcorrect', ...
+    'stimcoding_z_prevcorrect', ...
+    'stimcoding_dc_z_prevcorrect', ...
+    'regress_dc_z_prevresp_prevstim', ...
+    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', ...
+    'regress_dc_z_prevresp_prevstim_prevrt', ...
+    'regress_dc_z_prev2resp_prev2stim', ...
+    'regress_dc_z_prev3resp_prev3stim', ...
+    'stimcoding_nohist_onlyz', 'stimcoding_nohist_onlydc'}
 
     switch datasets{d}
-      case 'RT_RDK'
+    case 'RT_RDK'
       subjects = [3:15 17:25];
     case {'MEG', 'MEG_MEGsessions'}
       subjects = 2:65;
     case {'Anke_2afc_serial', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'},
       subjects = [1:7 9 11:16 18:21 23 24 26 27];
-      case 'NatComm'
+    case 'NatComm'
       subjects = 1:27;
+    case 'JW_yesno'
+      subjects = [0:23] + 1; % added 1 for matlab indexing
+    case 'Anke_merged'
+      subjects = [1	2	3	4	5	6	7	9	11	12	13	14	15	16	18	19	20	21	23	24	26	27	31	32	33	34	35	37	38	39	40	41	42	43	44	45];
+    case 'Anke_MEG';
+      subjects =   [1     2     3     4     5     7     8     9    10    11    12    13    14    15];
+    case 'Bharath_fMRI'
+      subjects = [4	5	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25];
     end
 
     for m = 1:length(mdls),
@@ -87,7 +96,7 @@ function b2_HDDM_readIntoMatlab()
         end
         fclose(txtfile);
       else
-      dic.full = NaN;
+        dic.full = NaN;
       end
 
       if ~isempty(dic.full),
@@ -104,16 +113,16 @@ function b2_HDDM_readIntoMatlab()
       % ============================================ %
 
       try
-      rhat = readtable(sprintf('%s/%s/gelman_rubin.txt', usepath, mdls{m}));
-      notConverged = rhat(find(abs(rhat.Var2 - 1) > 0.001), :);
-      % ignore single-subject convergence or std
-      notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'subj'))), :) = [];
-      notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'std'))), :) = [];
-      if ~isempty(notConverged),
-        % warning('not all group parameters have converged');
-        disp(notConverged);
+        rhat = readtable(sprintf('%s/%s/gelman_rubin.txt', usepath, mdls{m}));
+        notConverged = rhat(find(abs(rhat.Var2 - 1) > 0.001), :);
+        % ignore single-subject convergence or std
+        notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'subj'))), :) = [];
+        notConverged(find(~cellfun(@isempty, strfind(notConverged.Var1, 'std'))), :) = [];
+        if ~isempty(notConverged),
+          % warning('not all group parameters have converged');
+          %  disp(notConverged);
+        end
       end
-    end
 
       % ============================================ %
       % ALSO GET POINT ESTIMATES FROM RESULTS FILE
@@ -141,7 +150,7 @@ function b2_HDDM_readIntoMatlab()
 
         switch datasets{d},
 
-          case 'NatComm'
+        case 'NatComm'
 
           varnames{v} = regexprep(varnames{v}, '1.0', '1');
 
@@ -177,7 +186,6 @@ function b2_HDDM_readIntoMatlab()
         end
 
         assert(isempty(strfind(varnames{v}, 'transitionprob')), 'no correct parsing')
-
         % recode some stuff
         varnames{v} = regexprep(varnames{v}, '[().]', '_');
         varnames{v} = regexprep(varnames{v}, '_-1(?=_)', '_2');
@@ -235,6 +243,7 @@ function b2_HDDM_readIntoMatlab()
           sjidx   = find(sjnr == subjects);
           assert(numel(sjidx) == 1, 'did not find this node');
 
+          % keep the mean and percentiles
           individuals.([params{p} '_mean'])(sjidx)    = pointestimates{vars(s), {'mean'}};
           individuals.([params{p} '_prct'])(sjidx, :) = pointestimates{vars{s}, {'x2_5q', 'x25q', 'x50q', 'x75q', 'x97_5q'}};
 
@@ -269,6 +278,19 @@ function b2_HDDM_readIntoMatlab()
 
             varname = [flds{p}(1:end-5) '__' thismdlname];
             results.(varname) = individuals.(flds{p});
+          elseif ~isempty(strfind(flds{p}, 'prct')),
+            % also save error bounds around each individual datapoint!
+            thismdlname = regexprep(mdls{m}, 'prevresp_prevstim', 'prevrespstim');
+            thismdlname = regexprep(thismdlname, 'prevrt_prevpupil', 'prevrtpupil');
+            thismdlname = regexprep(thismdlname, 'prevrespstim_prevrtpupil', 'prevrespstimrtpupil');
+            thismdlname = regexprep(thismdlname, 'sessions', 'sess');
+            thismdlname = regexprep(thismdlname, '_', '');
+
+            % separate variable for the percentiles
+            varname = [flds{p}(1:end-5) '_prct__' thismdlname];
+            try
+              results.(varname) = individuals.(flds{p});
+            end
           end
         end
       end
