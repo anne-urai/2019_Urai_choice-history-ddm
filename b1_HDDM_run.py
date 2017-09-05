@@ -187,6 +187,55 @@ def concat_models(mypath, model_name):
         all_traces = m.get_traces()
         all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
+def cornerplot(mypath, datasetname, modelname):
+
+    # ============================================ #
+    # corner plot for parameter recovery
+    # ============================================ #
+
+    m = hddm.load(os.path.join(mypath, modelname, 'modelfit-combined.model'))
+    print os.path.join(mypath, modelname, 'modelfit-combined.model')
+
+    # dictionary with all parameters that were fit
+    params_of_interest_0 = list(m.get_group_nodes().index)
+    # dont plot the std
+    params_of_interest_0 = [x for x in params_of_interest_0 if not 'std' in x]
+    params_of_interest_0 = [x for x in params_of_interest_0 if not 'sv' in x]
+
+    traces_0 = []
+    for p in range(len(params_of_interest_0)):
+        traces_0.append(m.nodes_db.node[params_of_interest_0[p]].trace.gettrace())
+
+    import corner
+    import pandas as pd
+    import scipy as sp
+    from IPython import embed
+    # embed()
+
+    fig = corner.corner(np.array(traces_0).T, color='b', labels=params_of_interest_0, show_titles=True, **{'lw':1})
+    fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
+
+    df0 = pd.DataFrame(np.array(traces_0).T[:,:len(params_of_interest_0)], columns=params_of_interest_0)
+    fig = corner.corner(df0, color='b', **{'lw':1})
+
+    # now add regression lines and stats, from JW
+    for i, j in zip(*np.triu_indices_from(np.zeros((len(params_of_interest_0),len(params_of_interest_0))), 1)):
+        # add titles:
+        r0, p0 = sp.stats.pearsonr(df0.iloc[:,i], df0.iloc[:,j])
+        fig.axes[(j*len(params_of_interest_0))+i].set_title('r={}; p={}'.format(round(r0, 3), round(p0, 3),))
+        # add regression lines:
+        x_line = np.linspace(fig.axes[(j*len(params_of_interest_0))+i].axis()[0], fig.axes[(j*len(params_of_interest_0))+i].axis()[1], 100)
+        (m,b) = sp.polyfit(df0.iloc[:,i], df0.iloc[:,j],1)
+        regression_line = sp.polyval([m,b],x_line)
+        if p0 < 0.05:
+            fig.axes[(j*len(params_of_interest_0))+i].plot(x_line, regression_line, color='r', zorder=3)
+        else:
+            fig.axes[(j*len(params_of_interest_0))+i].plot(x_line, regression_line, color='b', zorder=3)
+
+    # sns.despine(offset=0, trim=True)
+    plt.tight_layout()
+    fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
+
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
 # ============================================ #
@@ -203,22 +252,17 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 8
     'regress_dc_z_prevresp_prevstim_prevrt', # 9
     'regress_dc_z_prev2resp_prev2stim', # 10
-    'regress_dc_z_prev3resp_prev3stim', # 11
-    'stimcoding_nohist_onlyz', # 12
-    'stimcoding_nohist_onlydc'] # 13
+    'regress_dc_z_prev3resp_prev3stim'] # 13
 
-datasets = ['RT_RDK', # 0
+    datasets = ['RT_RDK', # 0
     'MEG', # 1
     'NatComm', # 2
-    'Anke_2afc_neutral', # 3
-    'Anke_2afc_repetitive', # 4
-    'Anke_2afc_alternating', # 5
-    'Anke_2afc_sequential', # 6
-    'MEG_MEGsessions',#7
-    'JW_yesno', #8
-    'Bharath_fMRI', #9
-    'Anke_MEG', #10
-    'Anke_merged'] #11
+    'Anke_merged', # 4
+    'Anke_2afc_sequential', # 4
+    'JW_yesno', # 5
+    'Bharath_fMRI', # 6
+    'Anke_MEG', # 7
+    'MEG_MEGsessions'] # 8
 
 # recode
 if isinstance(d, int):
@@ -280,6 +324,9 @@ for dx in d:
                 # concatenate the different chains, will save disk space
                 concat_models(mypath, models[vx])
 
+                # make corner plot
+                cornerplot('/nfs/aeurai/HDDM/', datasets[dx], models[vx])
+
         elif runMe == 2:
 
             # ============================================ #
@@ -301,57 +348,3 @@ for dx in d:
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppq_data.csv'), index=True)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s %s, PPC: %f seconds\n" %(models[vx], datasets[dx], elapsed))
-
-        elif runMe == 0:
-
-            # concatenate the different chains
-            concat_models(mypath, models[vx])
-
-        elif runMe == 4:
-
-            # ============================================ #
-            # corner plot for parameter recovery
-            # ============================================ #
-
-            m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
-            print os.path.join(mypath, models[vx], 'modelfit-combined.model')
-
-            # dictionary with all parameters that were fit
-            params_of_interest_0 = list(m.get_group_nodes().index)
-            # dont plot the std
-            params_of_interest_0 = [x for x in params_of_interest_0 if not 'std' in x]
-            params_of_interest_0 = [x for x in params_of_interest_0 if not 'sv' in x]
-
-            traces_0 = []
-            for p in range(len(params_of_interest_0)):
-                traces_0.append(m.nodes_db.node[params_of_interest_0[p]].trace.gettrace())
-
-            import corner
-            import pandas as pd
-            import scipy as sp
-            from IPython import embed
-            # embed()
-
-            fig = corner.corner(np.array(traces_0).T, color='b', labels=params_of_interest_0, show_titles=True, **{'lw':1})
-            fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasets[dx],models[vx])))
-
-            df0 = pd.DataFrame(np.array(traces_0).T[:,:len(params_of_interest_0)], columns=params_of_interest_0)
-            fig = corner.corner(df0, color='b', **{'lw':1})
-
-            # now add regression lines and stats, from JW
-            for i, j in zip(*np.triu_indices_from(np.zeros((len(params_of_interest_0),len(params_of_interest_0))), 1)):
-                # add titles:
-                r0, p0 = sp.stats.pearsonr(df0.iloc[:,i], df0.iloc[:,j])
-                fig.axes[(j*len(params_of_interest_0))+i].set_title('r={}; p={}'.format(round(r0, 3), round(p0, 3),))
-                # add regression lines:
-                x_line = np.linspace(fig.axes[(j*len(params_of_interest_0))+i].axis()[0], fig.axes[(j*len(params_of_interest_0))+i].axis()[1], 100)
-                (m,b) = sp.polyfit(df0.iloc[:,i], df0.iloc[:,j],1)
-                regression_line = sp.polyval([m,b],x_line)
-                if p0 < 0.05:
-                    fig.axes[(j*len(params_of_interest_0))+i].plot(x_line, regression_line, color='r', zorder=3)
-                else:
-                    fig.axes[(j*len(params_of_interest_0))+i].plot(x_line, regression_line, color='b', zorder=3)
-
-            # sns.despine(offset=0, trim=True)
-            plt.tight_layout()
-            fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasets[dx],models[vx])))
