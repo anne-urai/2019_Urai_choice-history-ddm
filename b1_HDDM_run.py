@@ -254,7 +254,7 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_z_prev2resp_prev2stim', # 10
     'regress_dc_z_prev3resp_prev3stim'] # 13
 
-    datasets = ['RT_RDK', # 0
+datasets = ['RT_RDK', # 0
     'MEG', # 1
     'NatComm', # 2
     'Anke_merged', # 4
