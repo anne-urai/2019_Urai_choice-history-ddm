@@ -20,16 +20,6 @@ for d = 1:length(datasets),
     colors = linspecer(5); % red blue green
     
     switch d
-        case {1, 2, 3}
-            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-            results = results(results.session == 0, :);
-            
-            % use the stimcoding difference
-            results.z_prevresp = ...
-                results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
-            results.v_prevresp = ...
-                results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
-            
         case 4 % Alternating
             results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, 'Anke_2afc_sequential'));
             results = results(results.session == 0, :);
@@ -77,7 +67,43 @@ for d = 1:length(datasets),
             
             results.z_prevresp = z_prevresp;
             results.v_prevresp = v_prevresp;
+            
+        otherwise
+            results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+            results = results(results.session == 0, :);
+            
+            try
+                % use the stimcoding difference
+                results.z_prevresp = ...
+                    results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
+                results.v_prevresp = ...
+                    results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
+            catch
+                results.z_prevresp = ...
+                    results.z_1_0__stimcodingdczprevresp - results.z_2_0__stimcodingdczprevresp;
+                results.v_prevresp = ...
+                    results.dc_1_0__stimcodingdczprevresp - results.dc_2_0__stimcodingdczprevresp;
+            end
+            
+            try
+                % also compute the confidence intervals, to put error bars
+                % around each datapoint
+                results.z_prevresp_ci = ...
+                    [results.z_1_prct__stimcodingdczprevresp_1 - results.z_2_prct__stimcodingdczprevresp_1 ...
+                    results.z_1_prct__stimcodingdczprevresp_5 - results.z_2_prct__stimcodingdczprevresp_5];
+                
+                results.v_prevresp_ci = ...
+                    [results.dc_1_prct__stimcodingdczprevresp_1 - results.dc_2_prct__stimcodingdczprevresp_1 ...
+                    results.dc_1_prct__stimcodingdczprevresp_5 - results.dc_2_prct__stimcodingdczprevresp_5];
+            end
+            
     end
+    
+    % dont show errorbars for now
+    if ~isfield(results, 'z_prevresp_ci'), results.z_prevresp_ci = nan(length(results.z_prevresp), 2); end
+    if ~isfield(results, 'v_prevresp_ci'), results.v_prevresp_ci = nan(length(results.z_prevresp), 2); end
+    if ~isfield(results, 'criterionshift_prct_1'), results.criterionshift_prct_1 = nan(length(results.z_prevresp), 1); end
+    if ~isfield(results, 'criterionshift_prct_2'), results.criterionshift_prct_2 = nan(length(results.z_prevresp), 1); end
     
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
     
@@ -86,7 +112,8 @@ for d = 1:length(datasets),
     
     close all;
     subplot(4,4,1); hold on;
-    [rho1, tt1] = plotScatter(results.z_prevresp, results.repetition, 0.585, colors(5, :));
+    [rho1, tt1] = plotScatter(results.z_prevresp, results.z_prevresp_ci, ...
+        results.criterionshift, [results.criterionshift_prct_1 results.criterionshift_prct_2], 0.585, colors(5, :));
     xlabel('History bias in z', 'interpreter', 'tex');
     ylabel('P(repeat)');
     offsetAxes;
@@ -100,7 +127,8 @@ for d = 1:length(datasets),
     ylabel('History bias in c');
     
     sp2 = subplot(4,4,2); hold on;
-    [rho2, tt2] = plotScatter(results.v_prevresp, results.repetition, 0.05, colors(4, :));
+    [rho2, tt2] = plotScatter(results.v_prevresp, results.v_prevresp_ci, ...
+        results.criterionshift, [results.criterionshift_prct_1 results.criterionshift_prct_2], 0.05, colors(4, :));
     xlabel('History bias in v', 'interpreter', 'tex', 'fontweight', 'normal');
     set(gca, 'yticklabel', []);
     
@@ -137,7 +165,7 @@ end
 
 end
 
-function [rho, tt] = plotScatter(x,y, legendWhere, plotColor);
+function [rho, tt] = plotScatter(x, xci, y, yci, legendWhere, plotColor);
 
 plot(x,y, '.');
 axis square;
@@ -159,7 +187,16 @@ ylims = [min(get(gca, 'ylim')) max(get(gca, 'ylim'))];
 plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
 plot(xlims, [0 0 ], 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
 
-scatter(x,y, 15, ...
+% % scatter with error bars
+% h = ploterr(x, y, xci-x, yci-y, '.', 'abshhxy', 0);
+%
+% % color markers appropiately
+% set([h(1)], 'markersize', 8, ...
+%     'LineWidth', 0.001, ...
+%     'markeredgecolor', 'w', 'markerfacecolor', plotColor);
+% set([h(2:end)], 'color', plotColor, 'linewidth', 0.2);
+
+scatter(x, y,  15, ...
     'LineWidth', 0.001, ...
     'markeredgecolor', 'w', 'markerfacecolor', plotColor);
 
