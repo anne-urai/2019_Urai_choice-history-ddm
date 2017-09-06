@@ -38,9 +38,16 @@ for d = 1:length(datasets),
         vars    = dat.Properties.VariableNames';
         cohvars = vars(~cellfun(@isempty, strfind(vars, 'dprime_c')));
         alldprime = dat{dat.session == 0, cohvars};
+        
         driftvars = regexp(vars, 'v_c\w+__stimcodingnohist$', 'match');
         driftvars = vars((~cellfun(@isempty, driftvars)));
         alldrift  = dat{dat.session == 0, driftvars};
+        
+        if isempty(alldrift),
+            driftvars = regexp(vars, 'v_0_\w+__stimcodingnohist$', 'match');
+            driftvars = vars((~cellfun(@isempty, driftvars)));
+            alldrift  = dat{dat.session == 0, driftvars};
+        end
 
         % which coherences were used?
         cohvars = regexprep(cohvars, '_', '.');
@@ -72,7 +79,8 @@ for d = 1:length(datasets),
     [rho, pval] = corr(alldprime(:), alldrift(:), 'rows', 'complete');
   catch
     assert(1==0)
-  end
+    end
+  
     txt = {sprintf('r = %.3f', rho) sprintf('p = %.3f', pval)};
     if pval < 0.001,
         txt = {sprintf('r = %.3f', rho) sprintf('p < 0.001')};
