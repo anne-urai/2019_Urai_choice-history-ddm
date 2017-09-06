@@ -32,13 +32,13 @@ datasetnames = { {'2AFC, RT'}, ...
 
 disp('starting');
 
-e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
-e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
-f0_schematic_DDM_bias; % figure 3a
+% f0_schematic_DDM_bias; % figure 3a
 e1_serialBias_SfN_DIC; % figure 3b & c
 
 e1b_serialBias_SfN_ModelFreeCorrelation; % figure 4
+e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 
 e9_prevCorrect; % error vs correct
 e3_serialBias_SfN_Posteriors; % figure 4c

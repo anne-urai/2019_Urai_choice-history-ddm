@@ -16,87 +16,63 @@ global mypath datasets datasetnames
 close all;
 for d = length(datasets):-1:1
     disp(datasets{d});
-    
+
     colors = linspecer(5); % red blue green
     results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     results = results(results.session == 0, :);
-    
+
     allresults = {};
     switch datasets{d}
         case {'Anke_2afc_sequential'}
-            
+
             % DOES THIS DATASET HAVE MULTIPLE TRANSITION PROBABILITIES?
             % THEN PLOT THESE SEPARATELY
-            
+
             % use the stimcoding difference only from alternating
             allresults{1}.z_prevresp        = results.z_1_neu__stimcodingdczprevresp - results.z_2_neu__stimcodingdczprevresp;
             allresults{1}.v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_neu__stimcodingdczprevresp;
             allresults{1}.criterionshift    = results.repetition_neutral;
             allresults{1}.subjnr            = results.subjnr;
             alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
-            
+
             allresults{2}.z_prevresp        = results.z_1_alt__stimcodingdczprevresp - results.z_2_alt__stimcodingdczprevresp;
             allresults{2}.v_prevresp        = results.dc_1_alt__stimcodingdczprevresp - results.dc_2_alt__stimcodingdczprevresp;
             allresults{2}.criterionshift    = results.repetition_alternating;
             allresults{2}.subjnr            = results.subjnr;
             alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
-            
+
             allresults{3}.z_prevresp        = results.z_1_rep__stimcodingdczprevresp - results.z_2_rep__stimcodingdczprevresp;
             allresults{3}.v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_rep__stimcodingdczprevresp;
             allresults{3}.criterionshift    = results.repetition_repetitive;
             allresults{3}.subjnr            = results.subjnr;
             alltitles{3}                    = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
-            
-        case {'Bharath_fMRI'}
-            
+
+        case {'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'}
+
             % DOES THIS DATASET HAVE MULTIPLE TRANSITION PROBABILITIES?
             % THEN PLOT THESE SEPARATELY
-            
+
             % use the stimcoding difference only from alternating
             allresults{1}.z_prevresp        = results.z_1_0_50_0__stimcodingdczprevresp - results.z_2_0_50_0__stimcodingdczprevresp;
             allresults{1}.v_prevresp        = results.dc_1_0_50_0__stimcodingdczprevresp - results.dc_2_0_50_0__stimcodingdczprevresp;
             allresults{1}.criterionshift    = results.repetition_neutral;
             allresults{1}.subjnr            = results.subjnr;
             alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
-            
+
             allresults{2}.z_prevresp        = results.z_1_0_20_0__stimcodingdczprevresp - results.z_2_0_20_0__stimcodingdczprevresp;
             allresults{2}.v_prevresp        = results.dc_1_0_20_0__stimcodingdczprevresp - results.dc_2_0_20_0__stimcodingdczprevresp;
             allresults{2}.criterionshift    = results.repetition_alternating;
             allresults{2}.subjnr            = results.subjnr;
             alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
-            
+
             allresults{3}.z_prevresp        = results.z_1_0_80_0__stimcodingdczprevresp - results.z_2_0_80_0__stimcodingdczprevresp;
             allresults{3}.v_prevresp        = results.dc_1_0_80_0__stimcodingdczprevresp - results.dc_2_0_80_0__stimcodingdczprevresp;
             allresults{3}.criterionshift    = results.repetition_repetitive;
             allresults{3}.subjnr            = results.subjnr;
             alltitles{3}                    = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
-            
-        case {'Anke_MEG', 'Anke_merged'}
-            
-            % DOES THIS DATASET HAVE MULTIPLE TRANSITION PROBABILITIES?
-            % THEN PLOT THESE SEPARATELY
-            
-            % use the stimcoding difference only from alternating
-            allresults{1}.z_prevresp        = results.z_1_0_50_0__stimcodingdczprevresp - results.z_0_0_50_0__stimcodingdczprevresp;
-            allresults{1}.v_prevresp        = results.dc_1_0_50_0__stimcodingdczprevresp - results.dc_0_0_50_0__stimcodingdczprevresp;
-            allresults{1}.criterionshift    = results.repetition_neutral;
-            allresults{1}.subjnr            = results.subjnr;
-            alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
-            
-            allresults{2}.z_prevresp        = results.z_1_0_20_0__stimcodingdczprevresp - results.z_0_0_20_0__stimcodingdczprevresp;
-            allresults{2}.v_prevresp        = results.dc_1_0_20_0__stimcodingdczprevresp - results.dc_0_0_20_0__stimcodingdczprevresp;
-            allresults{2}.criterionshift    = results.repetition_alternating;
-            allresults{2}.subjnr            = results.subjnr;
-            alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
-            
-            allresults{3}.z_prevresp        = results.z_1_0_80_0__stimcodingdczprevresp - results.z_0_0_80_0__stimcodingdczprevresp;
-            allresults{3}.v_prevresp        = results.dc_1_0_80_0__stimcodingdczprevresp - results.dc_0_0_80_0__stimcodingdczprevresp;
-            allresults{3}.criterionshift    = results.repetition_repetitive;
-            allresults{3}.subjnr            = results.subjnr;
-            alltitles{3}                    = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
-            
+
         otherwise
-            
+
             try
                 % use the stimcoding difference
                 results.z_prevresp = ...
@@ -109,26 +85,26 @@ for d = length(datasets):-1:1
                 results.v_prevresp = ...
                     results.dc_1_0__stimcodingdczprevresp - results.dc_2_0__stimcodingdczprevresp;
             end
-            
+
             results.criterionshift = results.repetition;
             allresults{1} = results;
-            
+
             alltitles{1} = datasetnames{d}{1}; % use only the dataset title
     end
-    
-    
+
+
     for resultsSet = 1:length(allresults),
-        
+
         results = allresults{resultsSet};
-        
+
         % dont show errorbars for now
         if ~isfield(results, 'z_prevresp_ci'), results.z_prevresp_ci = nan(length(results.z_prevresp), 2); end
         if ~isfield(results, 'v_prevresp_ci'), results.v_prevresp_ci = nan(length(results.z_prevresp), 2); end
         if ~isfield(results, 'criterionshift_prct_1'), results.criterionshift_prct_1 = nan(length(results.z_prevresp), 1); end
         if ~isfield(results, 'criterionshift_prct_2'), results.criterionshift_prct_2 = nan(length(results.z_prevresp), 1); end
-        
+
         disp(datasets{d}); disp(numel(unique(results.subjnr)));
-        
+
         close all;
         subplot(4,4,1); hold on;
         [rho1, tt1] = plotScatter(results.z_prevresp, results.z_prevresp_ci, ...
@@ -140,16 +116,16 @@ for d = length(datasets):-1:1
         elseif d == 3 % avoid 10^-3 in the axis
             %   set(gca, 'xtick', get(gca, 'xtick'), 'xticklabel', {'', '0', '', '', '0.015'});
         end
-        
+
         ylabel('\Deltac');
         ylabel('P(repeat)');
-        
+
         sp2 = subplot(4,4,2); hold on;
         [rho2, tt2] = plotScatter(results.v_prevresp, results.v_prevresp_ci, ...
             results.criterionshift, [results.criterionshift_prct_1 results.criterionshift_prct_2], 0.05, colors(4, :));
         xlabel('History bias in v', 'interpreter', 'tex', 'fontweight', 'normal');
         set(gca, 'yticklabel', []);
-        
+
         % compute the difference in correlation
         [rho3, pval3] = corr(results.v_prevresp, results.z_prevresp, ...
             'rows', 'complete', 'type', 'pearson');
@@ -158,15 +134,15 @@ for d = length(datasets):-1:1
         end
         [rhodiff, ~, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan(results.criterionshift)), 0.05);
         offsetAxes; drawnow;
-        
+
         % move together
         sp2.Position(1) = sp2.Position(1) - 0.08;
         ss = suplabel(alltitles{resultsSet}, 't');
-        
+
         set(ss, 'fontweight', 'normal');
         ss.FontWeight = 'normal';
         ss.Position(2) = ss.Position(2) - 0.007;
-        
+
         %% add line between the two correlation coefficients
         txt = {sprintf('\\Deltar_{%d} = %.3f, p = %.3f', length(find(~isnan(results.v_prevresp)))-3, rhodiff, pval)};
         if pval < 0.001,
@@ -174,7 +150,7 @@ for d = length(datasets):-1:1
         end
         title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
         tightfig;
-        
+
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d_s%d.pdf', d, resultsSet));
     end
 end
