@@ -2,7 +2,7 @@
 
 #PBS -o /home/aeurai/jobs
 #PBS -e /home/aeurai/jobs
-#PBS -lnodes=1 -lwalltime=24:00:00 # specify in hours, not days
+#PBS -lnodes=1 -lwalltime=30:00:00 # specify in hours, not days
 
 # load necessary modules
 module load stopos

@@ -31,6 +31,16 @@ if any(~cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'transitionp
   results.repetition_repetitive = nan(size(results.criterionshift));
 end
 
+% preallocate dprime for different coherence levels
+if sum(strcmp(alldata.Properties.VariableNames, 'coherence')) > 0,
+    cohlevels = unique(alldata.coherence);
+    for c = 1:length(cohlevels),
+        vrnm = ['dprime_c' num2str(cohlevels(c)*100)];
+        vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
+        results.(vrnm) = nan(size(results.dprime));
+    end
+end
+
 % measures that are modulated by previous trial RT or pupil
 metrics = {'dprime', 'criterion', 'abscriterion', 'accuracy', 'repetition', ...
     'stimrepetition', 'repetitioncrit', 'criterionshift', 'handshift', ...
@@ -151,6 +161,7 @@ for sj = subjects,
             for c = 1:length(cohlevels),
                 vrnm = ['dprime_c' num2str(cohlevels(c)*100)];
                 vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
+                disp(vrnm);
                 results.(vrnm)(icnt) = ...
                     dprime(data.stimulus(data.coherence == cohlevels(c)), ...
                     data.response(data.coherence == cohlevels(c)));

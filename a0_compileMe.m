@@ -44,7 +44,7 @@ function [] = compileMe(fname)
     % ============================================ #
 
     nsmp       = [10000]
-    datasets   = [1 8]; % RT-RDK and MEG-PL
+    datasets   = [0:8]; % RT-RDK and MEG-PL
     models     = [12]; % the nr of the models
     nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
@@ -63,34 +63,12 @@ function [] = compileMe(fname)
     dlmwrite('hddmparams', alldat, 'delimiter', ' ');
     size(alldat)
 
-    % also write a file for concatenation
-    alldat = [];
-    for a = datasets,
-      % dont run Ankes data with the session version
-      for b = models,
-        %if ~(a == 2 & ismember(b, [6 8 10])),
-        alldat = [alldat; a b];
-        %  end
-      end
-    end
-
-    % write to a file
-    dlmwrite('hddmparams_concat', alldat, 'delimiter', ' ');
-    size(alldat)
-
     % PPC
         alldat = [];
         for a = datasets,
-          % dont run Ankes data with the session version
-            %if ~(a == 2 & ismember(b, [6 8 10])),
             alldat = [alldat; a 0];
-            %  end
         end
 
         % write to a file
         dlmwrite('hddmparams_PPC', alldat, 'delimiter', ' ');
         size(alldat)
-
-        cdat = [];
-        cdat = [1 7]
-        dlmwrite('hddmparams_concat', alldat, 'delimiter', ' ');
