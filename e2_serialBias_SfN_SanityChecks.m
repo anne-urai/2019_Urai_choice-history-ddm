@@ -12,10 +12,10 @@ colormap(cmap);
 % ========================================== %
 
 for d = 1:length(datasets),
-
+    
     close all; subplot(4,4,1);
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-
+    
     if any(strcmp(dat.Properties.VariableNames', 'v__stimcodingnohist') > 0),
         % one coherence level, grey markers
         xlabel('d'''); ylabel('Drift rate (v)');
@@ -30,11 +30,11 @@ for d = 1:length(datasets),
             g(gi).LineWidth       = 0.01;
         end
     else
-
+        
         % ========================================== %
         % Anke's data - drift rate as a function of coherence
         % ========================================== %
-
+        
         vars    = dat.Properties.VariableNames';
         cohvars = vars(~cellfun(@isempty, strfind(vars, 'dprime_c')));
         alldprime = dat{dat.session == 0, cohvars};
@@ -48,7 +48,7 @@ for d = 1:length(datasets),
             driftvars = vars((~cellfun(@isempty, driftvars)));
             alldrift  = dat{dat.session == 0, driftvars};
         end
-
+        
         % which coherences were used?
         cohvars = regexprep(cohvars, '_', '.');
         cohs    = cellfun(@sscanf, cohvars, repmat({'dprime.c%f'}, length(cohvars), 1));
@@ -56,11 +56,11 @@ for d = 1:length(datasets),
         colors  = cbrewer('seq', 'PuBuGn', numel(unique(allcohs(:))) + 5);
         colors  = colors([3:end-4 end], :);
         try
-        g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
-        catch 
+            g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
+        catch
             assert(1==0);
         end
-
+        
         box off;
         for gi = 1:length(g),
             g(gi).Marker = 'o';
@@ -69,7 +69,7 @@ for d = 1:length(datasets),
             g(gi).LineWidth = 0.01;
         end
     end
-
+    
     %% add correlation
     % layout
     axis tight; axis square;
@@ -78,13 +78,13 @@ for d = 1:length(datasets),
     if d == 1,
         ylabel('Drift rate (v)');
     end
-
+    
     try
-    [rho, pval] = corr(alldprime(:), alldrift(:), 'rows', 'complete');
-  catch
-    assert(1==0)
+        [rho, pval] = corr(alldprime(:), alldrift(:), 'rows', 'complete');
+    catch
+        assert(1==0)
     end
-  
+    
     txt = {sprintf('r = %.3f', rho) sprintf('p = %.3f', pval)};
     if pval < 0.001,
         txt = {sprintf('r = %.3f', rho) sprintf('p < 0.001')};
@@ -93,7 +93,7 @@ for d = 1:length(datasets),
         min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
         txt, 'fontsize', 5);
     set(gca, 'color', 'none');
-
+    
     % lsline manually
     p = polyfit(alldprime(~isnan(alldrift) & ~isnan(alldprime)), ...
         alldrift(~isnan(alldrift(:)) & ~isnan(alldprime(:))), 1);
@@ -105,33 +105,33 @@ for d = 1:length(datasets),
     else
         l.LineStyle = ':';
     end
-
+    
     offsetAxes; box off;
     title(datasetnames{d});
-
+    
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_driftrate_d%d.pdf',d));
-
+    
     % ========================================== %
     % colorbar
     % ========================================== %
-
+    
     if ~any(strcmp(dat.Properties.VariableNames', 'v__stimcodingnohist') > 0),
-
+        
         close all;
         subplot(441);
         colormap(colors);
         imagesc(log(allcohs+1));
         handles = colorbar('southoutside');
         set(gca, 'Xscale', 'log');
-
+        
         % ==================================================================
         % make colorbar look pretty
         % ==================================================================
         drawnow;
         handles.TickDirection = 'out';
         handles.Box = 'off';
-
+        
         % find the right place for tickmarks
         if d == 2,
             handles.Ticks = linspace(0.75, 3.25, 7);
@@ -141,28 +141,28 @@ for d = 1:length(datasets),
             handles.TickLabels = {'0' '5' '10' '20' '40', '60'};
         end
         drawnow;
-
+        
         % get original axes
         hAllAxes = findobj(gcf,'type','axes'); axpos = {};
         axpos = hAllAxes.Position;
-
+        
         % make colorbar thinner
         cpos = handles.Position;
         cpos(3) = 0.75*cpos(3);
         handles.Position = cpos;
-
+        
         drawnow;
         % restore axis pos
         set(hAllAxes, 'Position', axpos);
         drawnow;
         handles.Label.String = '% coherence';
         handles.FontSize = 5;
-
+        
         % export_fig(handles, sprintf('~/Data/serialHDDM/figure1b_legend_d%d.pdf',d));
         axis off;
         % tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_legend_d%d.pdf',d));
-
+        
     end
-
+    
 end
