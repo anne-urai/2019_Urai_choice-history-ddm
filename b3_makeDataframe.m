@@ -44,6 +44,27 @@ if ~exist('ds', 'var'), ds = 1:length(datasets); end
     % compute a bunch of basic things from Matlab
     results     = b3b_behaviouralMetrics(alldata);
 
+    % add personality scores and drug conditions
+    switch datasets{d}
+    case {'MEG', 'MEG_MEGsessions'},
+      disp('adding in personality questionnaires');
+      results.drug = repmat({'NaN'}, length(results.dprime), 1);
+      results.BIS = nan(size(results.dprime));
+      results.BAS = nan(size(results.dprime));
+      results.AQ = nan(size(results.dprime));
+      results.PSWQ = nan(size(results.dprime));
+
+      sjs = unique(results.subjnr)';
+      for sj = sjs,
+          subjectdata = subjectspecifics(sj);
+          results.drug(results.subjnr == sj)  = {subjectdata.drug};
+          results.BIS(results.subjnr == sj)   = subjectdata.BIS;
+          results.BAS(results.subjnr == sj)   = subjectdata.BAS;
+          results.AQ(results.subjnr == sj)    = subjectdata.AQ;
+          results.PSWQ(results.subjnr == sj)  = subjectdata.PSWQ;
+      end
+    end
+
     % get the summary results from HDDM
     hddmresults = readtable(sprintf('%s/summary/%s/individualresults.csv', mypath, datasets{d}));
 
