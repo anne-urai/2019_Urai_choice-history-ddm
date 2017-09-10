@@ -10,8 +10,8 @@ addpath(genpath('~/code/Tools'));
 global mypath
 % neutral vs biased plots
 datasets = {'MEG', 'MEG_MEGsessions'};
-datasetnames = {{'2IFC, replication'}, ...
-    {'2IFC, replication', 'MEG sessions'}};
+datasetnames = {{'2IFC replication'}, ...
+    {'2IFC replication, MEG sessions'}};
 
 % ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
@@ -101,7 +101,7 @@ for d = length(datasets):-1:1
         close all;
         corrplot(allresults{resultsSet}, {'repetition', 'z_prevresp', 'v_prevresp'}, ...
             {'BIS', 'BAS', 'PSWQ', 'AQ'});
-        
+        suptitle(datasetnames{d});
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/personality_d%d_s%d.pdf', d, resultsSet));
     end
 end

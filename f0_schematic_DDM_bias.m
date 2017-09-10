@@ -1,6 +1,8 @@
 function f0_schematic_DDM_bias(seed)
 close all; clc;
 
+colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
+
 fz = 9; timefz = 8;
 set(groot, 'defaultaxesfontsize', fz, 'defaultaxestitlefontsizemultiplier', 1);
 
@@ -10,7 +12,6 @@ disp(seed);
 
 % use code by Peter Murphy to compute RT distributions
 addpath('/Users/anne/Drive/Dropbox/code/analyticalDDM/DDM');
-colors = linspecer(5);
 
 tmax = 0.7;
 %% make 3 sets of distributions
@@ -58,23 +59,23 @@ plot(cfg.time, y,'k');
 cfg.dc = 1*cfg.timestep;
 cfg.v = cfg.v+cfg.dc;
 y = ddm(cfg);
-plot(cfg.time, y, 'color', colors(4, :));
+plot(cfg.time, y, 'color', colors(1, :));
 cfg.v = -cfg.v + 2*cfg.dc; % flip around drift rate
 y = ddm(cfg);
-plot(cfg.time, y,'k', 'color', colors(4, :));
+plot(cfg.time, y,'k', 'color', colors(1, :));
 
 % plot the drift on top 
 plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % add distributions at the top!
 scaling = 300;
-plot(ts, -scaling*gE_z - cfg.a, 'color', colors(5, :), 'linestyle', '-.');
-plot(ts, scaling*gC_z + cfg.a, 'color', colors(5, :), 'linestyle', '-.');
+plot(ts, -scaling*gE_z - cfg.a, 'color', colors(2, :), 'linestyle', '-.');
+plot(ts, scaling*gC_z + cfg.a, 'color', colors(2, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
-plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :));
+plot(ts, scaling*gC_dc + cfg.a, 'color', colors(1, :));
 plot(ts, -scaling*gE_nobias - cfg.a, 'k');
-plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :));
+plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(1, :));
 
 %%  layout
 %ylim([-cfg.a cfg.a]); 
@@ -107,22 +108,22 @@ plot(cfg.time, y,'k');
 % now with drift criterion bias
 cfg.z = 0.4;
 y = ddm(cfg);
-plot(cfg.time, y, 'color', colors(5, :));
+plot(cfg.time, y, 'color', colors(2, :));
 cfg.v = -cfg.v;
 y = ddm(cfg);
-plot(cfg.time, y,'k', 'color', colors(5, :));
+plot(cfg.time, y,'k', 'color', colors(2, :));
 
 % drifting particle
 plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % add distributions at the top!
-plot(ts, scaling*gC_dc + cfg.a, 'color', colors(4, :), 'linestyle', '-.');
-plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(4, :), 'linestyle', '-.');
+plot(ts, scaling*gC_dc + cfg.a, 'color', colors(1, :), 'linestyle', '-.');
+plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(1, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
-plot(ts, scaling*gC_z + cfg.a, 'color', colors(5, :));
+plot(ts, scaling*gC_z + cfg.a, 'color', colors(2, :));
 plot(ts, -scaling*gE_nobias - cfg.a, 'k');
-plot(ts, -scaling*gE_z - cfg.a, 'color', colors(5, :));
+plot(ts, -scaling*gE_z - cfg.a, 'color', colors(2, :));
 
 % layout
 %ylim([-cfg.a cfg.a]);

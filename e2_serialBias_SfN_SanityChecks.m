@@ -55,11 +55,7 @@ for d = 1:length(datasets),
         allcohs = repmat(cohs', size(alldrift, 1), 1);
         colors  = cbrewer('seq', 'PuBuGn', numel(unique(allcohs(:))) + 5);
         colors  = colors([3:end-4 end], :);
-        try
-            g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
-        catch
-            assert(1==0);
-        end
+        g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
         
         box off;
         for gi = 1:length(g),
@@ -73,21 +69,27 @@ for d = 1:length(datasets),
     %% add correlation
     % layout
     axis tight; axis square;
+    
+    switch datasets{d}
+        case 'JW_yesno'
+           ylim([0.4 1.09]); 
+    end
     xlim([0 ceil(max(get(gca, 'xlim')))]);
     xlabel('d''');
     if d == 1,
         ylabel('Drift rate (v)');
     end
     
-    try
+    if any(strcmp(dat.Properties.VariableNames', 'v__stimcodingnohist') > 0),
         [rho, pval] = corr(alldprime(:), alldrift(:), 'rows', 'complete');
-    catch
-        assert(1==0)
+    else 
+        [coef,pval] = partialcorr([alldprime(:), alldrift(:)], allcohs(:), 'rows', 'complete');
+        rho = coef(1,2); pval = pval(1,2);
     end
     
-    txt = {sprintf('r = %.3f', rho) sprintf('p = %.3f', pval)};
+    txt = {sprintf('r_{%d} = %.3f',  length(find(~isnan(alldrift(:))))-2, rho) sprintf('p = %.3f', pval)};
     if pval < 0.001,
-        txt = {sprintf('r = %.3f', rho) sprintf('p < 0.001')};
+        txt = {sprintf('r_{%d} = %.3f',  length(find(~isnan(alldrift(:))))-2, rho) sprintf('p < 0.001')};
     end
     tt = text(min(get(gca, 'xlim')) + 0.04*(range(get(gca, 'xlim'))), ...
         min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
@@ -139,6 +141,9 @@ for d = 1:length(datasets),
         elseif d == 4,
             handles.Ticks = linspace(0.5, 3.75, 6);
             handles.TickLabels = {'0' '5' '10' '20' '40', '60'};
+        elseif d == 9,  
+            handles.Ticks = linspace(0.35, 4.2, 10);
+            handles.TickLabels = {'0' '3' '5' '9' '10', '20', '27', '40', '60', '81'};
         end
         drawnow;
         

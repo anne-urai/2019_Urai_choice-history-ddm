@@ -1,4 +1,4 @@
-function e1b_serialBias_SfN_ModelFreeCorrelation_grey
+function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey
 % from the csv table, make an overview of repetition behaviour
 
 % get a huge list with values for each participant
@@ -8,16 +8,19 @@ clear; close all; clc;
 addpath(genpath('~/code/Tools'));
 
 global mypath datasets datasetnames
+cnt = 1;
 
 % ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
+doText = false;
+
 close all;
 for d = length(datasets):-1:1
     disp(datasets{d});
     
-    colors = linspecer(5); % red blue green
+    colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
     
     results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     results = results(results.session == 0, :);
@@ -93,7 +96,7 @@ for d = length(datasets):-1:1
             allresults(1).z_prevresp = results.z_prevresp;
             allresults(1).v_prevresp = results.v_prevresp;
             allresults(1).criterionshift = results.criterionshift;
-
+            
             alltitles{1} = datasetnames{d}{1}; % use only the dataset title
     end
     
@@ -101,15 +104,15 @@ for d = length(datasets):-1:1
     close all;
     
     % PLOT
-    subplot(4,4,1); hold on;
-    [rho1, tt1] = plotScatter(allresults, 'z_prevresp', 0.585);
-    xlabel('History bias in z', 'interpreter', 'tex', 'color', 'k');
+    sp1 = subplot(4,4,1); hold on;
+    [rho1, tt1] = plotScatter(allresults, 'z_prevresp', 0.585, doText);
     ylabel('P(repeat)');
     
     sp2 = subplot(4,4,2); hold on;
-    [rho2, tt2] = plotScatter(allresults, 'v_prevresp', 0.05);
-    xlabel('History bias in v', 'interpreter', 'tex', 'fontweight', 'normal', 'color', 'k');
+    [rho2, tt2] = plotScatter(allresults, 'v_prevresp', 0.05, doText);
     set(gca, 'yticklabel', []);
+    
+    set(sp2, 'ylim', get(sp1, 'ylim'), 'ytick', get(sp1, 'ytick'));
     
     % compute the difference in correlation
     [rho3, pval3] = corr(cat(1, allresults(:).v_prevresp), cat(1, allresults(:).z_prevresp), ...
@@ -125,44 +128,65 @@ for d = length(datasets):-1:1
     ss = suplabel(datasetnames{d}{1}, 't');
     set(ss, 'fontweight', 'normal');
     ss.FontWeight = 'normal';
-    ss.Position(2) = ss.Position(2) - 0.007;
+    ss.Position(2) = ss.Position(2) - 0.03;
     
-    %% add line between the two correlation coefficients
-    txt = {sprintf('\\Deltar_{%d} = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
-    if pval < 0.001,
-        txt = {sprintf('\\Deltar_{%d} = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
+    % add colored axes after suplabel (which makes them black)
+    xlabel(sp1, 'History bias in z');
+    set(sp1, 'xcolor', colors(2, :));
+    xlabel(sp2, 'History bias in v');
+    set(sp2, 'xcolor', colors(1, :));
+    
+    if doText,
+        %% add line between the two correlation coefficients
+        txt = {sprintf('\\Deltar_{%d} = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
+        if pval < 0.001,
+            txt = {sprintf('\\Deltar_{%d} = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
+        end
+        title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
     end
-    title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf', d));
+    
+    for a = 1:length(allresults),
+        
+        % SAVE CORRELATIONS FOR OVERVIEW PLOT
+        [r,p,rlo,rup] = corrcoef(allresults(a).z_prevresp, allresults(a).criterionshift);
+        alldat(cnt).corrz = r(1,2);
+        alldat(cnt).corrz_ci = [rlo(1,2) rup(1,2)];
+        alldat(cnt).pz = p(1,2);
+        
+        [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).criterionshift);
+        alldat(cnt).corrv = r(1,2);
+        alldat(cnt).corrv_ci = [rlo(1,2) rup(1,2)];
+        alldat(cnt).pv = p(1,2);
+        
+        alldat(cnt).datasets = datasets{d};
+        alldat(cnt).datasetnames = alltitles{a};
+        
+        % also add the difference in r, Steigers test
+        [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).z_prevresp);
+        
+        [rhodiff, rhodiffci, pval] = rddiffci(alldat(cnt).corrz,alldat(cnt).corrv, ...
+            r(1,2), ...
+            numel(allresults(a).v_prevresp), 0.05);
+        
+        alldat(cnt).corrdiff = rhodiff;
+        alldat(cnt).corrdiff_ci = rhodiffci;
+        alldat(cnt).pdiff = pval;
+        
+        cnt = cnt + 1;
+    end
 end
 
 end
 
-function [rho, tt] = plotScatter(allresults, fld, legendWhere);
+function [rho, tt] = plotScatter(allresults, fld, legendWhere, doText);
 
 % overall correlation
 x = cat(1, allresults(:).(fld));
 y = cat(1, allresults(:).criterionshift);
-
 % show line
-[rho, pval] = corr(x,y, 'type', 'pearson', 'rows', 'complete');
-
-% CORRELATION LINE SEPARATELY FOR EACH DATASET?
-p = polyfit(x, ...
-    y, 1);
-xrange = linspace(min(x), max(x), 100);
-yrange = polyval(p, xrange);
-l = plot(xrange, yrange);
-l.Color = 'k';
-l.LineWidth = 0.5;
-if pval < 0.05,
-    l.LineStyle = '-';
-else
-    l.LineStyle = ':';
-end
-
 axis square;
 
 % show lines to indicate origin
@@ -172,16 +196,28 @@ plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
 plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2); % if p(repeat), 0.5
 
 % color in different grouos
-
-% use separate colors for the different transition probabilities, from
-% Thomas, blue green pink
-% transitioncolors = [[8/256 141/256 165/256]; [165/256 8/256 141/256]; [141/256 165/256 8/256]];
-transitioncolors = [[0.5 0.5 0.5]; [8/256 141/256 165/256]; [141/256 165/256 8/256]; [165/256 8/256 141/256]];
-meancolors = [0 0 0; 0 0 1; 0 1 0];
-
-markers = {'o', '^', 'v'}; %also indicate with different markers
+colors = cbrewer('qual', 'Paired', 10);
+transitioncolors = [[0.5 0.5 0.5]; colors([7 9], :)];
+meancolors = [0 0 0; colors([8 10], :)];
+markers = {'o', 'v', '^'}; %also indicate with different markers
 
 for a = length(allresults):-1:1, % neutral last
+    
+    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
+    % CORRELATION LINE SEPARATELY FOR EACH DATASET?
+    p = polyfit(allresults(a).(fld), allresults(a).criterionshift, 1);
+    xrangeextra = 0.15*range(allresults(a).(fld));
+    xrange = linspace(min(allresults(a).(fld))- xrangeextra, ...
+        max(allresults(a).(fld))+xrangeextra, 100);
+    yrange = polyval(p, xrange);
+    l = plot(xrange, yrange);
+    l.Color = meancolors(a, :);
+    l.LineWidth = 0.5;
+    if pval < 0.05,
+        l.LineStyle = '-';
+    else
+        l.LineStyle = ':';
+    end
     
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
     s  = scatter(allresults(a).(fld), allresults(a).criterionshift,  10, ...
@@ -194,20 +230,24 @@ for a = length(allresults):-1:1, % neutral last
     p = ploterr(nanmean(allresults(a).(fld)), nanmean(allresults(a).criterionshift), 2*nanstd(allresults(a).(fld)) ./ sqrt(length(allresults(a).(fld))), ...
         2*nanstd(allresults(a).criterionshift) ./ sqrt(length(allresults(a).criterionshift)), '.', 'abshhxy', 0);
     set(p(1), 'markersize', 0.1, 'color', meancolors(a, :)); % tiny marker
-    set(p(2), 'color', meancolors(a, :), 'linewidth', 0.5);
-    set(p(3), 'color', meancolors(a, :), 'linewidth', 0.5);
+    set(p(2), 'color', meancolors(a, :), 'linewidth', 1);
+    set(p(3), 'color', meancolors(a, :), 'linewidth', 1);
 end
 
 axis tight; offsetAxes;
 
-% PRINT THE CORRELATION COEFFICIENT
-txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
-if pval < 0.001,
-    txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
+if doText,
+    % PRINT THE CORRELATION COEFFICIENT
+    txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
+    if pval < 0.001,
+        txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
+    end
+    tt = text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
+        min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
+        txt, 'fontsize', 5);
+else
+    tt = [];
 end
-tt = text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
-    min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
-    txt, 'fontsize', 5);
 set(gca, 'color', 'none');
 
 end

@@ -152,6 +152,8 @@ for d = length(datasets):-1:1
         tightfig;
 
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d_s%d.pdf', d, resultsSet));
+    
+        
     end
 end
 
