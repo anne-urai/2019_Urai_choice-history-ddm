@@ -376,7 +376,7 @@ def make_model(mypath, model_name, trace_id):
         if 'transitionprob' in mydata.columns:
             z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob)+ prev2resp:C(transitionprob)',
             'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)  + prev2resp:C(transitionprob),
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)  + prev2resp:C(transitionprob)',
             'link_func': lambda x:x}
         else:
             z_reg = {'model': 'z ~ 1 + prevresp  + prev2resp ', 'link_func': z_link_func}
