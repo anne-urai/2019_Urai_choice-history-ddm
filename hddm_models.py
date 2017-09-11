@@ -287,16 +287,16 @@ def make_model(mypath, model_name, trace_id):
     # REGRESSION MODULATION
     # ============================================ #
 
-    elif model_name == 'regress_dc_z_prevresp_prevstim':
+    elif model_name == 'regress_dc_z_prevresp':
 
         if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob)',
             'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob)',
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)',
             'link_func': lambda x:x}
         else:
-            z_reg = {'model': 'z ~ 1 + prevresp + prevstim', 'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim', 'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
@@ -308,7 +308,7 @@ def make_model(mypath, model_name, trace_id):
     # MODULATION BY PUPIL AND RT
     # ============================================ #
 
-    elif model_name == 'regress_dc_z_prevresp_prevstim_prevrt':
+    elif model_name == 'regress_dc_z_prevresp_prevrt':
 
         # subselect data
         mydata = balance_designmatrix(mydata)
@@ -316,17 +316,17 @@ def make_model(mypath, model_name, trace_id):
         # boundary separation and drift rate will change over sessions
         if 'transitionprob' in mydata.columns:
             v_reg = {'model': 'v ~ 1 + stimulus+ ' \
-                'prevresp:C(transitionprob) + prevstim:C(transitionprob) + ' \
-                'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
+                'prevresp:C(transitionprob)  + ' \
+                'prevresp:prevrt:C(transitionprob)',
                 'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) +' \
-                'prevresp:prevrt:C(transitionprob) + prevstim:prevrt:C(transitionprob)',
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) +' \
+                'prevresp:prevrt:C(transitionprob) ',
                 'link_func': z_link_func}
         else:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prevresp:prevrt + prevstim:prevrt',
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevresp:prevrt',
             'link_func': lambda x:x}
-            z_reg = {'model': 'z ~ 1 + prevresp + prevstim +' \
-            'prevresp:prevrt + prevstim:prevrt',
+            z_reg = {'model': 'z ~ 1 + prevresp  +' \
+            'prevresp:prevrt',
             'link_func': z_link_func}
         reg_both = [v_reg, z_reg]
 
@@ -371,39 +371,39 @@ def make_model(mypath, model_name, trace_id):
     # MULTIPLE LAGS
     # ============================================ #
 
-    elif model_name == 'regress_dc_z_prev2resp_prev2stim':
+    elif model_name == 'regress_dc_z_prev2resp':
 
         if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob)',
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob)+ prev2resp:C(transitionprob)',
             'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob)',
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)  + prev2resp:C(transitionprob),
             'link_func': lambda x:x}
         else:
-            z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim', 'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim', 'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp  + prev2resp ', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prev2resp ', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         # subselect data
-        mydata = mydata.dropna(subset=['prev2resp', 'prev2stim'])
+        mydata = mydata.dropna(subset=['prev2resp'])
 
         # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=True,  p_outlier=0.05)
 
-    elif model_name == 'regress_dc_z_prev3resp_prev3stim':
+    elif model_name == 'regress_dc_z_prev3resp':
 
         if 'transitionprob' in mydata.columns:
-            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob) + prev3resp:C(transitionprob) + prev3stim:C(transitionprob)',
+            z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) + prev2resp:C(transitionprob) + prev3resp:C(transitionprob)',
             'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prevstim:C(transitionprob) + prev2resp:C(transitionprob) + prev2stim:C(transitionprob) + prev3resp:C(transitionprob) + prev3stim:C(transitionprob)',
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) + prev2resp:C(transitionprob) + prev3resp:C(transitionprob)',
             'link_func': lambda x:x}
         else:
-            z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp + prev2resp + prev3resp ', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prev2resp + prev3resp ', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
-        mydata = mydata.dropna(subset=['prev2resp', 'prev2stim', 'prev3resp', 'prev3stim'])
+        mydata = mydata.dropna(subset=['prev2resp', 'prev3resp'])
 
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
@@ -861,6 +861,39 @@ def make_model(mypath, model_name, trace_id):
 
     # ============================================ #
     # END OF FUNCTION THAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+HAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+ND OF FUNCTION THAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+HAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+CTION THAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+HAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+eturn m
+HAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+CTION THAT CREATES THE MODEL
+    # ============================================ #
+
+    return m
+HAT CREATES THE MODEL
     # ============================================ #
 
     return m

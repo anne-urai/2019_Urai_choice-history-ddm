@@ -248,20 +248,20 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_dc_prevcorrect', # 4
     'stimcoding_z_prevcorrect', # 5
     'stimcoding_dc_z_prevcorrect', # 6
-    'regress_dc_z_prevresp_prevstim', # 7
+    'regress_dc_z_prevresp', # 7
+    'regress_dc_z_prevresp_prevrt', # 8
+    'regress_dc_z_prev2resp', # 9
+    'regress_dc_z_prev3resp', # 10
     'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 8
-    'regress_dc_z_prevresp_prevstim_prevrt', # 9
-    'regress_dc_z_prev2resp_prev2stim', # 10
-    'regress_dc_z_prev3resp_prev3stim', # 11
     'stimcoding_dc_z_prevresp_pharma'] # 12
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1
     'NatComm', # 2
-    'Anke_merged', # 4
+    'Anke_merged', # 3
+    'JW_yesno', # 4
+    'Bharath_fMRI', # 5
     'Anke_2afc_sequential', # 4
-    'JW_yesno', # 5
-    'Bharath_fMRI', # 6
     'Anke_MEG', # 7
     'MEG_MEGsessions'] # 8
 
@@ -349,3 +349,5 @@ for dx in d:
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppq_data.csv'), index=True)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s %s, PPC: %f seconds\n" %(models[vx], datasets[dx], elapsed))
+asets[dx], elapsed))
+ts[dx], elapsed))
