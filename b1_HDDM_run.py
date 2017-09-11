@@ -349,5 +349,3 @@ for dx in d:
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppq_data.csv'), index=True)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s %s, PPC: %f seconds\n" %(models[vx], datasets[dx], elapsed))
-asets[dx], elapsed))
-ts[dx], elapsed))
