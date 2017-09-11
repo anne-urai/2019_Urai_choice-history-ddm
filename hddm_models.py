@@ -864,36 +864,3 @@ def make_model(mypath, model_name, trace_id):
     # ============================================ #
 
     return m
-HAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
-ND OF FUNCTION THAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
-HAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
-CTION THAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
-HAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
-eturn m
-HAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
-CTION THAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
-HAT CREATES THE MODEL
-    # ============================================ #
-
-    return m
