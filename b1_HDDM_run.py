@@ -36,6 +36,7 @@ warnings.filterwarnings('ignore')
 from hddm_models import make_model
 import os, hddm, time, kabuki, glob
 from math import ceil
+import os, fnmatch
 
 # ============================================ #
 # parse input arguments
