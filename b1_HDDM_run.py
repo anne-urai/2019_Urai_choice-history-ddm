@@ -379,7 +379,7 @@ for dx in d:
             print mydata.head()
 
             subj_params = []
-            for subj_idx, subj_data in data.groupby('subj_idx'):
+            for subj_idx, subj_data in mydata.groupby('subj_idx'):
                m_subj = make_model(mypath, subj_data, models[vx], trace_id)
                subj_params.append(m_subj.optimize('chisquare'))
             params = pandas.DataFrame(subj_params)
