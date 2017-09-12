@@ -43,6 +43,11 @@ e1_serialBias_SfN_DIC; % figure 3b & c
 
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey; % figure 4
 forestPlot(alldat);
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));
+
+alldat = e1b_serialBias_SfN_ModelFreeCorrelation_chiSquare; % figure 4
+forestPlot(alldat);
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_chiSquare.pdf'));
 
 pharmaPosteriors;
 %e9_prevCorrect; % error vs correct
