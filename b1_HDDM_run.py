@@ -273,7 +273,11 @@ if isinstance(model_version, int):
 for dx in d:
 
     # find path depending on location and dataset
-    mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
+    usr = os.environ['USER']
+    if 'aeurai' in usr:
+        mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
+    elif 'anne' in usr:
+        mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
 
     for vx in model_version:
         time.sleep(trace_id) # to avoid different jobs trying to make the same folder
@@ -379,9 +383,11 @@ for dx in d:
             subj_params = []
             for subj_idx, subj_data in mydata.groupby('subj_idx'):
                m_subj = make_model(mypath, subj_data, models[vx], trace_id)
-               subj_params.append(m_subj.optimize('chisquare'))
+               thismodel = m_subj.optimize('chisquare')
+               thismodel.update({'subj_idx':subj_idx}) # keep original subject number
+               subj_params.append(thismodel)
             params = pd.DataFrame(subj_params)
-            params.to_csv(os.path.join(mypath, models[vx], 'chisquare.csv'), index=True)
+            params.to_csv(os.path.join(mypath, models[vx], 'chisquare.csv'))
 
             print params.head()
             print(os.path.join(mypath, models[vx], 'chisquare.csv'))
