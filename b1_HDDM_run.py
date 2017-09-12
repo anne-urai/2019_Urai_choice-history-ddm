@@ -37,6 +37,9 @@ from hddm_models import make_model
 import os, hddm, time, kabuki, glob
 from math import ceil
 import os, fnmatch
+import corner
+import pandas as pd
+import scipy as sp
 
 # ============================================ #
 # parse input arguments
@@ -206,11 +209,6 @@ def cornerplot(mypath, datasetname, modelname):
     traces_0 = []
     for p in range(len(params_of_interest_0)):
         traces_0.append(m.nodes_db.node[params_of_interest_0[p]].trace.gettrace())
-
-    import corner
-    import pandas as pd
-    import scipy as sp
-    from IPython import embed
     # embed()
 
     fig = corner.corner(np.array(traces_0).T, color='b', labels=params_of_interest_0, show_titles=True, **{'lw':1})
@@ -382,7 +380,7 @@ for dx in d:
             for subj_idx, subj_data in mydata.groupby('subj_idx'):
                m_subj = make_model(mypath, subj_data, models[vx], trace_id)
                subj_params.append(m_subj.optimize('chisquare'))
-            params = pandas.DataFrame(subj_params)
+            params = pd.DataFrame(subj_params)
             params.to_csv(os.path.join(mypath, models[vx], 'chisquare.csv'), index=True)
 
             print params.head()
