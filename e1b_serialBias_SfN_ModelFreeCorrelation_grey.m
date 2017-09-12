@@ -109,7 +109,7 @@ for d = length(datasets):-1:1
     ylabel('P(repeat)');
     
     sp2 = subplot(4,4,2); hold on;
-    [rho2, tt2] = plotScatter(allresults, 'v_prevresp', 0.05, doText);
+    [rho2, tt2, handles] = plotScatter(allresults, 'v_prevresp', 0.05, doText);
     set(gca, 'yticklabel', []);
     
     set(sp2, 'ylim', get(sp1, 'ylim'), 'ytick', get(sp1, 'ytick'));
@@ -121,7 +121,6 @@ for d = length(datasets):-1:1
         fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
     end
     [rhodiff, ~, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan( cat(1, allresults(:).criterionshift))), 0.05);
-    offsetAxes; drawnow;
     
     % move together
     sp2.Position(1) = sp2.Position(1) - 0.08;
@@ -145,8 +144,17 @@ for d = length(datasets):-1:1
         title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
     end
     
+    
+    % LEGEND
+    switch datasets{d}
+        case 'Bharath_fMRI'
+          %  l = legend([handles{1}(1) handles{2}(1) handles{3}(1)], {'Repetitive', 'Neutral', 'Alternating'});
+            % l.Box = 'off';
+    end
+    
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf', d));
+    
     
     for a = 1:length(allresults),
         
@@ -181,7 +189,7 @@ end
 
 end
 
-function [rho, tt] = plotScatter(allresults, fld, legendWhere, doText);
+function [rho, tt, handles] = plotScatter(allresults, fld, legendWhere, doText);
 
 % overall correlation
 x = cat(1, allresults(:).(fld));
@@ -223,6 +231,8 @@ for a = length(allresults):-1:1, % neutral last
     s  = scatter(allresults(a).(fld), allresults(a).criterionshift,  10, ...
         markers{a}, 'LineWidth', 0.001, ...
         'markeredgecolor', 'w', 'markerfacecolor', transitioncolors(a, :));
+    handles{a} = s;
+    
 end
 
 for a = length(allresults):-1:1, % neutral last
