@@ -288,8 +288,18 @@ for dx in d:
 
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
-            # get the model specification
-            m = make_model(mypath, models[vx], trace_id)
+
+            # get the csv file for this dataset
+            filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
+            mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
+
+            # correct a weirdness in Anke's data
+            if 'transitionprob' in mydata.columns:
+                mydata.transitionprob = mydata.transitionprob * 100;
+                mydata.transitionprob = mydata.transitionprob.round();
+
+            # get the model specification, pass data
+            m = make_model(mypath, mydata, models[vx], trace_id)
 
             # now sample and save
             if os.path.exists(model_filename):
@@ -349,3 +359,30 @@ for dx in d:
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppq_data.csv'), index=True)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s %s, PPC: %f seconds\n" %(models[vx], datasets[dx], elapsed))
+
+        elif runMe == 3:
+
+            # ============================================ #
+            # QUANTILE OPTIMISATION
+            # http://ski.clps.brown.edu/hddm_docs/howto.html#run-quantile-opimization
+            # ============================================ #
+
+            # get the csv file for this dataset
+            filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
+            mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
+
+            # correct a weirdness in Anke's data
+            if 'transitionprob' in mydata.columns:
+                mydata.transitionprob = mydata.transitionprob * 100;
+                mydata.transitionprob = mydata.transitionprob.round();
+            print mydata.head()
+
+            subj_params = []
+            for subj_idx, subj_data in data.groupby('subj_idx'):
+               m_subj = make_model(mypath, subj_data, models[vx], trace_id)
+               subj_params.append(m_subj.optimize('chisquare'))
+            params = pandas.DataFrame(subj_params)
+            params.to_csv(os.path.join(mypath, models[vx], 'chisquare.csv'), index=True)
+
+            print params.head()
+            print(os.path.join(mypath, models[vx], 'chisquare.csv'))

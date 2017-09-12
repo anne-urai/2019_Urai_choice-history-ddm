@@ -53,20 +53,10 @@ def recode_4stimcoding(mydata):
 # define the function that will do the work
 # ============================================ #
 
-def make_model(mypath, model_name, trace_id):
+def make_model(mypath, mydata, model_name, trace_id):
 
     model_filename  = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
     print model_filename
-
-    # get the csv file for this dataset
-    filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
-    mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-    # print mydata.head()
-
-    # correct a weirdness in Anke's data
-    if 'transitionprob' in mydata.columns:
-        mydata.transitionprob = mydata.transitionprob * 100;
-        mydata.transitionprob = mydata.transitionprob.round();
 
     # ============================================ #
     # NO HISTORY FOR MODEL COMPARISON
