@@ -3,7 +3,7 @@ close all; clc;
 
 colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
 
-fz = 9; timefz = 8;
+fz = 10; timefz = 8;
 set(groot, 'defaultaxesfontsize', fz, 'defaultaxestitlefontsizemultiplier', 1);
 
 % random seed will determine how the drifting timecourse looks
@@ -43,7 +43,7 @@ defcfg = cfg;
 
 %% make an overview of the two biasing mechanisms in the DDM
 
-subplot(331); hold on;
+subplot(332); hold on;
 arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
 y1 = ddm(cfg);
 
@@ -94,7 +94,7 @@ xlim([min(cfg.time) max(cfg.time)]);
 
 %% now change in starting point
 cfg = defcfg;
-subplot(332); hold on;
+subplot(331); hold on;
 arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
 
 % show the unbiased average drift towards two stimuli

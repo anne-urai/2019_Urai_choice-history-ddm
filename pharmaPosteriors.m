@@ -30,6 +30,12 @@ for d = 1:length(datasets),
     set(gca, 'yticklabel', []);
     box off;
     
+    % ADD P-VALUES
+    posteriorpval = @(dat1, dat2) min([mean(dat2 > dat1) mean(dat2 < dat1)]);
+    pvalat = posteriorpval(z_atomox, z_placebo)
+    pvalat = posteriorpval(z_donepezil, z_placebo)
+    pvalat = posteriorpval(z_donepezil, z_atomox)
+    
     subplot(442); hold on;
     h1 = histogram_smooth(v_placebo, colors(1, :));
     h2 = histogram_smooth(v_atomox, colors(2, :));
@@ -39,13 +45,17 @@ for d = 1:length(datasets),
     set(gca, 'yticklabel', []);
     box off;
     
+    pvalat = posteriorpval(v_atomox, v_placebo)
+    pvalat = posteriorpval(v_donepezil, v_placebo)
+    pvalat = posteriorpval(v_donepezil, v_atomox)
+    
     l = legend([h1 h2 h3], {'Placebo', 'Atomoxetine', 'Donepezil'});
     l.Box = 'off';
     l.Position(1) = l.Position(1) + 0.15;
     
     print(gcf, '-deps', sprintf('~/Data/serialHDDM/pharmaPosteriors.eps'));
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/pharmaPosteriors.pdf'));
-
+    
 end
 
 end

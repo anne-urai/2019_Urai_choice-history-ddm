@@ -20,76 +20,53 @@ close all;
 for d = length(datasets):-1:1
     disp(datasets{d});
     
-    colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
+    colors = [8 141 165; 141 165 8; 150 150 150] ./ 256;
     
     results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     results = results(results.session == 0, :);
     
     % ALSO GET THE CHISQUARE RESULTS!
-    chisquare = readtable(sprintf('%s/summary/%s/stimcoding_dc_z_prevresp/chisquare.csv', mypath, datasets{d}));
+    chisquare = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/chisquare.csv', mypath, datasets{d}));
+    
+    switch datasets{d}
+        
+        case {'MEG_MEGsessions'}
+            chisquare = chisquare(1:61, :);
+    end
     
     allresults = struct(); alltitles = {};
     switch datasets{d}
-        case {'Anke_2afc_sequential'}
+        
+        case {'Bharath_fMRI', 'Anke_MEG', 'Anke_merged', 'Anke_2afc_sequential'}
             
             % DOES THIS DATASET HAVE MULTIPLE TRANSITION PROBABILITIES?
             % THEN PLOT THESE SEPARATELY
             
             % use the stimcoding difference only from alternating
-            allresults(1).z_prevresp        = results.z_1_neu__stimcodingdczprevresp - results.z_2_neu__stimcodingdczprevresp;
-            allresults(1).v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_neu__stimcodingdczprevresp;
+            allresults(1).z_prevresp        = chisquare.z_1_0_50_0_ - chisquare.z__1_0_50_0_;
+            allresults(1).v_prevresp        = chisquare.dc_1_0_50_0_ - chisquare.dc__1_0_50_0_;
             allresults(1).criterionshift    = results.repetition_neutral;
             allresults(1).subjnr            = results.subjnr;
             alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
             
-            allresults(2).z_prevresp        = results.z_1_alt__stimcodingdczprevresp - results.z_2_alt__stimcodingdczprevresp;
-            allresults(2).v_prevresp        = results.dc_1_alt__stimcodingdczprevresp - results.dc_2_alt__stimcodingdczprevresp;
+            allresults(2).z_prevresp        = chisquare.z_1_0_20_0_ - chisquare.z__1_0_20_0_;
+            allresults(2).v_prevresp        = chisquare.dc_1_0_20_0_ - chisquare.dc__1_0_20_0_;
             allresults(2).criterionshift    = results.repetition_alternating;
             allresults(2).subjnr            = results.subjnr;
             alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
             
-            allresults(3).z_prevresp        = results.z_1_rep__stimcodingdczprevresp - results.z_2_rep__stimcodingdczprevresp;
-            allresults(3).v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_rep__stimcodingdczprevresp;
-            allresults(3).criterionshift    = results.repetition_repetitive;
-            allresults(3).subjnr            = results.subjnr;
-            alltitles{3}                    = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
-            
-        case {'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'}
-            
-            % DOES THIS DATASET HAVE MULTIPLE TRANSITION PROBABILITIES?
-            % THEN PLOT THESE SEPARATELY
-            
-            % use the stimcoding difference only from alternating
-            allresults(1).z_prevresp        = results.z_1_0_50_0__stimcodingdczprevresp - results.z_2_0_50_0__stimcodingdczprevresp;
-            allresults(1).v_prevresp        = results.dc_1_0_50_0__stimcodingdczprevresp - results.dc_2_0_50_0__stimcodingdczprevresp;
-            allresults(1).criterionshift    = results.repetition_neutral;
-            allresults(1).subjnr            = results.subjnr;
-            alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
-            
-            allresults(2).z_prevresp        = results.z_1_0_20_0__stimcodingdczprevresp - results.z_2_0_20_0__stimcodingdczprevresp;
-            allresults(2).v_prevresp        = results.dc_1_0_20_0__stimcodingdczprevresp - results.dc_2_0_20_0__stimcodingdczprevresp;
-            allresults(2).criterionshift    = results.repetition_alternating;
-            allresults(2).subjnr            = results.subjnr;
-            alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
-            
-            allresults(3).z_prevresp        = results.z_1_0_80_0__stimcodingdczprevresp - results.z_2_0_80_0__stimcodingdczprevresp;
-            allresults(3).v_prevresp        = results.dc_1_0_80_0__stimcodingdczprevresp - results.dc_2_0_80_0__stimcodingdczprevresp;
+            allresults(3).z_prevresp        = chisquare.z_1_0_80_0_ - chisquare.z__1_0_80_0_;
+            allresults(3).v_prevresp        = chisquare.dc_1_0_80_0_ - chisquare.dc__1_0_80_0_;
             allresults(3).criterionshift    = results.repetition_repetitive;
             allresults(3).subjnr            = results.subjnr;
             alltitles{3}                   = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
             
         otherwise
             
-            % use the stimcoding difference
-            results.z_prevresp = chisquare.z1 - chisquare.z2;
-            results.v_prevresp = chisquare.dc1 - chisquare.dc2;
-            
-            results.criterionshift = results.repetition;
-            
             % assign to structure
-            allresults(1).z_prevresp = results.z_prevresp;
-            allresults(1).v_prevresp = results.v_prevresp;
-            allresults(1).criterionshift = results.criterionshift;
+            allresults(1).z_prevresp = chisquare.z_1_ - chisquare.z__1_;
+            allresults(1).v_prevresp = chisquare.dc_1_ - chisquare.dc__1_;
+            allresults(1).criterionshift = results.repetition;
             
             alltitles{1} = datasetnames{d}{1}; % use only the dataset title
     end
@@ -142,7 +119,7 @@ for d = length(datasets):-1:1
     % LEGEND
     switch datasets{d}
         case 'Bharath_fMRI'
-          %  l = legend([handles{1}(1) handles{2}(1) handles{3}(1)], {'Repetitive', 'Neutral', 'Alternating'});
+            %  l = legend([handles{1}(1) handles{2}(1) handles{3}(1)], {'Repetitive', 'Neutral', 'Alternating'});
             % l.Box = 'off';
     end
     

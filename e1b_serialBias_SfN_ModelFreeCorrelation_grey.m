@@ -130,9 +130,9 @@ for d = length(datasets):-1:1
     ss.Position(2) = ss.Position(2) - 0.03;
     
     % add colored axes after suplabel (which makes them black)
-    xlabel(sp1, 'History bias in z');
+    xlabel(sp1, 'History shift in z');
     set(sp1, 'xcolor', colors(2, :));
-    xlabel(sp2, 'History bias in v');
+    xlabel(sp2, 'History shift in v');
     set(sp2, 'xcolor', colors(1, :));
     
     if doText,
