@@ -260,7 +260,7 @@ datasets = ['RT_RDK', # 0
     'Anke_merged', # 3
     'JW_yesno', # 4
     'Bharath_fMRI', # 5
-    'Anke_2afc_sequential', # 4
+    'Anke_2afc_sequential', # 6
     'Anke_MEG', # 7
     'MEG_MEGsessions'] # 8
 

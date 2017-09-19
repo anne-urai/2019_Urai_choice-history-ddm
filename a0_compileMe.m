@@ -44,7 +44,7 @@ function [] = compileMe(fname)
     % ============================================ #
 
     nsmp       = [10000]
-    datasets   = [0:7]; % RT-RDK and MEG-PL
+    datasets   = [0:5]; % RT-RDK and MEG-PL
     models     = [0:5]; % the nr of the models
     nrTraces   = 1; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
@@ -66,7 +66,9 @@ function [] = compileMe(fname)
     % PPC
         alldat = [];
         for a = datasets,
-            alldat = [alldat; a 0];
+			for v = 0:3
+            alldat = [alldat; a v];
+		end
         end
 
         % write to a file
