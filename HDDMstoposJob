@@ -40,3 +40,6 @@ stopos status -p pool1
  ) &
 done
 wait
+
+echo "Job $PBS_JOBID finished at `date`" | mail $USER -s "Job $PBS_JOBID"
+
