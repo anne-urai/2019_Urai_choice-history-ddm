@@ -17,7 +17,7 @@ cnt = 1;
 doText = false;
 
 close all;
-for d = length(datasets):-1:1
+for d = 5; %length(datasets):-1:1
     disp(datasets{d});
     
     colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;

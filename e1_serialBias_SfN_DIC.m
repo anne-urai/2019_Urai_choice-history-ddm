@@ -12,14 +12,14 @@ for s = 1:length(types),
     % ============================================ %
     
     % 1. STIMCODING, only prevresps
-    mdls = {'dc_prevresp', 'z_prevresp', ...
+    mdls = {'z_prevresp', 'dc_prevresp', ...
         'dc_z_prevresp', 'nohist'};
     for d = 1:length(datasets),
         close all;
         subplot(4, 6, 1);
         getPlotDIC(mdls, types{s}, d);
         title(datasetnames{d});
-        set(gca, 'xtick', 1:3, 'xticklabel', {'v_{bias}', 'z_{bias}', 'both'});
+        set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'both'});
         
         if ismember(d, [1]),
             ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
@@ -116,7 +116,7 @@ if isnan(mdldic(end)), assert(1==0); end
 mdldic = bsxfun(@minus, mdldic, mdldic(end));
 mdldic = mdldic(1:end-1);
 
-colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
+colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
 [~, bestMdl] = min(mdldic);
 
 for i = 1:length(mdldic),

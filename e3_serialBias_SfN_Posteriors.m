@@ -1,7 +1,7 @@
 function e3_serialBias_SfN_Posteriors
 
 addpath(genpath('~/code/Tools'));
-warning off; close all; 
+warning off; close all;
 global mypath datasets datasetnames
 
 % neutral vs biased plots
@@ -10,6 +10,9 @@ global mypath datasets datasetnames
 % datasetnames = {{'2AFC, Braun et al. 2017', 'Alternating'}, ...
 %     {'2AFC, Braun et al. 2017', 'Neutral'}, ...
 %     {'2AFC, Braun et al. 2017', 'Repetitive'}};
+
+datasets = {'Anke_merged', 'Bharath_fMRI'};
+datasetnames = {'2AFC-1', '2AFC-2'};
 
 % ========================================== %
 % MODULATION OF SERIAL CHOICE BIAS
@@ -25,80 +28,93 @@ for pa = 1:length(parameters),
         
         switch parameters{pa}
             case 'dc'
-                dat1 = traces.dc_1_;
-                dat2 = traces.dc__1_;
+                dat1 = traces.dc_1_0_20_0_ - traces.dc__1_0_20_0_;
+                dat2 = traces.dc_1_0_50_0_ - traces.dc__1_0_50_0_;
+                dat3 = traces.dc_1_0_80_0_ - traces.dc__1_0_80_0_;
+                
             case 'z' % pull through the inverse logit
                 % see https://groups.google.com/forum/#!topic/hddm-users/PjH7PWZKbqo
-                dat1 = invlogit(traces.z_trans_1_);
-                dat2 = invlogit(traces.z_trans__1_);
+                dat1 = invlogit(traces.z_trans_1_0_20_0_) - invlogit(traces.z_trans__1_0_20_0_);
+                dat2 = invlogit(traces.z_trans_1_0_50_0_) - invlogit(traces.z_trans__1_0_50_0_);
+                dat3 = invlogit(traces.z_trans_1_0_80_0_) - invlogit(traces.z_trans__1_0_80_0_);
         end
         
-        % plot the pupil and RT traces
-        colors = linspecer(9, 'sequential');
+        % color in different grouos
+        colors = cbrewer('qual', 'Paired', 10);
+        transitioncolors = [[0.5 0.5 0.5]; colors([7 9], :)];
+        meancolors = [0 0 0; colors([8 10], :)];
         
         close all;
         subplot(4,4,1); hold on;
-        h1 = histogram_smooth(dat1, colors(3, :));
-        h2 = histogram_smooth(dat2, colors(2, :));
+        h2 = histogram_smooth(dat1, transitioncolors(2, :));
+        h1 = histogram_smooth(dat2, transitioncolors(1, :));
+        h2 = histogram_smooth(dat3, transitioncolors(3, :));
         
         % show if these are significant - two sided
         % https://github.com/jwdegee/2017_eLife/blob/master/hddm_regression.py, line 273
-        pvalD    = min([mean(dat2 > dat1) mean(dat2 < dat1)]);
         
         axis tight; axis square;
-        ylims = get(gca, 'ylim');
-        ylim([ylims(1) ylims(2)*1.2]);
-        
+        xlims = get(gca, 'xlim');
+        xlim([xlims(1) xlims(2)*1.2]);
+        set(gca, 'xtick', [0 max(get(gca, 'xtick'))]);
         offsetAxes_y;
         
         switch parameters{pa}
             case 'dc'
-                xlim([-1 1]);
-                xlabel('v_{bias}');
-                
+               % ylim([-1 1]);
+                if d == 1, ylabel('History shift in v'); end
+                set(gca, 'ytick', [-1 0 1], 'ylim', [-1.3 1.3]);
             case 'z'
-                xlim([0.4 0.6]);
-                xlabel('z_{bias}');
-                
+                % ylim([-0.1 0.1]);
+                if d == 1, ylabel('History shift in z'); end
+                set(gca, 'ytick', [-.1 0 .1], 'ylim', [-0.12 0.12]);
         end
         
+        pvalD = posteriorpval(dat1, dat2);
         txt = sprintf('p = %.3f', pvalD);
         if pvalD < 0.001,
             txt = sprintf('p < 0.001');
         end
-        text(min(get(gca, 'xlim')) + 0.7*(range(get(gca, 'xlim'))), ...
-            min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
-            txt, 'fontsize', 5);
+        text(min(get(gca, 'xlim')) + 0.05*(range(get(gca, 'xlim'))), ...
+            nanmean(dat1), txt, 'fontsize', 5, 'color', meancolors(2, :));
         
+        pvalD = posteriorpval(dat3, dat2);
+        txt = sprintf('p = %.3f', pvalD);
+        if pvalD < 0.001,
+            txt = sprintf('p < 0.001');
+        end
+        text(min(get(gca, 'xlim')) + 0.05*(range(get(gca, 'xlim'))), ...
+           nanmean(dat3), txt, 'fontsize', 5, 'color', meancolors(3, :));
+       
         if pa == 1,
             title(datasetnames{d});
         end
-        % offsetAxes_y;
-        if d == 1, ylabel('Posterior probability'); end
-        ticks = get(gca, 'ytick'); set(gca, 'ytick', ticks([1 end]));
-        tightfig;
         
+        if pa == 2, xlabel('Posterior probability'); end
+        ticks = get(gca, 'xtick'); set(gca, 'xtick', [0 ticks(end)]);
+        set(gca, 'xlim', [0 max(get(gca, 'xlim'))]);
+        offsetAxes_y;
+
+        tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure2_posteriors_%s_d%d.pdf', parameters{pa}, d));
-    
-        %% correlate against each other
         
-        histdc = traces.dc__1_ - traces.dc_1_;
-        histz  = invlogit(traces.z_trans__1_) - invlogit(traces.z_trans_1_);
-      
-        close all
-        subplot(441);
-        scatter(histdc, histz, '.');
-        xlabel('History bias in dc');
-        ylabel('History bias in z');
-        
-        [rho, pval] = corr(histdc, histz);
-        title({datasetnames{d}{end} sprintf('r = %.3f, p = %.3f', rho, pval)});
-        lsline;
-        axis square;
-        tightfig;
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/posteriors_correlation_d%d.pdf',  d));
-        
-    
+        %         %% correlate against each other
+        %         histdc = traces.dc__1_ - traces.dc_1_;
+        %         histz  = invlogit(traces.z_trans__1_) - invlogit(traces.z_trans_1_);
+        %
+        %         close all
+        %         subplot(441);
+        %         scatter(histdc, histz, '.');
+        %         xlabel('History bias in dc');
+        %         ylabel('History bias in z');
+        %
+        %         [rho, pval] = corr(histdc, histz);
+        %         title({datasetnames{d}{end} sprintf('r = %.3f, p = %.3f', rho, pval)});
+        %         lsline;
+        %         axis square;
+        %         tightfig;
+        %         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/posteriors_correlation_d%d.pdf',  d));
+        %
     end
 end
 close all;
@@ -108,7 +124,8 @@ end
 function h = histogram_smooth(x, color2)
 
 [f,xi] = ksdensity(x);
-a1 = area(xi, f, 'edgecolor', 'none', 'facecolor', color2, 'facealpha', 0.4);
+a1 = area(f, xi, 'edgecolor', 'none', 'facecolor', ...
+    color2, 'facealpha', 0.4, 'showbaseline', 'off');
 
 % % Make area transparent
 % drawnow; % pause(0.05);  % This needs to be done for transparency to work
@@ -116,7 +133,7 @@ a1 = area(xi, f, 'edgecolor', 'none', 'facecolor', color2, 'facealpha', 0.4);
 % a1.Face.ColorData(4) = 255 * 0.3; % Your alpha value is the 0.3
 
 % area
-h = plot(xi, f, 'color', color2, 'linewidth', 1);
+h = plot(f, xi, 'color', color2, 'linewidth', 1);
 set(gca, 'color', 'none');
 
 end
@@ -129,7 +146,7 @@ if ~exist('offset', 'var'), offset = 4;
 end
 
 % ax.YLim(1) = ax.YLim(1)-(ax.YTick(2)-ax.YTick(1))/offset;
-ax.XLim(1) = ax.XLim(1)-(ax.XTick(2)-ax.XTick(1))/offset;
+ax.YLim(2) = ax.YLim(2)+(ax.YTick(2)-ax.YTick(1))/offset;
 
 % this will keep the changes constant even when resizing axes
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
