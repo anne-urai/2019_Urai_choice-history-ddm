@@ -170,14 +170,15 @@ for sj = subjects,
         end
 
         % measure of repetition behaviour
-        data.repeat = [~(abs(diff(data.response)) > 0); NaN];
-        data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
+        % data.repeat = [~(abs(diff(data.response)) > 0); NaN];
+        % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
 
-        try
-            % skip trials at boundaries
-            data.repeat((diff(data.trial) ~= 1)) = NaN;
-            data.stimrepeat((diff(data.trial) ~= 1)) = NaN;
-        end
+		% 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
+        data.repeat = [NaN; (diff(data.resp) == 0)];
+        data.stimrepeat = [NaN; (diff(data.resp) == 0)];
+        wrongTrls   = ([NaN; diff(data.trial)] ~= 1);
+    	data.repeat(wrongTrls) = NaN;
+		data.stimrepeat(wrongTrls) = NaN;
 
         results.repetition(icnt)        = nanmean(data.repeat);
         results.stimrepetition(icnt)    = nanmean(data.stimrepeat);
