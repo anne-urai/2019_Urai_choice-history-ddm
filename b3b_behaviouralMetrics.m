@@ -174,8 +174,8 @@ for sj = subjects,
         % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
 
 		% 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
-        data.repeat = [NaN; (diff(data.resp) == 0)];
-        data.stimrepeat = [NaN; (diff(data.resp) == 0)];
+        data.repeat = [NaN; (diff(data.response) == 0)];
+        data.stimrepeat = [NaN; (diff(data.response) == 0)];
         wrongTrls   = ([NaN; diff(data.trial)] ~= 1);
     	data.repeat(wrongTrls) = NaN;
 		data.stimrepeat(wrongTrls) = NaN;
