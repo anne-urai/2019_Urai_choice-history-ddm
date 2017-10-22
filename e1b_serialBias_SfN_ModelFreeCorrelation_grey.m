@@ -17,7 +17,7 @@ cnt = 1;
 doText = false;
 
 close all;
-for d = 5; %length(datasets):-1:1
+for d = length(datasets):-1:1
     disp(datasets{d});
     
     colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
@@ -124,11 +124,11 @@ for d = 5; %length(datasets):-1:1
     
     % move together
     sp2.Position(1) = sp2.Position(1) - 0.08;
-    ss = suplabel(datasetnames{d}{1}, 't');
-    set(ss, 'fontweight', 'normal');
-    ss.FontWeight = 'normal';
-    ss.Position(2) = ss.Position(2) - 0.03;
-    
+%     ss = suplabel(datasetnames{d}{1}, 't');
+%     set(ss, 'fontweight', 'normal');
+%     ss.FontWeight = 'normal';
+%     ss.Position(2) = ss.Position(2) - 0.03;
+%     
     % add colored axes after suplabel (which makes them black)
     xlabel(sp1, 'History shift in z');
     set(sp1, 'xcolor', colors(2, :));
@@ -154,7 +154,8 @@ for d = 5; %length(datasets):-1:1
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf', d));
-    
+    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.eps', d));
+
     
     for a = 1:length(allresults),
         

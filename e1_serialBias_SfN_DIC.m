@@ -18,12 +18,12 @@ for s = 1:length(types),
         close all;
         subplot(4, 6, 1);
         getPlotDIC(mdls, types{s}, d);
-        title(datasetnames{d});
+       % title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'both'});
         
-        if ismember(d, [1]),
+       % if ismember(d, [1]),
             ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
-        end
+       % end
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf', types{s}, d));
         fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf \n', types{s}, d);

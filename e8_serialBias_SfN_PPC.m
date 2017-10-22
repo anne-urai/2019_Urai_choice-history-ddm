@@ -19,7 +19,6 @@ for d = 1:length(datasets),
     end
     
     close all; subplot(4,4,1); hold on;
-    title(datasetnames{d});
     xlabel('RT (s)');
     
     % get traces for the model with pupil and rt modulation
@@ -48,9 +47,9 @@ for d = 1:length(datasets),
     axis tight; axis square;
     offsetAxes_y;
     xlim([-3 3]); set(gca, 'xtick', [-3 0 3]);
-    if d == 1,
-        ylabel('Probability');
-    end
+   % if d == 1,
+        ylabel({datasetnames{d}{1} ' ' 'Probability'});
+   % end
     set(gca, 'yticklabel', []);
     
     tightfig;

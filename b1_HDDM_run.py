@@ -263,7 +263,8 @@ datasets = ['RT_RDK', # 0
     'Bharath_fMRI', # 5
     'Anke_2afc_sequential', # 6
     'Anke_MEG', # 7
-    'MEG_MEGsessions'] # 8
+    'MEG_MEGsessions', # 8
+    'Murphy'] # 9
 
 # recode
 if isinstance(d, int):

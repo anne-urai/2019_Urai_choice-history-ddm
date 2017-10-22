@@ -76,9 +76,9 @@ for d = 1:length(datasets),
     end
     xlim([0 ceil(max(get(gca, 'xlim')))]);
     xlabel('d''');
-    if d == 1,
+   % if d == 1,
         ylabel('Drift rate (v)');
-    end
+   % end
     
     if any(strcmp(dat.Properties.VariableNames', 'v__stimcodingnohist') > 0),
         [rho, pval] = corr(alldprime(:), alldrift(:), 'rows', 'complete');
@@ -109,7 +109,7 @@ for d = 1:length(datasets),
     end
     
     offsetAxes; box off;
-    title(datasetnames{d});
+    %title(datasetnames{d});
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_driftrate_d%d.pdf',d));
