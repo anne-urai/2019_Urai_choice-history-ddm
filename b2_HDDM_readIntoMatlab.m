@@ -48,6 +48,8 @@ function b2_HDDM_readIntoMatlab()
       subjects =   [1     2     3     4     5     7     8     9    10    11    12    13    14    15];
     case 'Bharath_fMRI'
       subjects = [4	5	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25];
+  case 'Murphy'
+	subjects =   [109	110	112	113	114	116	117	119	120	121	124	125	126	127	128	129	131	132	134	135	136	137	138	139	140	142];
     end
 
     for m = 1:length(mdls),

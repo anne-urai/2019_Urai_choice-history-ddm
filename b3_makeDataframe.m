@@ -18,7 +18,7 @@ function b3_makeDataframe(ds)
     mypath = '/nfs/aeurai/HDDM';
   end
   datasets = {'Anke_merged', 'RT_RDK', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG'};
-  datasets = {'Murhpy'};
+  datasets = {'Murphy'};
 
   set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...

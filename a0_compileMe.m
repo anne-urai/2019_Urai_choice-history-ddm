@@ -65,8 +65,8 @@ function [] = compileMe(fname)
 
     % PPC
         alldat = [];
-        for a = datasets,
-			for v = 0:3
+        for a = 9,
+			for v = 0,
             alldat = [alldat; a v];
 		end
         end
