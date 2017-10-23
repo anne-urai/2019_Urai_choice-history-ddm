@@ -15,7 +15,7 @@ for sj = subjects
             {'coherence', 'correct', 'rt', 'stimulus', 'isi'});
         thistab.subj_idx    = sj * ones(size(thistab.rt));
         thistab.session     = session * ones(size(thistab.rt));
-        thistab.trialnr     = transpose(1:100);
+        thistab.trial       = transpose(1:100);
         
         if sj == subjects(1) && session == 1
             t = thistab;
@@ -46,7 +46,7 @@ t.prevrt   = circshift(nanzscore(log(t.rt)), 1);
 
 % remove trials without previous
 % remove trials where the previous trial was not immediately preceding
-wrongtrls               = find([NaN; diff(t.trialnr)] ~= 1);
+wrongtrls               = find([NaN; diff(t.trial)] ~= 1);
 t(wrongtrls, :)         = [];
 t(isnan(t.rt), :)       = [];
 t.response(t.response == -1) = 0;

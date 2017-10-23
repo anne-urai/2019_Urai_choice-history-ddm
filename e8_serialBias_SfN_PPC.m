@@ -58,33 +58,33 @@ for d = 1:length(datasets),
 end
 
 %% also show a histogram of the rt error
-
-ds = [1 6 2 3 9 7];
-close all;
-subplot(441); 
-% https://nl.mathworks.com/matlabcentral/answers/60818-boxplot-with-vectors-of-different-lengths
-col = @(x)reshape(x,numel(x),1);
-boxplot2 = @(C,varargin)boxplot(cell2mat(cellfun(col,col(C),'uni',0)),...
-    cell2mat(arrayfun(@(I)I*ones(numel(C{I}),1),col(1:numel(C)),'uni',0)),varargin{:});
-boxplot2(errors(ds));
-
-set(gca, 'xtick', 1:length(ds), 'xticklabel', datasetnames{ds});
-ylabel('$$|\widehat{RT}-RT|$$','Interpreter','Latex');
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_compare.pdf'));
-
-
-colors = cbrewer('qual', 'Dark2', length(errors));
-subplot(441); hold on;
-for e = 1:length(errors),
-    plot([median(errors{e}) median(errors{e})], [0 4], ':', 'color', colors(e, :), 'linewidth', 0.2);
-    h(e) = histogram(errors{e}, 'displaystyle', 'stairs', 'normalization', 'pdf', ...
-        'edgecolor', colors(e, :));
-end
-xlim([0 2]); ylim([0 4]);
-set(gca, 'yticklabel', []);
-ylabel('Probability');
-tightfig;
-offsetAxes;
+% 
+% ds = [1 6 2 3 9 7];
+% close all;
+% subplot(441); 
+% % https://nl.mathworks.com/matlabcentral/answers/60818-boxplot-with-vectors-of-different-lengths
+% col = @(x)reshape(x,numel(x),1);
+% boxplot2 = @(C,varargin)boxplot(cell2mat(cellfun(col,col(C),'uni',0)),...
+%     cell2mat(arrayfun(@(I)I*ones(numel(C{I}),1),col(1:numel(C)),'uni',0)),varargin{:});
+% boxplot2(errors(ds));
+% 
+% set(gca, 'xtick', 1:length(ds), 'xticklabel', datasetnames{ds});
+% ylabel('$$|\widehat{RT}-RT|$$','Interpreter','Latex');
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_compare.pdf'));
+% 
+% 
+% colors = cbrewer('qual', 'Dark2', length(errors));
+% subplot(441); hold on;
+% for e = 1:length(errors),
+%     plot([median(errors{e}) median(errors{e})], [0 4], ':', 'color', colors(e, :), 'linewidth', 0.2);
+%     h(e) = histogram(errors{e}, 'displaystyle', 'stairs', 'normalization', 'pdf', ...
+%         'edgecolor', colors(e, :));
+% end
+% xlim([0 2]); ylim([0 4]);
+% set(gca, 'yticklabel', []);
+% ylabel('Probability');
+% tightfig;
+% offsetAxes;
 
 % how often does the model make the same choice as the subject?
 %disp(estimperf);

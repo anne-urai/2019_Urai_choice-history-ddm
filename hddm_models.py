@@ -191,6 +191,30 @@ def make_model(mypath, mydata, model_name, trace_id):
                 include=('sv'), group_only_nodes=['sv'],
                 depends_on={'dc':['prevresp'], 'z':['prevresp']})
 
+    elif model_name == 'stimcoding_st_dc_z_prevresp':
+
+        # include across-trial variability in starting point
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'st'), group_only_nodes=['sv', 'st'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'transitionprob'],
+                'z':['prevresp', 'transitionprob']})
+        elif len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'st'), group_only_nodes=['sv', 'st'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp'], 'z':['prevresp']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'st'), group_only_nodes=['sv', 'st'],
+                depends_on={'dc':['prevresp'], 'z':['prevresp']})
+
     elif model_name == 'stimcoding_dc_z_prevresp_pharma':
 
         # get the right variable coding

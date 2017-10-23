@@ -14,13 +14,14 @@ global datasets datasetnames mypath
 usr = getenv('USER');
 switch usr
     case 'anne'
+
         mypath = '~/Data/HDDM';
     case 'aeurai'
         mypath  = '/nfs/aeurai/HDDM';
 end
 
 % neutral vs biased plots
-datasets = {'RT_RDK', 'NatComm', 'MEG', 'Anke_2afc_sequential', ...
+datasets = {'Murphy', 'NatComm', 'MEG', 'Anke_2afc_sequential', ...
     'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
 datasetnames = { {'2AFC RT'}, ...
     {'2IFC-1'}, {'2IFC-2'}, ...
@@ -44,6 +45,7 @@ e1_serialBias_SfN_DIC; % figure 3b & c
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey; % figure 4
 forestPlot(alldat);
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));
+print(gcf, '-depsc', sprintf('~/Data/serialHDDM/forestplot.eps'));
 
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_chiSquare; % figure 4
 forestPlot(alldat);
