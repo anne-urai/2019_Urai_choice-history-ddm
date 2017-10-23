@@ -35,7 +35,13 @@ t.rt(t.rt < 0.2) = NaN;
 % test
 assert(isequal(t.correct, (t.stimulus == t.response)));
 t.prevresp = circshift(t.response, 1);
+t.prev2resp = circshift(t.response, 2);
+t.prev3resp = circshift(t.response, 3);
+
 t.prevstim = circshift(t.stimulus, 1);
+t.prev2stim = circshift(t.stimulus, 2);
+t.prev3stim = circshift(t.stimulus, 3);
+
 t.prevrt   = circshift(nanzscore(log(t.rt)), 1);
 
 % remove trials without previous
