@@ -120,7 +120,7 @@ def concat_models(mypath, model_name):
                 print model_filename
                 thism                 = hddm.load(model_filename)
                 allmodels.append(thism) # now append into a list
-
+                
         # ============================================ #
         # CHECK CONVERGENCE
         # ============================================ #
@@ -209,7 +209,6 @@ def cornerplot(mypath, datasetname, modelname):
     traces_0 = []
     for p in range(len(params_of_interest_0)):
         traces_0.append(m.nodes_db.node[params_of_interest_0[p]].trace.gettrace())
-    # embed()
 
     fig = corner.corner(np.array(traces_0).T, color='b', labels=params_of_interest_0, show_titles=True, **{'lw':1})
     fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
@@ -254,7 +253,10 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 11
     'stimcoding_dc_z_prevresp_pharma', #12
     'stimcoding_dc_z_prevresp_sessions', # 13
-    'stimcoding_st_dc_z_prevresp'] # 14
+    'stimcoding_st_dc_z_prevresp', # 14
+    'regress_dc_z_visualgamma', #15
+    'regress_dc_z_motorslope', #16
+    'regress_dc_z_motorstart'] # 17
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1
@@ -262,11 +264,9 @@ datasets = ['RT_RDK', # 0
     'Anke_merged', # 3
     'JW_yesno', # 4
     'Bharath_fMRI', # 5
-    'Anke_2afc_sequential', # 6
-    'Anke_MEG', # 7
-    'MEG_MEGsessions', # 8
-    'Murphy'] # 9
-
+    'Murphy', # 6
+    'MEG_MEGdata'] # 7
+    
 # recode
 if isinstance(d, int):
     d = range(d,d+1) # makes a list out of an integer
@@ -341,8 +341,9 @@ for dx in d:
                 # concatenate the different chains, will save disk space
                 concat_models(mypath, models[vx])
 
-                # make corner plot
-                cornerplot('/nfs/aeurai/HDDM/', datasets[dx], models[vx])
+            # make corner plot
+            if trace_id == 14 and os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
+                cornerplot(mypath, datasets[dx], models[vx])
 
         elif runMe == 2:
 
