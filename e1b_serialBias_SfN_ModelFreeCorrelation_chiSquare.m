@@ -188,14 +188,14 @@ for a = length(allresults):-1:1, % neutral last
     xrangeextra = 0.15*range(allresults(a).(fld));
     xrange = linspace(min(allresults(a).(fld))- xrangeextra, ...
         max(allresults(a).(fld))+xrangeextra, 100);
-    yrange = polyval(p, xrange);
-    l = plot(xrange, yrange);
-    l.Color = meancolors(a, :);
-    l.LineWidth = 0.5;
     if pval < 0.05,
+        yrange = polyval(p, xrange);
+        l = plot(xrange, yrange);
+        l.Color = meancolors(a, :);
+        l.LineWidth = 0.5;
         l.LineStyle = '-';
     else
-        l.LineStyle = ':';
+        %l.LineStyle = ':';
     end
     
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR

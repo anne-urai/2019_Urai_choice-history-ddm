@@ -21,13 +21,15 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'NatComm', 'MEG', 'Anke_2afc_sequential', ...
-    'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
-datasetnames = { {'2AFC RT'}, ...
-    {'2IFC-1'}, {'2IFC-2'}, ...
-    {'2AFC-1, Braun et al. 2017'}, ...
-    {'2IFC-2, MEG sessions'}, ...
-    {'Yes/no RT'}, {'2AFC-2'}, {'2AFC-1, Anke MEG'}, {'2AFC-1'}};
+datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG'};
+%, 'Anke_2afc_sequential', ...
+%    'MEG_MEGsessions',  'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
+
+datasetnames = { {'2AFC RT'},  {'Yes/no RT'}, ...
+    {'2IFC-1'}, {'2IFC-2'}}; ...
+%     {'2AFC-1, Braun et al. 2017'}, ...
+%     {'2IFC-2, MEG sessions'}, ...
+%    , {'2AFC-2'}, {'2AFC-1, Anke MEG'}, {'2AFC-1'}};
 
 % go to code
 cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
@@ -35,11 +37,11 @@ cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
 %% start the actual plots
 
 disp('starting');
+% f0_schematic_DDM_bias; % figure 3a
 
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
-% f0_schematic_DDM_bias; % figure 3a
 e1_serialBias_SfN_DIC; % figure 3b & c
 
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey; % figure 4

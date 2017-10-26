@@ -1,11 +1,12 @@
 function forestPlot(alldat)
 
 ds = [17 10 16 15 1 2 3 7 8 9]; % from the e1b collection script
+ds = 4:-1:1;
 close all;
 axiscolors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
 
 % MAKE AN OVERVIEW PLOT
-subplot(231); hold on;
+subplot(331); hold on;
 % make a vertical line at zero
 plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
@@ -41,7 +42,7 @@ for d = 1:length(ds),
 end
 
 set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}));
-xlabel('Correlation with history shift in z');
+xlabel('zbias');
 xlim([-1 1]); offsetAxes;
 set(gca, 'xcolor', axiscolors(2, :));
 
@@ -51,7 +52,7 @@ plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 %% NOW FOR DRIFT CRITERION
 
 % MAKE AN OVERVIEW PLOT
-sp2 = subplot(232); hold on;
+sp2 = subplot(332); hold on;
 % make a vertical line at zero
 plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
@@ -82,12 +83,12 @@ for d = 1:length(ds),
         length(ds)-d+1,  ...
         {alldat(ds(d)).corrv_ci(1) alldat(ds(d)).corrv_ci(2)} , [], 'o', 'abshhxy', 0.2);
     set(h(1), 'marker', mrk, 'color', col, 'markerfacecolor', meancol, 'markeredgecolor', 'w', ...
-         'markersize', 4, 'linewidth', 0.5);
+         'markersize', 5, 'linewidth', 0.5);
     set(h(2), 'color', col, 'linewidth', 1);
 end
 
 set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}), 'YAxisLocation', 'right');
-xlabel('Correlation with history shift in v');
+xlabel('vbias');
 set(gca, 'xcolor', axiscolors(1, :));
 xlim([-1 1]); offsetAxes;
 

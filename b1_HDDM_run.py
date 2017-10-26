@@ -211,7 +211,10 @@ def cornerplot(mypath, datasetname, modelname):
         traces_0.append(m.nodes_db.node[params_of_interest_0[p]].trace.gettrace())
 
     fig = corner.corner(np.array(traces_0).T, color='b', labels=params_of_interest_0, show_titles=True, **{'lw':1})
-    fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
+    try:
+        fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
+    except:
+        print('cannot save figure')
 
     df0 = pd.DataFrame(np.array(traces_0).T[:,:len(params_of_interest_0)], columns=params_of_interest_0)
     fig = corner.corner(df0, color='b', **{'lw':1})
@@ -232,7 +235,10 @@ def cornerplot(mypath, datasetname, modelname):
 
     # sns.despine(offset=0, trim=True)
     plt.tight_layout()
-    fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
+    try:
+        fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
+    except:
+        print('cannot save figure')
 
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
@@ -395,3 +401,4 @@ for dx in d:
 
             print params.head()
             print(os.path.join(mypath, models[vx], 'chisquare.csv'))
+                    

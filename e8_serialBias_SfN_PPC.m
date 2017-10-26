@@ -48,7 +48,7 @@ for d = 1:length(datasets),
     offsetAxes_y;
     xlim([-3 3]); set(gca, 'xtick', [-3 0 3]);
    % if d == 1,
-        ylabel({datasetnames{d}{1} ' ' 'Probability'});
+        ylabel('Probability');
    % end
     set(gca, 'yticklabel', []);
     

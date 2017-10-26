@@ -50,6 +50,7 @@ wrongtrls               = find([NaN; diff(t.trial)] ~= 1);
 t(wrongtrls, :)         = [];
 t(isnan(t.rt), :)       = [];
 t.response(t.response == -1) = 0;
+t.coherence             = [];
 
 writetable(t, sprintf('~/Data/HDDM/Murphy/murphy_hddm.csv'));
 disp('done!');

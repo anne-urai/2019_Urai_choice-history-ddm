@@ -72,24 +72,24 @@ for d = 1:length(datasets),
     
     switch datasets{d}
         case 'JW_yesno'
-           ylim([0.4 1.09]); 
+            ylim([0.4 1.09]);
     end
     xlim([0 ceil(max(get(gca, 'xlim')))]);
     xlabel('d''');
-   % if d == 1,
-        ylabel('Drift rate (v)');
-   % end
+    % if d == 1,
+    ylabel('Drift rate (v)');
+    % end
     
     if any(strcmp(dat.Properties.VariableNames', 'v__stimcodingnohist') > 0),
         [rho, pval] = corr(alldprime(:), alldrift(:), 'rows', 'complete');
-    else 
+    else
         [coef,pval] = partialcorr([alldprime(:), alldrift(:)], allcohs(:), 'rows', 'complete');
         rho = coef(1,2); pval = pval(1,2);
     end
     
-    txt = {sprintf('r_{%d} = %.3f',  length(find(~isnan(alldrift(:))))-2, rho) sprintf('p = %.3f', pval)};
+    txt = {sprintf('r(%d) = %.3f',  length(find(~isnan(alldrift(:))))-2, rho) sprintf('p = %.3f', pval)};
     if pval < 0.001,
-        txt = {sprintf('r_{%d} = %.3f',  length(find(~isnan(alldrift(:))))-2, rho) sprintf('p < 0.001')};
+        txt = {sprintf('r(%d) = %.3f',  length(find(~isnan(alldrift(:))))-2, rho) sprintf('p < 0.001')};
     end
     tt = text(min(get(gca, 'xlim')) + 0.04*(range(get(gca, 'xlim'))), ...
         min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
@@ -114,11 +114,11 @@ for d = 1:length(datasets),
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_driftrate_d%d.pdf',d));
     
-    % ========================================== %
-    % colorbar
-    % ========================================== %
     
     if ~any(strcmp(dat.Properties.VariableNames', 'v__stimcodingnohist') > 0),
+        % ========================================== %
+        % colorbar legend
+        % ========================================== %
         
         close all;
         subplot(441);
@@ -127,9 +127,6 @@ for d = 1:length(datasets),
         handles = colorbar('southoutside');
         set(gca, 'Xscale', 'log');
         
-        % ==================================================================
-        % make colorbar look pretty
-        % ==================================================================
         drawnow;
         handles.TickDirection = 'out';
         handles.Box = 'off';
@@ -141,7 +138,7 @@ for d = 1:length(datasets),
         elseif d == 4,
             handles.Ticks = linspace(0.5, 3.75, 6);
             handles.TickLabels = {'0' '5' '10' '20' '40', '60'};
-        elseif d == 9,  
+        elseif d == 9,
             handles.Ticks = linspace(0.35, 4.2, 10);
             handles.TickLabels = {'0' '3' '5' '9' '10', '20', '27', '40', '60', '81'};
         end
@@ -168,6 +165,52 @@ for d = 1:length(datasets),
         % tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_legend_d%d.pdf',d));
         
+        % ========================================== %
+        % INSET - V ~ COHERENCE
+        % ========================================== %
+        
+        close all;
+        subplot(551);
+        
+        % take group-level means and quantiles from the posteriors
+        load(sprintf('%s/summary/%s/stimcoding_nohist_all.mat', mypath, datasets{d}));
+        
+        % grab the percentiles for all coherence levels
+        cohflds = regexp(fieldnames(group), 'v_c[0-9_]*_prct', 'match');
+        cohflds = cohflds(~cellfun(@isempty, cohflds));
+        cohflds = [cohflds{:}];
+        cohdat = nan(5, length(cohflds));
+        for c = 1:length(cohflds),
+            cohdat(:, c) = group.(cohflds{c});
+        end
+        % extract the coherence levels themselves
+        cohflds     = regexprep(cohflds, '_', '.');
+        cohflds     = regexprep(cohflds, 'v.c', '');
+        cohflds     = regexprep(cohflds, '.prct', '');
+        cohlevels   = str2double(cohflds);
+       
+        hold on;
+        for c = 1:length(cohlevels),
+            h = ploterr(cohlevels(c), cohdat(3, c), ...
+                [], {cohdat(1, c), cohdat(5, c)}, 'ko', 'abshhxy', 0);
+            set(h(1), 'color', colors(c, :), 'markerfacecolor', colors(c, :), ...
+                'markeredgecolor', 'w', 'markersize', 3, 'linewidth', 0.1);
+            set(h(2), 'color', colors(c, :));
+        end
+        set(gca, 'xtick', cohlevels);
+        ylabel('Drift rate (v)');
+                
+        switch datasets{d}
+            case 'NatComm'
+                xlabel('\Delta % coherence');
+                set(gca, 'xticklabel', {'', '', '', '5', '10', '20', '30'});                
+        end
+        
+        axis square; axis tight; 
+        xlim([-2 max(get(gca, 'xlim'))]);
+        offsetAxes;
+        print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_inset_d%d.eps',d));
+
     end
     
 end

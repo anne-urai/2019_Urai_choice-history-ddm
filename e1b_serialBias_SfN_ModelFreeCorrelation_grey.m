@@ -14,7 +14,7 @@ cnt = 1;
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
-doText = false;
+doText = true;
 
 close all;
 for d = length(datasets):-1:1
@@ -124,26 +124,25 @@ for d = length(datasets):-1:1
     
     % move together
     sp2.Position(1) = sp2.Position(1) - 0.08;
-%     ss = suplabel(datasetnames{d}{1}, 't');
-%     set(ss, 'fontweight', 'normal');
-%     ss.FontWeight = 'normal';
-%     ss.Position(2) = ss.Position(2) - 0.03;
-%     
+    ss = suplabel(' ', 't');
+    set(ss, 'fontweight', 'normal');
+    ss.FontWeight = 'normal';
+    ss.Position(2) = ss.Position(2) - 0.03;
+    
     % add colored axes after suplabel (which makes them black)
-    xlabel(sp1, 'History shift in z');
+    xlabel(sp1, 'History bias in z');
     set(sp1, 'xcolor', colors(2, :));
-    xlabel(sp2, 'History shift in v');
+    xlabel(sp2, 'History bias in v');
     set(sp2, 'xcolor', colors(1, :));
     
     if doText,
         %% add line between the two correlation coefficients
-        txt = {sprintf('\\Deltar_{%d} = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
+        txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
         if pval < 0.001,
-            txt = {sprintf('\\Deltar_{%d} = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
+            txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
         end
-        title(txt, 'fontweight', 'bold', 'fontsize', 6, 'horizontalalignment', 'left');
+        title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
     end
-    
     
     % LEGEND
     switch datasets{d}
@@ -156,7 +155,6 @@ for d = length(datasets):-1:1
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf', d));
     print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.eps', d));
 
-    
     for a = 1:length(allresults),
         
         % SAVE CORRELATIONS FOR OVERVIEW PLOT
@@ -190,7 +188,9 @@ end
 
 end
 
-function [rho, tt, handles] = plotScatter(allresults, fld, legendWhere, doText);
+function [rho, tt, handles] = plotScatter(allresults, fld, legendWhere, doText)
+
+doText = 0;
 
 % overall correlation
 x = cat(1, allresults(:).(fld));
@@ -213,19 +213,20 @@ markers = {'o', 'v', '^'}; %also indicate with different markers
 for a = length(allresults):-1:1, % neutral last
     
     [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
-    % CORRELATION LINE SEPARATELY FOR EACH DATASET?
-    p = polyfit(allresults(a).(fld), allresults(a).criterionshift, 1);
-    xrangeextra = 0.15*range(allresults(a).(fld));
-    xrange = linspace(min(allresults(a).(fld))- xrangeextra, ...
-        max(allresults(a).(fld))+xrangeextra, 100);
-    yrange = polyval(p, xrange);
-    l = plot(xrange, yrange);
-    l.Color = meancolors(a, :);
-    l.LineWidth = 0.5;
+    
     if pval < 0.05,
+        % CORRELATION LINE SEPARATELY FOR EACH DATASET?
+        p = polyfit(allresults(a).(fld), allresults(a).criterionshift, 1);
+        xrangeextra = 0.15*range(allresults(a).(fld));
+        xrange = linspace(min(allresults(a).(fld))- xrangeextra, ...
+            max(allresults(a).(fld))+xrangeextra, 100);
+        yrange = polyval(p, xrange);
+        l = plot(xrange, yrange);
+        l.Color = meancolors(a, :);
+        l.LineWidth = 0.5;
         l.LineStyle = '-';
-    else
-        l.LineStyle = ':';
+        %else
+        % l.LineStyle = ':';
     end
     
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
