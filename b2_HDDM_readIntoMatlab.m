@@ -4,8 +4,8 @@ function b2_HDDM_readIntoMatlab()
   close all; clc;
   warning off MATLAB:table:ModifiedVarnames % skip this warning
 
-    datasets = {'RT_RDK', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG', 'Anke_merged'};
-	datasets = {'Murphy'};
+    datasets = {'Murphy', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG', 'Anke_merged'};
+	%datasets = {'Murphy'};
 
   for d = 1:length(datasets),
     usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
@@ -29,7 +29,8 @@ function b2_HDDM_readIntoMatlab()
     'regress_dc_z_prev2resp_prev2stim', ...
     'regress_dc_z_prev3resp_prev3stim', ...
     'stimcoding_nohist_onlyz', 'stimcoding_nohist_onlydc', ...
-    'stimcoding_dc_z_prevresp_sessions'};
+    'stimcoding_dc_z_prevresp_sessions', ...
+    'stimcoding_st_dc_z_prevresp'};
 
     switch datasets{d}
     case 'RT_RDK'

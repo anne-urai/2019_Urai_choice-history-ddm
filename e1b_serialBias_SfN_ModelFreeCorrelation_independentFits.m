@@ -1,4 +1,4 @@
-function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey
+function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits
 % from the csv table, make an overview of repetition behaviour
 
 % get a huge list with values for each participant
@@ -33,20 +33,20 @@ for d = length(datasets):-1:1
             % THEN PLOT THESE SEPARATELY
             
             % use the stimcoding difference only from alternating
-            allresults(1).z_prevresp        = results.z_1_neu__stimcodingdczprevresp - results.z_2_neu__stimcodingdczprevresp;
-            allresults(1).v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_neu__stimcodingdczprevresp;
+            allresults(1).z_prevresp        = results.z_1_neu__stimcodingzprevresp - results.z_2_neu__stimcodingzprevresp;
+            allresults(1).v_prevresp        = results.dc_1_neu__stimcodingdcprevresp - results.dc_2_neu__stimcodingdcprevresp;
             allresults(1).criterionshift    = results.repetition_neutral;
             allresults(1).subjnr            = results.subjnr;
             alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
             
-            allresults(2).z_prevresp        = results.z_1_alt__stimcodingdczprevresp - results.z_2_alt__stimcodingdczprevresp;
-            allresults(2).v_prevresp        = results.dc_1_alt__stimcodingdczprevresp - results.dc_2_alt__stimcodingdczprevresp;
+            allresults(2).z_prevresp        = results.z_1_alt__stimcodingzprevresp - results.z_2_alt__stimcodingzprevresp;
+            allresults(2).v_prevresp        = results.dc_1_alt__stimcodingdcprevresp - results.dc_2_alt__stimcodingdcprevresp;
             allresults(2).criterionshift    = results.repetition_alternating;
             allresults(2).subjnr            = results.subjnr;
             alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
             
-            allresults(3).z_prevresp        = results.z_1_rep__stimcodingdczprevresp - results.z_2_rep__stimcodingdczprevresp;
-            allresults(3).v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_rep__stimcodingdczprevresp;
+            allresults(3).z_prevresp        = results.z_1_rep__stimcodingzprevresp - results.z_2_rep__stimcodingzprevresp;
+            allresults(3).v_prevresp        = results.dc_1_neu__stimcodingdcprevresp - results.dc_2_rep__stimcodingdcprevresp;
             allresults(3).criterionshift    = results.repetition_repetitive;
             allresults(3).subjnr            = results.subjnr;
             alltitles{3}                    = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
@@ -57,20 +57,20 @@ for d = length(datasets):-1:1
             % THEN PLOT THESE SEPARATELY
             
             % use the stimcoding difference only from alternating
-            allresults(1).z_prevresp        = results.z_1_0_50_0__stimcodingdczprevresp - results.z_2_0_50_0__stimcodingdczprevresp;
-            allresults(1).v_prevresp        = results.dc_1_0_50_0__stimcodingdczprevresp - results.dc_2_0_50_0__stimcodingdczprevresp;
+            allresults(1).z_prevresp        = results.z_1_0_50_0__stimcodingzprevresp - results.z_2_0_50_0__stimcodingzprevresp;
+            allresults(1).v_prevresp        = results.dc_1_0_50_0__stimcodingdcprevresp - results.dc_2_0_50_0__stimcodingdcprevresp;
             allresults(1).criterionshift    = results.repetition_neutral;
             allresults(1).subjnr            = results.subjnr;
             alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
             
-            allresults(2).z_prevresp        = results.z_1_0_20_0__stimcodingdczprevresp - results.z_2_0_20_0__stimcodingdczprevresp;
-            allresults(2).v_prevresp        = results.dc_1_0_20_0__stimcodingdczprevresp - results.dc_2_0_20_0__stimcodingdczprevresp;
+            allresults(2).z_prevresp        = results.z_1_0_20_0__stimcodingzprevresp - results.z_2_0_20_0__stimcodingzprevresp;
+            allresults(2).v_prevresp        = results.dc_1_0_20_0__stimcodingdcprevresp - results.dc_2_0_20_0__stimcodingdcprevresp;
             allresults(2).criterionshift    = results.repetition_alternating;
             allresults(2).subjnr            = results.subjnr;
             alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
             
-            allresults(3).z_prevresp        = results.z_1_0_80_0__stimcodingdczprevresp - results.z_2_0_80_0__stimcodingdczprevresp;
-            allresults(3).v_prevresp        = results.dc_1_0_80_0__stimcodingdczprevresp - results.dc_2_0_80_0__stimcodingdczprevresp;
+            allresults(3).z_prevresp        = results.z_1_0_80_0__stimcodingzprevresp - results.z_2_0_80_0__stimcodingzprevresp;
+            allresults(3).v_prevresp        = results.dc_1_0_80_0__stimcodingdcprevresp - results.dc_2_0_80_0__stimcodingdcprevresp;
             allresults(3).criterionshift    = results.repetition_repetitive;
             allresults(3).subjnr            = results.subjnr;
             alltitles{3}                   = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
@@ -80,14 +80,14 @@ for d = length(datasets):-1:1
             try
                 % use the stimcoding difference
                 results.z_prevresp = ...
-                    results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
+                    results.z_1__stimcodingzprevresp - results.z_2__stimcodingzprevresp;
                 results.v_prevresp = ...
-                    results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
+                    results.dc_1__stimcodingdcprevresp - results.dc_2__stimcodingdcprevresp;
             catch
                 results.z_prevresp = ...
-                    results.z_1_0__stimcodingdczprevresp - results.z_2_0__stimcodingdczprevresp;
+                    results.z_1_0__stimcodingzprevresp - results.z_2_0__stimcodingzprevresp;
                 results.v_prevresp = ...
-                    results.dc_1_0__stimcodingdczprevresp - results.dc_2_0__stimcodingdczprevresp;
+                    results.dc_1_0__stimcodingdcprevresp - results.dc_2_0__stimcodingdcprevresp;
             end
             
             results.criterionshift = results.repetition;
@@ -152,8 +152,8 @@ for d = length(datasets):-1:1
     end
     
     tightfig;
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf', d));
-    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.eps', d));
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcodingIndep_d%d.pdf', d));
+   % print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.eps', d));
 
     for a = 1:length(allresults),
         
@@ -232,7 +232,7 @@ for a = length(allresults):-1:1, % neutral last
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
     s  = scatter(allresults(a).(fld), allresults(a).criterionshift,  10, ...
         markers{a}, 'LineWidth', 0.001, ...
-        'markeredgecolor', 'w', 'markerfacecolor', transitioncolors(a, :));
+        'markeredgecolor', [1 1 1], 'markerfacecolor', transitioncolors(a, :));
     handles{a} = s;
     
 end
