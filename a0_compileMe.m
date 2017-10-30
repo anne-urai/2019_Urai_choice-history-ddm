@@ -43,10 +43,10 @@ function [] = compileMe(fname)
     % parameter file for HDDM
     % ============================================ #
 
-    nsmp       = [10000]
-    datasets   = [7]; % RT-RDK and MEG-PL
-    models     = [7 8 15:17]; % the nr of the models
-    nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
+    nsmp       = [5000]
+    datasets   = [0:7]; % RT-RDK and MEG-PL
+    models     = [0:3 17:20]; % the nr of the models
+    nrTraces   = 1; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
     alldat = [];
     for n = nsmp,

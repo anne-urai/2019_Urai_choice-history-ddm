@@ -259,10 +259,14 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 11
     'stimcoding_dc_z_prevresp_pharma', #12
     'stimcoding_dc_z_prevresp_sessions', # 13
-    'stimcoding_st_dc_z_prevresp', # 14
-    'regress_dc_z_visualgamma', #15
-    'regress_dc_z_motorslope', #16
-    'regress_dc_z_motorstart'] # 17
+    'regress_dc_z_visualgamma', #14
+    'regress_dc_z_motorslope', #15
+    'regress_dc_z_motorstart', #16
+    'stimcoding_sz_nohist', # 17
+    'stimcoding_sz_dc_prevresp', # 18
+    'stimcoding_sz_z_prevresp', # 19
+    'stimcoding_sz_dc_z_prevresp', # 20
+    ]
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1
@@ -383,22 +387,18 @@ for dx in d:
             # get the csv file for this dataset
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-
-            # correct a weirdness in Anke's data
-            if 'transitionprob' in mydata.columns:
-                mydata.transitionprob = mydata.transitionprob * 100;
-                mydata.transitionprob = mydata.transitionprob.round();
-            print mydata.head()
-
+            
             subj_params = []
+            bic         = []
             for subj_idx, subj_data in mydata.groupby('subj_idx'):
-               m_subj = make_model(mypath, subj_data, models[vx], trace_id)
-               thismodel = m_subj.optimize('chisquare')
-               thismodel.update({'subj_idx':subj_idx}) # keep original subject number
-               subj_params.append(thismodel)
+                m_subj = make_model(mypath, subj_data, models[vx], trace_id)
+                thismodel = m_subj.optimize('gsquare')
+                thismodel.update({'subj_idx':subj_idx}) # keep original subject number
+                subj_params.append(thismodel)
+                bic.append(m_subj.bic_info)
+                
             params = pd.DataFrame(subj_params)
             params.to_csv(os.path.join(mypath, models[vx], 'chisquare.csv'))
-
-            print params.head()
-            print(os.path.join(mypath, models[vx], 'chisquare.csv'))
-                    
+            bic = pd.DataFrame(bic)
+            bic.to_csv(os.path.join(mypath, models[vx], 'BIC.csv'))
+           
