@@ -47,8 +47,8 @@ xlim([-1 1]); offsetAxes;
 set(gca, 'xcolor', axiscolors(2, :));
 
 plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
-[h, pval, ci, stats] = ttest([alldat(ds).corrz]);
-title(sprintf('t(%d) = %.3f, p = %.4f', stats.df, stats.tstat, pval));
+[h, pval] = ttest([alldat(ds).corrz]);
+assert(1==0)
 
 %% NOW FOR DRIFT CRITERION
 
@@ -95,8 +95,9 @@ xlim([-1 1]); offsetAxes;
 
 % ADD THE AVERAGE??
 plot(nanmean([alldat(ds).corrv]), 0.1, 'd', 'color', 'k', 'markersize', 4);
-[h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]));
-title(sprintf('t(%d) = %.3f, p = %.4f', stats.df, stats.tstat, pval));
+[h, pval] = ttest(fisherz([alldat(ds).corrv]));
+
+[hdiff, pdiff] = ttest(fisherz([alldat(ds).corrz]), fisherz([alldat(ds).corrv]));
 
 % move closer together
 sp2.Position(1) = sp2.Position(1) - 0.05;
@@ -118,8 +119,7 @@ for d = 1:length(ds),
 end
 
 % DO STATS ACROSS DATASETS!
-[h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]), fisherz([alldat(ds).corrz]));
-suplabel(sprintf('t(%d) = %.3f, p = %.4f', stats.df, stats.tstat, pval), 't');
+
 
 tightfig;
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));
