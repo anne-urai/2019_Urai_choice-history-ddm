@@ -21,12 +21,15 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'Anke_2afc_sequential', ...
+datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', ...
+'JW_PNAS', 'JW_fMRI', ...
+'Anke_2afc_sequential', ...
     'MEG_MEGsessions',  'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
-datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG'};
+datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI'};
 
-datasetnames = { {'2AFC RT'},  {'Yes/no RT'}, ...
+datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2IFC-1'}, {'2IFC-2'}, ...
+    {'Yes/no contrast RT-1'},  {'Yes/no contrast RT-2'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
     {'2IFC-2, MEG sessions'}, ...
     {'2AFC-2'}, {'2AFC-1, Anke MEG'}, {'2AFC-1'}};
@@ -41,11 +44,11 @@ end
 disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
-% e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+ e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 % e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
-% e1_serialBias_SfN_DIC; % figure 3b & c
-e1_serialBias_SfN_BIC;
+e1_serialBias_SfN_DIC; % figure 3b & c
+%e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z
 % alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits; % figure 4
@@ -54,8 +57,8 @@ e1_serialBias_SfN_BIC;
 
 % main figure: correlations from the jointly fit model
 close all;
-for Gsq = [1 0],
-    for sz = [1 0],
+for Gsq = [0],
+    for sz = [0],
         
         if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
         
@@ -71,16 +74,4 @@ for Gsq = [1 0],
     end
 end
 
-%alldat = e1b_serialBias_SfN_ModelFreeCorrelation_chiSquare; % figure 4
-%forestPlot(alldat);
-%print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_chiSquare.pdf'));
-
-%pharmaPosteriors;
-%e9_prevCorrect; % error vs correct
-%e3_serialBias_SfN_Posteriors; % figure 4c
-
-% to add (from regression models)
-% - RT modulation
-% - kernels (lags)
-
-%
+%alldat = e1b_seri

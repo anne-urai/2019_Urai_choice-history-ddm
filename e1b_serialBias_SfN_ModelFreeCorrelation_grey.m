@@ -130,7 +130,7 @@ for d = length(datasets):-1:1
     
     % compute the difference in correlation
     [rho3, pval3] = corr(cat(1, allresults(:).v_prevresp), cat(1, allresults(:).z_prevresp), ...
-        'rows', 'complete', 'type', 'pearson');
+        'rows', 'complete', 'type', 'spearman');
     if pval3 < 0.05,
         fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
     end
@@ -223,7 +223,7 @@ markers = {'o', 'v', '^'}; %also indicate with different markers
 
 for a = length(allresults):-1:1, % neutral last
     
-    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
+    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'spearman', 'rows', 'complete');
     
     if pval < 0.05,
         % CORRELATION LINE SEPARATELY FOR EACH DATASET?

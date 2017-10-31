@@ -275,7 +275,9 @@ datasets = ['RT_RDK', # 0
     'JW_yesno', # 4
     'Bharath_fMRI', # 5
     'Murphy', # 6
-    'MEG_MEGdata'] # 7
+    'MEG_MEGdata', # 7
+    'JW_PNAS', # 8
+    'JW_fMRI'] # 9
     
 # recode
 if isinstance(d, int):
@@ -387,18 +389,20 @@ for dx in d:
             # get the csv file for this dataset
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
+            mydata      = mydata[mydata.rt > 0.15] # remove superfast responses
             
             subj_params = []
             bic         = []
             for subj_idx, subj_data in mydata.groupby('subj_idx'):
-                m_subj = make_model(mypath, subj_data, models[vx], trace_id)
+                m_subj    = make_model(mypath, subj_data, models[vx], trace_id)
+                # m_subj.find_starting_values() # this may help the fits
                 thismodel = m_subj.optimize('gsquare')
                 thismodel.update({'subj_idx':subj_idx}) # keep original subject number
                 subj_params.append(thismodel)
                 bic.append(m_subj.bic_info)
                 
             params = pd.DataFrame(subj_params)
-            params.to_csv(os.path.join(mypath, models[vx], 'chisquare.csv'))
+            params.to_csv(os.path.join(mypath, models[vx], 'Gsquare.csv'))
             bic = pd.DataFrame(bic)
             bic.to_csv(os.path.join(mypath, models[vx], 'BIC.csv'))
            

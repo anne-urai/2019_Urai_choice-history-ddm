@@ -5,7 +5,7 @@ function b2_HDDM_readIntoMatlab()
   warning off MATLAB:table:ModifiedVarnames % skip this warning
 
     datasets = {'Murphy', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG', 'Anke_merged'};
-	%datasets = {'Murphy'};
+	datasets =  {'JW_fMRI', 'JW_PNAS'};
 
   for d = 1:length(datasets),
     usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
@@ -55,6 +55,10 @@ function b2_HDDM_readIntoMatlab()
       subjects = [4	5	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25];
   	case 'Murphy'
 		subjects =  [109	110	112	113	114	116	117	119	120	121	124	125	126	127	128	129	131	132	134	135	136	137	138	139	140	142];
+	case 'JW_fMRI'
+		subjects = [1	2	3	4	5	6	7	8	9	10	11	12	13	14];
+	case 'JW_PNAS'
+		subjects = [1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23];
     end
 
     for m = 1:length(mdls),

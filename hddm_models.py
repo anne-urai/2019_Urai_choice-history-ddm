@@ -38,14 +38,17 @@ def recode_4stimcoding(mydata):
     mydata.prevcorrect[mydata.prevresp != mydata.prevstim] = 0
     mydata.prevcorrect[mydata.prevresp == mydata.prevstim] = 1
 
-    # also create a binary prevcorrect
-    mydata['prev2correct']     = mydata.prevresp
-    mydata.prev2correct[mydata.prev2resp != mydata.prev2stim] = 0
-    mydata.prev2correct[mydata.prev2resp == mydata.prev2stim] = 1
-    # also create a binary prevcorrect
-    mydata['prev3correct']     = mydata.prevresp
-    mydata.prev3correct[mydata.prev3resp != mydata.prev3stim] = 0
-    mydata.prev3correct[mydata.prev3resp == mydata.prev3stim] = 1
+    try:
+        # also create a binary prevcorrect
+        mydata['prev2correct']     = mydata.prevresp
+        mydata.prev2correct[mydata.prev2resp != mydata.prev2stim] = 0
+        mydata.prev2correct[mydata.prev2resp == mydata.prev2stim] = 1
+        # also create a binary prevcorrect
+        mydata['prev3correct']     = mydata.prevresp
+        mydata.prev3correct[mydata.prev3resp != mydata.prev3stim] = 0
+        mydata.prev3correct[mydata.prev3resp == mydata.prev3stim] = 1
+    except:
+        pass
 
     return mydata
 
