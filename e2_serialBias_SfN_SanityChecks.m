@@ -194,7 +194,7 @@ for d = 1:length(datasets),
             h = ploterr(cohlevels(c), cohdat(3, c), ...
                 [], {cohdat(1, c), cohdat(5, c)}, 'ko', 'abshhxy', 0);
             set(h(1), 'color', colors(c, :), 'markerfacecolor', colors(c, :), ...
-                'markeredgecolor', 'w', 'markersize', 3, 'linewidth', 0.1);
+                'markeredgecolor', colors(c, :), 'markersize', 3, 'linewidth', 0.1);
             set(h(2), 'color', colors(c, :));
         end
         set(gca, 'xtick', cohlevels);
@@ -210,6 +210,10 @@ for d = 1:length(datasets),
         xlim([-2 max(get(gca, 'xlim'))]);
         offsetAxes;
         print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_inset_d%d.eps',d));
+        
+        tightfig;
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_inset_d%d.pdf',d));
+
 
     end
     

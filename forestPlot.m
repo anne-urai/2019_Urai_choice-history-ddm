@@ -1,7 +1,7 @@
 function forestPlot(alldat)
 
 ds = [17 10 16 15 1 2 3 7 8 9]; % from the e1b collection script
-ds = 4:-1:1;
+ds = length(alldat):-1:length(alldat)-3;
 close all;
 axiscolors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
 

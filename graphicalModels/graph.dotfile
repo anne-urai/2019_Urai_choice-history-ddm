@@ -1,0 +1,37 @@
+graph main_graph {
+labelloc=b;
+rankdir=TD;
+labeljust=r;
+ranksep=1;
+"x(p,s,t)" [style=filled, fillcolor=lightgray];
+node [fixedsize=true, width=1, shape=circle, fontsize=24, height=1];
+"t(s)" -- "x(p,s,t)";
+"v(s)" -- "x(p,s,t)";
+"a(s)" -- "x(p,s,t)";
+"dc(s)" -- "x(p,s,t)";
+"z(s)" -- "x(p,s,t)";
+sv -- "x(p,s,t)";
+subgraph cluster_plate_p {
+fontsize=24;
+label="p = 1,2 previous choices";
+"z(s)";
+"dc(s)";
+}
+
+subgraph cluster_plate_s {
+fontsize=24;
+label="s = 1,...,subjects";
+"t(s)";
+"z(s)";
+"dc(s)";
+"v(s)";
+"a(s)";
+subgraph cluster_plate_x {
+fontsize=24;
+label="t = 1,...,trials";
+"x(p,s,t)" [style=filled, fillcolor=lightgray];
+}
+
+}
+
+}
