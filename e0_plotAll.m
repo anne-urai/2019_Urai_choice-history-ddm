@@ -57,8 +57,8 @@ e1_serialBias_SfN_DIC; % figure 3b & c
 
 % main figure: correlations from the jointly fit model
 close all;
-for Gsq = [0],
-    for sz = [0],
+for Gsq = [0 1],
+    for sz = [0 1],
         
         if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
         

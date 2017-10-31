@@ -5,7 +5,7 @@ function b2b_Gsq_readIntoMatlab()
   warning off MATLAB:table:ModifiedVarnames % skip this warning
 
     datasets = {'Murphy', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG', 'Anke_merged'};
-	%datasets = {'Murphy'};
+	datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI'};
 
   for d = 1:length(datasets),
 	  
@@ -77,7 +77,7 @@ function b2b_Gsq_readIntoMatlab()
 	  % GET THE GSQUARE FITS
       % ============================================ %
 	  
-      gsq = readtable(sprintf('%s/%s/chisquare.csv', usepath, mdls{m}));
+      gsq = readtable(sprintf('%s/%s/Gsquare.csv', usepath, mdls{m}));
 	 
      % ============================================ %
   	 % APPEND BIC VALUES
