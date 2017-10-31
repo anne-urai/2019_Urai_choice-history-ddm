@@ -1,14 +1,17 @@
-function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey
+function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz)
 % from the csv table, make an overview of repetition behaviour
 
 % get a huge list with values for each participant
 % can then work with this dataframe
 
-clear; close all; clc;
+close all; clc;
 addpath(genpath('~/code/Tools'));
 
 global mypath datasets datasetnames
 cnt = 1;
+
+if ~exist('Gsq', 'var'), Gsq = 0; end
+if ~exist('sz', 'var'),  sz = 0; end
 
 % ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
@@ -16,13 +19,24 @@ cnt = 1;
 
 doText = true;
 
+switch sz
+    case 1
+        whichmdls = ['stimcodingsz'];
+    case 0
+        whichmdls = ['stimcoding'];
+end
+
 close all;
 for d = length(datasets):-1:1
     disp(datasets{d});
     
     colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
     
-    results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+    if Gsq,
+        results = readtable(sprintf('%s/summary/%s/allindividualresults_Gsq.csv', mypath, datasets{d}));
+    else
+        results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+    end
     results = results(results.session == 0, :);
     
     allresults = struct(); alltitles = {};
@@ -33,7 +47,7 @@ for d = length(datasets):-1:1
             % THEN PLOT THESE SEPARATELY
             
             % use the stimcoding difference only from alternating
-            allresults(1).z_prevresp        = results.z_1_neu__stimcodingdczprevresp - results.z_2_neu__stimcodingdczprevresp;
+            allresults(1).z_prevresp        = results.(['z_1_neu__' whichmdls 'dczprevresp']) - results.(['z_2_neu__' whichmdls 'dczprevresp']);
             allresults(1).v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_neu__stimcodingdczprevresp;
             allresults(1).criterionshift    = results.repetition_neutral;
             allresults(1).subjnr            = results.subjnr;
@@ -80,21 +94,21 @@ for d = length(datasets):-1:1
             try
                 % use the stimcoding difference
                 results.z_prevresp = ...
-                    results.z_1__stimcodingdczprevresp - results.z_2__stimcodingdczprevresp;
+                    results.(['z_1__' whichmdls 'dczprevresp']) - results.(['z_2__' whichmdls 'dczprevresp']);
                 results.v_prevresp = ...
-                    results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
+                    results.(['dc_1__' whichmdls 'dczprevresp']) - results.(['dc_2__' whichmdls 'dczprevresp']);
             catch
                 results.z_prevresp = ...
-                    results.z_1_0__stimcodingdczprevresp - results.z_2_0__stimcodingdczprevresp;
+                    results.(['z_1_0__' whichmdls 'dczprevresp']) - results.(['z_2_0__' whichmdls 'dczprevresp']);
                 results.v_prevresp = ...
-                    results.dc_1_0__stimcodingdczprevresp - results.dc_2_0__stimcodingdczprevresp;
+                    results.(['dc_1_0__' whichmdls 'dczprevresp']) - results.(['dc_2_0__' whichmdls 'dczprevresp']);
             end
             
             results.criterionshift = results.repetition;
             
             % assign to structure
-            allresults(1).z_prevresp = results.z_prevresp;
-            allresults(1).v_prevresp = results.v_prevresp;
+            allresults(1).z_prevresp     = results.z_prevresp;
+            allresults(1).v_prevresp     = results.v_prevresp;
             allresults(1).criterionshift = results.criterionshift;
             
             alltitles{1} = datasetnames{d}{1}; % use only the dataset title
@@ -143,18 +157,15 @@ for d = length(datasets):-1:1
         end
         title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
     end
-    
-    % LEGEND
-    switch datasets{d}
-        case 'Bharath_fMRI'
-          %  l = legend([handles{1}(1) handles{2}(1) handles{3}(1)], {'Repetitive', 'Neutral', 'Alternating'});
-            % l.Box = 'off';
+
+    tightfig;
+    if Gsq,
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_Gsq_modelfree_stimcoding_sz%d_d%d.pdf', d, sz));
+    else
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_sz%d_d%d.pdf', d, sz));
+        %print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.eps', d));
     end
     
-    tightfig;
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.pdf', d));
-    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.eps', d));
-
     for a = 1:length(allresults),
         
         % SAVE CORRELATIONS FOR OVERVIEW PLOT
