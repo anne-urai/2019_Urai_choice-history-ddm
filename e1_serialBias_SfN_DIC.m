@@ -18,7 +18,7 @@ for s = 1:length(types),
         close all;
         subplot(4, 6, 1);
         getPlotDIC(mdls, types{s}, d);
-        % title(datasetnames{d});
+         title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'both'});
         
         % if ismember(d, [1]),

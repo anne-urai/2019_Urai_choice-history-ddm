@@ -109,7 +109,7 @@ for d = 1:length(datasets),
     end
     
     offsetAxes; box off;
-    %title(datasetnames{d});
+    title(datasetnames{d});
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_driftrate_d%d.pdf',d));

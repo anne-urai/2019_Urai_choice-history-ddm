@@ -45,7 +45,7 @@ disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
 e1_serialBias_SfN_DIC; % figure 3b & c
 %e1_serialBias_SfN_BIC;
@@ -74,4 +74,5 @@ for Gsq = [0 1],
     end
 end
 
-%alldat = e1b_seri
+% MODEL-FREE QUANTIFICATION OF BIAS, White & Poldrack Conditional Response Functions
+e6_serialBias_SfN_modelFree_CRF

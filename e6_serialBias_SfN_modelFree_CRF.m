@@ -6,8 +6,6 @@ function e6_serialBias_SfN_modelFree_CRF
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames
-datasets = {'RT_RDK', 'projects/0/neurodec/Data/MEG-PL', 'Anke_2afc_neutral', 'NatComm'};
-datasetnames = {'RT', '2IFC', 'Anke neutral', 'NatComm'};
 
 set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
@@ -23,32 +21,27 @@ for d = 1:length(datasets),
     
     % load data
     clearvars -except d datasets cnt datasetnames whichSJ ylims;
-    csvfile = dir(sprintf('~/Data/%s/HDDM/*.csv', datasets{d}));
+    csvfile = dir(sprintf('~/Data/HDDM/%s/*.csv', datasets{d}));
     csvfile = csvfile(arrayfun(@(x) ~strcmp(x.name(1),'.'), csvfile)); % remove hidden files
-    alldata = readtable(sprintf('~/Data/%s/HDDM/%s', datasets{d}, csvfile.name));
+    alldata = readtable(sprintf('~/Data/HDDM/%s/%s', datasets{d}, csvfile.name));
     
     % define repeaters and alternators based on dc
-    dat = readtable(sprintf('~/Data/%s/HDDM/summary/allindividualresults.csv', ...
+    dat = readtable(sprintf('~/Data/HDDM/summary/%s/allindividualresults.csv', ...
         datasets{d}));
-    if d > 2,
-        alldata.stimulus = sign(alldata.motionenergy);
-    end
+    dat = dat(dat.session == 0, :);
     
     % find alternators and repeaters
     allsubjects = unique(dat.subjnr); clear groups;
-    groups{1}   = unique(dat.subjnr((dat.v_prevresp__regressdcprevrespstim < 0 & ...
-        dat.criterionshift < 0)));
-    groups{3}   = unique(dat.subjnr((dat.v_prevresp__regressdcprevrespstim > 0)  & ...
-        dat.criterionshift > 0));
-    groups{2}   = setdiff(allsubjects, [groups{1}; groups{3}]);
+    groups{1}   = unique(dat.subjnr(dat.repetition < 0.5));
+    groups{2}   = unique(dat.subjnr(dat.repetition > 0.5));
     alldata.session(:) = 1;
     
     cnt = d;
-    groupnames  = {'alternators', 'rest', 'repeaters'};
+    groupnames  = {'alternators', 'repeaters'};
     for gr = 1:length(groups),
         sph{gr} = subplot(4,4,cnt); cnt = cnt + 4;
         h = plotCRF(alldata(ismember(alldata.subj_idx, groups{gr}), :));
-        title({datasetnames{d}, sprintf('%s n = %d', groupnames{gr}, numel(groups{gr}))});
+        title({datasetnames{d}{1}, sprintf('%s n = %d', groupnames{gr}, numel(groups{gr}))});
         axis square;
     end
     
