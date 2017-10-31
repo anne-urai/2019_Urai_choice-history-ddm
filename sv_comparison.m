@@ -21,15 +21,18 @@ for d = 1:length(datasets),
     % show if these are significant - two sided
     % https://github.com/jwdegee/2017_eLife/blob/master/hddm_regression.py, line 273
     
-    axis tight; axis square;
-    xlims = get(gca, 'xlim');
-    xlim([xlims(1) xlims(2)*1.2]);
-    set(gca, 'xtick', [0 max(get(gca, 'xtick'))]);
-    offsetAxes_y;
+    axis square; axis tight;
+    % xlims = get(gca, 'xlim');
+    % xlim([xlims(1) xlims(2)*1.2]);
+    set(gca, 'xtick', [min(get(gca, 'xtick')) max(get(gca, 'xtick'))]);
+    % offsetAxes_y;
     title(datasetnames{d}{1});
+	ylabel('sv');
+	xlabel('Probability');
     tightfig;
+	
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/sv_comparison_d%d.pdf', d));
-
+	
 end
 
 end

@@ -44,6 +44,8 @@ end
 disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
+sv_comparison;
+assert(1==0)
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
