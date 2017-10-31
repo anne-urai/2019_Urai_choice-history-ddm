@@ -65,8 +65,19 @@ if ~exist('ds', 'var'), ds = 1:length(datasets); end
       end
     end
 
-    % get the summary results from HDDM
-    hddmresults = readtable(sprintf('%s/summary/%s/individualresults.csv', mypath, datasets{d}));
+	for whichFit = 1:2,
+		
+	switch whichFit
+	case 1
+    	% get the summary results from HDDM
+    	hddmresults = readtable(sprintf('%s/summary/%s/individualresults.csv', mypath, datasets{d}));
+	case 2
+		if exist(sprintf('%s/summary/%s/individualresults_Gsq.csv', mypath, datasets{d}), 'file'),
+    	hddmresults = readtable(sprintf('%s/summary/%s/individualresults_Gsq.csv', mypath, datasets{d}));
+	else
+		continue;
+	end
+	end
 
     % most parameters will go under session 0
     hddmresults.session = zeros(size(hddmresults.subjnr));
@@ -129,7 +140,13 @@ if ~exist('ds', 'var'), ds = 1:length(datasets); end
     skippedSession = (isnan(nanmean(tab{:, 3:11}, 2)));
     tab(skippedSession, :) = [];
 
-    writetable(tab, sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+	switch whichFit
+	case 1
+    	writetable(tab, sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+	case 2
+    	writetable(tab, sprintf('%s/summary/%s/allindividualresults_Gsq.csv', mypath, datasets{d}));
+	end
+	
     fprintf('%s/summary/%s/allindividualresults.csv \n', mypath,  datasets{d});
 
   end

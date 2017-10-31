@@ -41,14 +41,16 @@ disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
 % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-%e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
 %e1_serialBias_SfN_DIC; % figure 3b & c
 
+% show the fits separately for dc and z
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits; % figure 4
 forestPlot(alldat);
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_indep.pdf'));
 
+% main figure: correlations from the jointly fit model
 close all;
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey; % figure 4
 forestPlot(alldat);

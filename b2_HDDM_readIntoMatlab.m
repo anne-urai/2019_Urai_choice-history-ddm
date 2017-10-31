@@ -30,7 +30,11 @@ function b2_HDDM_readIntoMatlab()
     'regress_dc_z_prev3resp_prev3stim', ...
     'stimcoding_nohist_onlyz', 'stimcoding_nohist_onlydc', ...
     'stimcoding_dc_z_prevresp_sessions', ...
-    'stimcoding_st_dc_z_prevresp'};
+	'stimcoding_sz_nohist', ...
+	'stimcoding_sz_dc_prevresp', ...
+	'stimcoding_sz_z_prevresp', ...
+	'stimcoding_sz_dc_z_prevresp', ...
+    };
 
     switch datasets{d}
     case 'RT_RDK'
@@ -49,15 +53,15 @@ function b2_HDDM_readIntoMatlab()
       subjects =   [1     2     3     4     5     7     8     9    10    11    12    13    14    15];
     case 'Bharath_fMRI'
       subjects = [4	5	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25];
-  case 'Murphy'
-	subjects =   [109	110	112	113	114	116	117	119	120	121	124	125	126	127	128	129	131	132	134	135	136	137	138	139	140	142];
+  	case 'Murphy'
+		subjects =  [109	110	112	113	114	116	117	119	120	121	124	125	126	127	128	129	131	132	134	135	136	137	138	139	140	142];
     end
 
     for m = 1:length(mdls),
 
       % skip if this model is empty
       stuff = dir(sprintf('%s/%s', usepath, mdls{m}));
-      stuff = stuff(arrayfun(@(x) ~strcmp(x.name(1),'.'),stuff)); % remove hidden stuff
+      stuff = stuff(arrayfun(@(x) ~strcmp(x.name(1),'.'),stuff)); % remove hidden files 
       if isempty(stuff),
         disp(['skipping ' mdls{m}]);
         continue;
@@ -187,12 +191,6 @@ function b2_HDDM_readIntoMatlab()
         varnames{v} = regexprep(varnames{v}, '[().]', '_');
         varnames{v} = regexprep(varnames{v}, '_-1(?=_)', '_2');
         varnames{v} = regexprep(varnames{v}, '_$', '');
-
-        % correct z
-        if (isempty(strfind(mdls{m}, 'stimcoding')) & ~isempty(strfind(varnames{v}, 'z_Intercept'))) || ...
-          (~isempty(strfind(mdls{m}, 'stimcoding')) & ~isempty(strfind(varnames{v}(1), 'z'))),
-          % pointestimates{v, :} = 1 ./ (1 + exp(pointestimates{v, :}));
-        end
 
         if strfind(varnames{v}, 'session'),
           varnames{v} = regexprep(varnames{v}, 'C[a-zA-Z_]+(?=\d)', '_s');
