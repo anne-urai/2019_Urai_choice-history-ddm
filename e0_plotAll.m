@@ -21,7 +21,7 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', ...
+datasets = {'RT_RDK', 'JW_yesno', 'NatComm', 'MEG', ...
     'JW_PNAS', 'JW_fMRI', ...
     'Anke_2afc_sequential', ...
     'MEG_MEGsessions',  'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
@@ -45,7 +45,6 @@ disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
 sv_comparison;
-assert(1==0)
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
