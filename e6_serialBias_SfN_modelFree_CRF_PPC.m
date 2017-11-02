@@ -6,12 +6,12 @@ function e6_serialBias_SfN_modelFree_CRF_PPC
 
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
-global datasets datasetnames
+global datasets datasetnames mypath
 
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
 qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
 
-for d = 3; % 1:length(datasets),
+for d = 1:length(datasets),
     
     % plot
     close all;
@@ -23,17 +23,24 @@ for d = 3; % 1:length(datasets),
     models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_nohist'};
     colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
 
-    for m = 3:length(models),
+    for m = 1:length(models),
         
+		if ~exist(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}), 'file'),
+			assert(1==0);
+			continue;
+		else
+			fprintf('%s/%s/%s/ppc_data.csv \n', mypath, datasets{d}, models{m});
+		end
+		
         % load simulated data - make sure this has all the info we need
-        alldata    = readtable(sprintf('~/Data/HDDM/%s/%s/ppc_data.csv', datasets{d}, models{m}));
+        alldata    = readtable(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}));
         
         % use the simulations rather than the subjects' actual responses
         alldata.rt = alldata.rt_sampled; 
         alldata.response = alldata.response_sampled;
         
         % define repeaters and alternators based on dc
-        dat = readtable(sprintf('~/Data/HDDM/summary/%s/allindividualresults.csv', datasets{d}));
+        dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
         dat = dat(dat.session == 0, :);
         
         % recode into repeat and alternate
@@ -71,7 +78,9 @@ for d = 3; % 1:length(datasets),
     title(datasetnames{d}{1});
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf', d));
+	fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
     
+
 end
 
 end

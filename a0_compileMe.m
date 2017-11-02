@@ -64,8 +64,8 @@ function [] = a0_compileMe(fname)
 
     % PPC
         alldat = [];
-        for a = [8 9],
-			for v = 0,
+        for a = 0:9
+			for v = 0:3,
             alldat = [alldat; a v];
 		end
         end
