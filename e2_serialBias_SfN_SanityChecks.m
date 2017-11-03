@@ -177,18 +177,29 @@ for d = 1:length(datasets),
         
         % grab the percentiles for all coherence levels
         cohflds = regexp(fieldnames(group), 'v_c[0-9_]*_prct', 'match');
+        if all(cellfun(@isempty, cohflds)),
+            cohflds = regexp(fieldnames(group), 'v_0_[0-9_]*_prct', 'match');
+        end
         cohflds = cohflds(~cellfun(@isempty, cohflds));
         cohflds = [cohflds{:}];
         cohdat = nan(5, length(cohflds));
         for c = 1:length(cohflds),
             cohdat(:, c) = group.(cohflds{c});
         end
+        
         % extract the coherence levels themselves
         cohflds     = regexprep(cohflds, '_', '.');
         cohflds     = regexprep(cohflds, 'v.c', '');
         cohflds     = regexprep(cohflds, '.prct', '');
         cohlevels   = str2double(cohflds);
-       
+        if all(isnan(cohlevels)),
+            cohflds     = regexprep(cohflds, 'v.0.', '');
+            cohlevels   = str2double(cohflds);
+            if ~all(diff(cohlevels) > 0),
+                cohlevels(2) = cohlevels(2) * 10;
+            end
+        end
+        
         hold on;
         for c = 1:length(cohlevels),
             h = ploterr(cohlevels(c), cohdat(3, c), ...

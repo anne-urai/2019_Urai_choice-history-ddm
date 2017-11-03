@@ -173,11 +173,13 @@ for d = length(datasets):-1:1
         alldat(cnt).corrz = r(1,2);
         alldat(cnt).corrz_ci = [rlo(1,2) rup(1,2)];
         alldat(cnt).pz = p(1,2);
+        alldat(cnt).bfz = corrbf(r(1,2), numel(allresults(a).z_prevresp));
         
         [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).criterionshift);
         alldat(cnt).corrv = r(1,2);
         alldat(cnt).corrv_ci = [rlo(1,2) rup(1,2)];
         alldat(cnt).pv = p(1,2);
+        alldat(cnt).bfv = corrbf(r(1,2), numel(allresults(a).v_prevresp));
         
         alldat(cnt).datasets = datasets{d};
         alldat(cnt).datasetnames = alltitles{a};

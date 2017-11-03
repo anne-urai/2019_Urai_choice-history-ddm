@@ -25,14 +25,15 @@ datasets = {'RT_RDK', 'JW_yesno', 'NatComm', 'MEG', ...
     'JW_PNAS', 'JW_fMRI', ...
     'Anke_2afc_sequential', ...
     'MEG_MEGsessions',  'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
-datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI'};
+datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', ...
+    'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
+datasets = datasets(1:4);
 
 datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2IFC-1'}, {'2IFC-2'}, ...
-    {'Yes/no contrast RT-1'},  {'Yes/no contrast RT-2'}, ...
+    {'Yes/no contrast RT'},  ...
     {'2AFC-1, Braun et al. 2017'}, ...
-    {'2IFC-2, MEG sessions'}, ...
-    {'2AFC-2'}, {'2AFC-1, Anke MEG'}, {'2AFC-1'}};
+   {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
 % go to code
 try
@@ -44,10 +45,10 @@ end
 disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
-e6_serialBias_SfN_modelFree_CRF_PPC
-assert(1==0)
+% e6_serialBias_SfN_modelFree_CRF_PPC
+% assert(1==0)
 
-sv_comparison;
+% sv_comparison;
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
@@ -61,8 +62,8 @@ e1_serialBias_SfN_DIC; % figure 3b & c
 
 % main figure: correlations from the jointly fit model
 close all;
-for Gsq = [0 1],
-    for sz = [0 1],
+for Gsq = [0],
+    for sz = [0],
         
         if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
         
