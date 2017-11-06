@@ -8,52 +8,46 @@ global datasets datasetnames
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
 
-
-cnt = 1; close all;
-params = {'dc', 'z'};
-
-for pa = 1:length(params),
-    for d = 1:length(datasets),
-        
-        % get traces for the model with pupil and rt modulation
-        traces = readtable(sprintf('~/Data/HDDM/%s/regress_dc_z_prevresp_prevstim_prevrt_prevpupil/all_traces.csv', datasets{d}));
-        
-        switch params
-            case 'dc'
-                dat1 = traces.v_prevresp_prevrt;
-                dat2 = traces.v_prevresp_prevpupil;
-            case 'z'
-                dat1 = invlogit(traces.z_prevresp_prevrt);
-                dat2 = invlogit(traces.z_prevresp_prevpupil);
-        end
-        
-        colors = cbrewer('qual', 'Paired', 8);
-        % plot the pupil and RT traces
-        subplot(4,4,d); hold on;
-        h1 = histogram_smooth(dat1, colors(1, :), colors(2, :));
-        h2 = histogram_smooth(dat, colors(3, :), colors(4, :));
-        
-        % show if these are significant (1-sided?)
-        pvalRT    = min([mean(dat1 > 0) mean(dat1 < 0)]);
-        pvalPupil    = min([mean(dat2 > 0) mean(dat2 < 0)]);
-        
-        axis tight; axis square;
-        l = legend([h1 h2], {sprintf('RT, p = %.3f', pvalRT); sprintf('Pupil, p = %.3f', pvalPupil)}, ...
-            'location', 'southeast');
-        l.Position(2) = l.Position(2) - 0.15;
-        legend boxoff;
-        title(datasetnames{d}); xlabel(sprinft('%s ~ prevresp modulation', params{pa}));
-        vline(0);
-        offsetAxes_y;
-        print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure2_modulationTraces_%s.eps', plots{p}));
-
-    end
+close all;
+for d = 1:length(datasets),
+    
+    % get traces for the model with pupil and rt modulation
+    traces = readtable(sprintf('~/Data/HDDM/%s/regress_dc_z_prevresp_prevrt/all_traces.csv', datasets{d}));
+    
+    dat1 = traces.z_prevresp_prevrt;
+    dat2 = traces.v_prevresp_prevrt;
+ 
+    % colors
+    colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
+    
+    % plot the pupil and RT traces
+    subplot(4,4,d); hold on;
+    h1 = histogram_smooth(dat1, [], colors(1, :));
+    h2 = histogram_smooth(dat2, [], colors(2, :));
+    
+    % show if these are significant (1-sided?)
+    pvalZ       = min([mean(dat1 > 0) mean(dat1 < 0)]);
+    pvalV       = min([mean(dat2 > 0) mean(dat2 < 0)]);
+    
+    axis tight; axis square;
+    l = legend([h1 h2], {sprintf('zbias, p = %.3f', pvalZ); sprintf('vbias, p = %.3f', pvalV)}, ...
+        'location', 'southeast');
+    l.Position(2) = l.Position(2) - 0.15;
+    legend boxoff;
+    title(datasetnames{d}); 
+    %xlabel(sprinft('%s ~ prevresp modulation', params{pa}));
+    %vline(0);
+    %offsetAxes_y;
+    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure2_modulationTraces_D%s.eps', d));
+    
 end
 end
 
 function h = histogram_smooth(x, color1, color2)
 [f,xi] = ksdensity(x);
-area(xi, f, 'edgecolor', 'none', 'facecolor', color1);
+if ~isempty(color1),
+    area(xi, f, 'edgecolor', 'none', 'facecolor', color1);
+end
 % area
 h = plot(xi, f, 'color', color2, 'linewidth', 1);
 end

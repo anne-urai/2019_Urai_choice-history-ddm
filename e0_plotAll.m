@@ -27,7 +27,6 @@ datasets = {'RT_RDK', 'JW_yesno', 'NatComm', 'MEG', ...
     'MEG_MEGsessions',  'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
 datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', ...
     'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
-datasets = datasets(1:4);
 
 datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2IFC-1'}, {'2IFC-2'}, ...
@@ -35,6 +34,8 @@ datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
+datasets = datasets(3:4);
+datasetnames = datasetnames(3:4);
 % go to code
 try
     cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
@@ -81,3 +82,8 @@ end
 
 % MODEL-FREE QUANTIFICATION OF BIAS, White & Poldrack Conditional Response Functions
 e6_serialBias_SfN_modelFree_CRF
+
+% ======================= %
+% REGRESSION MODELS
+% ======================= %
+

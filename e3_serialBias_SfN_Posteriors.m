@@ -11,8 +11,10 @@ global mypath datasets datasetnames
 %     {'2AFC, Braun et al. 2017', 'Neutral'}, ...
 %     {'2AFC, Braun et al. 2017', 'Repetitive'}};
 
-datasets = {'Anke_merged', 'Bharath_fMRI'};
-datasetnames = {'2AFC-1', '2AFC-2'};
+datasets =     {'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
+
+datasetnames = {   {'2AFC-1, Braun et al. 2017'}, ...
+   {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
 % ========================================== %
 % MODULATION OF SERIAL CHOICE BIAS

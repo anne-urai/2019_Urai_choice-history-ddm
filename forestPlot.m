@@ -49,7 +49,12 @@ set(gca, 'xcolor', axiscolors(2, :));
 plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest([alldat(ds).corrz]);
 % title(sprintf('t(%d) = %.3f, p = %.4f', stats.df, stats.tstat, pval));
+
+if ~h
 title(sprintf('BF10 = 1/%.3e', 1./ prod([alldat(ds).bfz])));
+else
+title(sprintf('BF10 = 1/%.2f', 1./ prod([alldat(ds).bfz])));
+end
 
 %% NOW FOR DRIFT CRITERION
 
