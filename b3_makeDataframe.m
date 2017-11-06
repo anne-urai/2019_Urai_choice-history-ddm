@@ -17,9 +17,10 @@ function b3_makeDataframe(ds)
   case 'aeurai' % lisa/cartesius
     mypath = '/nfs/aeurai/HDDM';
   end
-  datasets = {'Anke_merged', 'Murphy', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG'};
-  datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI'};
-
+  
+ datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
+  'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI', 'Anke_merged'};
+ 
   set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...
   'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');

@@ -43,8 +43,8 @@ function [] = a0_compileMe(fname)
     % ============================================ #
 
     nsmp       = [10000]
-    datasets   = [0 1 2 4 6 8 9]; % RT-RDK and MEG-PL
-    models     = [20]; % the nr of the models
+    datasets   = [3 5 10 11]; % RT-RDK and MEG-PL
+    models     = [0:3 17:20]; % the nr of the models
     nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
     alldat = [];

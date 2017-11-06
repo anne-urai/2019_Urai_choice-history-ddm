@@ -4,8 +4,8 @@ function b2_HDDM_readIntoMatlab()
   close all; clc;
   warning off MATLAB:table:ModifiedVarnames % skip this warning
 
-    datasets = {'Murphy', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG', 'Anke_merged'};
-	datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI'};
+	datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
+	'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI', 'Anke_merged'};
 
   for d = 1:length(datasets),
     usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
@@ -41,7 +41,7 @@ function b2_HDDM_readIntoMatlab()
       subjects = [3:15 17:25];
     case {'MEG', 'MEG_MEGsessions'}
       subjects = 2:65;
-    case {'Anke_2afc_serial', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'},
+    case {'Anke_2afc_sequential', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'},
       subjects = [1:7 9 11:16 18:21 23 24 26 27];
     case 'NatComm'
       subjects = 1:27;
@@ -274,9 +274,13 @@ function b2_HDDM_readIntoMatlab()
             thismdlname = regexprep(thismdlname, 'prevrespstim_prevrtpupil', 'prevrespstimrtpupil');
             thismdlname = regexprep(thismdlname, 'sessions', 'sess');
             thismdlname = regexprep(thismdlname, '_', '');
-
+			
+			try
             varname = [flds{p}(1:end-5) '__' thismdlname];
             results.(varname) = individuals.(flds{p});
+		catch
+			assert(1==0)
+		end
           elseif ~isempty(strfind(flds{p}, 'prct')),
             % also save error bounds around each individual datapoint!
             thismdlname = regexprep(mdls{m}, 'prevresp_prevstim', 'prevrespstim');
