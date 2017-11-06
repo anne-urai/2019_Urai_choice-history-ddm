@@ -34,8 +34,8 @@ datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
-datasets = datasets(3:4);
-datasetnames = datasetnames(3:4);
+datasets = datasets(1:4);
+datasetnames = datasetnames(1:4);
 % go to code
 try
     cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
@@ -46,8 +46,11 @@ end
 disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
-% e6_serialBias_SfN_modelFree_CRF_PPC
+e6_serialBias_SfN_modelFree_CRF_PPC
 % assert(1==0)
+
+% MODEL-FREE QUANTIFICATION OF BIAS, White & Poldrack Conditional Response Functions
+e6_serialBias_SfN_modelFree_CRF
 
 % sv_comparison;
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
@@ -80,8 +83,6 @@ for Gsq = [0],
     end
 end
 
-% MODEL-FREE QUANTIFICATION OF BIAS, White & Poldrack Conditional Response Functions
-e6_serialBias_SfN_modelFree_CRF
 
 % ======================= %
 % REGRESSION MODELS
