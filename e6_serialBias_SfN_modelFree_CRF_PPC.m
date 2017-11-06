@@ -9,7 +9,7 @@ warning off; close all; clear;
 global datasets datasetnames mypath
 
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
-qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
+%qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
 
 for d = 1:length(datasets),
     
@@ -20,7 +20,7 @@ for d = 1:length(datasets),
     
     % redo this for each simulation
     models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_nohist', 'stimcoding_nohist'};
-    colors = [141 165 8;  8 141 165; 150 150 150; 0 0 0] ./ 256;
+    colors = [141 165 8; 8 141 165; 150 150 150; 0 0 0] ./ 256;
 
     for m = 1:length(models),
         
@@ -32,15 +32,17 @@ for d = 1:length(datasets),
 		
         % load simulated data - make sure this has all the info we need
         alldata    = readtable(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}));
+        alldata    = sortrows(alldata, {'subj_idx'});
         
         if m < length(models),
             % use the simulations rather than the subjects' actual responses
             alldata.rt          = abs(alldata.rt_sampled);
             alldata.response    = alldata.response_sampled;
-        else
-            alldata.rt  = abs(alldata.rt);
         end
       
+        % make sure to use absolute RTs
+        alldata.rt = abs(alldata.rt);
+        
         % recode into repeat and alternate for the model
         alldata.repeat = zeros(size(alldata.response));
         alldata.repeat(alldata.response == (alldata.prevresp > 0)) = 1;
@@ -58,7 +60,6 @@ for d = 1:length(datasets),
         discretizeRTs = @(x) {discretize(x, quantile(x, [0, qntls]))};
         rtbins = splitapply(discretizeRTs, alldata.rt, findgroups(alldata.subj_idx));
         alldata.rtbins = cat(1, rtbins{:});
-        % scatter(1:length(alldata.rt), alldata.rt, 10, alldata.rtbins, 'filled');
         
         % get RT quantiles for choices that are in line with or against the bias
         [gr, sjidx, rtbins] = findgroups(alldata.subj_idx, alldata.rtbins);
