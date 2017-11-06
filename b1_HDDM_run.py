@@ -266,7 +266,8 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_sz_dc_prevresp', # 18
     'stimcoding_sz_z_prevresp', # 19
     'stimcoding_sz_dc_z_prevresp', # 20
-    ]
+    'regress_dc_prevresp', # 21
+    'regress_dc_prevresp_prevrt'] # 22
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1
