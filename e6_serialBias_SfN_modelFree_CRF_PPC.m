@@ -9,9 +9,9 @@ warning off; close all; clear;
 global datasets datasetnames mypath
 
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
-% qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
+qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
 
-for d = 1; %:length(datasets),
+for d = 1:length(datasets),
     
     % plot
     close all;
@@ -32,11 +32,6 @@ for d = 1; %:length(datasets),
 		
         % load simulated data - make sure this has all the info we need
         alldata    = readtable(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}));
-        try
-            alldata    = sortrows(alldata, {'subj_idx', 'session', 'block', 'trialnr'});
-        catch
-            alldata    = sortrows(alldata, {'subj_idx', 'session', 'trialnr'});
-        end
         
         if m < length(models),
             % use the simulations rather than the subjects' actual responses
@@ -92,7 +87,6 @@ for d = 1; %:length(datasets),
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf', d));
 	fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
     
-
 end
 
 end
