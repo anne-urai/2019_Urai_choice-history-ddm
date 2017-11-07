@@ -11,20 +11,20 @@ global datasets datasetnames mypath
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
 % qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
 
-for d = 1:length(datasets),
+for d = 6:length(datasets),
     
     switch datasets{d}
         case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}
-            tps = [20 50 80];
+            tps = [20 80];
         otherwise
             tps = 0;
     end
     
+    % plot
+    close all;
+    subplot(441); hold on;
+    
     for tp = 1:length(tps),
-        
-        % plot
-        close all;
-        subplot(441); hold on;
         
         % redo this for each simulation
         models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp', 'stimcoding_nohist', 'stimcoding_nohist'};
@@ -45,7 +45,7 @@ for d = 1:length(datasets),
             if ~any(ismember(alldata.Properties.VariableNames, 'transitionprob'))
                 alldata.transitionprob = zeros(size(alldata.subj_idx));
             else
-                assert(nanmean(unique(alldata.transitionprob)) == 0.5, 'rescale units');
+                assert(nanmean(unique(alldata.transitionprob)) == 50, 'rescale units');
                 alldata = alldata(alldata.transitionprob == tps(tp), :);
             end
             
@@ -72,7 +72,7 @@ for d = 1:length(datasets),
             altIdx = ismember(alldata.subj_idx, sjrep);
             if tps(tp) == 0,
                 alldata.biased(altIdx) = double(~(alldata.biased(altIdx))); % flip
-            end
+		    end
             
             % divide RT into quantiles for each subject
             discretizeRTs = @(x) {discretize(x, quantile(x, [0, qntls]))};
@@ -91,19 +91,21 @@ for d = 1:length(datasets),
             % biased choice proportion
             if m < length(models),
                 if isnumeric(colors{m})
-                    plot(qntls, nanmean(mat, 1), 'color', colors{m}, 'linewidth', 1.5);
+                    plot(qntls, nanmean(mat, 1), 'color', colors{m}, 'linewidth', 1);
                 elseif iscell(colors{m}) % superimposed lines for dashed
-                    plot(qntls, nanmean(mat, 1), 'color', colors{m}{1}, 'linewidth', 1.5);
-                    plot(qntls, nanmean(mat, 1), ':', 'color', colors{m}{2}, 'linewidth', 1.5);
+                    plot(qntls, nanmean(mat, 1), 'color', colors{m}{1}, 'linewidth', 1);
+                    plot(qntls, nanmean(mat, 1), ':', 'color', colors{m}{2}, 'linewidth', 1);
                 end
             else
                 %% ALSO ADD THE REAL DATA
-                h = ploterr(qntls, nanmean(mat, 1), [], nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k-o', 'abshhxy', 0);
-                set(h(1), 'color', 'k', 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'linewidth', 0.5, 'markersize', 4);
+                h = ploterr(qntls, nanmean(mat, 1), [], nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k-', 'abshhxy', 0);
+                set(h(1), 'color', 'k', 'marker', '.', 'markerfacecolor', 'k', 'markeredgecolor', 'k', 'linewidth', 0.5, 'markersize', 10);
                 set(h(2), 'linewidth', 0.5);
             end
         end
         
+		end
+		
         axis tight; box off;
         set(gca, 'xtick', qntls);
         axis square;  offsetAxes;
@@ -120,15 +122,16 @@ for d = 1:length(datasets),
             end
             ylabel('Fraction repetitions');
         else
-            title(datasetnames{d}{1});
             ylabel('Fraction biased choices');
         end
         
+        title(datasetnames{d}{1});
+	
         tightfig;
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_tp%d.pdf', d, tps(tp)));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf', d));
         fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
         
-    end
+    
 end
 
 end
