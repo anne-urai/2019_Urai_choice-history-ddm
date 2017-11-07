@@ -34,8 +34,8 @@ datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
-datasets = datasets(1:4);
-datasetnames = datasetnames(1:4);
+%% datasets = datasets(7);
+% datasetnames = datasetnames(7);
 % go to code
 try
     cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
