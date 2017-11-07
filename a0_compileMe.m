@@ -64,7 +64,7 @@ function [] = a0_compileMe(fname)
 
     % PPC
         alldat = [];
-        for a = 0:9
+        for a = [3 5 10 11]
 			for v = 0:3,
             alldat = [alldat; a v];
 		end

@@ -279,8 +279,8 @@ datasets = ['RT_RDK', # 0
     'MEG_MEGdata', # 7
     'JW_PNAS', # 8
     'JW_fMRI', # 9
-    'Anke_2afc_sequential',
-    'Anke_MEG'] # 10
+    'Anke_2afc_sequential', #10
+    'Anke_MEG'] # 11
     
 # recode
 if isinstance(d, int):
@@ -375,11 +375,19 @@ for dx in d:
             ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=50)
             
             # make the csv smaller, save disk space
-            try:
-                ppc = ppc[['rt','rt_sampled', 'response_sampled', 
-                    'index', 'stimulus', 'response', 'prevresp', 'subj_idx', 'session', 'block', 'trial']]
-            except:
-                pass
+            if 'transitionprob' in ppc.columns:
+                try:
+                    ppc = ppc[['rt','rt_sampled', 'response_sampled', 
+                        'index', 'stimulus', 'response', 'prevresp', 'subj_idx', 
+                        'transitionprob']]
+                except:
+                    pass
+            else:
+                try:
+                    ppc = ppc[['rt','rt_sampled', 'response_sampled', 
+                        'index', 'stimulus', 'response', 'prevresp', 'subj_idx']]
+                except:
+                    pass
 
             # save as pandas dataframe
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppc_data.csv'), index=True)
