@@ -21,10 +21,6 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'RT_RDK', 'JW_yesno', 'NatComm', 'MEG', ...
-    'JW_PNAS', 'JW_fMRI', ...
-    'Anke_2afc_sequential', ...
-    'MEG_MEGsessions',  'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'};
 datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', ...
     'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
 
@@ -34,8 +30,8 @@ datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
-%% datasets = datasets(7);
-% datasetnames = datasetnames(7);
+%datasets = datasets(8);
+%datasetnames = datasetnames(8);
 % go to code
 try
     cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
