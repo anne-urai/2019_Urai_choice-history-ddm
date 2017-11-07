@@ -19,8 +19,8 @@ for d = 1:length(datasets),
     plot(qntls, 0.5*ones(size(qntls)), 'color',  'k', 'linewidth', 0.5);
     
     % redo this for each simulation
-    models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_nohist', 'stimcoding_nohist'};
-    colors = [141 165 8; 8 141 165; 150 150 150; 0 0 0] ./ 256;
+    models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp', 'stimcoding_nohist', 'stimcoding_nohist'};
+    colors = {{[141 165 8] ./ 256}, {[8 141 165] ./ 256}; {[141 165 8] ./ 256, [8 141 165] ./ 256}, {[0.5 0.5 0.5]}, {[0 0 0]}};
 
     for m = 1:length(models),
         
@@ -32,7 +32,7 @@ for d = 1:length(datasets),
 		
         % load simulated data - make sure this has all the info we need
         alldata    = readtable(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}));
-        alldata = sortrows(alldata, {'s
+        alldata    = sortrows(alldata, {'subj_idx'});
         
         if m < length(models),
             % use the simulations rather than the subjects' actual responses
@@ -72,10 +72,15 @@ for d = 1:length(datasets),
         
         % biased choice proportion
         if m < length(models),
-            plot(qntls, nanmean(mat, 1), 'color', colors(m, :), 'linewidth', 1);
+            if isdouble(colors{m})
+                plot(qntls, nanmean(mat, 1), 'color', colors{m}, 'linewidth', 1);
+            elseif iscell(colors{m})
+                plot(qntls, nanmean(mat, 1), 'color', colors{m}{1}, 'linewidth', 1);
+                plot(qntls, nanmean(mat, 1), '--', 'color', colors{m}{2}, 'linewidth', 1);
+            end
         else
             %% ALSO ADD THE REAL DATA
-            plot(qntls, nanmean(mat, 1), 'color', colors(m, :), 'linewidth', 1.5);
+            plot(qntls, nanmean(mat, 1), 'color', colors{m}, 'linewidth', 1.5);
         end
     end
         

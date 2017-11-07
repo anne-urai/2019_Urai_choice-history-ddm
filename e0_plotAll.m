@@ -47,10 +47,6 @@ disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
 e6_serialBias_SfN_modelFree_CRF_PPC
-% assert(1==0)
-
-% MODEL-FREE QUANTIFICATION OF BIAS, White & Poldrack Conditional Response Functions
-e6_serialBias_SfN_modelFree_CRF
 
 % sv_comparison;
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate

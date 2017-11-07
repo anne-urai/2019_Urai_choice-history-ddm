@@ -9,18 +9,18 @@ warning off; close all; clear;
 global datasets datasetnames mypath
 
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
-%qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
+% qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
 
 for d = 1:length(datasets),
     
     % plot
     close all;
     subplot(441); hold on;
-    plot(qntls, 0.5*ones(size(qntls)), 'color',  'k', 'linewidth', 0.5);
+    % plot(qntls, 0.5*ones(size(qntls)), 'color',  'k', 'linewidth', 0.5);
     
     % redo this for each simulation
-    models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_nohist', 'stimcoding_nohist'};
-    colors = [141 165 8; 8 141 165; 150 150 150; 0 0 0] ./ 256;
+    models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp', 'stimcoding_nohist', 'stimcoding_nohist'};
+    colors = {[141 165 8] ./ 256, [8 141 165] ./ 256, {[8 141 165] ./ 256, [141 165 8] ./ 256}, [0.5 0.5 0.5], [0 0 0]};
 
     for m = 1:length(models),
         
@@ -72,10 +72,17 @@ for d = 1:length(datasets),
         
         % biased choice proportion
         if m < length(models),
-            plot(qntls, nanmean(mat, 1), 'color', colors(m, :), 'linewidth', 1);
+            if isnumeric(colors{m})
+                plot(qntls, nanmean(mat, 1), 'color', colors{m}, 'linewidth', 1.5);
+            elseif iscell(colors{m}) % superimposed lines for dashed
+                plot(qntls, nanmean(mat, 1), 'color', colors{m}{1}, 'linewidth', 1.5);
+                plot(qntls, nanmean(mat, 1), ':', 'color', colors{m}{2}, 'linewidth', 1.5);
+            end
         else
             %% ALSO ADD THE REAL DATA
-            plot(qntls, nanmean(mat, 1), 'color', colors(m, :), 'linewidth', 1.5);
+            h = ploterr(qntls, nanmean(mat, 1), [], nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k-o', 'abshhxy', 0);
+            set(h(1), 'color', 'k', 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'linewidth', 1, 'markersize', 4);
+            % plot(qntls, nanmean(mat, 1), 'color', colors{m}, 'linewidth', 1.5);
         end
     end
         
