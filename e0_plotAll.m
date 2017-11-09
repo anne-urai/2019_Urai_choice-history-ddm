@@ -14,7 +14,6 @@ global datasets datasetnames mypath
 usr = getenv('USER');
 switch usr
     case 'anne'
-        
         mypath = '~/Data/HDDM';
     case 'aeurai'
         mypath  = '/nfs/aeurai/HDDM';
