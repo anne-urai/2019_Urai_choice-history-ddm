@@ -42,7 +42,6 @@ disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
 e6_serialBias_SfN_modelFree_CRF_PPC
-assert(1==0)
 
 % sv_comparison;
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
@@ -79,4 +78,12 @@ end
 % ======================= %
 % REGRESSION MODELS
 % ======================= %
+
+% 1. compare dic between models with just history and with neural data
+e11_serialBias_MEGregression_DIC
+e11_serialBias_MEGregression_posteriors
+
+
+
+
 
