@@ -267,7 +267,12 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_sz_z_prevresp', # 19
     'stimcoding_sz_dc_z_prevresp', # 20
     'regress_dc_prevresp', # 21
-    'regress_dc_prevresp_prevrt'] # 22
+    'regress_dc_prevresp_prevrt', #22
+    'regress_nohist', # 23
+    'regress_dc_z_prevresp_visualgamma', # 24
+    'regress_dc_z_prevresp_motorslope', # 25
+    'regress_dc_z_prevresp_motorstart', # 26
+    ] 
 
 datasets = ['RT_RDK', # 0
     'MEG', # 1

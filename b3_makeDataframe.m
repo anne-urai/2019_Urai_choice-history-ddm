@@ -20,6 +20,7 @@ function b3_makeDataframe(ds)
   
  datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
   'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI', 'Anke_merged'};
+  datasets = {'MEG_MEGdata'};
  
   set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...
@@ -48,7 +49,7 @@ if ~exist('ds', 'var'), ds = 1:length(datasets); end
 
     % add personality scores and drug conditions
     switch datasets{d}
-    case {'MEG', 'MEG_MEGsessions'},
+    case {'MEG', 'MEG_MEGsessions', 'MEG_MEGdata'},
       disp('adding in personality questionnaires');
       results.drug = repmat({'NaN'}, length(results.dprime), 1);
       results.BIS = nan(size(results.dprime));
