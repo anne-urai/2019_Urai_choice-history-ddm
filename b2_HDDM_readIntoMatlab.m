@@ -6,6 +6,7 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
 
 datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
     'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI', 'Anke_merged'};
+	datasets = {'MEG_MEGdata'};
 
 for d = 1:length(datasets),
     usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
@@ -35,12 +36,15 @@ for d = 1:length(datasets),
         'stimcoding_sz_z_prevresp', ...
         'stimcoding_sz_dc_z_prevresp', ...
         };
+		mdls = {'regress_nohist'}
     
     switch datasets{d}
         case 'RT_RDK'
             subjects = [3:15 17:25];
         case {'MEG', 'MEG_MEGsessions'}
             subjects = 2:65;
+        case {'MEG_MEGdata'}
+			subjects = 2:65; subjects(ismember(subjects, [11 16 31 37])) = [];
         case {'Anke_2afc_sequential', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'},
             subjects = [1:7 9 11:16 18:21 23 24 26 27];
         case 'NatComm'
