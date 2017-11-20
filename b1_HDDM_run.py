@@ -387,6 +387,11 @@ for dx in d:
                         'transitionprob']]
                 except:
                     pass
+            elif 'coherence' in ppc.columns:
+                try:
+                    ppc = ppc[['rt','rt_sampled', 'response_sampled', 
+                        'index', 'stimulus', 'response', 'prevresp', 'subj_idx', 
+                        'coherence']]
             else:
                 try:
                     ppc = ppc[['rt','rt_sampled', 'response_sampled', 

@@ -734,6 +734,16 @@ def make_model(mypath, mydata, model_name, trace_id):
             include=['z', 'sv'], group_only_nodes=['sv'],
             group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
 
+    elif model_name == 'regress_dc_z_prevresp':
+
+        z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+        reg_both = [z_reg, v_reg]
+
+        m = hddm.HDDMRegressor(mydata, reg_both,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=False,  p_outlier=0.05)
+        
     elif model_name == 'regress_dc_z_visualgamma':
 
         z_reg = {'model': 'z ~ 1 + visualgamma', 'link_func': z_link_func}
