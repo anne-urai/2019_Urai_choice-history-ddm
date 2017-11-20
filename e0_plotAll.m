@@ -29,7 +29,7 @@ datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
-%datasets = datasets(8);
+datasets = datasets(1:4);
 %datasetnames = datasetnames(8);
 % go to code
 try
@@ -41,13 +41,13 @@ end
 disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
-e6_serialBias_SfN_modelFree_CRF_PPC
+% e6_serialBias_SfN_modelFree_CRF_PPC
 
 % sv_comparison;
-e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+% e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
-e1_serialBias_SfN_DIC; % figure 3b & c
+% e1_serialBias_SfN_DIC; % figure 3b & c
 %e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z
@@ -57,10 +57,10 @@ e1_serialBias_SfN_DIC; % figure 3b & c
 
 % main figure: correlations from the jointly fit model
 close all;
-for Gsq = [0],
-    for sz = [0],
+for Gsq = [0 1],
+    for sz = [0 1],
         
-        if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
+        %if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
         
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz); % figure 4
         forestPlot(alldat);
@@ -80,8 +80,8 @@ end
 % ======================= %
 
 % 1. compare dic between models with just history and with neural data
-e11_serialBias_MEGregression_DIC
-e11_serialBias_MEGregression_posteriors
+%e11_serialBias_MEGregression_DIC
+%e11_serialBias_MEGregression_posteriors
 
 
 
