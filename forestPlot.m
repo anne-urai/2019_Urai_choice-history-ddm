@@ -50,16 +50,18 @@ set(gca, 'xcolor', axiscolors(2, :));
 
 plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest([alldat(ds).corrz]);
-% title(sprintf('t(%d) = %.3f, p = %.4f', stats.df, stats.tstat, pval));
-
-if ~h
-title(sprintf('BF10 = 1/%.3e', 1./ prod([alldat(ds).bfz])));
-else
-title(sprintf('BF10 = 1/%.2f', 1./ prod([alldat(ds).bfz])));
+bf = prod([alldat(ds).bfz]);
+if bf < 100,
+    title(sprintf('BF_{10} < 1/100'));
+elseif bf > 100,
+    title(sprintf('BF_{10} > 100'));
+elseif bf < 1,
+    title(sprintf('BF_{10} = 1/%.2f', 1/bf));
+elseif bf > 1,
+    title(sprintf('BF_{10} = %.2f', bf));
 end
 
 %% NOW FOR DRIFT CRITERION
-
 % MAKE AN OVERVIEW PLOT
 sp2 = subplot(332); hold on;
 % make a vertical line at zero
@@ -104,7 +106,17 @@ xlim([-1 1]); offsetAxes;
 % ADD THE AVERAGE??
 plot(nanmean([alldat(ds).corrv]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]));
-title(sprintf('BF10 = %.3e',  prod([alldat(ds).bfv])));
+
+bf = prod([alldat(ds).bfv]);
+if bf < 100,
+    title(sprintf('BF_{10} < 1/100'));
+elseif bf > 100,
+    title(sprintf('BF_{10} > 100'));
+elseif bf < 1,
+    title(sprintf('BF_{10} = 1/%.2f', 1/bf));
+elseif bf > 1,
+    title(sprintf('BF_{10} = %.2f', bf));
+end
 
 % move closer together
 sp2.Position(1) = sp2.Position(1) - 0.05;

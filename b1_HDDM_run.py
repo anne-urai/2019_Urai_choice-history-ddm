@@ -380,27 +380,11 @@ for dx in d:
             ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=50)
             
             # make the csv smaller, save disk space
-            
-            
-            if 'transitionprob' in ppc.columns:
-                try:
-                    ppc = ppc[['rt','rt_sampled', 'response_sampled', 
+            savecols = list(set(ppc.columns) & set(['rt','rt_sampled', 'response_sampled', 
                         'index', 'stimulus', 'response', 'prevresp', 'subj_idx', 
-                        'transitionprob']]
-                except:
-                    pass
-            elif 'coherence' in ppc.columns:
-                try:
-                    ppc = ppc[['rt','rt_sampled', 'response_sampled', 
-                        'index', 'stimulus', 'response', 'prevresp', 'subj_idx', 
-                        'coherence']]
-            else:
-                try:
-                    ppc = ppc[['rt','rt_sampled', 'response_sampled', 
-                        'index', 'stimulus', 'response', 'prevresp', 'subj_idx']]
-                except:
-                    pass
-
+                        'transitionprob', 'coherence', 'prevcorrect']))
+            ppc = ppc[savecols]
+           
             # save as pandas dataframe
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppc_data.csv'), index=True)
             elapsed = time.time() - starttime
