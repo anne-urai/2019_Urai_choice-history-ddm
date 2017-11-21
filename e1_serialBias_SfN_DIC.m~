@@ -90,7 +90,7 @@ end
 
 function getPlotDIC(mdls, s, d)
 
-global datasets mypath colors
+global datasets mypath
 axis square; hold on;
 
 mdldic = nan(1, length(mdls));
@@ -115,6 +115,8 @@ if isnan(mdldic(end)), assert(1==0); end
 % everything relative to the full model
 mdldic = bsxfun(@minus, mdldic, mdldic(end));
 mdldic = mdldic(1:end-1);
+
+colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
 [~, bestMdl] = min(mdldic);
 
 for i = 1:length(mdldic)-1,
@@ -122,11 +124,12 @@ for i = 1:length(mdldic)-1,
         'edgecolor', 'none');
 end
 
-[ptchs,ptchGrp] = createPatches(i+1,mdldic(end),0.3, colors(1, :),0);
-hatch(ptchs, [0 5 2], colors(2, :));
-ptchs.EdgeColor = [0 0 0];
- 
+[ptchs,ptchGrp] = createPatches(i+1,mdldic(end),0.2,colors(1, :),0);
+ptchs.EdgeColor = 'none';
+hatch(ptchs, [315 )
 % fill the last one
+
+assert(1==0);
 
 %# Add a text string above/below each bin
 for i = 1:length(mdldic),

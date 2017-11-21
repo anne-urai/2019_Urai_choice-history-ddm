@@ -1,7 +1,8 @@
 function f0_schematic_DDM_bias(seed)
 close all; clc;
 
-colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
+global colors
+% colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
 
 fz = 10; timefz = 8;
 set(groot, 'defaultaxesfontsize', fz, 'defaultaxestitlefontsizemultiplier', 1);

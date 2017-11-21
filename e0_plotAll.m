@@ -9,7 +9,7 @@ set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, 
     'DefaultAxesTickLength', [0.02 0.05], 'defaultaxestickdir', 'out', 'DefaultAxesTickDirMode', 'manual', ...
     'defaultfigurecolormap', [1 1 1], 'defaultTextInterpreter','tex');
 
-global datasets datasetnames mypath
+global datasets datasetnames mypath colors
 
 usr = getenv('USER');
 switch usr
@@ -36,18 +36,23 @@ try
     cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
 end
 
+% from Thomas, green blue grey
+colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
+colors = [51,160,44; 31,120,180] ./ 256;
+colors = [178,223,138; 166,206,227] ./ 256; % lighter
+colors = [77,175,74; 55,126,184] ./ 256;
+
 %% start the actual plots
 
 disp('starting');
-% f0_schematic_DDM_bias; % figure 3a
-
+f0_schematic_DDM_bias; % figure 3a
 e6_serialBias_SfN_modelFree_CRF_PPC
 
 % sv_comparison;
 % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 % e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
-% e1_serialBias_SfN_DIC; % figure 3b & c
+e1_serialBias_SfN_DIC; % figure 3b & c
 %e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z

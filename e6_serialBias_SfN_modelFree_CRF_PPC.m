@@ -6,10 +6,11 @@ function e6_serialBias_SfN_modelFree_CRF_PPC
 
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
-global datasets datasetnames mypath
+global datasets datasetnames mypath colors
 
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
 % qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
+allcols = colors;
 
 for d = 3:length(datasets),
     
@@ -28,7 +29,7 @@ for d = 3:length(datasets),
         
         % redo this for each simulation
         models = {'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp', 'stimcoding_nohist', 'stimcoding_nohist'};
-        colors = {[141 165 8] ./ 256, [8 141 165] ./ 256, {[8 141 165] ./ 256, [141 165 8] ./ 256}, [0.5 0.5 0.5], [0 0 0]};
+        thesecolors = {colors(1, :), colors(2, :), {colors(1,:), colors(2, :)}, [0.5 0.5 0.5], [0 0 0]};
         
         for m = 1:length(models),
             
@@ -96,11 +97,11 @@ for d = 3:length(datasets),
             
             % biased choice proportion
             if m < length(models),
-                if isnumeric(colors{m})
-                    plot(qntls, nanmean(mat, 1), 'color', colors{m}, 'linewidth', 1);
-                elseif iscell(colors{m}) % superimposed lines for dashed
-                    plot(qntls, nanmean(mat, 1), 'color', colors{m}{1}, 'linewidth', 1);
-                    plot(qntls, nanmean(mat, 1), ':', 'color', colors{m}{2}, 'linewidth', 1);
+                if isnumeric(thesecolors{m})
+                    plot(qntls, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
+                elseif iscell(thesecolors{m}) % superimposed lines for dashed
+                    plot(qntls, nanmean(mat, 1), 'color', thesecolors{m}{1}, 'linewidth', 1);
+                    plot(qntls, nanmean(mat, 1), ':', 'color', thesecolors{m}{2}, 'linewidth', 1);
                 end
             else
                 %% ALSO ADD THE REAL DATA

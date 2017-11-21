@@ -7,7 +7,7 @@ function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz)
 close all; clc;
 addpath(genpath('~/code/Tools'));
 
-global mypath datasets datasetnames
+global mypath datasets datasetnames colors
 cnt = 1;
 
 if ~exist('Gsq', 'var'), Gsq = 0; end
@@ -30,7 +30,7 @@ close all;
 for d = length(datasets):-1:1
     disp(datasets{d});
     
-    colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
+    % colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
     
     if Gsq,
         results = readtable(sprintf('%s/summary/%s/allindividualresults_Gsq.csv', mypath, datasets{d}));

@@ -3,7 +3,9 @@ function forestPlot(alldat)
 ds = [17 10 16 15 1 2 3 7 8 9]; % from the e1b collection script
 ds = length(alldat):-1:1;
 close all;
-axiscolors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
+
+global colors;
+axiscolors = colors; 
 
 % MAKE AN OVERVIEW PLOT
 subplot(331); hold on;
@@ -12,9 +14,9 @@ plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
 for d = 1:length(ds),
     
-    colors = cbrewer('qual', 'Paired', 10);
-    transitioncolors = [[0.5 0.5 0.5]; colors([7 9], :)];
-    meancolors = [0 0 0; colors([8 10], :)];
+    markercolors = cbrewer('qual', 'Paired', 10);
+    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9], :)];
+    meancolors = [0 0 0; markercolors([8 10], :)];
     markers = {'o', 'v', '^'}; %also indicate with different markers
     
     % determine color and marker
@@ -65,9 +67,9 @@ plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
 for d = 1:length(ds),
     
-    colors = cbrewer('qual', 'Paired', 10);
-    transitioncolors = [[0.5 0.5 0.5]; colors([7 9], :)];
-    meancolors = [0 0 0; colors([8 10], :)];
+    markercolors = cbrewer('qual', 'Paired', 10);
+    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9], :)];
+    meancolors = [0 0 0; markercolors([8 10], :)];
     markers = {'o', 'v', '^'}; %also indicate with different markers
     
     % determine color and marker
