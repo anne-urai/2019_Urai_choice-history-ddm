@@ -11,8 +11,8 @@ global datasets datasetnames mypath
 
 for d = 1:length(datasets),
     
-    if ~exist(sprintf('%s/%s/stimcoding_nohist/ppq_data.csv', mypath, datasets{d}), 'file'),
-        fprintf('cannot find %s/stimcoding_nohist/ppq_data.csv \n', datasets{d});
+    if ~exist(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}), 'file'),
+        fprintf('cannot find %s/stimcoding_nohist/ppc_data.csv \n', datasets{d});
         continue;
     else
         disp(datasets{d});
@@ -22,7 +22,7 @@ for d = 1:length(datasets),
     xlabel('RT (s)');
     
     % get traces for the model with pupil and rt modulation
-    ppc = readtable(sprintf('%s/%s/stimcoding_nohist/ppq_data.csv', mypath, datasets{d}));
+    ppc = readtable(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}));
     
     % compute how often the person and the model make the same choice
     % estimperf{d} = mean(sign(ppc.rt) == sign(ppc.rt_sampled));
@@ -46,8 +46,11 @@ for d = 1:length(datasets),
     
     axis tight; axis square;
     offsetAxes_y;
-	assert(max(abs(ppc.rt)) <= 3, 'RTs can be larger than 3!');
-    xlim([-3 3]); set(gca, 'xtick', [-3 0 3]);
+	maxRT = round(max(abs(ppc.rt)));
+	if maxRT == 5, maxRT = 4; end
+    xlim([-maxRT maxRT]); set(gca, 'xtick', [-maxRT 0 maxRT]);
+	disp(maxRT);
+
     ylabel('Probability');
     set(gca, 'yticklabel', []);
     

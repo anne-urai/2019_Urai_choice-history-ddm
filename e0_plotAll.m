@@ -48,9 +48,9 @@ disp('starting');
 % e6_serialBias_SfN_modelFree_CRF_PPC
 
 % sv_comparison;
-e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-e1_serialBias_SfN_DIC; % figure 3b & c
-e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+%e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+%e1_serialBias_SfN_DIC; % figure 3b & c
+%e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
 %e1_serialBias_SfN_BIC;
 

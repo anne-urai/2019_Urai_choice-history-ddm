@@ -44,7 +44,7 @@ for d = 1:length(ds),
 end
 
 set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}));
-xlabel('zbias');
+xlabel('z_{bias}');
 xlim([-1 1]); offsetAxes;
 set(gca, 'xcolor', axiscolors(2, :));
 
@@ -99,7 +99,7 @@ for d = 1:length(ds),
 end
 
 set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}), 'YAxisLocation', 'right');
-xlabel('vbias');
+xlabel('v_{bias}');
 set(gca, 'xcolor', axiscolors(1, :));
 xlim([-1 1]); offsetAxes;
 
