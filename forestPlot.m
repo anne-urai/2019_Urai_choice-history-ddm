@@ -15,9 +15,9 @@ plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 for d = 1:length(ds),
     
     markercolors = cbrewer('qual', 'Paired', 10);
-    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9], :)];
-    meancolors = [0 0 0; markercolors([8 10], :)];
-    markers = {'o', 'v', '^'}; %also indicate with different markers
+    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
+    meancolors = [0 0 0; markercolors([8 10 6], :)];
+    markers = {'o', 'v', '^', 's'}; %also indicate with different markers
     
     % determine color and marker
     if ~isempty(strfind(alldat(ds(d)).datasetnames, 'Repetitive'))
@@ -28,6 +28,10 @@ for d = 1:length(ds),
         col = transitioncolors(2, :);
         mrk = markers{2};
         meancol = meancolors(2, :);
+   elseif ~isempty(strfind(alldat(ds(d)).datasetnames, 'Error'))
+        col = transitioncolors(4, :);
+        mrk = markers{4};
+        meancol = meancolors(4, :);
     else
         col = transitioncolors(1, :);
         mrk = markers{1};
@@ -70,9 +74,9 @@ plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 for d = 1:length(ds),
     
     markercolors = cbrewer('qual', 'Paired', 10);
-    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9], :)];
-    meancolors = [0 0 0; markercolors([8 10], :)];
-    markers = {'o', 'v', '^'}; %also indicate with different markers
+    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
+    meancolors = [0 0 0; markercolors([8 10 6], :)];
+    markers = {'o', 'v', '^', 's'}; %also indicate with different markers
     
     % determine color and marker
     if ~isempty(strfind(alldat(ds(d)).datasetnames, 'Repetitive'))
@@ -83,6 +87,10 @@ for d = 1:length(ds),
         col = transitioncolors(2, :);
         mrk = markers{2};
         meancol = meancolors(2, :);
+   elseif ~isempty(strfind(alldat(ds(d)).datasetnames, 'Error'))
+        col = transitioncolors(4, :);
+        mrk = markers{4};
+        meancol = meancolors(4, :);
     else
         col = transitioncolors(1, :);
         mrk = markers{1};

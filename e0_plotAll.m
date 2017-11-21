@@ -44,9 +44,15 @@ colors = [77,175,74; 55,126,184] ./ 256;
 %% start the actual plots
 
 disp('starting');
-%f0_schematic_DDM_bias; % figure 3a
-% e6_serialBias_SfN_modelFree_CRF_PPC
 
+% ======================= %
+% SCHEMATIC/HYPOTHESES
+% ======================= %
+%f0_schematic_DDM_bias; % figure 3a
+
+% ======================= %
+% SANITY CHECKS/ MODEL FITS
+% ======================= %
 % sv_comparison;
 %e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 %e1_serialBias_SfN_DIC; % figure 3b & c
@@ -59,7 +65,10 @@ disp('starting');
 % forestPlot(alldat);
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_indep.pdf'));
 
-% main figure: correlations from the jointly fit model
+% ======================= %
+% CORRELATIONS WITH P(REPEAT)
+% ======================= %
+
 close all;
 for Gsq = [0 1],
     for sz = [0 1],
@@ -78,6 +87,19 @@ for Gsq = [0 1],
     end
 end
 
+% ======================= %
+% MODEL FREE CONFIRMATION
+% ======================= %
+
+% e6_serialBias_SfN_modelFree_CRF_PPC
+
+% ======================= %
+% PREVCORRECT
+% ======================= %
+
+alldat = e1b_serialBias_SfN_ModelFreeCorrelation_prevCorrect;
+forestPlot(alldat);
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf'));
 
 % ======================= %
 % REGRESSION MODELS

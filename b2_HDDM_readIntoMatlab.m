@@ -7,12 +7,22 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
 datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
     'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI', 'Anke_merged'};
 	% datasets = {'MEG_MEGdata'};
+    datasets = {'NatComm'};
 
-for d = 1:length(datasets),
-    usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
-    savepath = sprintf('/nfs/aeurai/HDDM/summary/%s', datasets{d});
+    for d = 1:length(datasets),
+        
+        usr = getenv('USER');
+        switch usr
+            case 'anne'
+                mypath = '~/Data/HDDM';
+            case 'aeurai'
+                mypath  = '/nfs/aeurai/HDDM';
+        end
+    
+    usepath = sprintf('%s/%s/', mypath, datasets{d});
+    savepath = sprintf('%s/summary/%s', mypath, datasets{d});
     if ~exist(savepath, 'dir'),
-        cp = pwd; cd('/nfs/aeurai/HDDM/summary');
+        cp = pwd; cd(sprintf('%s/summary', mypath));
         mkdir(datasets{d}); cd(cp);
     end
     
@@ -41,6 +51,7 @@ for d = 1:length(datasets),
 % 		'regress_dc_z_prevresp_motorstart', ...
 % 		'regress_dc_z_prevresp_visualgamma', ...
 % 		}
+% mdls = {'stimcoding_dc_z_prevcorrect'};
     
     switch datasets{d}
         case 'RT_RDK'
@@ -165,17 +176,20 @@ for d = 1:length(datasets),
                 
                 case 'NatComm'
                     
+                    % varnames{v} = regexprep(varnames{v}, '0.1', '0_1');
                     varnames{v} = regexprep(varnames{v}, '1.0', '1');
                     
                     % recode coherence levels
-                    varnames{v} = regexprep(varnames{v}, '\(0.00625\)', '_c0_0625');
-                    varnames{v} = regexprep(varnames{v}, '\(0.0125\)', '_c1_25');
-                    varnames{v} = regexprep(varnames{v}, '\(0.025\)', '_c2_5');
-                    varnames{v} = regexprep(varnames{v}, '\(0.05\)', '_c5');
-                    varnames{v} = regexprep(varnames{v}, '\(0.1\)', '_c10');
-                    varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
-                    varnames{v} = regexprep(varnames{v}, '\(0.3\)', '_c30');
-                    
+                    if ~isempty(strfind(varnames{v}, 'v')),
+                        varnames{v} = regexprep(varnames{v}, '\(0.00625\)', '_c0_0625');
+                        varnames{v} = regexprep(varnames{v}, '\(0.0125\)', '_c1_25');
+                        varnames{v} = regexprep(varnames{v}, '\(0.025\)', '_c2_5');
+                        varnames{v} = regexprep(varnames{v}, '\(0.05\)', '_c5');
+                        varnames{v} = regexprep(varnames{v}, '\(0.1\)', '_c10');
+                        varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
+                        varnames{v} = regexprep(varnames{v}, '\(0.3\)', '_c30');
+                    end
+                     
                 case {'Anke_2afc_neutral', 'Anke_2afc_sequential', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'}
                     
                     varnames{v} = regexprep(varnames{v}, '1.0', '1');

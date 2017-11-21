@@ -9,7 +9,8 @@ warning off;
 
 % preallocate variables
 varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'bias', 'abscriterion', 'rt', ...
-  'criterionshift', 'criterionshift_prct', ...
+    'criterionshift', 'criterionshift_prct', ...
+    'repetition_prevcorrect', 'repetition_preverror', ...
     'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error', ...
     'rt_valid_slow_correct', 'rt_valid_fast_correct', 'rt_invalid_slow_correct', 'rt_invalid_fast_correct', ...
     'rt_valid_slow_error', 'rt_valid_fast_error', 'rt_invalid_slow_error', 'rt_invalid_fast_error', ...
@@ -161,7 +162,7 @@ for sj = subjects,
             for c = 1:length(cohlevels),
                 vrnm = ['dprime_c' num2str(cohlevels(c)*100)];
                 vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
-                disp(vrnm);
+                % disp(vrnm);
                 results.(vrnm)(icnt) = ...
                     dprime(data.stimulus(data.coherence == cohlevels(c)), ...
                     data.response(data.coherence == cohlevels(c)));
@@ -182,7 +183,11 @@ for sj = subjects,
 
         results.repetition(icnt)        = nanmean(data.repeat);
         results.stimrepetition(icnt)    = nanmean(data.stimrepeat);
-
+        
+        % also compute this after error and correct trials
+        results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
+        results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
+        
         % criterion based on repetition and stimulus sequences
         [~, c] = dprime(data.stimrepeat, data.repeat);
         results.repetitioncrit(icnt)    = -c;
