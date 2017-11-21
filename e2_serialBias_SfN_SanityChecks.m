@@ -203,9 +203,9 @@ for d = 1:length(datasets),
         hold on;
         for c = 1:length(cohlevels),
             h = ploterr(cohlevels(c), cohdat(3, c), ...
-                [], {cohdat(1, c), cohdat(5, c)}, 'ko', 'abshhxy', 0);
+                [], {cohdat(1, c), cohdat(5, c)}, 'k.', 'abshhxy', 0);
             set(h(1), 'color', colors(c, :), 'markerfacecolor', colors(c, :), ...
-                'markeredgecolor', colors(c, :), 'markersize', 3, 'linewidth', 0.1);
+                'markeredgecolor', colors(c, :), 'markersize', 10, 'linewidth', 0.1);
             set(h(2), 'color', colors(c, :));
         end
         set(gca, 'xtick', cohlevels);

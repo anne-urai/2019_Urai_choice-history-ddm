@@ -25,8 +25,8 @@ for s = 1:length(types),
         ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
         % end
         drawnow; tightfig;
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf', types{s}, d));
-        fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevcorrect_d%d.pdf \n', types{s}, d);
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevresp_d%d.pdf', types{s}, d));
+        fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevresp_d%d.pdf \n', types{s}, d);
     end
     
     %     % ============================================ %
@@ -119,7 +119,7 @@ mdldic = mdldic(1:end-1);
 
 for i = 1:length(mdldic)-1,
     b = bar(i, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
-        'edgecolor', 'none');
+        'edgecolor', 'k');
 end
 
 [ptchs,ptchGrp] = createPatches(i+1,mdldic(end),0.3, colors(1, :),0);

@@ -380,6 +380,8 @@ for dx in d:
             ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=50)
             
             # make the csv smaller, save disk space
+            
+            
             if 'transitionprob' in ppc.columns:
                 try:
                     ppc = ppc[['rt','rt_sampled', 'response_sampled', 

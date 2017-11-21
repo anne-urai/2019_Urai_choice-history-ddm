@@ -20,16 +20,15 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', ...
+datasets = {'Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', ...
     'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
 
-datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, ...
+datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, {'Yes/no contrast RT'}, ...
     {'2IFC-1'}, {'2IFC-2'}, ...
-    {'Yes/no contrast RT'},  ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
-datasets = datasets(1:4);
+datasets = datasets(1:5);
 %datasetnames = datasetnames(8);
 % go to code
 try
@@ -45,14 +44,14 @@ colors = [77,175,74; 55,126,184] ./ 256;
 %% start the actual plots
 
 disp('starting');
-f0_schematic_DDM_bias; % figure 3a
-e6_serialBias_SfN_modelFree_CRF_PPC
+%f0_schematic_DDM_bias; % figure 3a
+% e6_serialBias_SfN_modelFree_CRF_PPC
 
 % sv_comparison;
-% e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
-
+e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 e1_serialBias_SfN_DIC; % figure 3b & c
+e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+
 %e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z

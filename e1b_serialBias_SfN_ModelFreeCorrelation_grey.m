@@ -245,7 +245,7 @@ for a = length(allresults):-1:1, % neutral last
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
     s  = scatter(allresults(a).(fld), allresults(a).criterionshift,  10, ...
         markers{a}, 'LineWidth', 0.001, ...
-        'markeredgecolor', 'w', 'markerfacecolor', transitioncolors(a, :));
+        'markeredgecolor', [1 1 1], 'markerfacecolor', transitioncolors(a, :));
     handles{a} = s;
     
 end

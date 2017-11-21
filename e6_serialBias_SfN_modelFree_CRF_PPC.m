@@ -12,7 +12,7 @@ qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
 % qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
 allcols = colors;
 
-for d = 3:length(datasets),
+for d = 1:length(datasets),
     
     switch datasets{d}
         case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}
@@ -59,10 +59,15 @@ for d = 3:length(datasets),
             % when there were multiple levels of evidence, do these plots
             % separately for each level
             if any(ismember(alldata.Properties.VariableNames, 'coherence'))
+				origNsubj = numel(unique(alldata.subj_idx));
                 alldata.subj_idx = findgroups(alldata.subj_idx, alldata.coherence);
+				newNsubj = numel(unique(alldata.subj_idx));
+				if origNsubj ~= newNsubj,
+					fprintf('splitting by coherence, nsubj %d newNsubj %d', origNsubj, newNsubj);
+				end
             end
             
-            % make sure to use absolute RTs
+            % make sure to use absolute RTs!
             alldata.rt = abs(alldata.rt);
             
             % recode into repeat and alternate for the model
@@ -110,8 +115,7 @@ for d = 3:length(datasets),
                 set(h(2), 'linewidth', 0.5);
             end
         end
-        
-		end
+	end
 		
         axis tight; box off;
         set(gca, 'xtick', qntls);
