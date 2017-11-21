@@ -11,7 +11,7 @@ global datasets datasetnames mypath
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
 % qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
 
-for d = 6:length(datasets),
+for d = 3:length(datasets),
     
     switch datasets{d}
         case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}
@@ -53,6 +53,12 @@ for d = 6:length(datasets),
                 % use the simulations rather than the subjects' actual responses
                 alldata.rt          = abs(alldata.rt_sampled);
                 alldata.response    = alldata.response_sampled;
+            end
+            
+            % when there were multiple levels of evidence, do these plots
+            % separately for each level
+            if any(ismember(alldata.Properties.VariableNames, 'coherence'))
+                alldata.subj_idx = findgroups(alldata.subj_idx, alldata.coherence);
             end
             
             % make sure to use absolute RTs

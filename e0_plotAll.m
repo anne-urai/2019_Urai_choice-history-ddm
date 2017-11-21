@@ -41,7 +41,7 @@ end
 disp('starting');
 % f0_schematic_DDM_bias; % figure 3a
 
-% e6_serialBias_SfN_modelFree_CRF_PPC
+e6_serialBias_SfN_modelFree_CRF_PPC
 
 % sv_comparison;
 % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
