@@ -24,21 +24,21 @@ for d = 1:length(datasets),
     % get traces for the model with pupil and rt modulation
     ppc = readtable(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}));
     
-    % compute how often the person and the model make the same choice
-    % estimperf{d} = mean(sign(ppc.rt) == sign(ppc.rt_sampled));
-    
     % keep info about the distribution of errors
-    errors{d} = abs(ppc.rt_sampled - ppc.rt);
-    qntls = quantile(errors{d},[0.25, 0.5, 0.75]);
-    fprintf('%s: %.3f (%.3f-%.3f) \n', datasetnames{d}{1}, qntls(2), qntls(1), qntls(3));
+    % errors{d} = abs(ppc.rt_sampled - ppc.rt);
+    % qntls = quantile(errors{d},[0.25, 0.5, 0.75]);
+    % fprintf('%s: %.3f (%.3f-%.3f) \n', datasetnames{d}{1}, qntls(2), qntls(1), qntls(3));
     
     % make sure errors are negative
-    ppc.correct = (ppc.stimulus == ppc.response);
+    ppc.correct                        = (ppc.stimulus == ppc.response);
     ppc.rt(ppc.correct == 1)           = abs(ppc.rt(ppc.correct == 1));
     ppc.rt(ppc.correct == 0)           = -abs(ppc.rt(ppc.correct == 0));
-    ppc.rt_sampled(ppc.correct == 1)   = abs(ppc.rt_sampled(ppc.correct == 1));
-    ppc.rt_sampled(ppc.correct == 0)   = -abs(ppc.rt_sampled(ppc.correct == 0));
-    ppc = ppc(:, {'rt', 'rt_sampled', 'correct'}); % save some memory
+    
+    % define the sampled RT also by the sampled correctness!
+    ppc.modelcorrect                   = (ppc.response_sampled == ppc.stimulus);
+    ppc.rt_sampled(ppc.modelcorrect == 1)   = abs(ppc.rt_sampled(ppc.modelcorrect == 1));
+    ppc.rt_sampled(ppc.modelcorrect == 0)   = -abs(ppc.rt_sampled(ppc.modelcorrect == 0));
+    ppc = ppc(:, {'rt', 'rt_sampled'}); % save some memory
     
     % plot the pupil and RT traces
     bestcolor = linspecer(4, 'qualitative');
@@ -50,13 +50,11 @@ for d = 1:length(datasets),
 	if maxRT == 5, maxRT = 4; end
     xlim([-maxRT maxRT]); set(gca, 'xtick', [-maxRT 0 maxRT]);
 	disp(maxRT);
-
     ylabel('Probability');
     set(gca, 'yticklabel', []);
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));
-    
     
 end
 

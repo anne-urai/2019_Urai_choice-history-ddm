@@ -123,9 +123,8 @@ for i = 1:length(mdldic)-1,
 end
 
 [ptchs,ptchGrp] = createPatches(i+1,mdldic(end),0.3, colors(1, :),0);
-hatch(ptchs, [0 5 2], colors(2, :));
-ptchs.EdgeColor = [0 0 0];
- 
+hatch(ptchs, [0 4.5 1.5], colors(2, :));
+% ptchs.EdgeColor = [0 0 0];
 % fill the last one
 
 %# Add a text string above/below each bin

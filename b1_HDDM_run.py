@@ -318,7 +318,10 @@ for dx in d:
             # get the csv file for this dataset
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-
+            
+            # remove RTs below 250 ms
+            mydata = mydata.loc[mydata.rt > 0.250,:]
+            
             # correct a weirdness in Anke's data
             if 'transitionprob' in mydata.columns:
                 mydata.transitionprob = mydata.transitionprob * 100;
