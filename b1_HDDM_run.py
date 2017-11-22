@@ -403,7 +403,7 @@ for dx in d:
             # get the csv file for this dataset
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-            mydata      = mydata[mydata.rt > 0.15] # remove superfast responses
+            mydata      = mydata[mydata.rt > 0.25] # remove superfast responses
             
             subj_params = []
             bic         = []
