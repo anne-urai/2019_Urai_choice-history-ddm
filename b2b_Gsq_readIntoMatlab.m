@@ -1,11 +1,8 @@
-function b2b_Gsq_readIntoMatlab()
+function b2b_Gsq_readIntoMatlab(datasets)
 
   addpath(genpath('~/code/Tools'));
   close all; clc;
   warning off MATLAB:table:ModifiedVarnames % skip this warning
-
-    datasets = {'Murphy', 'MEG', 'MEG_MEGsessions', 'JW_yesno', 'Bharath_fMRI', 'NatComm', 'Anke_2afc_sequential', 'Anke_MEG', 'Anke_merged'};
-	datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI'};
 
   for d = 1:length(datasets),
 	  

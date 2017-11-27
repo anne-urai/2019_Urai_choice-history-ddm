@@ -43,6 +43,6 @@ for d = 1:length(datasets),
     subplot(6,6,2); plot(0,0,'.w'); axis off;
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetitionRange_d%d.pdf',d));
-    print(gcf, '-depsc', sprintf('~/Data/serialHDDM/repetitionRange_d%d.eps',d));
+    % print(gcf, '-depsc', sprintf('~/Data/serialHDDM/repetitionRange_d%d.eps',d));
     
 end

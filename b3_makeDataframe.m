@@ -1,6 +1,6 @@
 % get a huge list with values for each participant
 % can then work with this dataframe
-function b3_makeDataframe(ds)
+function b3_makeDataframe(datasets)
 
   close all; clc;
   addpath(genpath('~/code/Tools'));
@@ -18,16 +18,11 @@ function b3_makeDataframe(ds)
     mypath = '/nfs/aeurai/HDDM';
   end
   
- datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
-  'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI', 'Anke_merged'};
-  % datasets = {'MEG_MEGdata'};
-  datasets = {'NatComm'};
- 
   set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
   'defaultaxestitlefontweight', 'bold', ...
   'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters');
 
-if ~exist('ds', 'var'), ds = 1:length(datasets); end
+ds = 1:length(datasets);
 
   for d = ds,
     disp(datasets{d});

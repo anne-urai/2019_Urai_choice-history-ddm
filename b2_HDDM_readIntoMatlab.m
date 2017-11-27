@@ -1,13 +1,8 @@
-function b2_HDDM_readIntoMatlab()
+function b2_HDDM_readIntoMatlab(datasets)
 
 addpath(genpath('~/code/Tools'));
 close all; clc;
 warning off MATLAB:table:ModifiedVarnames % skip this warning
-
-datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
-    'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI', 'Anke_merged'};
-	% datasets = {'MEG_MEGdata'};
-    datasets = {'NatComm'};
 
     for d = 1:length(datasets),
         
@@ -56,13 +51,13 @@ datasets = {'Murphy', 'JW_yesno', 'NatComm', 'MEG', 'JW_PNAS', 'JW_fMRI', ...
     switch datasets{d}
         case 'RT_RDK'
             subjects = [3:15 17:25];
-        case {'MEG', 'MEG_MEGsessions'}
+        case {'MEG', 'MEG_MEGsessions', 'MEG_750ms'}
             subjects = 2:65;
         case {'MEG_MEGdata'}
 			subjects = 2:65; subjects(ismember(subjects, [11 16 31 37])) = [];
         case {'Anke_2afc_sequential', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'},
             subjects = [1:7 9 11:16 18:21 23 24 26 27];
-        case 'NatComm'
+        case {'NatComm', 'NatComm_500ms'}
             subjects = 1:27;
         case 'JW_yesno'
             subjects = [0:23] + 1; % added 1 for matlab indexing
