@@ -20,11 +20,11 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', ...
+datasets = {'Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'RT-RDK', ...
     'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
 
-datasetnames = { {'2AFC motion RT'},  {'Yes/no tone RT'}, {'Yes/no contrast RT'}, ...
-    {'2IFC-1'}, {'2IFC-2'}, ...
+datasetnames = { {'Left/right motion RT'},  {'Yes/no tone RT'}, {'Yes/no contrast RT'}, ...
+    {'2IFC-1'}, {'2IFC-2'}, {'Up/down motion RT'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
@@ -54,9 +54,10 @@ disp('starting');
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 % sv_comparison;
+e3_serialBias_SfN_repetitionRange
 %e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 %e1_serialBias_SfN_DIC; % figure 3b & c
-%e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
 %e1_serialBias_SfN_BIC;
 

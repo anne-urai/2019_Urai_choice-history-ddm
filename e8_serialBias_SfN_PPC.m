@@ -9,6 +9,9 @@ global datasets datasetnames mypath
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
 
+plotWhich = 'error'; % {'error', 'biased'};
+
+
 for d = 1:length(datasets),
     
     if ~exist(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}), 'file'),
@@ -23,26 +26,63 @@ for d = 1:length(datasets),
     
     % get traces for the model with pupil and rt modulation
     ppc = readtable(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}));
-    
-    % keep info about the distribution of errors
-    % errors{d} = abs(ppc.rt_sampled - ppc.rt);
-    % qntls = quantile(errors{d},[0.25, 0.5, 0.75]);
-    % fprintf('%s: %.3f (%.3f-%.3f) \n', datasetnames{d}{1}, qntls(2), qntls(1), qntls(3));
-    
-    % make sure errors are negative
     ppc.correct                        = (ppc.stimulus == ppc.response);
-    ppc.rt(ppc.correct == 1)           = abs(ppc.rt(ppc.correct == 1));
-    ppc.rt(ppc.correct == 0)           = -abs(ppc.rt(ppc.correct == 0));
+    ppc.repeat                         = zeros(size(ppc.response));
+    ppc.repeat(ppc.response == (ppc.prevresp > 0)) = 1;
+    
+    % for each observers, compute their bias
+    [gr, sjs] = findgroups(ppc.subj_idx);
+    sjrep = splitapply(@nanmean, ppc.repeat, gr);
+    sjrep = sjs(sjrep < 0.5);
+    
+    % recode real data into biased vs unbiased
+    ppc.biased                         = ppc.repeat;
+    altIdx                             = ismember(ppc.subj_idx, sjrep);
+    ppc.biased(altIdx) = double(~(ppc.biased(altIdx))); % flip
+ 
+    switch plotWhich
+        case 'error'
+            ppc.biased = ppc.correct;
+    end
+    
+    % unbiased RTs negative
+    ppc.rt(ppc.biased == 1)           = abs(ppc.rt(ppc.biased == 1));
+    ppc.rt(ppc.biased == 0)           = -abs(ppc.rt(ppc.biased == 0));
+    
+    % SAME FOR THE SIMULATED DATA
+    ppc.correct_sampled = (ppc.stimulus == ppc.response_sampled);
+    
+    % recode into repeat and alternate for the model
+    ppc.repeat_sampled = zeros(size(ppc.response_sampled));
+    ppc.repeat_sampled(ppc.response_sampled == (ppc.prevresp > 0)) = 1;
+    
+    % recode into biased and unbiased choices
+    ppc.biased_sampled = ppc.repeat_sampled;
+    altIdx = ismember(ppc.subj_idx, sjrep);
+    ppc.biased_sampled(altIdx) = double(~(ppc.biased_sampled(altIdx))); % flip
+    
+    switch plotWhich
+        case 'error'
+            ppc.biased_sampled = ppc.correct_sampled;
+    end
     
     % define the sampled RT also by the sampled correctness!
     ppc.modelcorrect                   = (ppc.response_sampled == ppc.stimulus);
-    ppc.rt_sampled(ppc.modelcorrect == 1)   = abs(ppc.rt_sampled(ppc.modelcorrect == 1));
-    ppc.rt_sampled(ppc.modelcorrect == 0)   = -abs(ppc.rt_sampled(ppc.modelcorrect == 0));
+    ppc.rt_sampled(ppc.biased_sampled == 1)   = abs(ppc.rt_sampled(ppc.biased_sampled == 1));
+    ppc.rt_sampled(ppc.biased_sampled == 0)   = -abs(ppc.rt_sampled(ppc.biased_sampled == 0));
     ppc = ppc(:, {'rt', 'rt_sampled'}); % save some memory
     
     % plot the pupil and RT traces
-    bestcolor = linspecer(4, 'qualitative');
-    histogram_smooth(ppc.rt, ppc.rt_sampled, bestcolor(3, :), bestcolor(2, :));
+    
+    switch plotWhich
+        case 'error'
+            bestcolor = linspecer(4, 'qualitative');
+            bestcolor = bestcolor([3 2], :);
+        case 'biased'
+            bestcolor = cbrewer('div', 'PiYG', 6);
+            bestcolor = bestcolor([1 end], :);
+    end
+    histogram_smooth(ppc.rt, ppc.rt_sampled, bestcolor(1, :), bestcolor(2, :));
     
     axis tight; axis square;
     offsetAxes_y;
@@ -54,7 +94,12 @@ for d = 1:length(datasets),
     set(gca, 'yticklabel', []);
     
     tightfig;
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));
+    switch plotWhich
+        case 'error'
+            print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));
+        case 'biased'
+            print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d_biased.pdf', d));
+    end
     
 end
 

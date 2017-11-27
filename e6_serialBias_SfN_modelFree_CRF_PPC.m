@@ -10,6 +10,7 @@ global datasets datasetnames mypath colors
 
 qntls = [.2, .4, .6, .8, .95]; % White & Poldrack
 % qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
+qntls = [0.1, 0.3, 0.5, 0.7, 0.9];
 allcols = colors;
 
 for d = 1:length(datasets),
@@ -137,11 +138,9 @@ for d = 1:length(datasets),
         end
         
         title(datasetnames{d}{1});
-	
         tightfig;
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf', d));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_qntlsR.pdf', d));
         fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
-        
     
 end
 
