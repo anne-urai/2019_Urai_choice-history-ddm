@@ -285,7 +285,8 @@ datasets = ['RT_RDK', # 0
     'JW_PNAS', # 8
     'JW_fMRI', # 9
     'Anke_2afc_sequential', #10
-    'Anke_MEG'] # 11
+    'Anke_MEG', #11
+    'NatComm_500ms'] # 12
     
 # recode
 if isinstance(d, int):
@@ -380,7 +381,7 @@ for dx in d:
             # specify how many samples are needed
             m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
             print os.path.join(mypath, models[vx], 'modelfit-combined.model')
-            ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=50)
+            ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=100)
             
             # make the csv smaller, save disk space
             savecols = list(set(ppc.columns) & set(['rt','rt_sampled', 'response_sampled', 
