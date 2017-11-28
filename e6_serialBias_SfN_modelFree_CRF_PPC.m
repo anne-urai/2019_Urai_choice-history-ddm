@@ -14,7 +14,7 @@ qntls{2} = [0.1, 0.3, 0.5, 0.7, 0.9];
 
 allcols = colors;
 
-for d = 5:length(datasets),
+for d = 6:length(datasets),
 	for q = 1:length(qntls),
 	
     switch datasets{d}

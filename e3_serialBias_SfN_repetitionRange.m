@@ -27,11 +27,11 @@ for d = 1:length(datasets),
     % offsetAxes;
     
     % yyaxis right;
-    if d < 4
         name = strsplit(datasetnames{d}{1});
+		if length(name) == 1,
+	        y = ylabel(sprintf('%s', datasetnames{d}{1}));
+		else
         y = ylabel({name{1} [name{2} ' ' name{3}]});
-    else
-        y = ylabel(sprintf('%s', datasetnames{d}{1}));
     end
     
     y.Rotation = y.Rotation + 180;
@@ -40,7 +40,7 @@ for d = 1:length(datasets),
     %axis square;
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     % text(0.7, 0, '.w');
-    subplot(6,6,2); plot(0,0,'.w'); axis off;
+    subplot(6,6,2); plot(0,0,'.w', 'color', 'w'); axis off;
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetitionRange_d%d.pdf',d));
     % print(gcf, '-depsc', sprintf('~/Data/serialHDDM/repetitionRange_d%d.eps',d));
