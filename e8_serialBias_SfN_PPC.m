@@ -9,10 +9,9 @@ global datasets datasetnames mypath
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
 
-plotWhich = 'error'; % {'error', 'biased'};
+plotWhich = 'biased'; % {'error', 'biased'};
 
-
-for d = 1:length(datasets),
+for d = 6:length(datasets),
     
     if ~exist(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}), 'file'),
         fprintf('cannot find %s/stimcoding_nohist/ppc_data.csv \n', datasets{d});
