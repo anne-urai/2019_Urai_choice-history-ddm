@@ -370,17 +370,19 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     # ============================================ #
     # REGRESSION MODULATION
+    # Nienborg @ SfN: ((s*v) + vbias)dt / (s*(v+vbias))dt, does it matter and what are the differential predictions? 
     # ============================================ #
 
     elif model_name == 'regress_dc_prevresp':
 
-        if 'transitionprob' in mydata.columns:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob)',
-            'link_func': lambda x:x}
-        else:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+        v_reg = {'model': 'v ~ (1 + prevresp) + stimulus', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg,
+        include=['z', 'sv'], group_only_nodes=['sv'],
+        group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
 
-        # specify that we want individual parameters for all regressors, see email Gilles 22.02.2017
+    elif model_name == 'regress_dc2_prevresp':
+
+        v_reg = {'model': 'v ~ (1 + prevresp)*stimulus', 'link_func': lambda x:x}
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)

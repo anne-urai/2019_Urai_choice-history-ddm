@@ -47,7 +47,8 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
 % 		'regress_dc_z_prevresp_visualgamma', ...
 % 		}
 % mdls = {'stimcoding_dc_z_prevcorrect'};
-    
+    mdls = {'stimcoding_dc_z_prevresp_pharma'};
+
     switch datasets{d}
         case 'RT_RDK'
             subjects = [3:15 17:25];

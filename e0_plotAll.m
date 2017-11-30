@@ -41,7 +41,7 @@ colors = [51,160,44; 31,120,180] ./ 256;
 colors = [178,223,138; 166,206,227] ./ 256; % lighter
 colors = [77,175,74; 55,126,184] ./ 256;
 
-% PREPARING DATA
+%% PREPARING DATA
 if 0,
 b2_HDDM_readIntoMatlab(datasets);
 b2b_Gsq_readIntoMatlab(datasets);
@@ -62,8 +62,7 @@ disp('starting');
 %  e3_serialBias_SfN_repetitionRange
 % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 % 1_serialBias_SfN_DIC; % figure 3b & c
-e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
-assert(1==0)
+% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 % e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z
@@ -75,7 +74,7 @@ assert(1==0)
 % MODEL FREE CONFIRMATION
 % ======================= %
 
-e6_serialBias_SfN_modelFree_CRF_PPC
+% e6_serialBias_SfN_modelFree_CRF_PPC
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
@@ -116,6 +115,13 @@ end
 %e11_serialBias_MEGregression_DIC
 %e11_serialBias_MEGregression_posteriors
 
+% ========================= %
+% MEG PHARMA
+% ========================= %
+
+alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma(); % figure 4
+forestPlot(fliplr(alldat));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
 
 
 

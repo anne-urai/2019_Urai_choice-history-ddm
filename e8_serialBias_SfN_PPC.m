@@ -9,9 +9,11 @@ global datasets datasetnames mypath
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
 
-plotWhich = 'biased'; % {'error', 'biased'};
+plotWhich = 'stimcoding'; % {'error', 'biased', 'stimcoding'};
+choiceCat = {{'Left', 'Right'}, {'no', 'yes'}, {'no','yes'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}, {'down', 'up'}};
 
-for d = 6:length(datasets),
+for d = 1:length(datasets),
+    close all;
     
     if ~exist(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}), 'file'),
         fprintf('cannot find %s/stimcoding_nohist/ppc_data.csv \n', datasets{d});
@@ -19,9 +21,6 @@ for d = 6:length(datasets),
     else
         disp(datasets{d});
     end
-    
-    close all; subplot(4,4,1); hold on;
-    xlabel('RT (s)');
     
     % get traces for the model with pupil and rt modulation
     ppc = readtable(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}));
@@ -38,10 +37,12 @@ for d = 6:length(datasets),
     ppc.biased                         = ppc.repeat;
     altIdx                             = ismember(ppc.subj_idx, sjrep);
     ppc.biased(altIdx) = double(~(ppc.biased(altIdx))); % flip
- 
+    
     switch plotWhich
         case 'error'
             ppc.biased = ppc.correct;
+        case 'stimcoding'
+            ppc.biased = (ppc.response > 0);
     end
     
     % unbiased RTs negative
@@ -63,94 +64,130 @@ for d = 6:length(datasets),
     switch plotWhich
         case 'error'
             ppc.biased_sampled = ppc.correct_sampled;
+        case 'stimcoding'
+            ppc.biased_sampled = (ppc.response_sampled > 0);
     end
     
     % define the sampled RT also by the sampled correctness!
     ppc.modelcorrect                   = (ppc.response_sampled == ppc.stimulus);
     ppc.rt_sampled(ppc.biased_sampled == 1)   = abs(ppc.rt_sampled(ppc.biased_sampled == 1));
     ppc.rt_sampled(ppc.biased_sampled == 0)   = -abs(ppc.rt_sampled(ppc.biased_sampled == 0));
-    ppc = ppc(:, {'rt', 'rt_sampled'}); % save some memory
+    ppc = ppc(:, {'rt', 'rt_sampled', 'stimulus', 'response'}); % save some memory
     
-    % plot the pupil and RT traces
-    
+    % determine the colors
     switch plotWhich
         case 'error'
             bestcolor = linspecer(4, 'qualitative');
             bestcolor = bestcolor([3 2], :);
+            fitcolor = [0 0 0];
         case 'biased'
             bestcolor = cbrewer('div', 'PiYG', 6);
             bestcolor = bestcolor([1 end], :);
+            fitcolor = [0 0 0];
+        case 'stimcoding'
+            bestcolor = cbrewer('qual', 'Dark2', 5);
+            bestcolor = bestcolor([3 5], :);
+            fitcolor = cbrewer('qual', 'Set2', 5);
+            fitcolor = fitcolor([3 5], :);
     end
-    histogram_smooth(ppc.rt, ppc.rt_sampled, bestcolor(1, :), bestcolor(2, :));
     
-    axis tight; axis square;
-    offsetAxes_y;
-	maxRT = round(max(abs(ppc.rt)));
-	if maxRT == 5, maxRT = 4; end
-    xlim([-maxRT maxRT]); set(gca, 'xtick', [-maxRT 0 maxRT]);
-	disp(maxRT);
-    ylabel('Probability');
-    set(gca, 'yticklabel', []);
+    switch plotWhich
+        case {'error', 'biased'};
+            ppc.stimulus = ones(size(ppc.stimulus));
+    end
     
-    tightfig;
+    ix = unique(ppc.stimulus);
+    rx = unique(ppc.response);
+    for i = 1:length(ix),
+        %subplot(4,4,(i-1)*4+1);
+        % subplot(4,4,1);
+        sph{i} = subplot(4,10 ,i);
+        hold on;
+        for r = 1:length(rx),
+            histogram_smooth(abs(ppc.rt(ppc.stimulus == ix(i) & ppc.response == rx(r))), ...
+                abs(ppc.rt_sampled(ppc.stimulus==ix(i) & ppc.response == rx(r))), ...
+                bestcolor(r, :), bestcolor(r, :), fitcolor(r, :));
+        end
+        
+        axis tight; % axis square;
+        offsetAxes_y;
+        maxRT = round(max(abs(ppc.rt)));
+        if maxRT == 5, maxRT = 4; end
+        xlim([0 maxRT]); set(gca, 'xtick', [0 maxRT], 'xminortick', 'on');
+       %  ylabel('Probability');
+       title({'Stimulus', capitalize(choiceCat{d}{i})}, 'color', bestcolor(i, :), 'fontweight', 'normal');
+       set(gca, 'yticklabel', []);
+    end
+    
+    % move together
+    sph{2}.Position(1) = sph{2}.Position(1) - 0.01;
+        
+    % xlabel('RT (s)');
+    ss = suplabel('RT (s)', 'x');
+    ss.Position(2) = ss.Position(2) + 0.04;
+    ss = suplabel('Probability', 'y');
+    ss.Position(1) = ss.Position(1) + 0.06;
+    set(sph{2}, 'ylim', get(sph{1}, 'ylim'));
+    
+    % legend for choices!
+    ylims = get(gca, 'ylim');
+    text(maxRT*0.8, max(ylims)*0.7, 'Choice', 'fontsize', 6);
+    text(maxRT*0.8, max(ylims)*0.6, sprintf('"%s"', capitalize(choiceCat{d}{1})), 'color', bestcolor(1, :), 'fontsize', 6);
+    text(maxRT*0.8, max(ylims)*0.5, sprintf('"%s"', capitalize(choiceCat{d}{2})), 'color', bestcolor(2, :), 'fontsize', 6);
+   
+    set(gcf, 'color', 'none');
+    tightfigadv;
     switch plotWhich
         case 'error'
             print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));
         case 'biased'
             print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d_biased.pdf', d));
+        case 'stimcoding'
+            print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d_stimcode.pdf', d));
+           % export_fig(sprintf('~/Data/serialHDDM/PPC_d%d_stimcode.eps', d));
     end
+    
     
 end
 
-%% also show a histogram of the rt error
-% 
-% ds = [1 6 2 3 9 7];
-% close all;
-% subplot(441); 
-% % https://nl.mathworks.com/matlabcentral/answers/60818-boxplot-with-vectors-of-different-lengths
-% col = @(x)reshape(x,numel(x),1);
-% boxplot2 = @(C,varargin)boxplot(cell2mat(cellfun(col,col(C),'uni',0)),...
-%     cell2mat(arrayfun(@(I)I*ones(numel(C{I}),1),col(1:numel(C)),'uni',0)),varargin{:});
-% boxplot2(errors(ds));
-% 
-% set(gca, 'xtick', 1:length(ds), 'xticklabel', datasetnames{ds});
-% ylabel('$$|\widehat{RT}-RT|$$','Interpreter','Latex');
-% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_compare.pdf'));
-% 
-% 
-% colors = cbrewer('qual', 'Dark2', length(errors));
-% subplot(441); hold on;
-% for e = 1:length(errors),
-%     plot([median(errors{e}) median(errors{e})], [0 4], ':', 'color', colors(e, :), 'linewidth', 0.2);
-%     h(e) = histogram(errors{e}, 'displaystyle', 'stairs', 'normalization', 'pdf', ...
-%         'edgecolor', colors(e, :));
-% end
-% xlim([0 2]); ylim([0 4]);
-% set(gca, 'yticklabel', []);
-% ylabel('Probability');
-% tightfig;
-% offsetAxes;
-
-% how often does the model make the same choice as the subject?
-%disp(estimperf);
-%disp(datasetnames);
-
 end
 
-function h = histogram_smooth(x1, x2, color1, color2)
+function h = histogram_smooth(x1, x2, color1, color2, fitcolor)
 
-% manually count so i can plot myself
-[n, edges] = histcounts(x1, -3:0.1:3, 'normalization', 'pdf');
+% % manually count so i can plot myself
+% [n, edges] = histcounts(x1, -3:0.1:3, 'normalization', 'pdf');
+% 
+% posidx = find(edges > 0); posidx(posidx > length(n)) = [];
+% negidx = find(edges < 0);
+% 
+% % plot as stairs??
+% %bar(edges(posidx), n(posidx), 'edgecolor', 'none', 'facecolor', color1, 'barwidth', 1);
+% %bar(edges(negidx), n(negidx), 'edgecolor', 'none', 'facecolor', color2, 'barwidth', 1);
+% 
+% % [n, edges] =
 
-posidx = find(edges > 0); posidx(posidx > length(n)) = [];
-negidx = find(edges < 0);
+% first the fit - make sure this is not normalized to 1!
+%[f,xi] = ksdensity(x2);
+%h = plot(xi, f, 'color', fitcolor, 'linewidth', 0.75);
 
-bar(edges(posidx), n(posidx), 'edgecolor', 'none', 'facecolor', color1, 'barwidth', 1);
-bar(edges(negidx), n(negidx), 'edgecolor', 'none', 'facecolor', color2, 'barwidth', 1);
+% put the real number of trials on the y-axis
 
-% then the line
-[f,xi] = ksdensity(x2);
-h = plot(xi, f, 'color', 'k', 'linewidth', 1);
+[n1, edges1] = histcounts(x1, -5:0.05:5);
+[n2, edges2] = histcounts(x2, -5:0.05:5); % much smaller steps, smoother
+
+% correctionRatio
+%n2 = n2*10; 
+stairs(edges1(1:end-1), n1, 'color', fitcolor, 'linewidth', 1);
+plot(edges2(1:end-1), n2, 'color', color1, 'linewidth', 0.75);
+
+% histogram(x2, -3:0.01:3, 'displaystyle', 'stairs', ...
+%     'edgecolor', fitcolor, 'linewidth', 0.75);
+% 
+% % put the real number of trials on the y-axis
+% histogram(x1, -3:0.1:3, 'displaystyle', 'stairs', ...
+%     'edgecolor', color1, 'linewidth', 0.75);
+
+% remove white box in the pdf
 set(gca, 'color', 'none');
 
 end
@@ -167,6 +204,7 @@ ax.XLim(1) = ax.XLim(1)-(ax.XTick(2)-ax.XTick(1))/offset;
 
 % this will keep the changes constant even when resizing axes
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
+
 end
 
 function resetVertex ( ax )

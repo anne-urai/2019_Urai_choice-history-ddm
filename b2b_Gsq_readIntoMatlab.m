@@ -34,6 +34,7 @@ function b2b_Gsq_readIntoMatlab(datasets)
 	'stimcoding_sz_z_prevresp', ...
 	'stimcoding_sz_dc_z_prevresp', ...
     };
+mdls = {'stimcoding_dz_z_prevresp_pharma'};
 
     switch datasets{d}
     case 'RT_RDK'

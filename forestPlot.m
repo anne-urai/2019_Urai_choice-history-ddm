@@ -20,19 +20,11 @@ for d = 1:length(ds),
     markers = {'o', 'v', '^', 's'}; %also indicate with different markers
     
     % determine color and marker
-    if ~isempty(strfind(alldat(ds(d)).datasetnames, 'Repetitive'))
-        col = transitioncolors(3, :);
-        mrk = markers{3};
-        meancol = meancolors(3, :);
-    elseif ~isempty(strfind(alldat(ds(d)).datasetnames, 'Alternating'))
-        col = transitioncolors(2, :);
-        mrk = markers{2};
-        meancol = meancolors(2, :);
-   elseif ~isempty(strfind(alldat(ds(d)).datasetnames, 'Error'))
-        col = transitioncolors(4, :);
-        mrk = markers{4};
-        meancol = meancolors(4, :);
-    else
+    try
+        col = alldat(ds(d)).scattercolor;
+        mrk = alldat(ds(d)).marker;
+        meancol = alldat(ds(d)).meancolor;
+    catch
         col = transitioncolors(1, :);
         mrk = markers{1};
         meancol = meancolors(1, :);
@@ -79,23 +71,16 @@ for d = 1:length(ds),
     markers = {'o', 'v', '^', 's'}; %also indicate with different markers
     
     % determine color and marker
-    if ~isempty(strfind(alldat(ds(d)).datasetnames, 'Repetitive'))
-        col = transitioncolors(3, :);
-        mrk = markers{3};
-        meancol = meancolors(3, :);
-    elseif ~isempty(strfind(alldat(ds(d)).datasetnames, 'Alternating'))
-        col = transitioncolors(2, :);
-        mrk = markers{2};
-        meancol = meancolors(2, :);
-   elseif ~isempty(strfind(alldat(ds(d)).datasetnames, 'Error'))
-        col = transitioncolors(4, :);
-        mrk = markers{4};
-        meancol = meancolors(4, :);
-    else
+    try
+        col = alldat(ds(d)).scattercolor;
+        mrk = alldat(ds(d)).marker;
+        meancol = alldat(ds(d)).meancolor;
+    catch
         col = transitioncolors(1, :);
         mrk = markers{1};
         meancol = meancolors(1, :);
     end
+    
     
     % start at the top
     h = ploterr(alldat(ds(d)).corrv, ...
@@ -132,23 +117,19 @@ sp2.Position(1) = sp2.Position(1) - 0.05;
 %% ADD TEXT
 for d = 1:length(ds),
     
-    if alldat(ds(d)).pdiff < 0.001,
-        txt = sprintf('\\Deltar = %.3f, ***', alldat(ds(d)).corrdiff);
-    elseif alldat(ds(d)).pdiff < 0.01,
-        txt = sprintf('\\Deltar = %.3f, **', alldat(ds(d)).corrdiff);
-    elseif alldat(ds(d)).pdiff < 0.05,
-        txt = sprintf('\\Deltar = %.3f, *', alldat(ds(d)).corrdiff);
+    if alldat(ds(d)).pdiff < 0.0001,
+        txt = sprintf('\\Deltar = %.3f, p < 0.0001', alldat(ds(d)).corrdiff);
     else
-        txt = sprintf('\\Deltar = %.3f, n.s.', alldat(ds(d)).corrdiff);
+        txt = sprintf('\\Deltar = %.3f, p = %.4f', alldat(ds(d)).corrdiff, alldat(ds(d)).pdiff);
     end
     text(-1.3, length(ds)-d+1, txt, ...
-        'fontsize', 5);
+        'fontsize', 4);
 end
 
-% DO STATS ACROSS DATASETS!
-[h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]), fisherz([alldat(ds).corrz]));
-%suplabel(sprintf('t(%d) = %.3f, p = %.4f', stats.df, stats.tstat, pval), 't');
 
+% DO STATS ACROSS DATASETS!
+% [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]), fisherz([alldat(ds).corrz]));
+suplabel('Correlation P(repeat) with history shift', 'x');
 tightfig;
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));
 
