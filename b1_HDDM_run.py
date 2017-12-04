@@ -274,21 +274,23 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_z_prevresp_motorstart', # 26
     ] 
 
-datasets = ['RT_RDK', # 0
-    'MEG', # 1
-    'NatComm', # 2
-    'Anke_merged', # 3
-    'JW_yesno', # 4
-    'Bharath_fMRI', # 5
-    'Murphy', # 6
-    'MEG_MEGdata', # 7
-    'JW_PNAS', # 8
-    'JW_fMRI', # 9
-    'Anke_2afc_sequential', #10
-    'Anke_MEG', #11
-    'NatComm_500ms', # 12
-    'MEG_750ms', # 13
-    'JW_yesno_2500ms'] # 14
+# datasets = ['RT_RDK', # 0
+#     'MEG', # 1
+#     'NatComm', # 2
+#     'Anke_merged', # 3
+#     'JW_yesno', # 4
+#     'Bharath_fMRI', # 5
+#     'Murphy', # 6
+#     'MEG_MEGdata', # 7
+#     'JW_PNAS', # 8
+#     'JW_fMRI', # 9
+#     'Anke_2afc_sequential', #10
+#     'Anke_MEG', #11
+#     'NatComm_500ms', # 12
+#     'MEG_750ms', # 13
+#     'JW_yesno_2500ms'] # 14
+    
+datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG']
     
 # recode
 if isinstance(d, int):
