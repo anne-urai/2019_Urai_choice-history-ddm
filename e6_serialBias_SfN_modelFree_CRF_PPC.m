@@ -14,7 +14,7 @@ qntls{2} = [0.1, 0.3, 0.5, 0.7, 0.9];
 
 allcols = colors;
 
-for d = 5:length(datasets),
+for d = 1:length(datasets),
 	for q = 2:length(qntls),
 	
     switch datasets{d}
@@ -141,6 +141,8 @@ for d = 5:length(datasets),
         
         title(datasetnames{d}{1});
         tightfig;
+		set(gca, 'xcolor', 'k', 'ycolor', 'k');
+		
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_qntlsR%d.pdf', d, q));
         fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
     

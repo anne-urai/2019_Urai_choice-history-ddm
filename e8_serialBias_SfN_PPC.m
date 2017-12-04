@@ -113,30 +113,36 @@ for d = 1:length(datasets),
         offsetAxes_y;
         maxRT = round(max(abs(ppc.rt)));
         if maxRT == 5, maxRT = 4; end
+			if d > 3,maxRT = 3; end
         xlim([0 maxRT]); set(gca, 'xtick', [0 maxRT], 'xminortick', 'on');
        %  ylabel('Probability');
        title({'Stimulus', capitalize(choiceCat{d}{i})}, 'color', bestcolor(i, :), 'fontweight', 'normal');
        set(gca, 'yticklabel', []);
+   	set(gca, 'xcolor', 'k', 'ycolor', 'k');
+	   
     end
     
     % move together
     sph{2}.Position(1) = sph{2}.Position(1) - 0.01;
         
     % xlabel('RT (s)');
-    ss = suplabel('RT (s)', 'x');
+    [ss, h1] = suplabel('RT (s)', 'x');
     ss.Position(2) = ss.Position(2) + 0.04;
-    ss = suplabel('Probability', 'y');
+	h1.Color = 'k';
+    [ss, h1] = suplabel('Probability', 'y');
     ss.Position(1) = ss.Position(1) + 0.06;
+	h1.Color = 'k';
     set(sph{2}, 'ylim', get(sph{1}, 'ylim'));
     
     % legend for choices!
     ylims = get(gca, 'ylim');
-    text(maxRT*0.8, max(ylims)*0.7, 'Choice', 'fontsize', 6);
-    text(maxRT*0.8, max(ylims)*0.6, sprintf('"%s"', capitalize(choiceCat{d}{1})), 'color', bestcolor(1, :), 'fontsize', 6);
-    text(maxRT*0.8, max(ylims)*0.5, sprintf('"%s"', capitalize(choiceCat{d}{2})), 'color', bestcolor(2, :), 'fontsize', 6);
+    text(maxRT*0.7, max(ylims)*0.7, 'Choice', 'fontsize', 6);
+    text(maxRT*0.7, max(ylims)*0.6, sprintf('"%s"', capitalize(choiceCat{d}{1})), 'color', bestcolor(1, :), 'fontsize', 6);
+    text(maxRT*0.7, max(ylims)*0.5, sprintf('"%s"', capitalize(choiceCat{d}{2})), 'color', bestcolor(2, :), 'fontsize', 6);
    
     set(gcf, 'color', 'none');
-    tightfigadv;
+	set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    tightfig;
     switch plotWhich
         case 'error'
             print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d.pdf', d));

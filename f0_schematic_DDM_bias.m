@@ -13,6 +13,8 @@ disp(seed);
 
 % use code by Peter Murphy to compute RT distributions
 addpath('/Users/anne/Drive/Dropbox/code/analyticalDDM/DDM');
+addpath('~/code/analyticalDDM/DDM');
+addpath(genpath('~/code/Tools'));
 
 tmax = 0.7;
 %% make 3 sets of distributions
@@ -90,7 +92,7 @@ plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
 box off; 
 ax = gca;
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
-set(ax, 'xcolor', 'w');
+set(ax, 'xcolor', 'w', 'xtick',[]);
 xlim([min(cfg.time) max(cfg.time)]);
 
 %% now change in starting point
@@ -138,7 +140,7 @@ plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
 box off;
 ax = gca;
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
-set(ax, 'xcolor', 'w');
+set(ax, 'xcolor', 'w', 'xtick',[]);
 xlim([min(cfg.time) max(cfg.time)]);
 
 %% now add the equations!
@@ -232,7 +234,7 @@ text(-0.1, 1.2, 'Ter', 'fontsize', fz-1);
 
 ax = gca;
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
-set(ax, 'xcolor', 'w');
+set(ax, 'xcolor', 'w', 'xtick',[]);
 xlim([-0.1 max(cfg.time)]);
 
 tightfig;

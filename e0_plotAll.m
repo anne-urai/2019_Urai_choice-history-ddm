@@ -51,19 +51,14 @@ end
 disp('starting');
 
 % ======================= %
-% SCHEMATIC/HYPOTHESES
-% ======================= %
-% f0_schematic_DDM_bias; % figure 3a
-
-% ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
-% sv_comparison;
- %e3_serialBias_SfN_repetitionRange
- %e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
- %e1_serialBias_SfN_DIC; % figure 3b & c
- % e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
- %e1_serialBias_SfN_BIC;
+ sv_comparison;
+ e3_serialBias_SfN_repetitionRange
+ e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+ e1_serialBias_SfN_DIC; % figure 3b & c
+ e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+ e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z
 % alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits; % figure 4
@@ -126,5 +121,9 @@ forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
 
 
+% ======================= %
+% SCHEMATIC/HYPOTHESES
+% ======================= %
 
+ f0_schematic_DDM_bias; % figure 3a
 
