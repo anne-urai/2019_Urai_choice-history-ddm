@@ -6,7 +6,7 @@ addpath(genpath('~/code/Tools'));
 
 global mypath datasets datasetnames colors
 
-datasets = {'MEG_750ms'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!
+datasets = {'MEG'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!
 datasetnames = {{'2IFC-2'}};
 cnt = 1;
 

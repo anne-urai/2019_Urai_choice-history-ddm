@@ -20,15 +20,14 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'JW_yesno_2500ms', 'JW_PNAS', 'NatComm_500ms', 'MEG_750ms', 'RT_RDK'}; %, ...
+datasets = {'Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm, 'MEG'}; 
+%, 'RT_RDK'}; %, ...
    % 'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
 
 datasetnames = { {'Left/right motion RT'},  {'Yes/no tone RT'}, {'Yes/no contrast RT'}, ...
     {'2IFC-1'}, {'2IFC-2'}, {'Up/down motion RT'}, ...
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
-
-datasets = datasets(1:5);
 
 % go to code
 try
