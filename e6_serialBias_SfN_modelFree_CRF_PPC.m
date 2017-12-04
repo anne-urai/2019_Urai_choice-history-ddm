@@ -14,8 +14,8 @@ qntls{2} = [0.1, 0.3, 0.5, 0.7, 0.9];
 
 allcols = colors;
 
-for d = 6:length(datasets),
-	for q = 1:length(qntls),
+for d = 5:length(datasets),
+	for q = 2:length(qntls),
 	
     switch datasets{d}
         case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}

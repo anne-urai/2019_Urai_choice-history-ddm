@@ -28,7 +28,7 @@ datasetnames = { {'Left/right motion RT'},  {'Yes/no tone RT'}, {'Yes/no contras
     {'2AFC-1, Braun et al. 2017'}, ...
    {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
 
-%datasets = datasets(1:6);
+datasets = datasets(1:5);
 
 % go to code
 try
@@ -43,9 +43,9 @@ colors = [77,175,74; 55,126,184] ./ 256;
 
 %% PREPARING DATA
 if 0,
-b2_HDDM_readIntoMatlab(datasets);
-b2b_Gsq_readIntoMatlab(datasets);
-b3_makeDataframe(datasets);
+	b2_HDDM_readIntoMatlab(datasets);
+	b2b_Gsq_readIntoMatlab(datasets);
+	b3_makeDataframe(datasets);
 end
 
 disp('starting');
@@ -59,11 +59,11 @@ disp('starting');
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 % sv_comparison;
-%  e3_serialBias_SfN_repetitionRange
-% e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-% 1_serialBias_SfN_DIC; % figure 3b & c
-% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
-% e1_serialBias_SfN_BIC;
+ %e3_serialBias_SfN_repetitionRange
+ %e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+ %e1_serialBias_SfN_DIC; % figure 3b & c
+ % e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+ %e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z
 % alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits; % figure 4
@@ -74,27 +74,29 @@ disp('starting');
 % MODEL FREE CONFIRMATION
 % ======================= %
 
-% e6_serialBias_SfN_modelFree_CRF_PPC
+e6_serialBias_SfN_modelFree_CRF_PPC
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
 % ======================= %
 
 close all;
-for Gsq = [0 1],
-    for sz = [0 1],
+for sz = [0 1],
+	for Gsq = [0 1],
         
-        if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
+         % if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
         
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz); % figure 4
         forestPlot(alldat);
         
         switch Gsq
             case 1
-                print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_sz%d_Gsq.pdf', sz));
+                filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_Gsq.pdf', sz);
             case 0
-                print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_sz%d_HDDM.pdf', sz));
+                filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_HDDM.pdf', sz);
         end
+		print(gcf, '-dpdf', filename);
+		disp(filename);
     end
 end
 

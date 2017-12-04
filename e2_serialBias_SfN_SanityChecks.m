@@ -212,7 +212,7 @@ for d = 1:length(datasets),
         ylabel('Drift rate (v)');
                 
         switch datasets{d}
-            case 'NatComm'
+            case {'NatComm', 'NatComm_500ms'}
                 xlabel('\Delta % coherence');
                 set(gca, 'xticklabel', {'', '', '', '5', '10', '20', '30'});                
         end

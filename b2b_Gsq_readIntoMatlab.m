@@ -33,8 +33,7 @@ function b2b_Gsq_readIntoMatlab(datasets)
 	'stimcoding_sz_dc_prevresp', ...
 	'stimcoding_sz_z_prevresp', ...
 	'stimcoding_sz_dc_z_prevresp', ...
-    };
-mdls = {'stimcoding_dz_z_prevresp_pharma'};
+	'stimcoding_dz_z_prevresp_pharma'};
 
     switch datasets{d}
     case 'RT_RDK'
@@ -45,7 +44,7 @@ mdls = {'stimcoding_dz_z_prevresp_pharma'};
       subjects = [1:7 9 11:16 18:21 23 24 26 27];
     case 'NatComm'
       subjects = 1:27;
-    case 'JW_yesno'
+    case {'JW_yesno', 'JW_yesno_2500ms'},
       subjects = [0:23] + 1; % added 1 for matlab indexing
     case 'Anke_merged'
       subjects = [1	2	3	4	5	6	7	9	11	12	13	14	15	16	18	19	20	21	23	24	26	27	31	32	33	34	35	37	38	39	40	41	42	43	44	45];

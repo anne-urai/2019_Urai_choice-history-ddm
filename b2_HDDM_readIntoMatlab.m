@@ -40,14 +40,7 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
         'stimcoding_sz_dc_prevresp', ...
         'stimcoding_sz_z_prevresp', ...
         'stimcoding_sz_dc_z_prevresp', ...
-        };
-		% mdls = {'regress_nohist', ...
-% 		'regress_dc_z_prevresp_motorslope', ...
-% 		'regress_dc_z_prevresp_motorstart', ...
-% 		'regress_dc_z_prevresp_visualgamma', ...
-% 		}
-% mdls = {'stimcoding_dc_z_prevcorrect'};
-    mdls = {'stimcoding_dc_z_prevresp_pharma'};
+		'stimcoding_dc_z_prevresp_pharma'};
 
     switch datasets{d}
         case 'RT_RDK'
@@ -60,7 +53,7 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
             subjects = [1:7 9 11:16 18:21 23 24 26 27];
         case {'NatComm', 'NatComm_500ms'}
             subjects = 1:27;
-        case 'JW_yesno'
+        case {'JW_yesno', 'JW_yesno_2500ms'}
             subjects = [0:23] + 1; % added 1 for matlab indexing
         case 'Anke_merged'
             subjects = [1	2	3	4	5	6	7	9	11	12	13	14	15	16	18	19	20	21	23	24	26	27	31	32	33	34	35	37	38	39	40	41	42	43	44	45];
@@ -170,7 +163,7 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
             
             switch datasets{d},
                 
-                case 'NatComm'
+                case {'NatComm', 'NatComm_500ms'}
                     
                     % varnames{v} = regexprep(varnames{v}, '0.1', '0_1');
                     varnames{v} = regexprep(varnames{v}, '1.0', '1');

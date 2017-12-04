@@ -383,7 +383,12 @@ for dx in d:
             # specify how many samples are needed
             m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
             print os.path.join(mypath, models[vx], 'modelfit-combined.model')
-            ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=100)
+            if 'MEG' in datasets[dx]:
+                nsmp = 50
+            else:
+                nsmp = 100
+            
+            ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=nsmp)
             
             # make the csv smaller, save disk space
             savecols = list(set(ppc.columns) & set(['rt','rt_sampled', 'response_sampled', 

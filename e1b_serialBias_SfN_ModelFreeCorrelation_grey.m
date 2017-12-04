@@ -98,11 +98,15 @@ for d = length(datasets):-1:1
                 results.v_prevresp = ...
                     results.(['dc_1__' whichmdls 'dczprevresp']) - results.(['dc_2__' whichmdls 'dczprevresp']);
             catch
+				try
                 results.z_prevresp = ...
                     results.(['z_1_0__' whichmdls 'dczprevresp']) - results.(['z_2_0__' whichmdls 'dczprevresp']);
                 results.v_prevresp = ...
                     results.(['dc_1_0__' whichmdls 'dczprevresp']) - results.(['dc_2_0__' whichmdls 'dczprevresp']);
-            end
+				catch
+					assert(1==0)
+				end
+			end
             
             results.criterionshift = results.repetition;
             
