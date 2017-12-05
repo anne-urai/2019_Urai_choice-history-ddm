@@ -149,9 +149,9 @@ for d = length(datasets):-1:1
     
     % add colored axes after suplabel (which makes them black)
     xlabel(sp1, 'History bias in z');
-    set(sp1, 'xcolor', colors(2, :));
+    set(sp1, 'xcolor', colors(1, :));
     xlabel(sp2, 'History bias in v');
-    set(sp2, 'xcolor', colors(1, :));
+    set(sp2, 'xcolor', colors(2, :));
     
     if doText,
         %% add line between the two correlation coefficients
@@ -159,7 +159,8 @@ for d = length(datasets):-1:1
         if pval < 0.001,
             txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
         end
-        title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
+        tt = title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
+        tt.Position(2) = tt.Position(2) - 0.008;
     end
 
     tightfig;

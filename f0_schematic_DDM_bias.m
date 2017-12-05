@@ -62,23 +62,23 @@ plot(cfg.time, y,'k');
 cfg.dc = 1*cfg.timestep;
 cfg.v = cfg.v+cfg.dc;
 y = ddm(cfg);
-plot(cfg.time, y, 'color', colors(1, :));
+plot(cfg.time, y, 'color', colors(2, :));
 cfg.v = -cfg.v + 2*cfg.dc; % flip around drift rate
 y = ddm(cfg);
-plot(cfg.time, y,'k', 'color', colors(1, :));
+plot(cfg.time, y,'k', 'color', colors(2, :));
 
 % plot the drift on top 
 plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % add distributions at the top!
 scaling = 300;
-plot(ts, -scaling*gE_z - cfg.a, 'color', colors(2, :), 'linestyle', '-.');
-plot(ts, scaling*gC_z + cfg.a, 'color', colors(2, :), 'linestyle', '-.');
+plot(ts, -scaling*gE_z - cfg.a, 'color', colors(1, :), 'linestyle', '-.');
+plot(ts, scaling*gC_z + cfg.a, 'color', colors(1, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
-plot(ts, scaling*gC_dc + cfg.a, 'color', colors(1, :));
+plot(ts, scaling*gC_dc + cfg.a, 'color', colors(2, :));
 plot(ts, -scaling*gE_nobias - cfg.a, 'k');
-plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(1, :));
+plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(2, :));
 
 %%  layout
 %ylim([-cfg.a cfg.a]); 
@@ -98,7 +98,7 @@ xlim([min(cfg.time) max(cfg.time)]);
 %% now change in starting point
 cfg = defcfg;
 subplot(331); hold on;
-arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
+arrow([cfg.time(1) cfg.z], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
 
 % show the unbiased average drift towards two stimuli
 cfg.cdW = 0;
@@ -111,22 +111,22 @@ plot(cfg.time, y,'k');
 % now with drift criterion bias
 cfg.z = 0.4;
 y = ddm(cfg);
-plot(cfg.time, y, 'color', colors(2, :));
+plot(cfg.time, y, 'color', colors(1, :));
 cfg.v = -cfg.v;
 y = ddm(cfg);
-plot(cfg.time, y,'k', 'color', colors(2, :));
+plot(cfg.time, y,'k', 'color', colors(1, :));
 
 % drifting particle
 plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % add distributions at the top!
-plot(ts, scaling*gC_dc + cfg.a, 'color', colors(1, :), 'linestyle', '-.');
-plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(1, :), 'linestyle', '-.');
+plot(ts, scaling*gC_dc + cfg.a, 'color', colors(2, :), 'linestyle', '-.');
+plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(2, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
-plot(ts, scaling*gC_z + cfg.a, 'color', colors(2, :));
+plot(ts, scaling*gC_z + cfg.a, 'color', colors(1, :));
 plot(ts, -scaling*gE_nobias - cfg.a, 'k');
-plot(ts, -scaling*gE_z - cfg.a, 'color', colors(2, :));
+plot(ts, -scaling*gE_z - cfg.a, 'color', colors(1, :));
 
 % layout
 %ylim([-cfg.a cfg.a]);
@@ -161,8 +161,6 @@ axis off;
 tightfig;
 print(gcf, '-depsc', sprintf('~/Data/serialHDDM/DDMschematic.eps'));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic.pdf'));
-
-
 
 % SEPARATE UNBIASED PLOT
 

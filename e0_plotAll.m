@@ -35,7 +35,7 @@ end
 colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
 colors = [51,160,44; 31,120,180] ./ 256;
 colors = [178,223,138; 166,206,227] ./ 256; % lighter
-colors = [77,175,74; 55,126,184] ./ 256;
+colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %% PREPARING DATA
 if 0,
@@ -49,6 +49,7 @@ disp('starting');
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
+
  sv_comparison;
  e3_serialBias_SfN_repetitionRange
  e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate

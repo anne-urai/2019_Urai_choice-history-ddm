@@ -14,17 +14,18 @@ plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
 for d = 1:length(ds),
     
-    markercolors = cbrewer('qual', 'Paired', 10);
-    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
-    meancolors = [0 0 0; markercolors([8 10 6], :)];
-    markers = {'o', 'v', '^', 's'}; %also indicate with different markers
-    
+
     % determine color and marker
     try
         col = alldat(ds(d)).scattercolor;
         mrk = alldat(ds(d)).marker;
         meancol = alldat(ds(d)).meancolor;
     catch
+        markercolors = cbrewer('qual', 'Paired', 10);
+        transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
+        meancolors = [0 0 0; markercolors([8 10 6], :)];
+        markers = {'o', 'v', '^', 's'}; %also indicate with different markers
+    
         col = transitioncolors(1, :);
         mrk = markers{1};
         meancol = meancolors(1, :);
@@ -42,7 +43,7 @@ end
 set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}));
 xlabel('z_{bias}');
 xlim([-1 1]); offsetAxes;
-set(gca, 'xcolor', axiscolors(2, :));
+set(gca, 'xcolor', axiscolors(1, :));
 
 plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest([alldat(ds).corrz]);
@@ -65,17 +66,18 @@ plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
 for d = 1:length(ds),
     
-    markercolors = cbrewer('qual', 'Paired', 10);
-    transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
-    meancolors = [0 0 0; markercolors([8 10 6], :)];
-    markers = {'o', 'v', '^', 's'}; %also indicate with different markers
-    
+
     % determine color and marker
     try
         col = alldat(ds(d)).scattercolor;
         mrk = alldat(ds(d)).marker;
         meancol = alldat(ds(d)).meancolor;
     catch
+        markercolors = cbrewer('qual', 'Paired', 10);
+        transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
+        meancolors = [0 0 0; markercolors([8 10 6], :)];
+        markers = {'o', 'v', '^', 's'}; %also indicate with different markers
+        
         col = transitioncolors(1, :);
         mrk = markers{1};
         meancol = meancolors(1, :);
@@ -93,7 +95,7 @@ end
 
 set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}), 'YAxisLocation', 'right');
 xlabel('v_{bias}');
-set(gca, 'xcolor', axiscolors(1, :));
+set(gca, 'xcolor', axiscolors(2, :));
 xlim([-1 1]); offsetAxes;
 
 % ADD THE AVERAGE??

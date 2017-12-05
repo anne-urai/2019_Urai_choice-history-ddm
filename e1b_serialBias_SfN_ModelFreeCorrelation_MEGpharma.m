@@ -7,6 +7,7 @@ addpath(genpath('~/code/Tools'));
 global mypath datasets datasetnames colors
 
 datasets = {'MEG'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!
+% datasets = {'MEG_MEGsessions'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!
 datasetnames = {{'2IFC-2'}};
 cnt = 1;
 
@@ -119,9 +120,9 @@ for d = length(datasets):-1:1
     
     % add colored axes after suplabel (which makes them black)
     xlabel(sp1, 'History bias in z');
-    set(sp1, 'xcolor', colors(2, :));
+    set(sp1, 'xcolor', colors(1, :));
     xlabel(sp2, 'History bias in v');
-    set(sp2, 'xcolor', colors(1, :));
+    set(sp2, 'xcolor', colors(2, :));
     
     if doText,
         %% add line between the two correlation coefficients
