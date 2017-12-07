@@ -51,6 +51,7 @@ disp('starting');
 % ======================= %
 
  sv_comparison;
+ assert(1==0)
  e3_serialBias_SfN_repetitionRange;
  e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
  e1_serialBias_SfN_DIC; % figure 3b & c
@@ -68,6 +69,7 @@ disp('starting');
 
 e6_serialBias_SfN_modelFree_CRF_PPC
 
+
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
 % ======================= %
@@ -76,7 +78,7 @@ close all;
 for sz = [0 1],
 	for Gsq = [0 1],
         
-         % if Gsq == 0 && sz == 1, continue; end % hierarchical sampling with sz takes forever
+         if Gsq == 1 && sz == 1, continue; end % hierarchical sampling with sz takes forever
         
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz); % figure 4
         forestPlot(alldat);

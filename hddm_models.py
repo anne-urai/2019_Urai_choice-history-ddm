@@ -286,7 +286,7 @@ def make_model(mypath, mydata, model_name, trace_id):
             include=('sv'), group_only_nodes=['sv'],
             depends_on={'dc':['prevresp', 'drug'], 'z':['prevresp', 'drug']})
 
-    elif model_name == 'stimcoding_dc_z_prevresp_sessions':
+    elif model_name == 'stimcoding_dc_prevresp_sessions':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
@@ -294,7 +294,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
             drift_criterion=True, bias=True, p_outlier=0.05,
             include=('sv'), group_only_nodes=['sv'],
-            depends_on={'dc':['prevresp', 'session'], 'z':['prevresp', 'session']})
+            depends_on={'dc':['prevresp', 'session']})
             
     # ============================================ #
     # STIMCODING PREVRESP + PREVCORRECT

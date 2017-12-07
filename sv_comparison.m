@@ -13,7 +13,7 @@ for d = 1:length(datasets),
     traces_withhist = readtable(sprintf('%s/%s/stimcoding_dc_prevresp/group_traces.csv', mypath, datasets{d}));
     
     % color in different grouos
-    colors = cbrewer('seq', 'Greens', 5);
+    colors = cbrewer('seq', 'Blues', 5);
     
     close all;
     subplot(4,4,1); hold on;
@@ -26,11 +26,14 @@ for d = 1:length(datasets),
     axis square; axis tight;
     % xlims = get(gca, 'xlim');
     % xlim([xlims(1) xlims(2)*1.2]);
-    set(gca, 'xtick', [min(get(gca, 'xtick')) max(get(gca, 'xtick'))]);
-    % offsetAxes_y;
+    set(gca, 'ytick', [min(get(gca, 'ytick')) max(get(gca, 'ytick'))], ...
+        'yticklabel', []);
+    offsetAxes_y;
+%     ylim([min([min(traces_nohist.sv) max(traces_withhist.sv)]) ...
+%         max([max(traces_nohist.sv) max(traces_withhist.sv)])]);
     title(datasetnames{d}{1});
-	ylabel('sv');
-	xlabel('Probability');
+	xlabel('sv');
+	ylabel('Probability');
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/sv_comparison_d%d.pdf', d));
 	
@@ -41,7 +44,7 @@ end
 function h = histogram_smooth(x, color2)
 
 [f,xi] = ksdensity(x);
-a1 = area(f, xi, 'edgecolor', 'none', 'facecolor', ...
+a1 = area(xi, f, 'edgecolor', 'none', 'facecolor', ...
     color2, 'facealpha', 0.4, 'showbaseline', 'off');
 
 % % Make area transparent
@@ -50,7 +53,7 @@ a1 = area(f, xi, 'edgecolor', 'none', 'facecolor', ...
 % a1.Face.ColorData(4) = 255 * 0.3; % Your alpha value is the 0.3
 
 % area
-h = plot(f, xi, 'color', color2, 'linewidth', 1);
+h = plot(xi, f, 'color', color2, 'linewidth', 1);
 set(gca, 'color', 'none');
 
 end

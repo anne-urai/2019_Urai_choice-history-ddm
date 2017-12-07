@@ -258,7 +258,7 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_z_prev3resp', # 10
     'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 11
     'stimcoding_dc_z_prevresp_pharma', #12
-    'stimcoding_dc_z_prevresp_sessions', # 13
+    'stimcoding_dc_prevresp_sessions', # 13
     'regress_dc_z_visualgamma', #14
     'regress_dc_z_motorslope', #15
     'regress_dc_z_motorstart', #16
@@ -269,9 +269,11 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_prevresp', # 21
     'regress_dc_prevresp_prevrt', #22
     'regress_nohist', # 23
-    'regress_dc_z_prevresp_visualgamma', # 24
-    'regress_dc_z_prevresp_motorslope', # 25
-    'regress_dc_z_prevresp_motorstart', # 26
+    'regress_dc_prevcorrect_prevrt', # 24
+    'regress_dc_prevcorrect', # 25
+    'regress_dc_z_prevresp_visualgamma', # 26
+    'regress_dc_z_prevresp_motorslope', # 27
+    'regress_dc_z_prevresp_motorstart', # 28
     ] 
 
 # datasets = ['RT_RDK', # 0
