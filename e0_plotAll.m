@@ -51,7 +51,7 @@ disp('starting');
 % ======================= %
 
  sv_comparison;
- e3_serialBias_SfN_repetitionRange
+ e3_serialBias_SfN_repetitionRange;
  e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
  e1_serialBias_SfN_DIC; % figure 3b & c
  e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK

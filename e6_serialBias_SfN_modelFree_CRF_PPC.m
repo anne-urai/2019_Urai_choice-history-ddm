@@ -124,6 +124,7 @@ for d = 1:length(datasets),
         set(gca, 'xtick', qntls{q});
         axis square;  offsetAxes;
         xlabel('RT (quantiles)');
+        set(gca, 'xcolor', 'k', 'ycolor', 'k');
         
         if tps(tp) > 0,
             switch tps(tp)

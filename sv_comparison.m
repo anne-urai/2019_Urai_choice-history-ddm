@@ -10,7 +10,7 @@ for d = 1:length(datasets),
     
     % check that sv is smaller for models that include history
     traces_nohist = readtable(sprintf('%s/%s/stimcoding_nohist/group_traces.csv', mypath, datasets{d}));
-    traces_withhist = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
+    traces_withhist = readtable(sprintf('%s/%s/stimcoding_dc_prevresp/group_traces.csv', mypath, datasets{d}));
     
     % color in different grouos
     colors = cbrewer('seq', 'Greens', 5);
@@ -32,7 +32,6 @@ for d = 1:length(datasets),
 	ylabel('sv');
 	xlabel('Probability');
     tightfig;
-	
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/sv_comparison_d%d.pdf', d));
 	
 end
