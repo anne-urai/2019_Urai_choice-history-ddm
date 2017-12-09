@@ -138,7 +138,27 @@ ds = 1:length(datasets);
     % remove sessions where no data was recorded
     skippedSession = (isnan(nanmean(tab{:, 3:11}, 2)));
     tab(skippedSession, :) = [];
-
+    
+    % PUT DRIFT BIAS PER SESSION!
+    switch datasets{d}
+        case 'MEG'
+            behav.vbias_sess     = behav.dc_1__stimcodingdcprevresp - behav.dc_2__stimcodingdcprevresp;
+            behav.vbias_sess(behav.session == 1) = behav.dc_1_1__stimcodingdcprevrespsess(behav.session == 0) ...
+                - behav.dc_2_1__stimcodingdcprevrespsess(behav.session == 0);
+            s2 = behav.dc_1_2__stimcodingdcprevrespsess(behav.session == 0) ...
+                - behav.dc_2_2__stimcodingdcprevrespsess(behav.session == 0);
+            behav.vbias_sess(behav.session == 2) = s2(~isnan(s2));
+            s3 = behav.dc_1_3__stimcodingdcprevrespsess(behav.session ==0) ...
+                - behav.dc_2_3__stimcodingdcprevrespsess(behav.session == 0);
+            behav.vbias_sess(behav.session == 3) = s3(~isnan(s3));
+            s4 = behav.dc_1_4__stimcodingdcprevrespsess(behav.session == 0) ...
+                - behav.dc_2_4__stimcodingdcprevrespsess(behav.session == 0);
+            behav.vbias_sess(behav.session == 4) = s4(~isnan(s4));
+            behav.vbias_sess(behav.session == 5) = behav.dc_1_5__stimcodingdcprevrespsess(behav.session ==0) ...
+                - behav.dc_2_5__stimcodingdcprevrespsess (behav.session == 0);
+            behav.absvbias_sess  = abs(behav.vbias_sess);
+    end
+    
 	switch whichFit
 	case 1
     	writetable(tab, sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
