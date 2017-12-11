@@ -20,11 +20,11 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG'}; 
+datasets = {'Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'MEG_MEGsessions'}; 
 datasetnames = { {'Left/right motion RT'},  {'Yes/no tone RT'}, {'Yes/no contrast RT'}, ...
-    {'2IFC-1'}, {'2IFC-2'}, {'Up/down motion RT'}, ...
-    {'2AFC-1, Braun et al. 2017'}, ...
-   {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
+    {'2IFC-1'}, {'2IFC-2'},  {'2IFC-2 MEG'}};
+	datasets = datasets(end);
+	
 
 % go to code
 try
@@ -38,20 +38,20 @@ colors = [178,223,138; 166,206,227] ./ 256; % lighter
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %% PREPARING DATA
-if 0,
+if 1,
 	b2_HDDM_readIntoMatlab(datasets);
 	b2b_Gsq_readIntoMatlab(datasets);
 	b3_makeDataframe(datasets);
 end
 
 disp('starting');
+assert(1==0)
 
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 
 e3_serialBias_SfN_RTmodulation;
-assert(1==0)
 
  sv_comparison;
  e3_serialBias_SfN_repetitionRange;
