@@ -296,6 +296,16 @@ def make_model(mypath, mydata, model_name, trace_id):
             include=('sv'), group_only_nodes=['sv'],
             depends_on={'dc':['prevresp', 'session']})
             
+    elif model_name == 'stimcoding_dc_z_prevresp_sessions':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+            drift_criterion=True, bias=True, p_outlier=0.05,
+            include=('sv'), group_only_nodes=['sv'],
+            depends_on={'dc':['prevresp', 'session'], 'z':['prevresp', 'session']})
+            
     # ============================================ #
     # STIMCODING PREVRESP + PREVCORRECT
     # ============================================ #
@@ -395,16 +405,16 @@ def make_model(mypath, mydata, model_name, trace_id):
 
         # subselect data
         mydata = balance_designmatrix(mydata)
-        mydata = mydata.dropna(subset=['prevresp','prevrt'])
+        mydata = mydata.dropna(subset=['prevrt'])
 
         # boundary separation and drift rate will change over sessions
         if 'transitionprob' in mydata.columns:
             v_reg = {'model': 'v ~ 1 + stimulus+ ' \
                 'prevresp*prevrt*C(transitionprob)',
                 'link_func': lambda x:x}
-          
+         
         else:
-            v_reg = {'model': 'v ~ 1 + stimulus + prevresp*prevrt',
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevresp:prevrt',
             'link_func': lambda x:x}
            
         m = hddm.HDDMRegressor(mydata, v_reg,

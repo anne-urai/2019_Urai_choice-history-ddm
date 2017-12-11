@@ -142,24 +142,42 @@ for d = ds,
         % PUT DRIFT BIAS PER SESSION!
         if whichFit == 1,
             switch datasets{d}
-                case 'MEG'
-                    tab.vbias_sess = tab.dc_1__stimcodingdcprevresp - tab.dc_2__stimcodingdcprevresp;
-                    s1 = tab.dc_1_1__stimcodingdcprevrespsess(tab.session == 0) ...
-                        - tab.dc_2_1__stimcodingdcprevrespsess(tab.session == 0);
+                case {'MEG', 'MEG_MEGsessions'}
+                    tab.vbias_sess = tab.dc_1__stimcodingdczprevresp - tab.dc_2__stimcodingdczprevresp;
+                    s1 = tab.dc_1_1__stimcodingdczprevrespsess(tab.session == 0) ...
+                        - tab.dc_2_1__stimcodingdczprevrespsess(tab.session == 0);
                     tab.vbias_sess(tab.session == 1) = s1(~isnan(s1));
-                    s2 = tab.dc_1_2__stimcodingdcprevrespsess(tab.session == 0) ...
-                        - tab.dc_2_2__stimcodingdcprevrespsess(tab.session == 0);
+                    s2 = tab.dc_1_2__stimcodingdczprevrespsess(tab.session == 0) ...
+                        - tab.dc_2_2__stimcodingdczprevrespsess(tab.session == 0);
                     tab.vbias_sess(tab.session == 2) = s2(~isnan(s2));
-                    s3 = tab.dc_1_3__stimcodingdcprevrespsess(tab.session ==0) ...
-                        - tab.dc_2_3__stimcodingdcprevrespsess(tab.session == 0);
+                    s3 = tab.dc_1_3__stimcodingdczprevrespsess(tab.session ==0) ...
+                        - tab.dc_2_3__stimcodingdczprevrespsess(tab.session == 0);
                     tab.vbias_sess(tab.session == 3) = s3(~isnan(s3));
-                    s4 = tab.dc_1_4__stimcodingdcprevrespsess(tab.session == 0) ...
-                        - tab.dc_2_4__stimcodingdcprevrespsess(tab.session == 0);
+                    s4 = tab.dc_1_4__stimcodingdczprevrespsess(tab.session == 0) ...
+                        - tab.dc_2_4__stimcodingdczprevrespsess(tab.session == 0);
                     tab.vbias_sess(tab.session == 4) = s4(~isnan(s4));
-                    s5 = tab.dc_1_5__stimcodingdcprevrespsess(tab.session ==0) ...
-                        - tab.dc_2_5__stimcodingdcprevrespsess (tab.session == 0);
+                    s5 = tab.dc_1_5__stimcodingdczprevrespsess(tab.session ==0) ...
+                        - tab.dc_2_5__stimcodingdczprevrespsess (tab.session == 0);
                     tab.vbias_sess(tab.session == 5) = s5(~isnan(s5));
                     tab.absvbias_sess  = abs(tab.vbias_sess);
+					
+                    tab.zbias_sess = tab.dc_1__stimcodingdczprevresp - tab.dc_2__stimcodingdczprevresp;
+                    s1 = tab.z_1_1__stimcodingdczprevrespsess(tab.session == 0) ...
+                        - tab.z_2_1__stimcodingdczprevrespsess(tab.session == 0);
+                    tab.zbias_sess(tab.session == 1) = s1(~isnan(s1));
+                    s2 = tab.z_1_2__stimcodingdczprevrespsess(tab.session == 0) ...
+                        - tab.z_2_2__stimcodingdczprevrespsess(tab.session == 0);
+                    tab.zbias_sess(tab.session == 2) = s2(~isnan(s2));
+                    s3 = tab.z_1_3__stimcodingdczprevrespsess(tab.session ==0) ...
+                        - tab.z_2_3__stimcodingdczprevrespsess(tab.session == 0);
+                    tab.zbias_sess(tab.session == 3) = s3(~isnan(s3));
+                    s4 = tab.z_1_4__stimcodingdczprevrespsess(tab.session == 0) ...
+                        - tab.z_2_4__stimcodingdczprevrespsess(tab.session == 0);
+                    tab.zbias_sess(tab.session == 4) = s4(~isnan(s4));
+                    s5 = tab.z_1_5__stimcodingdczprevrespsess(tab.session ==0) ...
+                        - tab.z_2_5__stimcodingdczprevrespsess (tab.session == 0);
+                    tab.zbias_sess(tab.session == 5) = s5(~isnan(s5));
+                    tab.abszbias_sess  = abs(tab.zbias_sess);
             end
         end
         
