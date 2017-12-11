@@ -144,7 +144,8 @@ for d = ds,
             switch datasets{d}
                 case {'MEG', 'MEG_MEGsessions'}
                     tab.vbias_sess = tab.dc_1__stimcodingdczprevresp - tab.dc_2__stimcodingdczprevresp;
-                    s1 = tab.dc_1_1__stimcodingdczprevrespsess(tab.session == 0) ...
+					try
+				    s1 = tab.dc_1_1__stimcodingdczprevrespsess(tab.session == 0) ...
                         - tab.dc_2_1__stimcodingdczprevrespsess(tab.session == 0);
                     tab.vbias_sess(tab.session == 1) = s1(~isnan(s1));
                     s2 = tab.dc_1_2__stimcodingdczprevrespsess(tab.session == 0) ...
@@ -159,10 +160,12 @@ for d = ds,
                     s5 = tab.dc_1_5__stimcodingdczprevrespsess(tab.session ==0) ...
                         - tab.dc_2_5__stimcodingdczprevrespsess (tab.session == 0);
                     tab.vbias_sess(tab.session == 5) = s5(~isnan(s5));
+				end
                     tab.absvbias_sess  = abs(tab.vbias_sess);
 					
                     tab.zbias_sess = tab.dc_1__stimcodingdczprevresp - tab.dc_2__stimcodingdczprevresp;
-                    s1 = tab.z_1_1__stimcodingdczprevrespsess(tab.session == 0) ...
+					try
+				    s1 = tab.z_1_1__stimcodingdczprevrespsess(tab.session == 0) ...
                         - tab.z_2_1__stimcodingdczprevrespsess(tab.session == 0);
                     tab.zbias_sess(tab.session == 1) = s1(~isnan(s1));
                     s2 = tab.z_1_2__stimcodingdczprevrespsess(tab.session == 0) ...
@@ -177,6 +180,7 @@ for d = ds,
                     s5 = tab.z_1_5__stimcodingdczprevrespsess(tab.session ==0) ...
                         - tab.z_2_5__stimcodingdczprevrespsess (tab.session == 0);
                     tab.zbias_sess(tab.session == 5) = s5(~isnan(s5));
+				end
                     tab.abszbias_sess  = abs(tab.zbias_sess);
             end
         end
