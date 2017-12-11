@@ -38,7 +38,7 @@ colors = [178,223,138; 166,206,227] ./ 256; % lighter
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %% PREPARING DATA
-if 0,
+if 1,
 	b2_HDDM_readIntoMatlab(datasets);
 	b2b_Gsq_readIntoMatlab(datasets);
 	b3_makeDataframe(datasets);
