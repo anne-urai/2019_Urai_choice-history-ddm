@@ -102,11 +102,11 @@ for d = 1:length(datasets),
     l = refline(p(1), p(2));
     l.Color = 'k';
     l.LineWidth = 0.5;
-    if pval < 0.05,
-        l.LineStyle = '-';
-    else
-        l.LineStyle = ':';
-    end
+    % if pval < 0.05,
+    %     l.LineStyle = '-';
+    % else
+    %     l.LineStyle = ':';
+    % end
     
     offsetAxes; box off;
     title(datasetnames{d}{1});

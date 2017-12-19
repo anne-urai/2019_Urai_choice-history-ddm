@@ -8,7 +8,7 @@ global mypath datasets datasetnames colors
 
 datasets = {'MEG'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!
 % datasets = {'MEG_MEGsessions'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!
-datasetnames = {{'2IFC-2'}};
+datasetnames = {{'Visual motion' '2IFC (FD) #2'}};
 cnt = 1;
 
 Gsq = 0; sz = 0;
@@ -56,7 +56,7 @@ for d = length(datasets):-1:1
     allresults(1).z_prevresp     = results.z_prevresp_placebo;
     allresults(1).v_prevresp     = results.v_prevresp_placebo;
     allresults(1).criterionshift = results.repetition;
-    alltitles{1}                 = cat(2, datasetnames{d}{1}, ' - ', 'Placebo');
+    alltitles{1}                 = {cat(2, datasetnames{1}{1}, ' ', datasetnames{1}{2}) ' - Placebo'};
     allresults(1).scattercolor    = colors1(8, :);
     allresults(1).meancolor       = colors2(8, :);
     allresults(1).marker          = 'o';
@@ -70,7 +70,7 @@ for d = length(datasets):-1:1
     allresults(2).z_prevresp     = results.z_prevresp_atomoxetine;
     allresults(2).v_prevresp     = results.v_prevresp_atomoxetine;
     allresults(2).criterionshift = results.repetition;
-    alltitles{2}                 = cat(2, datasetnames{d}{1}, ' - ', 'Atomoxetine');
+    alltitles{2}                 = {cat(2, datasetnames{1}{1}, ' ', datasetnames{1}{2}) ' - Atomoxetine'};
     allresults(2).scattercolor    = paired(5, :);
     allresults(2).meancolor       = paired(6, :);
     allresults(2).marker          = 's';
@@ -84,7 +84,7 @@ for d = length(datasets):-1:1
     allresults(3).z_prevresp     = results.z_prevresp_donepezil;
     allresults(3).v_prevresp     = results.v_prevresp_donepezil;
     allresults(3).criterionshift = results.repetition;
-    alltitles{3}                 = cat(2, datasetnames{d}{1}, ' - ', 'Donepezil');
+    alltitles{3}                 = {cat(2, datasetnames{1}{1}, ' ', datasetnames{1}{2}) ' - Donepezil'};
     allresults(3).scattercolor    = paired(1, :);
     allresults(3).meancolor       = paired(2, :);
     allresults(3).marker          = 'd';

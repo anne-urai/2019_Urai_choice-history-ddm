@@ -40,7 +40,13 @@ for d = 1:length(ds),
     set(h(2), 'color', col, 'linewidth', 1);
 end
 
-set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}));
+names = {alldat(ds).datasetnames};
+for n = 1:length(names),
+	names{n} = cat(2, names{n}{1}, ' ', names{n}{2});
+end
+names = fliplr(names);
+
+set(gca, 'ytick', 1:length(ds), 'yticklabel', names);
 xlabel('z_{bias}');
 xlim([-1 1]); offsetAxes;
 set(gca, 'xcolor', axiscolors(1, :));
@@ -93,7 +99,7 @@ for d = 1:length(ds),
     set(h(2), 'color', col, 'linewidth', 1);
 end
 
-set(gca, 'ytick', 1:length(ds), 'yticklabel', fliplr({alldat(ds).datasetnames}), 'YAxisLocation', 'right');
+set(gca, 'ytick', 1:length(ds), 'yticklabel', names, 'YAxisLocation', 'right');
 xlabel('v_{bias}');
 set(gca, 'xcolor', axiscolors(2, :));
 xlim([-1 1]); offsetAxes;

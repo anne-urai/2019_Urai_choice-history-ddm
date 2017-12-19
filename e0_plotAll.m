@@ -22,7 +22,7 @@ end
 % neutral vs biased plots
 datasets = {'Murphy', 'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG', 'MEG_MEGsessions'};
 datasetnames = { {{'Visual motion' '2AFC (RT)'}},  {{'Visual contrast' 'yes/no (RT)'}}, {{'Auditory' 'yes/no (RT)'}}, ...
-    {{'Visual motion' '2IFC (FD) #1'}}, {{'Visual motion' '2IFC (FD) #2'}},  {'2IFC-2 MEG'}};
+    {{'Visual motion' '2IFC (FD) #1'}}, {{'Visual motion' '2IFC (FD) #2'}},  {'Visual motion' '2IFC (FD) #2'}};
 datasets = datasets(1:5);
 
 % go to code
@@ -52,25 +52,18 @@ disp('starting');
 
 % e3_serialBias_SfN_RTmodulation;
 
- sv_comparison;
+ %sv_comparison;
  e3_serialBias_SfN_repetitionRange;
- e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
- assert(1==0)
  
- e1_serialBias_SfN_DIC; % figure 3b & c
- e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
- e1_serialBias_SfN_BIC;
+ % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+ %e1_serialBias_SfN_DIC; % figure 3b & c
+ %e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+ % e1_serialBias_SfN_BIC;
 
 % % show the fits separately for dc and z
 % alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits; % figure 4
 % forestPlot(alldat);
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_indep.pdf'));
-
-% ======================= %
-% MODEL FREE CONFIRMATION
-% ======================= %
-
-e6_serialBias_SfN_modelFree_CRF_PPC
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
@@ -96,6 +89,11 @@ for sz = [0 1],
     end
 end
 
+% ======================= %
+% MODEL FREE CONFIRMATION
+% ======================= %
+
+%e6_serialBias_SfN_modelFree_CRF_PPC
 
 % ======================= %
 % PREVCORRECT
@@ -120,7 +118,7 @@ end
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma(); % figure 4
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
-
+assert(1==0)
 
 % ======================= %
 % SCHEMATIC/HYPOTHESES
