@@ -29,12 +29,12 @@ for d = 1:length(datasets),
     set(gca, 'ytick', [1 numel(rep)], 'xtick', [0.4 0.5 0.6]);
     
     % yyaxis right;
-        name = strsplit(datasetnames{d}{1});
-		if length(name) == 1,
-	        y = ylabel(sprintf('%s', datasetnames{d}{1}));
-		else
-        y = ylabel({name{1} [name{2} ' ' name{3}]});
-    end
+    % name = strsplit(datasetnames{d}{1});
+    %if length(name) == 1,
+    y = ylabel(datasetnames{d}{1});
+    %else
+    % y = ylabel({name{1} [name{2} ' ' name{3}]});
+    %end
     
     y.Rotation = y.Rotation + 180;
     y.Position(1) = y.Position(1) + 0.27;

@@ -87,8 +87,8 @@ set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
 title('History bias in drift');
 % add two axes manually
-plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
-plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
+plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
+plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k--', 'linewidth', 0.5);
 box off; 
 ax = gca;
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
@@ -134,8 +134,8 @@ axis tight;
 set(gca, 'ytick', [-cfg.a 0 cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
 title('History bias in starting point');
-plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
-plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
+plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
+plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k--', 'linewidth', 0.5);
 
 box off;
 ax = gca;
@@ -144,17 +144,17 @@ set(ax, 'xcolor', 'w', 'xtick',[]);
 xlim([min(cfg.time) max(cfg.time)]);
 
 %% now add the equations!
-
-subplot(335);
-xoffset = 0.02;
-text(xoffset, 1.15, 'dy = (s\cdotv+\bf{v_{bias}}\rm{)dt + cdW}', 'fontsize', fz);
-text(xoffset, 1, 'y(0) = z = a/2', 'fontsize', fz);
-axis off;
-
-subplot(334);
-text(xoffset, 1.15, 'dy = s\cdotv\cdotdt + cdW', 'fontsize', fz);
-text(xoffset, 1, 'y(0) = z = a/2 + \bf{z_{bias}}', 'fontsize', fz);
-axis off;
+% 
+% subplot(335);
+% xoffset = 0.02;
+% text(xoffset, 1.15, 'dy = (s\cdotv+\bf{v_{bias}}\rm{)dt + cdW}', 'fontsize', fz);
+% text(xoffset, 1, 'y(0) = z = a/2', 'fontsize', fz);
+% axis off;
+% 
+% subplot(334);
+% text(xoffset, 1.15, 'dy = s\cdotv\cdotdt + cdW', 'fontsize', fz);
+% text(xoffset, 1, 'y(0) = z = a/2 + \bf{z_{bias}}', 'fontsize', fz);
+% axis off;
 
 % save
 % offsetAxes;

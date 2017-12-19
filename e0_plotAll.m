@@ -20,11 +20,10 @@ switch usr
 end
 
 % neutral vs biased plots
-datasets = {'Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'MEG_MEGsessions'}; 
-datasetnames = { {'Left/right motion RT'},  {'Yes/no tone RT'}, {'Yes/no contrast RT'}, ...
-    {'2IFC-1'}, {'2IFC-2'},  {'2IFC-2 MEG'}};
-	datasets = datasets(end);
-	
+datasets = {'Murphy', 'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG', 'MEG_MEGsessions'};
+datasetnames = { {{'Visual motion' '2AFC (RT)'}},  {{'Visual contrast' 'yes/no (RT)'}}, {{'Auditory' 'yes/no (RT)'}}, ...
+    {{'Visual motion' '2IFC (FD) #1'}}, {{'Visual motion' '2IFC (FD) #2'}},  {'2IFC-2 MEG'}};
+datasets = datasets(1:5);
 
 % go to code
 try
@@ -70,7 +69,6 @@ e3_serialBias_SfN_RTmodulation;
 % ======================= %
 
 e6_serialBias_SfN_modelFree_CRF_PPC
-
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
