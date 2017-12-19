@@ -113,7 +113,7 @@ for d = length(datasets):-1:1
     
     % move together
     sp2.Position(1) = sp2.Position(1) - 0.08;
-    ss = suplabel(datasetnames{d}{1}, 't');
+    ss = suplabel('Visual motion 2IFC (FD) #2', 't');
     set(ss, 'fontweight', 'normal');
     ss.FontWeight = 'normal';
     ss.Position(2) = ss.Position(2) - 0.03;

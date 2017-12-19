@@ -49,7 +49,7 @@ names = fliplr(names);
 set(gca, 'ytick', 1:length(ds), 'yticklabel', names);
 xlabel('z_{bias}');
 xlim([-1 1]); offsetAxes;
-set(gca, 'xcolor', axiscolors(1, :));
+set(gca, 'xcolor', axiscolors(1, :), 'ycolor', 'k');
 
 plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest([alldat(ds).corrz]);
@@ -101,7 +101,7 @@ end
 
 set(gca, 'ytick', 1:length(ds), 'yticklabel', names, 'YAxisLocation', 'right');
 xlabel('v_{bias}');
-set(gca, 'xcolor', axiscolors(2, :));
+set(gca, 'xcolor', axiscolors(2, :), 'ycolor', 'k');
 xlim([-1 1]); offsetAxes;
 
 % ADD THE AVERAGE??

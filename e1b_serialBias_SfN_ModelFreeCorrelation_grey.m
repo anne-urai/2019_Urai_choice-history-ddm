@@ -149,9 +149,9 @@ for d = length(datasets):-1:1
     
     % add colored axes after suplabel (which makes them black)
     xlabel(sp1, 'History bias in z');
-    set(sp1, 'xcolor', colors(1, :));
+    set(sp1, 'xcolor', colors(1, :), 'ycolor', 'k');
     xlabel(sp2, 'History bias in v');
-    set(sp2, 'xcolor', colors(2, :));
+    set(sp2, 'xcolor', colors(2, :), 'ycolor', 'k');
     
     if doText,
         %% add line between the two correlation coefficients
