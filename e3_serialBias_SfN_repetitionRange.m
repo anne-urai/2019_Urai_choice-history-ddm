@@ -24,7 +24,7 @@ for d = 1:length(datasets),
 
     % ylabel(sprintf('%s, n = %d', datasetnames{d}{1}, numel(rep)));
     % show on x-axis what the mean is
-    box off; xlim([0.35 0.65]); ylim([0.5 numel(rep)+0.5]);
+    box off; xlim([0.4 0.65]); ylim([1 numel(rep)+0.5]);
     plot(mean(rep), 0, 'k^', 'markerfacecolor', linspecer(1), 'markeredgecolor', linspecer(1), 'markersize', 2);
     set(gca, 'ytick', [1 numel(rep)], 'xtick', [0.4 0.5 0.6]);
     
@@ -37,7 +37,7 @@ for d = 1:length(datasets),
     %end
     
     y.Rotation = y.Rotation + 180;
-    y.Position(1) = y.Position(1) + 0.27;
+    y.Position(1) = y.Position(1) + 0.3;
     y.Position(2) = y.Position(2) - 1.5;
 	
     xlabel('P(repeat)');

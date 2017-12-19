@@ -98,8 +98,7 @@ end
 % MODEL FREE CONFIRMATION
 % ======================= %
 
-
-%e6_serialBias_SfN_modelFree_CRF_PPC
+e6_serialBias_SfN_modelFree_CRF_PPC
 
 % ======================= %
 % PREVCORRECT
