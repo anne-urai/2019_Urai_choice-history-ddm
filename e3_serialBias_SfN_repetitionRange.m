@@ -38,7 +38,7 @@ for d = 1:length(datasets),
     
     y.Rotation = y.Rotation + 180;
     y.Position(1) = y.Position(1) + 0.27;
-    y.Position(2) = y.Position(2) + 0.02;
+    y.Position(2) = y.Position(2) - 1.5;
 	
     xlabel('P(repeat)');
     offsetAxes;
