@@ -37,24 +37,26 @@ colors = [178,223,138; 166,206,227] ./ 256; % lighter
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %% PREPARING DATA
-if 1,
+if 0,
 	b2_HDDM_readIntoMatlab(datasets);
 	b2b_Gsq_readIntoMatlab(datasets);
 	b3_makeDataframe(datasets);
 end
 
 disp('starting');
-assert(1==0)
+%assert(1==0)
 
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 
-e3_serialBias_SfN_RTmodulation;
+% e3_serialBias_SfN_RTmodulation;
 
  sv_comparison;
  e3_serialBias_SfN_repetitionRange;
  e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+ assert(1==0)
+ 
  e1_serialBias_SfN_DIC; % figure 3b & c
  e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
  e1_serialBias_SfN_BIC;

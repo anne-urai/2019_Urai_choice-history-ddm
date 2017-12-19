@@ -80,7 +80,7 @@ function e3_serialBias_SfN_RTmodulation
 			if pval < 0.05, l = lsline; l.Color = 'k'; end
 			end
 		
-			suplabel(datasetnames{d}{1}, 't'); 
+			suptitle(datasetnames{d}{1}); 
 			tightfig;
 			print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/RT_modulationTraces_d%d.pdf', d));
     
