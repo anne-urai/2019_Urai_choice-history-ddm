@@ -13,10 +13,12 @@ qntls{2} = [0.1, 0.3, 0.5, 0.7, 0.9]; % Leite & Ratcliff
 qntls{3} = [0.3 0.6 0.9];
 qntls{4} = [0.5 0.95]; % median split
 
+fixedEffects = 1;
+
 allcols = colors;
 
-for d = 5:length(datasets),
-    for q = 4:length(qntls),
+    for q = 1:length(qntls),
+		for d = 1:length(datasets),
         
         switch datasets{d}
             case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}
@@ -51,7 +53,7 @@ for d = 5:length(datasets),
                 % load simulated data - make sure this has all the info we need
                 alldata    = readtable(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}));
                 alldata    = sortrows(alldata, {'subj_idx'});
-                
+			   
                 if ~any(ismember(alldata.Properties.VariableNames, 'transitionprob'))
                     alldata.transitionprob = zeros(size(alldata.subj_idx));
                 else
@@ -72,7 +74,7 @@ for d = 5:length(datasets),
                     alldata.subj_idx = findgroups(alldata.subj_idx, alldata.coherence);
                     newNsubj = numel(unique(alldata.subj_idx));
                     if origNsubj ~= newNsubj,
-                        fprintf('splitting by coherence, nsubj %d newNsubj %d', origNsubj, newNsubj);
+                        fprintf('splitting by coherence, nsubj %d newNsubj %d \n', origNsubj, newNsubj);
                     end
                 end
                 
@@ -94,6 +96,11 @@ for d = 5:length(datasets),
                 if tps(tp) == 0,
                     alldata.biased(altIdx) = double(~(alldata.biased(altIdx))); % flip
                 end
+				
+				% fixed effects
+				if fixedEffects,
+					alldata.subj_idx = ones(size(alldata.subj_idx));
+				end
                 
                 % divide RT into quantiles for each subject
                 discretizeRTs = @(x) {discretize(x, quantile(x, [0, qntls{q}]))};
@@ -160,8 +167,12 @@ for d = 5:length(datasets),
         tightfig;
         set(gca, 'xcolor', 'k', 'ycolor', 'k');
         
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_qntlsR%d.pdf', d, q));
-        fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
+		if fixedEffects,
+	        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_qntlsR%d_fixed.pdf', d, q));
+		else
+        	print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_qntlsR%d.pdf', d, q));
+		end
+        fprintf('~/Data/serialHDDM/CRF_PPC_d%d_qntlsR%d.pdf \n', d, q);
         
     end
 end

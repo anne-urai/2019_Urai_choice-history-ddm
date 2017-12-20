@@ -45,7 +45,6 @@ end
 
 disp('starting');
 %
-e6_serialBias_SfN_modelFree_CRF_PPC
 assert(1==0)
 
 % ======================= %
@@ -99,7 +98,8 @@ end
 % MODEL FREE CONFIRMATION
 % ======================= %
 
-
+e6_serialBias_SfN_modelFree_CRF_PPC
+assert(1==0)
 
 % ======================= %
 % PREVCORRECT
