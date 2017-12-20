@@ -23,11 +23,11 @@ thesecolors = {[0.5 0.5 0.5],  colors(1, :), ...
 fixedEffects = 0;
 allcols = colors;
 
-allds.fast  = nan(length(datasets), length(models));
-allds.slow = nan(length(datasets), length(models));
+allds.late  = nan(length(datasets), length(models));
+allds.early = nan(length(datasets), length(models));
 
 for q = 1; %:length(qntls),
-    for d = 1:length(datasets),
+    for d = 1:2; %length(datasets),
         
         switch datasets{d}
             case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}
@@ -143,8 +143,8 @@ for q = 1; %:length(qntls),
                 
                 % SAVE
                 avg = nanmean(mat, 1);
-                allds.fast(d, m) = nanmean(avg(1:2));
-                allds.slow(d, m) = nanmean(avg(end-1:end));
+                allds.early(d, m) = nanmean(avg(1:2));
+                allds.late(d, m) = nanmean(avg(end-1:end));
             end
         end
         
@@ -188,37 +188,37 @@ for q = 1; %:length(qntls),
     % ========================================== %
     %% PLOT ACROSS DATASETS
     % ========================================== %
-    
+
+    close all;
     periods = {'fast', 'slow'};
     for p  = 1:2,
-        close all;
-        subplot(3,3,1); hold on;
-        for b = 1:4,
-            if ~iscell(thesecolors{b}),
-                bar(b, nanmean(allds.(periods{p})(:, b)), 'edgecolor', 'none', ...
-                    'facecolor', thesecolors{b}, 'basevalue', 0.5, 'barwidth', 0.6);
-            else
-                [ptchs,ptchGrp] = createPatches(b, nanmean(allds.(periods{p})(:, b)), 0.3, thesecolors{b}{1},0, 0.5);
-                hatch(ptchs, [0 10 1], thesecolors{b}{2});
-            end
-            %             ploterr(b, nanmean(allds.(periods{p})(:, b)), [], nanstd(allds.(periods{p})(:, b)) ./ sqrt(length(datasets)), ...
-            %                 'k.', 'abshhxy', 0);
+    subplot(3,3,1); hold on;
+    for b = 1:4,
+        if ~iscell(thesecolors{b}),
+            bar(b, nanmean(allds.early(:, b)), 'edgecolor', 'none', ...
+                'facecolor', thesecolors{b}, 'basevalue', 0.5);
+        else
+            [ptchs,ptchGrp] = createPatches(b,nanmean(allds.early(:, b)), 0.3, thesecolors{b}{1},0.5);
+            hatch(ptchs, [0 4.5 1.5], thesecolors{b}{2});
         end
-        % now the data
-        b = ploterr(5, nanmean(allds.(periods{p})(:, 5)), [], ...
-            nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
-            'ko', 'abshhxy', 0);
-        set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
-        
-        title(sprintf('%s RTs', capitalize(periods{p})));
-        ylabel('History bias');
-        set(gca, 'xtick', 1:5, 'xticklabel', {'No history', 'z_{bias}', 'v_{bias}', 'Both', 'Data'}, ...
-            'xticklabelrotation', -30);
-        axis square; axis tight; offsetAxes;
-        tightfig;
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_%s.pdf', periods{p}));
-        
+        ploterr(b, nanmean(allds.early(:, b)), [], nanstd(allds.early(:, b)) ./ sqrt(length(datasets)), ...
+            'k.', 'abshhxy', 0);
     end
+    % now the data
+    b = ploterr(5, nanmean(allds.early(:, 5)), [], nanstd(allds.early(:, 5)) ./ sqrt(length(datasets)), ...
+        'ko', 'abshhxy', 0);
+
+    title(sprintf('%s RTs', capitalize(periods{p})));
+    ylabel('History bias'); 
+    set(gca, 'xtick', 1:5, 'xticklabel', {'No history', 'z_{bias}', 'v_{bias}', 'Both', 'Data'}, ...
+        'xticklabelrotation', -30);
+    axis square; axis tight; offsetAxes;
+    tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_%s.pdf', periods{p}));
+
+    end
+    
+    
 
 end
 end
