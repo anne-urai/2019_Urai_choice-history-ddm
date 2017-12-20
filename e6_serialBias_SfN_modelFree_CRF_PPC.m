@@ -13,11 +13,11 @@ qntls{2} = [0.1, 0.3, 0.5, 0.7, 0.9]; % Leite & Ratcliff
 qntls{3} = [0.3 0.6 0.9];
 qntls{4} = [0.5 0.95]; % median split
 
-fixedEffects = 1;
+fixedEffects = 0;
 
 allcols = colors;
 
-    for q = 1:length(qntls),
+    for q = 1; %:length(qntls),
 		for d = 1:length(datasets),
         
         switch datasets{d}
@@ -34,26 +34,31 @@ allcols = colors;
         for tp = 1:length(tps),
             
             % redo this for each simulation
-            models = {'stimcoding_dc_prevresp', 'stimcoding_z_prevresp', ...
-                'stimcoding_nohist', 'stimcoding_nohist'};
+            models = {'stimcoding_dc_prevresp', 'stimcoding_z_prevresp', 'stimcoding_dc_z_prevresp' ...
+                'stimcoding_nohist', 'data'};
             % 'stimcoding_dc_z_prevresp', ...
-            thesecolors = {colors(2, :), colors(1, :), ...
+            thesecolors = {colors(2, :), colors(1, :), {colors(1, :), colors(2, :)} ...
                 [0.5 0.5 0.5], [0 0 0]};
             
             % {colors(1,:), colors(2, :)}, ...
             
             for m = 1:length(models),
                 
-                if ~exist(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}), 'file'),
-                    continue;
-                else
-                    fprintf('%s/%s/%s/ppc_data.csv \n', mypath, datasets{d}, models{m});
-                end
-                
-                % load simulated data - make sure this has all the info we need
-                alldata    = readtable(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}));
-                alldata    = sortrows(alldata, {'subj_idx'});
-			   
+				switch models{m}
+				case 'data'
+					filename = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
+	                alldata  = readtable(sprintf('%s/%s/%s', mypath, datasets{d}, filename.name));
+				otherwise
+	                if ~exist(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}), 'file'),
+	                    continue;
+	                else
+	                    fprintf('%s/%s/%s/ppc_data.csv \n', mypath, datasets{d}, models{m});
+	                end
+	                % load simulated data - make sure this has all the info we need
+	                alldata    = readtable(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, models{m}));
+	                alldata    = sortrows(alldata, {'subj_idx'});
+				end
+							
                 if ~any(ismember(alldata.Properties.VariableNames, 'transitionprob'))
                     alldata.transitionprob = zeros(size(alldata.subj_idx));
                 else
@@ -117,19 +122,17 @@ allcols = colors;
                 mat = mat{:, 2:end}; % remove the last one, only has some weird tail
                 
                 % biased choice proportion
-                if m == 1,
-                    plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
-                elseif m < length(models),
+                if m < length(models),
                     if isnumeric(thesecolors{m})
                         plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 0.5);
                     elseif iscell(thesecolors{m}) % superimposed lines for dashed
-                        plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}{1}, 'linewidth', 0.5);
-                        plot(qntls{q}, nanmean(mat, 1), ':', 'color', thesecolors{m}{2}, 'linewidth', 0.5);
+                        plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}{1}, 'linewidth', 1.5);
+                        plot(qntls{q}, nanmean(mat, 1), ':', 'color', thesecolors{m}{2}, 'linewidth', 1.5);
                     end
                 else
                     %% ALSO ADD THE REAL DATA
                     h = ploterr(qntls{q}, nanmean(mat, 1), [], ...
-                        nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k', 'abshhxy', 0);
+                       1.96 *  nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k', 'abshhxy', 0);
                     set(h(1), 'color', 'k', 'marker', '.', ...
                         'markerfacecolor', 'k', 'markeredgecolor', 'k', 'linewidth', 0.5, 'markersize', 10, ...
                         'linestyle', 'none');
