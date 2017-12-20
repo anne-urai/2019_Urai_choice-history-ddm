@@ -9,15 +9,14 @@ warning off; close all; clear;
 global datasets datasetnames mypath colors
 
 qntls{1} = [.2, .4, .6, .8, .95]; % White & Poldrack
-% qntls = [.1, .3, .5, .7, .9, 1]; % Leite & Ratcliff
-qntls{2} = [0.1, 0.3, 0.5, 0.7, 0.9];
+qntls{2} = [0.1, 0.3, 0.5, 0.7, 0.9]; % Leite & Ratcliff
 qntls{3} = [0.3 0.6 0.9];
-qntls{4} = [0.5 1];
+qntls{4} = [0.5 0.95]; % median split
 
 allcols = colors;
 
-for d = 1:length(datasets),
-    for q = 2:length(qntls),
+for d = 5:length(datasets),
+    for q = 4:length(qntls),
         
         switch datasets{d}
             case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}
@@ -115,10 +114,10 @@ for d = 1:length(datasets),
                     plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
                 elseif m < length(models),
                     if isnumeric(thesecolors{m})
-                        plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 0.75);
+                        plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 0.5);
                     elseif iscell(thesecolors{m}) % superimposed lines for dashed
-                        plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}{1}, 'linewidth', 0.75);
-                        plot(qntls{q}, nanmean(mat, 1), ':', 'color', thesecolors{m}{2}, 'linewidth', 0.75);
+                        plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}{1}, 'linewidth', 0.5);
+                        plot(qntls{q}, nanmean(mat, 1), ':', 'color', thesecolors{m}{2}, 'linewidth', 0.5);
                     end
                 else
                     %% ALSO ADD THE REAL DATA

@@ -45,6 +45,8 @@ end
 
 disp('starting');
 %
+e6_serialBias_SfN_modelFree_CRF_PPC
+assert(1==0)
 
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
@@ -55,7 +57,6 @@ disp('starting');
 
 % POSTERIORS OF STARTING POINT SHIFT
 e3_serialBias_SfN_Posteriors_StartingPoint;
-assert(1==0)
 
  %sv_comparison;
  e3_serialBias_SfN_repetitionRange;
@@ -98,7 +99,7 @@ end
 % MODEL FREE CONFIRMATION
 % ======================= %
 
-e6_serialBias_SfN_modelFree_CRF_PPC
+
 
 % ======================= %
 % PREVCORRECT

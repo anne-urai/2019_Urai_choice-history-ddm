@@ -53,7 +53,8 @@ set(gca, 'xcolor', axiscolors(1, :), 'ycolor', 'k');
 
 plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest([alldat(ds).corrz]);
-bf = prod([alldat(ds).bfz]);
+disp('z bayes factor');
+bf = prod([alldat(ds).bfz])
 if bf < 100,
     title(sprintf('BF_{10} < 1/100'));
 elseif bf > 100,
@@ -107,8 +108,9 @@ xlim([-1 1]); offsetAxes;
 % ADD THE AVERAGE??
 plot(nanmean([alldat(ds).corrv]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]));
+disp('v bayes factor');
 
-bf = prod([alldat(ds).bfv]);
+bf = prod([alldat(ds).bfv])
 if bf < 100,
     title(sprintf('BF_{10} < 1/100'));
 elseif bf > 100,
