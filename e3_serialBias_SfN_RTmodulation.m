@@ -36,9 +36,9 @@ function e3_serialBias_SfN_RTmodulation
 		% MODEL WITH VBIAS AND ZBIAS
 		% ========================================== %
 	
-			subplot(4,4,5); hold on;
+		subplot(4,4,9); hold on;
 			
-			try
+		try
 			
 			% get traces for the model with pupil and rt modulation
 			traces = readtable(sprintf('%s/%s/regress_dc_z_prevresp_prevrt/all_traces.csv', mypath, datasets{d}));
@@ -64,7 +64,7 @@ function e3_serialBias_SfN_RTmodulation
 		% CORRELATION BETWEEN THE TWO
 		% ========================================== %
 
-		subplot(4,4,9);
+		subplot(4,4,3);
 
 		dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', ...
 		mypath, datasets{d}));
@@ -77,12 +77,50 @@ function e3_serialBias_SfN_RTmodulation
 			[rho, pval] = corr(dat.v_prevresp__regressdcprevrespprevrt, ...
 			dat.v_prevrespprevrt__regressdcprevrespprevrt, 'rows', 'complete');
 			title(sprintf('r = %.4f, p = %.4f', rho, pval));
-			if pval < 0.05, l = lsline; l.Color = 'k'; end
+			if pval < 0.05, l = lsline; l.Color = 'k'; 
 			end
-		
-			suptitle(datasetnames{d}{1}); 
-			tightfig;
-			print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/RT_modulationTraces_d%d.pdf', d));
     
 		end
+		
+		subplot(4,4,10);
+
+		dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', ...
+		mypath, datasets{d}));
+		
+		try
+			scatter(dat.z_prevresp__regressdczprevrespprevrt, ...
+			dat.z_prevrespprevrt__regressdczprevrespprevrt, 10, [0.5 0.5 0.5]);
+		
+			axis square; offsetAxes; xlabel('z_{bias} ~ prevresp'); ylabel('z_{bias} ~ prevresp*prevrt')
+			[rho, pval] = corr(dat.z_prevresp__regressdczprevrespprevrt, ...
+			dat.z_prevrespprevrt__regressdczprevrespprevrt, 'rows', 'complete');
+			title(sprintf('r = %.4f, p = %.4f', rho, pval));
+			if pval < 0.05, l = lsline; l.Color = 'k'; 
+			end
+    
+		end
+		
+		subplot(4,4,11);
+		
+		try
+			scatter(dat.v_prevresp__regressdczprevrespprevrt, ...
+			dat.v_prevrespprevrt__regressdczprevrespprevrt, 10, [0.5 0.5 0.5]);
+		
+			axis square; offsetAxes; xlabel('v_{bias} ~ prevresp'); ylabel('v_{bias} ~ prevresp*prevrt')
+			[rho, pval] = corr(dat.v_prevresp__regressdczprevrespprevrt, ...
+			dat.v_prevrespprevrt__regressdczprevrespprevrt, 'rows', 'complete');
+			title(sprintf('r = %.4f, p = %.4f', rho, pval));
+			if pval < 0.05, l = lsline; l.Color = 'k'; 
+			end
+    
+		end
+		
+	
+		% suptitle(datasetnames{d}{1}); 
+	    ss = suplabel(cat(2, datasetnames{d}{1}{1}, ' ', datasetnames{d}{1}{2}), 't');
+		tightfig;
+		
+		print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/RT_modulationTraces_d%d.pdf', d));
+		
 	end
+end
