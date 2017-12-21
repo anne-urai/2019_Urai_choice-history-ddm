@@ -216,6 +216,7 @@ for q = 1; %:length(qntls),
             'xticklabelrotation', -30);
         axis square; axis tight; offsetAxes;
         tightfig;
+        set(gca, 'ycolor', 'k', 'xcolor', 'k');
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_%s.pdf', periods{p}));
         
     end
