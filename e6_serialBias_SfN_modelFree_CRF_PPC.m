@@ -16,7 +16,7 @@ qntls{4} = [0.5 0.95]; % median split
 % redo this for each simulation
 models = {'stimcoding_nohist', 'stimcoding_z_prevresp',  ...
     'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp' ...
-     'data'};
+    'data'};
 thesecolors = {[0.5 0.5 0.5],  colors(1, :), ...
     colors(2, :), {colors(1, :), colors(2, :)}, [0 0 0]};
 
@@ -26,7 +26,7 @@ allcols = colors;
 allds.fast  = nan(length(datasets), length(models));
 allds.slow = nan(length(datasets), length(models));
 
-for q = 1; %:length(qntls),
+for q = 2; %:length(qntls),
     for d = 1:length(datasets),
         
         switch datasets{d}
@@ -143,8 +143,9 @@ for q = 1; %:length(qntls),
                 
                 % SAVE
                 avg = nanmean(mat, 1);
-                allds.fast(d, m) = nanmean(avg(1:2));
-                allds.slow(d, m) = nanmean(avg(end-1:end));
+                allds.fast(d, m) = nanmean(avg(1));
+                allds.slow(d, m) = nanmean(avg(end));
+				allds.all(d, m, :) = avg;
             end
         end
         
@@ -184,12 +185,16 @@ for q = 1; %:length(qntls),
         end
         fprintf('~/Data/serialHDDM/CRF_PPC_d%d_qntlsR%d.pdf \n', d, q);
     end
+	
+	savefast(sprintf('~/Data/serialHDDM/allds_q%d.mat', q), 'allds');
     
     % ========================================== %
     %% PLOT ACROSS DATASETS
     % ========================================== %
     
+	load(sprintf('~/Data/serialHDDM/allds_q%d.mat', q));
     periods = {'fast', 'slow'};
+	
     for p  = 1:2,
         close all;
         subplot(3,3,1); hold on;
@@ -197,29 +202,75 @@ for q = 1; %:length(qntls),
             if ~iscell(thesecolors{b}),
                 bar(b, nanmean(allds.(periods{p})(:, b)), 'edgecolor', 'none', ...
                     'facecolor', thesecolors{b}, 'basevalue', 0.5, 'barwidth', 0.6);
-            else
+            else % add bar hatch
                 [ptchs,ptchGrp] = createPatches(b, nanmean(allds.(periods{p})(:, b)), 0.3, thesecolors{b}{1},0, 0.5);
-                hatch(ptchs, [0 10 1], thesecolors{b}{2});
+                hatch(ptchs, [0 8 1], thesecolors{b}{2});
             end
-            %             ploterr(b, nanmean(allds.(periods{p})(:, b)), [], nanstd(allds.(periods{p})(:, b)) ./ sqrt(length(datasets)), ...
-            %                 'k.', 'abshhxy', 0);
         end
         % now the data
         b = ploterr(5, nanmean(allds.(periods{p})(:, 5)), [], ...
-            nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
+           1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
             'ko', 'abshhxy', 0);
         set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
         
         title(sprintf('%s RTs', capitalize(periods{p})));
-        ylabel('History bias');
+        ylabel('Fraction biased choices');
         set(gca, 'xtick', 1:5, 'xticklabel', {'No history', 'z_{bias}', 'v_{bias}', 'Both', 'Data'}, ...
             'xticklabelrotation', -30);
-        axis square; axis tight; offsetAxes;
+        axis square; axis tight; 
+        ylim([0.5 0.56]); 
+		set(gca, 'ytick', [0.5:0.02:0.56]);
+		offsetAxes;
         tightfig;
         set(gca, 'ycolor', 'k', 'xcolor', 'k');
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_%s.pdf', periods{p}));
-        
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_%s_q%d.pdf', periods{p}, q));
     end
+	
+    % ========================================== %
+    %% ALSO PER MODEL
+    % ========================================== %
+ 
+	modelnames = {'No history', 'z_{bias}', 'v_{bias}', 'Both', 'Data'};
+	close all;
+    for m = 1:5,
+		subplot(4,8,m); hold on;
+        
+		if m == 5,
+	        b = ploterr(1:2, [nanmean(allds.fast(:, m)) nanmean(allds.slow(:, m))], [], ...
+	           1.96* [nanstd(allds.fast(:, m)) nanstd(allds.slow(:, m))] ./ sqrt(length(datasets)), ...
+	            'ko', 'abshhxy', 0);
+	        set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
+		elseif ~iscell(thesecolors{m}),
+        	b = bar(1:2, [nanmean(allds.fast(:, m)) nanmean(allds.slow(:, m))], 'edgecolor', 'none', ...
+            	'facecolor', thesecolors{m}, 'basevalue', 0.5, 'barwidth', 0.6);
+			bl = b.BaseLine; set(bl, 'visible', 'off');
+			
+        else % add bar hatch
+            [ptchs, ptchGrp] = createPatches(1:2, [nanmean(allds.fast(:, m)) nanmean(allds.slow(:, m))], ...
+            0.3, thesecolors{m}{1},0, 0.5);
+           %  hatch(ptchs, [0 8 1], thesecolors{m}{2});
+        end
+		
+		set(gca, 'xtick', 1:2, 'xticklabel', periods);
+		title(modelnames{m});
 
+        % axis square; 
+		axis tight; 
+        ylim([0.5 0.56]); 
+		set(gca, 'ytick', [0.5:0.02:0.56]);
+		
+		if m == 1,
+	        ylabel('Fraction biased choices');
+		else
+			set(gca, 'yticklabel', []);
+		end
+		offsetAxes;
+        set(gca, 'ycolor', 'k', 'xcolor', 'k');
+	end
+    tightfig;
+	
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_v2_q%d.pdf', q));
+  
+	
 end
 end

@@ -19,7 +19,7 @@ switch usr
         mypath  = '/nfs/aeurai/HDDM';
 end
 
-% neutral vs biased plots
+% neutral vs biased plotsC
 datasets = {'Murphy', 'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG', 'MEG_MEGsessions'};
 datasetnames = { {{'Visual motion' '2AFC (RT)'}},  {{'Visual contrast' 'yes/no (RT)'}}, {{'Auditory' 'yes/no (RT)'}}, ...
     {{'Visual motion' '2IFC (FD) #1'}}, {{'Visual motion' '2IFC (FD) #2'}},  {'Visual motion' '2IFC (FD) #2'}};
