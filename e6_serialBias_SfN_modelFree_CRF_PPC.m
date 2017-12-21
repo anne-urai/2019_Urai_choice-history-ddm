@@ -198,6 +198,13 @@ for q = 2; %:length(qntls),
     for p  = 1:2,
         close all;
         subplot(3,3,1); hold on;
+		
+		plot([1 5], [nanmean(allds.(periods{p})(:, 5)) nanmean(allds.(periods{p})(:, 5))], '--k');
+		lower =  nanmean(allds.(periods{p})(:, 5)) - 1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
+		plot([1 5], [lower lower], ':k');
+		upper =  nanmean(allds.(periods{p})(:, 5)) + 1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
+		plot([1 5], [upper upper], ':k');
+		
         for b = 1:4,
             if ~iscell(thesecolors{b}),
                 bar(b, nanmean(allds.(periods{p})(:, b)), 'edgecolor', 'none', ...
@@ -232,31 +239,36 @@ for q = 2; %:length(qntls),
  
 	modelnames = {'No history', 'z_{bias}', 'v_{bias}', 'Both', 'Data'};
 	close all;
-    for m = 1:5,
+    for m = 1:4,
 		subplot(4,8,m); hold on;
         
-		if m == 5,
-	        b = ploterr(1:2, [nanmean(allds.fast(:, m)) nanmean(allds.slow(:, m))], [], ...
-	           1.96* [nanstd(allds.fast(:, m)) nanstd(allds.slow(:, m))] ./ sqrt(length(datasets)), ...
-	            'ko', 'abshhxy', 0);
-	        set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
-		elseif ~iscell(thesecolors{m}),
+		if ~iscell(thesecolors{m}),
         	b = bar(1:2, [nanmean(allds.fast(:, m)) nanmean(allds.slow(:, m))], 'edgecolor', 'none', ...
             	'facecolor', thesecolors{m}, 'basevalue', 0.5, 'barwidth', 0.6);
 			bl = b.BaseLine; set(bl, 'visible', 'off');
 			
         else % add bar hatch
-            [ptchs, ptchGrp] = createPatches(1:2, [nanmean(allds.fast(:, m)) nanmean(allds.slow(:, m))], ...
+            [ptchs, ptchGrp] = createPatches(1, [nanmean(allds.fast(:, m))], ...
             0.3, thesecolors{m}{1},0, 0.5);
-           %  hatch(ptchs, [0 8 1], thesecolors{m}{2});
+            hatch(ptchs, [0 8 1], thesecolors{m}{2});
+			
+            [ptchs, ptchGrp] = createPatches(2, [nanmean(allds.slow(:, m))], ...
+            0.3, thesecolors{m}{1},0, 0.5);
+            hatch(ptchs, [0 8 1], thesecolors{m}{2});
         end
+		
+        b = ploterr(1:2, [nanmean(allds.fast(:, 5)) nanmean(allds.slow(:, 5))], [], ...
+           1.96* [nanstd(allds.fast(:, 5)) nanstd(allds.slow(:, 5))] ./ sqrt(length(datasets)), ...
+            'ko', 'abshhxy', 0);
+        set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
 		
 		set(gca, 'xtick', 1:2, 'xticklabel', periods);
 		title(modelnames{m});
 
         % axis square; 
 		axis tight; 
-        ylim([0.5 0.56]); 
+		get(gca, 'ylim')
+        ylim([0.5 0.57]); 
 		set(gca, 'ytick', [0.5:0.02:0.56]);
 		
 		if m == 1,
@@ -268,7 +280,6 @@ for q = 2; %:length(qntls),
         set(gca, 'ycolor', 'k', 'xcolor', 'k');
 	end
     tightfig;
-	
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_v2_q%d.pdf', q));
   
 	
