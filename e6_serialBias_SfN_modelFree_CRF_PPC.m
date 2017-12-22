@@ -18,7 +18,7 @@ models = {'stimcoding_nohist', 'stimcoding_z_prevresp',  ...
     'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp' ...
     'data'};
 thesecolors = {[0.5 0.5 0.5],  colors(1, :), ...
-    colors(2, :), {colors(1, :), colors(2, :)}, [0 0 0]};
+    colors(2, :), {colors(2, :), colors(1, :)}, [0 0 0]};
 
 fixedEffects = 0;
 allcols = colors;
@@ -143,8 +143,8 @@ for q = 2; %:length(qntls),
                 
                 % SAVE
                 avg = nanmean(mat, 1);
-                allds.fast(d, m) = nanmean(avg(1));
-                allds.slow(d, m) = nanmean(avg(end));
+                allds.fast(d, m) = nanmean(avg(1:2));
+                allds.slow(d, m) = nanmean(avg(end-3:end));
 				allds.all(d, m, :) = avg;
             end
         end
@@ -216,7 +216,7 @@ for q = 2; %:length(qntls),
         end
         % now the data
         b = ploterr(5, nanmean(allds.(periods{p})(:, 5)), [], ...
-           1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
+          1.96 * nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
             'ko', 'abshhxy', 0);
         set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
         

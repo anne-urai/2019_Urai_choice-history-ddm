@@ -45,8 +45,6 @@ end
 
 disp('starting');
 %
-assert(1==0)
-
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
@@ -55,10 +53,10 @@ assert(1==0)
 
 
 % POSTERIORS OF STARTING POINT SHIFT
-e3_serialBias_SfN_Posteriors_StartingPoint;
+%e3_serialBias_SfN_Posteriors_StartingPoint;
 
  %sv_comparison;
- e3_serialBias_SfN_repetitionRange;
+% e3_serialBias_SfN_repetitionRange;
  
  % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
  %e1_serialBias_SfN_DIC; % figure 3b & c
@@ -94,6 +92,15 @@ for sz = [0 1],
     end
 end
 
+% ========================= %
+% MEG PHARMA
+% ========================= %
+
+alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma(); % figure 4
+forestPlot(fliplr(alldat));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
+assert(1==0)
+
 % ======================= %
 % MODEL FREE CONFIRMATION
 % ======================= %
@@ -117,14 +124,6 @@ assert(1==0)
 %e11_serialBias_MEGregression_DIC
 %e11_serialBias_MEGregression_posteriors
 
-% ========================= %
-% MEG PHARMA
-% ========================= %
-
-alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma(); % figure 4
-forestPlot(fliplr(alldat));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
-assert(1==0)
 
 % ======================= %
 % SCHEMATIC/HYPOTHESES

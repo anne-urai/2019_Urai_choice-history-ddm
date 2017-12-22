@@ -42,9 +42,9 @@ function [] = a0_compileMe(fname)
     % parameter file for HDDM
     % ============================================ #s
 	
-    nsmp       = [10000]
-    datasets   = [5]; % RT-RDK and MEG-PL
-    models     = [0 1 3]; % the nr of the models
+    nsmp       = [5000]
+    datasets   = [0:5]; % RT-RDK and MEG-PL
+    models     = [21 22]; % the nr of the models
     nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
     alldat = [];

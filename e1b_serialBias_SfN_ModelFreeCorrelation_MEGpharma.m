@@ -57,6 +57,7 @@ for d = length(datasets):-1:1
     allresults(1).v_prevresp     = results.v_prevresp_placebo;
     allresults(1).criterionshift = results.repetition;
     alltitles{1}                 = {cat(2, datasetnames{1}{1}, ' ', datasetnames{1}{2}) ' - Placebo'};
+    alltitles{1}                 = {'Placebo'};
     allresults(1).scattercolor    = colors1(8, :);
     allresults(1).meancolor       = colors2(8, :);
     allresults(1).marker          = 'o';
@@ -71,6 +72,7 @@ for d = length(datasets):-1:1
     allresults(2).v_prevresp     = results.v_prevresp_atomoxetine;
     allresults(2).criterionshift = results.repetition;
     alltitles{2}                 = {cat(2, datasetnames{1}{1}, ' ', datasetnames{1}{2}) ' - Atomoxetine'};
+    alltitles{2}                 = {'Atomoxetine'};
     allresults(2).scattercolor    = paired(5, :);
     allresults(2).meancolor       = paired(6, :);
     allresults(2).marker          = 's';
@@ -85,6 +87,7 @@ for d = length(datasets):-1:1
     allresults(3).v_prevresp     = results.v_prevresp_donepezil;
     allresults(3).criterionshift = results.repetition;
     alltitles{3}                 = {cat(2, datasetnames{1}{1}, ' ', datasetnames{1}{2}) ' - Donepezil'};
+    alltitles{3}                 = {'Donepezil'};
     allresults(3).scattercolor    = paired(1, :);
     allresults(3).meancolor       = paired(2, :);
     allresults(3).marker          = 'd';
@@ -119,9 +122,9 @@ for d = length(datasets):-1:1
     ss.Position(2) = ss.Position(2) - 0.03;
     
     % add colored axes after suplabel (which makes them black)
-    xlabel(sp1, 'History bias in z');
+    xlabel(sp1, 'History shift in z');
     set(sp1, 'xcolor', colors(1, :));
-    xlabel(sp2, 'History bias in v');
+    xlabel(sp2, 'History shift in v');
     set(sp2, 'xcolor', colors(2, :));
     
     if doText,
@@ -130,7 +133,7 @@ for d = length(datasets):-1:1
         if pval < 0.001,
             txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
         end
-        title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
+        %title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
     end
 
     tightfig;

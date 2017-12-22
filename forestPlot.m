@@ -8,7 +8,12 @@ global colors;
 axiscolors = colors; 
 
 % MAKE AN OVERVIEW PLOT
-subplot(331); hold on;
+if numel(alldat) == 3,
+subplot(431); 
+else
+subplot(331); 
+end
+hold on;
 % make a vertical line at zero
 plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
@@ -42,7 +47,11 @@ end
 
 names = {alldat(ds).datasetnames};
 for n = 1:length(names),
-	names{n} = cat(2, names{n}{1}, ' ', names{n}{2});
+	if numel(names{n}) > 1,
+		names{n} = cat(2, names{n}{1}, ' ', names{n}{2});
+	else
+		names{n} = names{n}{1};
+	end
 end
 names = fliplr(names);
 
@@ -67,7 +76,12 @@ end
 
 %% NOW FOR DRIFT CRITERION
 % MAKE AN OVERVIEW PLOT
-sp2 = subplot(332); hold on;
+if numel(alldat) == 3,
+	sp2 = subplot(432); hold on;
+else
+	sp2 = subplot(332); hold on;
+end
+
 % make a vertical line at zero
 plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
@@ -139,7 +153,8 @@ end
 
 % DO STATS ACROSS DATASETS!
 % [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]), fisherz([alldat(ds).corrz]));
-suplabel('Correlation P(repeat) with history shift', 'x');
+[~, h] = suplabel('Correlation P(repeat) with history shift', 'x');
+set(h, 'color', 'k');
 tightfig;
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));
 

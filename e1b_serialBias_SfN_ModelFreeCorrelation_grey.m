@@ -148,9 +148,9 @@ for d = length(datasets):-1:1
     ss.Position(2) = ss.Position(2) - 0.03;
     
     % add colored axes after suplabel (which makes them black)
-    xlabel(sp1, 'History bias in z');
+    xlabel(sp1, 'History shift in z');
     set(sp1, 'xcolor', colors(1, :), 'ycolor', 'k');
-    xlabel(sp2, 'History bias in v');
+    xlabel(sp2, 'History shift in v');
     set(sp2, 'xcolor', colors(2, :), 'ycolor', 'k');
     
     if doText,
@@ -219,8 +219,8 @@ axis square;
 % show lines to indicate origin
 xlims = [min(x) max(x)];
 ylims = [min(y) max(y)];
-plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
-plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2); % if p(repeat), 0.5
+plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.5);
+plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.5); % if p(repeat), 0.5
 
 % color in different grouos
 colors = cbrewer('qual', 'Paired', 10);
