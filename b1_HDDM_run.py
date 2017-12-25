@@ -293,7 +293,8 @@ models = ['stimcoding_nohist', # 0
 #     'MEG_750ms', # 13
 #     'JW_yesno_2500ms'] # 14
     
-datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'MEG_MEGsessions']
+datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'MEG_MEGsessions',
+    'Bharath_fMRI', 'Anke_2afc_sequential', 'Anke_MEG']
     
 # recode
 if isinstance(d, int):

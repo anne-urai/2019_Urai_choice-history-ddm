@@ -122,7 +122,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
 
-        # for Anke's data, also split by transition probability and include coherence-dependence of drift rate
+        # also split by transition probability and include coherence-dependence of drift rate
         if 'transitionprob' in mydata.columns:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
@@ -315,7 +315,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
 
-        # for Anke's data, also split by transition probability and include coherence-dependence of drift rate
+        # also split by transition probability and include coherence-dependence of drift rate
         if 'transitionprob' in mydata.columns:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
@@ -338,7 +338,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
 
-        # for Anke's data, also split by transition probability
+        # also split by transition probability
         if 'transitionprob' in mydata.columns:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
@@ -360,7 +360,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
 
-        # for Anke's data, also split by transition probability
+        # also split by transition probability
         if 'transitionprob' in mydata.columns:
             m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
@@ -385,7 +385,11 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'regress_dc_prevresp':
 
-        v_reg = {'model': 'v ~ (1 + prevresp) + stimulus', 'link_func': lambda x:x}
+        if 'transitionprob' in mydata.columns:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) ', 'link_func': lambda x:x}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+        
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -403,11 +407,12 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'regress_dc_prevresp_prevrt':
 
-        # subselect data
-        mydata = mydata.dropna(subset=['prevrt'])
-        v_reg = {'model': 'v ~ 1 + stimulus + prevresp*prevrt',
-        'link_func': lambda x:x}
-       
+     if 'transitionprob' in mydata.columns:
+         v_reg = {'model': 'v ~ 1 + stimulus + C(transitionprob):prevresp + '\ 
+         'C(transitionprob):prevrt + C(transitionprob):prevresp:prevrt, 'link_func': lambda x:x}
+     else:
+         v_reg = {'model': 'v ~ 1 + stimulus + prevresp*prevrt', 'link_func': lambda x:x}
+      
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -418,9 +423,17 @@ def make_model(mypath, mydata, model_name, trace_id):
     # ================================================== #
     
     elif model_name == 'regress_dc_z_prevresp_prevrt':
+        
+        mydata = mydata.dropna(subset=['prevresp','prevrt'])
 
         # subselect data
-        mydata = mydata.dropna(subset=['prevresp','prevrt'])
+     if 'transitionprob' in mydata.columns:
+         v_reg = {'model': 'v ~ 1 + stimulus + C(transitionprob):prevresp + ' \
+         'C(transitionprob):prevrt + C(transitionprob):prevresp:prevrt', 'link_func': lambda x:x}
+         z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) +' \
+         'prevresp:prevrt:C(transitionprob) + prevrt:C(transitionprob)',
+         'link_func': z_link_func}
+     else:
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp*prevrt',
         'link_func': lambda x:x}
         z_reg = {'model': 'z ~ 1 + prevresp*prevrt',
@@ -758,8 +771,12 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'regress_dc_z_prevresp':
 
-        z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
-        v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+        if 'transitionprob' in mydata.columns:
+            z_reg = {'model': 'z ~ 1 + C(transitionprob):prevresp', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + C(transitionprob):prevresp', 'link_func': lambda x:x}
+        else:
+            z_reg = {'model': 'z ~ 1 + prevresp', 'link_func': z_link_func}
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
         reg_both = [z_reg, v_reg]
 
         m = hddm.HDDMRegressor(mydata, reg_both,
