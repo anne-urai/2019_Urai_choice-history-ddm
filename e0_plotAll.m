@@ -49,8 +49,8 @@ disp('starting');
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 
-% e3_serialBias_SfN_RTmodulation;
-
+e3_serialBias_SfN_RTmodulation;
+assert(1==0)
 
 % POSTERIORS OF STARTING POINT SHIFT
 %e3_serialBias_SfN_Posteriors_StartingPoint;

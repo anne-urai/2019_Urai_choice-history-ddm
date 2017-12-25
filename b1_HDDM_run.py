@@ -1,4 +1,4 @@
-1 #!/usr/bin/env python
+#!/usr/bin/env python
 # encoding: utf-8
 
 """
@@ -339,13 +339,14 @@ for dx in d:
             m = make_model(mypath, mydata, models[vx], trace_id)
 
             # now sample and save
-            if os.path.exists(model_filename):
-                pass # skip if this model i has been run
-            elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
-                pass # skip if this model has been concatenated
-            else:
-                # only run if this hasnt been done, and there is no concatenated master model present
-                run_model(m, mypath, models[vx], trace_id, n_samples)
+            # if os.path.exists(model_filename):
+        #         pass # skip if this model i has been run
+        #     elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
+        #         pass # skip if this model has been concatenated
+        #     else:
+        #
+            # only run if this hasnt been done, and there is no concatenated master model present
+            run_model(m, mypath, models[vx], trace_id, n_samples)
             elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
@@ -353,7 +354,7 @@ for dx in d:
             # important, concat after running to save disk space
             # ================================================= #
 
-            if trace_id == 14 and not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
+            if trace_id == 14: # and not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
                 # https://stackoverflow.com/questions/35795452/checking-if-a-list-of-files-exists-before-proceeding
                 filelist = []
                 for t in range(15):

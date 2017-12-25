@@ -27,9 +27,7 @@ function e3_serialBias_SfN_RTmodulation
     
 			axis tight; axis square;
 			title({sprintf('vbias, p = %.3f', pvalV)});
-			l.Position(2) = l.Position(2) - 0.15;
-			legend boxoff;
-			ylabel('Probability');
+			ylabel('Probability'); vline(0); offsetAxes; xlabel('Parameter (a.u.)');
 		end
 	
 		% ========================================== %
@@ -55,9 +53,7 @@ function e3_serialBias_SfN_RTmodulation
     
 			axis tight; axis square;
 			title({sprintf('vbias, p = %.3f', pvalV); sprintf('zbias, p = %.3f', pvalZ)});
-			l.Position(2) = l.Position(2) - 0.15;
-			legend boxoff;
-			ylabel('Probability');
+			ylabel('Probability'); vline(0); offsetAxes; xlabel('Parameter (a.u.)');
 		end
 
 		% ========================================== %
@@ -71,7 +67,7 @@ function e3_serialBias_SfN_RTmodulation
 		
 		try
 			scatter(dat.v_prevresp__regressdcprevrespprevrt, ...
-			dat.v_prevrespprevrt__regressdcprevrespprevrt, 10, [0.5 0.5 0.5]);
+			dat.v_prevrespprevrt__regressdcprevrespprevrt, 10, colors(2, :));
 		
 			axis square; offsetAxes; xlabel('v_{bias} ~ prevresp'); ylabel('v_{bias} ~ prevresp*prevrt')
 			[rho, pval] = corr(dat.v_prevresp__regressdcprevrespprevrt, ...
@@ -89,7 +85,7 @@ function e3_serialBias_SfN_RTmodulation
 		
 		try
 			scatter(dat.z_prevresp__regressdczprevrespprevrt, ...
-			dat.z_prevrespprevrt__regressdczprevrespprevrt, 10, [0.5 0.5 0.5]);
+			dat.z_prevrespprevrt__regressdczprevrespprevrt, 10, colors(1, :));
 		
 			axis square; offsetAxes; xlabel('z_{bias} ~ prevresp'); ylabel('z_{bias} ~ prevresp*prevrt')
 			[rho, pval] = corr(dat.z_prevresp__regressdczprevrespprevrt, ...
@@ -104,7 +100,7 @@ function e3_serialBias_SfN_RTmodulation
 		
 		try
 			scatter(dat.v_prevresp__regressdczprevrespprevrt, ...
-			dat.v_prevrespprevrt__regressdczprevrespprevrt, 10, [0.5 0.5 0.5]);
+			dat.v_prevrespprevrt__regressdczprevrespprevrt, 10, colors(2, :));
 		
 			axis square; offsetAxes; xlabel('v_{bias} ~ prevresp'); ylabel('v_{bias} ~ prevresp*prevrt')
 			[rho, pval] = corr(dat.v_prevresp__regressdczprevrespprevrt, ...
