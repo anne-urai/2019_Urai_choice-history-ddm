@@ -407,17 +407,16 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'regress_dc_prevresp_prevrt':
 
-     if 'transitionprob' in mydata.columns:
-         v_reg = {'model': 'v ~ 1 + stimulus + C(transitionprob):prevresp + '\ 
-         'C(transitionprob):prevrt + C(transitionprob):prevresp:prevrt, 'link_func': lambda x:x}
-     else:
+        if 'transitionprob' in mydata.columns:
+         v_reg = {'model': 'v ~ 1 + stimulus + C(transitionprob):prevresp + ' \
+         'C(transitionprob):prevrt + C(transitionprob):prevresp:prevrt', 'link_func': lambda x:x}
+        else:
          v_reg = {'model': 'v ~ 1 + stimulus + prevresp*prevrt', 'link_func': lambda x:x}
-      
+
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
-        
-        
+
     # ================================================== #
     # THE MOST IMPORTANT MODEL FOR THE UNCERTAINTY MODULATION
     # ================================================== #
@@ -427,18 +426,18 @@ def make_model(mypath, mydata, model_name, trace_id):
         mydata = mydata.dropna(subset=['prevresp','prevrt'])
 
         # subselect data
-     if 'transitionprob' in mydata.columns:
-         v_reg = {'model': 'v ~ 1 + stimulus + C(transitionprob):prevresp + ' \
-         'C(transitionprob):prevrt + C(transitionprob):prevresp:prevrt', 'link_func': lambda x:x}
-         z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) +' \
-         'prevresp:prevrt:C(transitionprob) + prevrt:C(transitionprob)',
-         'link_func': z_link_func}
-     else:
-        v_reg = {'model': 'v ~ 1 + stimulus + prevresp*prevrt',
-        'link_func': lambda x:x}
-        z_reg = {'model': 'z ~ 1 + prevresp*prevrt',
-        'link_func': z_link_func}
-        reg_both = [v_reg, z_reg]
+        if 'transitionprob' in mydata.columns:
+             v_reg = {'model': 'v ~ 1 + stimulus + C(transitionprob):prevresp + ' \
+             'C(transitionprob):prevrt + C(transitionprob):prevresp:prevrt', 'link_func': lambda x:x}
+             z_reg = {'model': 'z ~ 1 + prevresp:C(transitionprob) +' \
+             'prevresp:prevrt:C(transitionprob) + prevrt:C(transitionprob)',
+             'link_func': z_link_func}
+        else:
+            v_reg = {'model': 'v ~ 1 + stimulus + prevresp*prevrt',
+            'link_func': lambda x:x}
+            z_reg = {'model': 'z ~ 1 + prevresp*prevrt',
+            'link_func': z_link_func}
+            reg_both = [v_reg, z_reg]
            
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],

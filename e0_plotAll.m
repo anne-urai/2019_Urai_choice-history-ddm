@@ -49,7 +49,8 @@ disp('starting');
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 
-e3_serialBias_SfN_RTmodulation;
+% e3_serialBias_SfN_RTmodulation;
+e1_serialBias_SfN_DIC
 assert(1==0)
 
 % POSTERIORS OF STARTING POINT SHIFT
@@ -59,7 +60,7 @@ assert(1==0)
 % e3_serialBias_SfN_repetitionRange;
  
  % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
- %e1_serialBias_SfN_DIC; % figure 3b & c
+ %; % figure 3b & c
  %e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
  % e1_serialBias_SfN_BIC;
 

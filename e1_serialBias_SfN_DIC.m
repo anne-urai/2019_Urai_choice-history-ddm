@@ -19,11 +19,13 @@ for s = 1:length(types),
         subplot(4, 6, 1);
         getPlotDIC(mdls, types{s}, d);
         title(datasetnames{d}{1});
-        set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'both'});
+        set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'Both'});
         
-        % if ismember(d, [1]),
-        ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
-        % end
+		if ismember(d, [1 4]),
+        	ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
+		else
+			ylabel({' '; ' '});
+		end
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevresp_d%d.pdf', types{s}, d));
         fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevresp_d%d.pdf \n', types{s}, d);
@@ -119,11 +121,11 @@ mdldic = mdldic(1:end-1);
 
 for i = 1:length(mdldic)-1,
     b = bar(i, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
-        'edgecolor', 'k');
+        'edgecolor', 'none');
 end
 
-[ptchs,ptchGrp] = createPatches(i+1,mdldic(end),0.3, colors(1, :),0);
-hatch(ptchs, [0 4.5 1.5], colors(2, :));
+[ptchs,ptchGrp] = createPatches(i+1,mdldic(end),0.3, colors(2, :), 0, 0.5);
+hatch(ptchs, [0 3 1], colors(1, :));
 % ptchs.EdgeColor = [0 0 0];
 % fill the last one
 
@@ -139,9 +141,10 @@ for i = 1:length(mdldic),
             'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
     end
 end
+axis square; axis tight; 
 xlim([0.5 length(mdldic)+0.5]);
 offsetAxes; box off;
-axis square;
 set(gca, 'color', 'none');
+set(gca, 'xcolor', 'k', 'ycolor', 'k');s
 
 end
