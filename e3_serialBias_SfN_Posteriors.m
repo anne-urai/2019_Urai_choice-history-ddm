@@ -13,8 +13,8 @@ global mypath datasets datasetnames
 
 datasets =     {'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
 
-datasetnames = {   {'2AFC-1, Braun et al. 2017'}, ...
-   {'2AFC-2, Anke MEG'}, {'2AFC-3, Bharath fMRI'}};
+datasetnames = {   {'Anke JoN'}, ...
+   {'Anke MEG'}, {'Bharath fMRI'}};
 
 % ========================================== %
 % MODULATION OF SERIAL CHOICE BIAS
@@ -99,24 +99,7 @@ for pa = 1:length(parameters),
 
         tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure2_posteriors_%s_d%d.pdf', parameters{pa}, d));
-        
-        %         %% correlate against each other
-        %         histdc = traces.dc__1_ - traces.dc_1_;
-        %         histz  = invlogit(traces.z_trans__1_) - invlogit(traces.z_trans_1_);
-        %
-        %         close all
-        %         subplot(441);
-        %         scatter(histdc, histz, '.');
-        %         xlabel('History bias in dc');
-        %         ylabel('History bias in z');
-        %
-        %         [rho, pval] = corr(histdc, histz);
-        %         title({datasetnames{d}{end} sprintf('r = %.3f, p = %.3f', rho, pval)});
-        %         lsline;
-        %         axis square;
-        %         tightfig;
-        %         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/posteriors_correlation_d%d.pdf',  d));
-        %
+  
     end
 end
 close all;
@@ -126,8 +109,9 @@ end
 function h = histogram_smooth(x, color2)
 
 [f,xi] = ksdensity(x);
-a1 = area(f, xi, 'edgecolor', 'none', 'facecolor', ...
-    color2, 'facealpha', 0.4, 'showbaseline', 'off');
+% a1 = area(f, xi, 'edgecolor', 'none', 'facecolor', ...
+%     color2, 'facealpha', 0.4, 'showbaseline', 'off', 'basevalue', median(xi));
+patch(f,xi, color2, 'edgecolor', 'none', 'facealpha', 0.4);
 
 % % Make area transparent
 % drawnow; % pause(0.05);  % This needs to be done for transparency to work

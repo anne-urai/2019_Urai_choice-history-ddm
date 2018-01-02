@@ -10,7 +10,8 @@ global datasets datasetnames mypath
 % ========================================== %
 
 plotWhich = 'stimcoding'; % {'error', 'biased', 'stimcoding'};
-choiceCat = {{'Left', 'Right'}, {'no', 'yes'}, {'no','yes'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}, {'down', 'up'}};
+choiceCat = {{'Left', 'Right'}, {'no', 'yes'}, {'no','yes'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}, ...
+{'down', 'up'}, {'down', 'up'}, {'down', 'up'}};
 
 for d = 1:length(datasets),
     close all;

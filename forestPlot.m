@@ -19,20 +19,21 @@ plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
 for d = 1:length(ds),
     
-
     % determine color and marker
     try
         col = alldat(ds(d)).scattercolor;
         mrk = alldat(ds(d)).marker;
         meancol = alldat(ds(d)).meancolor;
     catch
+		disp('cannot find colors');
+		assert(1==0)
         markercolors = cbrewer('qual', 'Paired', 10);
         transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
         meancolors = [0 0 0; markercolors([8 10 6], :)];
         markers = {'o', 'v', '^', 's'}; %also indicate with different markers
     
-        col = transitioncolors(1, :);
-        mrk = markers{1};
+        col 	= transitioncolors(1, :);
+        mrk 	= markers{1};
         meancol = meancolors(1, :);
     end
     

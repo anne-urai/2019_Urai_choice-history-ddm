@@ -437,8 +437,8 @@ def make_model(mypath, mydata, model_name, trace_id):
             'link_func': lambda x:x}
             z_reg = {'model': 'z ~ 1 + prevresp*prevrt',
             'link_func': z_link_func}
-            reg_both = [v_reg, z_reg]
-           
+            
+        reg_both = [v_reg, z_reg]           
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)

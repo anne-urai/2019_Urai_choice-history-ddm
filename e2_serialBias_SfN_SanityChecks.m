@@ -55,7 +55,11 @@ for d = 1:length(datasets),
         allcohs = repmat(cohs', size(alldrift, 1), 1);
         colors  = cbrewer('seq', 'PuBuGn', numel(unique(allcohs(:))) + 5);
         colors  = colors([3:end-4 end], :);
+		try
         g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
+	catch
+		assert(1==0)
+	end
         
         box off;
         for gi = 1:length(g),

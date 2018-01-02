@@ -26,6 +26,12 @@ switch sz
         whichmdls = ['stimcoding'];
 end
 
+% color in different grouos
+tmpcolors = cbrewer('qual', 'Paired', 10);
+transitioncolors = [[0.5 0.5 0.5]; tmpcolors([7 9], :)];
+meancolors = [0 0 0; tmpcolors([8 10], :)];
+markers = {'o', 'v', '^'}; %also indicate with different markers
+
 close all;
 for d = length(datasets):-1:1
     disp(datasets{d});
@@ -41,54 +47,40 @@ for d = length(datasets):-1:1
     
     allresults = struct(); alltitles = {};
     switch datasets{d}
-        case {'Anke_2afc_sequential'}
+        case {'Bharath_fMRI', 'Anke_MEG', 'Anke_merged', 'Anke_2afc_sequential'}
             
             % DOES THIS DATASET HAVE MULTIPLE TRANSITION PROBABILITIES?
             % THEN PLOT THESE SEPARATELY
             
             % use the stimcoding difference only from alternating
-            allresults(1).z_prevresp        = results.(['z_1_neu__' whichmdls 'dczprevresp']) - results.(['z_2_neu__' whichmdls 'dczprevresp']);
-            allresults(1).v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_neu__stimcodingdczprevresp;
+			
+            allresults(1).z_prevresp        = results.(['z_1_50_0__' whichmdls 'dczprevresp']) - results.(['z_2_50_0__' whichmdls 'dczprevresp']);
+            allresults(1).v_prevresp        = results.(['dc_1_50_0__' whichmdls 'dczprevresp']) - results.(['dc_2_50_0__' whichmdls 'dczprevresp']);
             allresults(1).criterionshift    = results.repetition_neutral;
             allresults(1).subjnr            = results.subjnr;
-            alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
+            alltitles{1}                    = {datasetnames{d}{1}, '- Neutral'};
+			allresults(1).marker 			= markers{1};
+			allresults(1).meancolor 		= meancolors(1, :);
+			allresults(1).scattercolor	 	= transitioncolors(1, :);
             
-            allresults(2).z_prevresp        = results.z_1_alt__stimcodingdczprevresp - results.z_2_alt__stimcodingdczprevresp;
-            allresults(2).v_prevresp        = results.dc_1_alt__stimcodingdczprevresp - results.dc_2_alt__stimcodingdczprevresp;
+            allresults(2).z_prevresp        = results.(['z_1_20_0__' whichmdls 'dczprevresp']) - results.(['z_2_20_0__' whichmdls 'dczprevresp']);
+            allresults(2).v_prevresp        = results.(['dc_1_20_0__' whichmdls 'dczprevresp']) - results.(['dc_2_20_0__' whichmdls 'dczprevresp']);
             allresults(2).criterionshift    = results.repetition_alternating;
             allresults(2).subjnr            = results.subjnr;
-            alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
-            
-            allresults(3).z_prevresp        = results.z_1_rep__stimcodingdczprevresp - results.z_2_rep__stimcodingdczprevresp;
-            allresults(3).v_prevresp        = results.dc_1_neu__stimcodingdczprevresp - results.dc_2_rep__stimcodingdczprevresp;
+            alltitles{2}                    = {datasetnames{d}{1}, '- Alternating'};
+			allresults(2).marker 			= markers{2};
+			allresults(2).meancolor 		= meancolors(2, :);
+			allresults(2).scattercolor	 	= transitioncolors(2, :);
+			
+            allresults(3).z_prevresp        = results.(['z_1_80_0__' whichmdls 'dczprevresp']) - results.(['z_2_80_0__' whichmdls 'dczprevresp']);
+            allresults(3).v_prevresp        = results.(['dc_1_80_0__' whichmdls 'dczprevresp']) - results.(['dc_2_80_0__' whichmdls 'dczprevresp']);
             allresults(3).criterionshift    = results.repetition_repetitive;
             allresults(3).subjnr            = results.subjnr;
-            alltitles{3}                    = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
-            
-        case {'Bharath_fMRI', 'Anke_MEG', 'Anke_merged'}
-            
-            % DOES THIS DATASET HAVE MULTIPLE TRANSITION PROBABILITIES?
-            % THEN PLOT THESE SEPARATELY
-            
-            % use the stimcoding difference only from alternating
-            allresults(1).z_prevresp        = results.z_1_0_50_0__stimcodingdczprevresp - results.z_2_0_50_0__stimcodingdczprevresp;
-            allresults(1).v_prevresp        = results.dc_1_0_50_0__stimcodingdczprevresp - results.dc_2_0_50_0__stimcodingdczprevresp;
-            allresults(1).criterionshift    = results.repetition_neutral;
-            allresults(1).subjnr            = results.subjnr;
-            alltitles{1}                    = cat(2, datasetnames{d}{1}, ' - ', 'Neutral');
-            
-            allresults(2).z_prevresp        = results.z_1_0_20_0__stimcodingdczprevresp - results.z_2_0_20_0__stimcodingdczprevresp;
-            allresults(2).v_prevresp        = results.dc_1_0_20_0__stimcodingdczprevresp - results.dc_2_0_20_0__stimcodingdczprevresp;
-            allresults(2).criterionshift    = results.repetition_alternating;
-            allresults(2).subjnr            = results.subjnr;
-            alltitles{2}                    = cat(2, datasetnames{d}{1}, ' - ', 'Alternating');
-            
-            allresults(3).z_prevresp        = results.z_1_0_80_0__stimcodingdczprevresp - results.z_2_0_80_0__stimcodingdczprevresp;
-            allresults(3).v_prevresp        = results.dc_1_0_80_0__stimcodingdczprevresp - results.dc_2_0_80_0__stimcodingdczprevresp;
-            allresults(3).criterionshift    = results.repetition_repetitive;
-            allresults(3).subjnr            = results.subjnr;
-            alltitles{3}                   = cat(2, datasetnames{d}{1}, ' - ', 'Repetitive');
-            
+            alltitles{3}                    = {datasetnames{d}{1}, '- Repetitive'};
+			allresults(3).marker 			= markers{3};
+			allresults(3).meancolor 		= meancolors(3, :);
+			allresults(3).scattercolor	 	= transitioncolors(3, :);      
+			       
         otherwise
             
             try
@@ -104,7 +96,9 @@ for d = length(datasets):-1:1
                 results.v_prevresp = ...
                     results.(['dc_1_0__' whichmdls 'dczprevresp']) - results.(['dc_2_0__' whichmdls 'dczprevresp']);
 				catch
-					assert(1==0)
+					results.z_prevresp = nan(size(results.repetition));
+	                results.v_prevresp = nan(size(results.repetition));
+					
 				end
 			end
             
@@ -114,8 +108,12 @@ for d = length(datasets):-1:1
             allresults(1).z_prevresp     = results.z_prevresp;
             allresults(1).v_prevresp     = results.v_prevresp;
             allresults(1).criterionshift = results.criterionshift;
-            
-            alltitles{1} = datasetnames{d}{1}; % use only the dataset title
+			
+			allresults(1).marker 			= markers{1};
+			allresults(1).meancolor 		= meancolors(1, :);
+			allresults(1).scattercolor	 	= transitioncolors(1, :);
+            alltitles{1} 					= {datasetnames{d}{1} datasetnames{d}{2}}; % use only the dataset title
+			
     end
     
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
@@ -142,7 +140,12 @@ for d = length(datasets):-1:1
     
     % move together
     sp2.Position(1) = sp2.Position(1) - 0.08;
-    ss = suplabel(cat(2, datasetnames{d}{1}{1}, ' ', datasetnames{d}{1}{2}), 't');
+	try
+    	ss = suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
+	catch
+		ss = suplabel(datasetnames{d}{1}, 't');
+	end
+
     set(ss, 'fontweight', 'normal');
     ss.FontWeight = 'normal';
     ss.Position(2) = ss.Position(2) - 0.03;
@@ -165,9 +168,9 @@ for d = length(datasets):-1:1
 
     tightfig;
     if Gsq,
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_Gsq_modelfree_stimcoding_sz%d_d%d.pdf', d, sz));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_Gsq_modelfree_stimcoding_sz%d_d%d.pdf', sz, d));
     else
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_sz%d_d%d.pdf', d, sz));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_sz%d_d%d.pdf', sz, d));
         %print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1c_HDDM_modelfree_stimcoding_d%d.eps', d));
     end
     
@@ -199,84 +202,13 @@ for d = length(datasets):-1:1
         alldat(cnt).corrdiff = rhodiff;
         alldat(cnt).corrdiff_ci = rhodiffci;
         alldat(cnt).pdiff = pval;
+		
+		alldat(cnt).marker = allresults(a).marker;
+		alldat(cnt).scattercolor = allresults(a).scattercolor;
+		alldat(cnt).meancolor = allresults(a).meancolor;
         
         cnt = cnt + 1;
     end
 end
-
-end
-
-function [rho, tt, handles] = plotScatter(allresults, fld, legendWhere, doText)
-
-doText = 0;
-
-% overall correlation
-x = cat(1, allresults(:).(fld));
-y = cat(1, allresults(:).criterionshift);
-% show line
-axis square;
-
-% show lines to indicate origin
-xlims = [min(x) max(x)];
-ylims = [min(y) max(y)];
-plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.5);
-plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.5); % if p(repeat), 0.5
-
-% color in different grouos
-colors = cbrewer('qual', 'Paired', 10);
-transitioncolors = [[0.5 0.5 0.5]; colors([7 9], :)];
-meancolors = [0 0 0; colors([8 10], :)];
-markers = {'o', 'v', '^'}; %also indicate with different markers
-
-for a = length(allresults):-1:1, % neutral last
-    
-    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
-    
-    if pval < 0.05,
-        % CORRELATION LINE SEPARATELY FOR EACH DATASET?
-        p = polyfit(allresults(a).(fld), allresults(a).criterionshift, 1);
-        xrangeextra = 0.15*range(allresults(a).(fld));
-        xrange = linspace(min(allresults(a).(fld))- xrangeextra, ...
-            max(allresults(a).(fld))+xrangeextra, 100);
-        yrange = polyval(p, xrange);
-        l = plot(xrange, yrange);
-        l.Color = meancolors(a, :);
-        l.LineWidth = 0.5;
-        l.LineStyle = '-';
-        %else
-        % l.LineStyle = ':';
-    end
-    
-    % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
-    s  = scatter(allresults(a).(fld), allresults(a).criterionshift, 10, 'w', markers{a});
-	set(s, 'markerfacecolor', transitioncolors(a, :));
-	handles{a} = s;
-    
-end
-
-for a = length(allresults):-1:1, % neutral last
-    % also add the group mean
-    p = ploterr(nanmean(allresults(a).(fld)), nanmean(allresults(a).criterionshift), 2*nanstd(allresults(a).(fld)) ./ sqrt(length(allresults(a).(fld))), ...
-        2*nanstd(allresults(a).criterionshift) ./ sqrt(length(allresults(a).criterionshift)), '.', 'abshhxy', 0);
-    set(p(1), 'markersize', 0.1, 'color', meancolors(a, :)); % tiny marker
-    set(p(2), 'color', meancolors(a, :), 'linewidth', 1);
-    set(p(3), 'color', meancolors(a, :), 'linewidth', 1);
-end
-
-axis tight; offsetAxes;
-
-if doText,
-    % PRINT THE CORRELATION COEFFICIENT
-    txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
-    if pval < 0.001,
-        txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
-    end
-    tt = text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
-        min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
-        txt, 'fontsize', 5);
-else
-    tt = [];
-end
-set(gca, 'color', 'none');
 
 end

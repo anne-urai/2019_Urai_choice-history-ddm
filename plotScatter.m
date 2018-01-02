@@ -15,6 +15,7 @@ ylims = [min(y) max(y)];
 plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
 plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2); % if p(repeat), 0.5
 
+
 for a = length(allresults):-1:1, % neutral last
     
     [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
@@ -36,7 +37,7 @@ for a = length(allresults):-1:1, % neutral last
     
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
     s  = scatter(allresults(a).(fld), allresults(a).criterionshift, 10, 'w', allresults(a).marker);
-	set(s, 'markerfacecolor', allresults(a).meancolor);
+	set(s, 'markerfacecolor', allresults(a).scattercolor);
 	handles{a} = s;
     
 end
