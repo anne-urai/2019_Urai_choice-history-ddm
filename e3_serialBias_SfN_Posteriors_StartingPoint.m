@@ -13,7 +13,7 @@ for d = 1:length(datasets),
 	traces = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
 	zbias = invlogit(traces.z_trans_1_) - invlogit(traces.z_trans__1_);
 	pval = mean(zbias > 0);
-	fprintf('%s %s, mean zbias %.4f, range %.4f to %.4f, p-value %.4f \n', datasetnames{d}{1}{1}, datasetnames{d}{1}{2}, ...
+	fprintf('%s %s, mean zbias %.4f, range %.4f to %.4f, p-value %.4f \n', datasetnames{d}{1}, datasetnames{d}{2}, ...
 	mean(zbias), min(zbias), max(zbias), pval);
     
 	close all;
@@ -31,8 +31,7 @@ for d = 1:length(datasets),
 	% offsetAxes_y;
 	offsetAxes;
    
-	title(datasetnames{d}{1});
-	ylabel('History shift in z');
+	title(datasetnames{d});
 	xlabel('  ');
 	txt = sprintf('p = %.4f', pval);
 	if pval < 0.0001, txt = 'p < 0.0001'; 
@@ -40,13 +39,15 @@ for d = 1:length(datasets),
 	text(0.1*mean(get(gca, 'xlim')), median(zbias),  ...
 	txt, 'horizontalalignment', 'left', 'fontsize', 4);
 	set(gca, 'xcolor', 'k', 'ycolor', 'k');
+	ylabel('History shift in z', 'color', colors(1, :));
+
 	tightfig;
 	print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/zbias_posteriors_d%d.pdf', d));
     
 	traces = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
 	zbias = traces.dc_1_ - traces.dc__1_;
 	pval = mean(zbias < 0);
-	fprintf('%s %s, mean zbias %.4f, range %.4f to %.4f, p-value %.4f \n', datasetnames{d}{1}{1}, datasetnames{d}{1}{2}, ...
+	fprintf('%s %s, mean zbias %.4f, range %.4f to %.4f, p-value %.4f \n', datasetnames{d}{1}, datasetnames{d}{2}, ...
 	mean(zbias), min(zbias), max(zbias), pval);
     
 	close all;
@@ -63,15 +64,16 @@ for d = 1:length(datasets),
 	hline(0);
 	offsetAxes;
 	
-	title(datasetnames{d}{1});
-	ylabel('History shift in v');
+	title(datasetnames{d});
+	set(gca, 'xcolor', 'k', 'ycolor', 'k');
+
+	ylabel('History shift in v_{bias}', 'color', colors(2, :));
 	xlabel('Probability');
 	txt = sprintf('p = %.4f', pval);
 	if pval < 0.0001, txt = 'p < 0.0001'; 
 	end
 	text(0.1*mean(get(gca, 'xlim')), median(zbias),  ...
 	txt, 'horizontalalignment', 'left', 'fontsize', 4);
-	set(gca, 'xcolor', 'k', 'ycolor', 'k');
 	tightfig;
 	print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/vbias_posteriors_d%d.pdf', d));
     

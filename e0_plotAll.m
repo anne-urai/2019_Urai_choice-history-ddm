@@ -45,8 +45,8 @@ if 0,
 end
 
 disp('starting');
-%e3_serialBias_SfN_Posteriors;
-
+e3_serialBias_SfN_Posteriors_StartingPoint;
+assert(1==0)
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %

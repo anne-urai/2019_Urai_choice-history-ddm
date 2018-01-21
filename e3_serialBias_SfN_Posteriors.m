@@ -64,7 +64,7 @@ for pa = 1:length(parameters),
         switch parameters{pa}
             case 'dc'
                % ylim([-1 1]);
-                if d == 1, ylabel('History shift in v'); end
+                if d == 1, ylabel('History shift in v_{bias}'); end
                 set(gca, 'ytick', [-1 0 1], 'ylim', [-1.3 1.3]);
             case 'z'
                 % ylim([-0.1 0.1]);
