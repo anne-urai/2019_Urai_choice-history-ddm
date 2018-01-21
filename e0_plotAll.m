@@ -24,6 +24,7 @@ datasets = {'Murphy', 'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG', 'MEG_MEGsessions'
 datasetnames = { {'Visual motion' '2AFC (RT)'},  {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'},  {'Visual motion' '2IFC (FD) #2'}, ...
     {'Bharath fMRI' ''}, {'Anke JoN' ''}, {'Anke MEG' ''}};
+datasets = datasets(1:5);
 
 % go to code
 try
@@ -38,14 +39,13 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %% PREPARING DATA
 if 0,
-	b2_HDDM_readIntoMatlab(datasets);
-	b2b_Gsq_readIntoMatlab(datasets);
-	b3_makeDataframe(datasets);
+    b2_HDDM_readIntoMatlab(datasets);
+    b2b_Gsq_readIntoMatlab(datasets);
+    b3_makeDataframe(datasets);
 end
 
 disp('starting');
-e3_serialBias_SfN_Posteriors;
-assert(1==0);
+%e3_serialBias_SfN_Posteriors;
 
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
@@ -67,14 +67,12 @@ assert(1==0);
 
 close all;
 for sz = [0 1],
-	for Gsq = [0],
+    for Gsq = [0 1],
         
-         if Gsq == 1 && sz == 1, continue; end % hierarchical sampling with sz takes forever
+        if Gsq == 1 && sz == 1, continue; end % hierarchical sampling with sz takes forever
         
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz); % figure 4
-		
-		
-        forestPlot(alldat(end-4:end));
+        forestPlot(alldat);
         
         switch Gsq
             case 1
@@ -82,19 +80,19 @@ for sz = [0 1],
             case 0
                 filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_HDDM.pdf', sz);
         end
-		print(gcf, '-dpdf', filename);
-		
-		
-        forestPlot(alldat(1:9));
+        print(gcf, '-dpdf', filename);
         
-        switch Gsq
-            case 1
-                filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_Gsq_biased.pdf', sz);
-            case 0
-                filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_HDDM_biased.pdf', sz);
-        end
-		print(gcf, '-dpdf', filename);
-		disp(filename);
+%         
+%         forestPlot(alldat(1:9));
+%         
+%         switch Gsq
+%             case 1
+%                 filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_Gsq_biased.pdf', sz);
+%             case 0
+%                 filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_HDDM_biased.pdf', sz);
+%         end
+%         print(gcf, '-dpdf', filename);
+%         disp(filename);
     end
 end
 
@@ -141,5 +139,5 @@ e6_serialBias_SfN_modelFree_CRF_PPC
 % SCHEMATIC/HYPOTHESES
 % ======================= %
 
- f0_schematic_DDM_bias; % figure 3a
+f0_schematic_DDM_bias; % figure 3a
 

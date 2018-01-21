@@ -21,7 +21,7 @@ for d = 1:length(datasets),
     b = barh(rep, 'facecolor', [0.5 0.5 0.5], 'basevalue', 0.5, 'edgecolor', 'none');
     plot([0.5 0.5],[0.5 numel(rep)+0.5],  'k');
     b(1).BaseLine.LineStyle = 'none';
-
+    
     % ylabel(sprintf('%s, n = %d', datasetnames{d}{1}, numel(rep)));
     % show on x-axis what the mean is
     box off; xlim([0.4 0.65]); ylim([1 numel(rep)+0.5]);
@@ -29,17 +29,12 @@ for d = 1:length(datasets),
     set(gca, 'ytick', [1 numel(rep)], 'xtick', [0.4 0.5 0.6]);
     
     % yyaxis right;
-    % name = strsplit(datasetnames{d}{1});
-    %if length(name) == 1,
-    y = ylabel(datasetnames{d}{1});
-    %else
-    % y = ylabel({name{1} [name{2} ' ' name{3}]});
-    %end
+    y = ylabel(datasetnames{d});
     
     y.Rotation = y.Rotation + 180;
     y.Position(1) = y.Position(1) + 0.3;
     y.Position(2) = y.Position(2) - 1.5;
-	
+    
     xlabel('P(repeat)');
     offsetAxes;
     

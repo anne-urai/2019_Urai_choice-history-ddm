@@ -116,7 +116,7 @@ for d = 1:length(ds),
 end
 
 set(gca, 'ytick', 1:length(ds), 'yticklabel', names, 'YAxisLocation', 'right');
-xlabel('History shift in v_{bias}');
+xlabel('v_{bias}');
 set(gca, 'xcolor', axiscolors(2, :), 'ycolor', 'k');
 xlim([-1 1]); offsetAxes;
 
@@ -154,7 +154,7 @@ end
 
 % DO STATS ACROSS DATASETS!
 % [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]), fisherz([alldat(ds).corrz]));
-[~, h] = suplabel('Correlation with P(repeat)', 'x');
+[~, h] = suplabel('Correlation P(repeat) with history shift', 'x');
 set(h, 'color', 'k');
 tightfig;
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));

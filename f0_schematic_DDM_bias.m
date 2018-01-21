@@ -12,7 +12,7 @@ if ~exist('seed', 'var'), seed = 100; end
 disp(seed);
 
 % use code by Peter Murphy to compute RT distributions
-addpath('/Users/anne/Drive/Dropbox/code/analyticalDDM/DDM');
+addpath('/Users/anne/Desktop/code/analyticalDDM/DDM');
 addpath('~/code/analyticalDDM/DDM');
 addpath(genpath('~/code/Tools'));
 
@@ -72,8 +72,8 @@ plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % add distributions at the top!
 scaling = 300;
-plot(ts, -scaling*gE_z - cfg.a, 'color', colors(1, :), 'linestyle', '-.');
-plot(ts, scaling*gC_z + cfg.a, 'color', colors(1, :), 'linestyle', '-.');
+%plot(ts, -scaling*gE_z - cfg.a, 'color', colors(1, :), 'linestyle', '-.');
+%plot(ts, scaling*gC_z + cfg.a, 'color', colors(1, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
 plot(ts, scaling*gC_dc + cfg.a, 'color', colors(2, :));
@@ -85,7 +85,7 @@ plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(2, :));
 axis tight;
 set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
-title('History bias in drift');
+title('History shift in drift bias', 'color', colors(2, :));
 % add two axes manually
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
 plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k--', 'linewidth', 0.5);
@@ -120,8 +120,8 @@ plot(cfg.time, y,'k', 'color', colors(1, :));
 plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
 
 % add distributions at the top!
-plot(ts, scaling*gC_dc + cfg.a, 'color', colors(2, :), 'linestyle', '-.');
-plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(2, :), 'linestyle', '-.');
+%plot(ts, scaling*gC_dc + cfg.a, 'color', colors(2, :), 'linestyle', '-.');
+%plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(2, :), 'linestyle', '-.');
 
 plot(ts, scaling*gC_nobias + cfg.a, 'k');
 plot(ts, scaling*gC_z + cfg.a, 'color', colors(1, :));
@@ -133,7 +133,7 @@ plot(ts, -scaling*gE_z - cfg.a, 'color', colors(1, :));
 axis tight;
 set(gca, 'ytick', [-cfg.a 0 cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
-title('History bias in starting point');
+title('History shift in starting point', 'color', colors(1, :));
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
 plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k--', 'linewidth', 0.5);
 

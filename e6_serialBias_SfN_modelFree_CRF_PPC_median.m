@@ -42,8 +42,6 @@ for q = 1; %:length(qntls),
         
         for tp = 1:length(tps),
             
-            % {colors(1,:), colors(2, :)}, ...
-            
             for m = 1:length(models),
                 
                 switch models{m}
@@ -73,6 +71,9 @@ for q = 1; %:length(qntls),
                     alldata.rt          = abs(alldata.rt_sampled);
                     alldata.response    = alldata.response_sampled;
                 end
+                
+                % only correct trials
+                alldata = alldata(alldata.stimulus == alldata.response, :);
                 
                 % when there were multiple levels of evidence, do these plots
                 % separately for each level
@@ -121,6 +122,12 @@ for q = 1; %:length(qntls),
                 qntls{1} = [0 1];
                 % biased choice proportion
                 if m < length(models),
+                    
+                    switch models{m}
+                        case 'stimcoding_z_prevresp'
+                            %      assert(1==0);
+                    end
+                    
                     if isnumeric(thesecolors{m})
                         plot(qntls{q}, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 0.5);
                     elseif iscell(thesecolors{m}) % superimposed lines for dashed
@@ -148,7 +155,7 @@ for q = 1; %:length(qntls),
         axis tight; box off;
         set(gca, 'xtick', qntls{q});
         axis square;  offsetAxes;
-        set(gca, 'xticklabel', {'np', 'yes'});
+        set(gca, 'xticklabel', {'alt', 'rep'});
         xlabel('Bias');
         set(gca, 'xcolor', 'k', 'ycolor', 'k');
         ylabel('Reaction time (s)');

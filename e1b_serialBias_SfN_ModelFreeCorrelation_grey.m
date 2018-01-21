@@ -153,7 +153,7 @@ for d = length(datasets):-1:1
     % add colored axes after suplabel (which makes them black)
     xlabel(sp1, 'History shift in z');
     set(sp1, 'xcolor', colors(1, :), 'ycolor', 'k');
-    xlabel(sp2, 'History shift in v');
+    xlabel(sp2, 'History shift in v_{bias}');
     set(sp2, 'xcolor', colors(2, :), 'ycolor', 'k');
     
     if doText,
