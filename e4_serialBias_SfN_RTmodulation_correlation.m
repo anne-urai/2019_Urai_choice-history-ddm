@@ -1,11 +1,17 @@
 function e4_serialBias_SfN_RTmodulation_correlation
 
+% Code to fit the history-dependent drift diffusion models described in
+% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+%
+% MIT License
+% Copyright (c) Anne Urai, 2018
+% anne.urai@gmail.com
+
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames
 
 colors = linspecer(5); % red blue green
-
 
 % ========================================== %
 % MODULATION OF SERIAL CHOICE BIAS

@@ -2,10 +2,12 @@
 # encoding: utf-8
 
 """
-Anne Urai, 2017
-takes input arguments from stopos
-Important: on Cartesius, call module load python/2.7.9 before running
-(the only environment where HDDM is installed)
+Code to fit the history-dependent drift diffusion models described in
+Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+
+MIT License
+Copyright (c) Anne Urai, 2018
+anne.urai@gmail.com
 """
 import numpy as np
 import os, fnmatch
@@ -247,7 +249,7 @@ def make_model(mypath, mydata, model_name, trace_id):
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
                 depends_on={'z':['prevresp']})
-                
+
     elif model_name == 'stimcoding_sz_dc_z_prevresp':
 
         # include across-trial variability in starting point
@@ -295,7 +297,7 @@ def make_model(mypath, mydata, model_name, trace_id):
             drift_criterion=True, bias=True, p_outlier=0.05,
             include=('sv'), group_only_nodes=['sv'],
             depends_on={'dc':['prevresp', 'session']})
-            
+
     elif model_name == 'stimcoding_dc_z_prevresp_sessions':
 
         # get the right variable coding
@@ -305,7 +307,7 @@ def make_model(mypath, mydata, model_name, trace_id):
             drift_criterion=True, bias=True, p_outlier=0.05,
             include=('sv'), group_only_nodes=['sv'],
             depends_on={'dc':['prevresp', 'session'], 'z':['prevresp', 'session']})
-            
+
     # ============================================ #
     # STIMCODING PREVRESP + PREVCORRECT
     # ============================================ #
@@ -380,7 +382,7 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     # ============================================ #
     # REGRESSION MODULATION
-    # Nienborg @ SfN: ((s*v) + vbias)dt / (s*(v+vbias))dt, does it matter and what are the differential predictions? 
+    # Nienborg @ SfN: ((s*v) + vbias)dt / (s*(v+vbias))dt, does it matter and what are the differential predictions?
     # ============================================ #
 
     elif model_name == 'regress_dc_prevresp':
@@ -389,7 +391,7 @@ def make_model(mypath, mydata, model_name, trace_id):
             v_reg = {'model': 'v ~ 1 + stimulus + prevresp:C(transitionprob) ', 'link_func': lambda x:x}
         else:
             v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
-        
+
         m = hddm.HDDMRegressor(mydata, v_reg,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -420,9 +422,9 @@ def make_model(mypath, mydata, model_name, trace_id):
     # ================================================== #
     # THE MOST IMPORTANT MODEL FOR THE UNCERTAINTY MODULATION
     # ================================================== #
-    
+
     elif model_name == 'regress_dc_z_prevresp_prevrt':
-        
+
         mydata = mydata.dropna(subset=['prevresp','prevrt'])
 
         # subselect data
@@ -437,8 +439,8 @@ def make_model(mypath, mydata, model_name, trace_id):
             'link_func': lambda x:x}
             z_reg = {'model': 'z ~ 1 + prevresp*prevrt',
             'link_func': z_link_func}
-            
-        reg_both = [v_reg, z_reg]           
+
+        reg_both = [v_reg, z_reg]
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -781,7 +783,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False,  p_outlier=0.05)
-        
+
     elif model_name == 'regress_dc_z_visualgamma':
 
         z_reg = {'model': 'z ~ 1 + visualgamma', 'link_func': z_link_func}
@@ -791,7 +793,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False,  p_outlier=0.05)
-        
+
     elif model_name == 'regress_dc_z_motorslope':
 
         z_reg = {'model': 'z ~ 1 + motorslope', 'link_func': z_link_func}
@@ -811,8 +813,8 @@ def make_model(mypath, mydata, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False,  p_outlier=0.05)
-        
-    
+
+
     elif model_name == 'regress_dc_z_prevresp_visualgamma':
 
         z_reg = {'model': 'z ~ 1 + prevresp + visualgamma', 'link_func': z_link_func}
@@ -822,7 +824,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False,  p_outlier=0.05)
-    
+
     elif model_name == 'regress_dc_z_prevresp_motorslope':
 
         z_reg = {'model': 'z ~ 1 + prevresp + motorslope', 'link_func': z_link_func}
@@ -842,7 +844,7 @@ def make_model(mypath, mydata, model_name, trace_id):
         m = hddm.HDDMRegressor(mydata, reg_both,
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False,  p_outlier=0.05)
- 
+
     # ============================================ #
     # END OF FUNCTION THAT CREATES THE MODEL
     # ============================================ #

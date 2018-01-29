@@ -1,8 +1,14 @@
 
 function sv_comparison()
 
-addpath(genpath('~/code/Tools'));
+% Code to fit the history-dependent drift diffusion models described in
+% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+%
+% MIT License
+% Copyright (c) Anne Urai, 2018
+% anne.urai@gmail.com
 
+addpath(genpath('~/code/Tools'));
 warning off; close all;
 global datasets datasetnames mypath
 

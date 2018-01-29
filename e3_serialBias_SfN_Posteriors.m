@@ -1,15 +1,15 @@
 function e3_serialBias_SfN_Posteriors
 
+% Code to fit the history-dependent drift diffusion models described in
+% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+%
+% MIT License
+% Copyright (c) Anne Urai, 2018
+% anne.urai@gmail.com
+
 addpath(genpath('~/code/Tools'));
 warning off; close all;
 global mypath datasets datasetnames
-
-% neutral vs biased plots
-% datasets = {'Anke_2afc_alternating', ...
-%     'Anke_2afc_neutral', 'Anke_2afc_repetitive'};
-% datasetnames = {{'2AFC, Braun et al. 2017', 'Alternating'}, ...
-%     {'2AFC, Braun et al. 2017', 'Neutral'}, ...
-%     {'2AFC, Braun et al. 2017', 'Repetitive'}};
 
 datasets =     {'Anke_2afc_sequential', 'Anke_MEG', 'Bharath_fMRI'};
 

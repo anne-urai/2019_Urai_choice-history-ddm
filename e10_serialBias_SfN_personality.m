@@ -1,8 +1,12 @@
 function e10_serialBias_SfN_personality
-% from the csv table, make an overview of repetition behaviour
 
-% get a huge list with values for each participant
-% can then work with this dataframe
+% Code to fit the history-dependent drift diffusion models described in
+% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+%
+% MIT License
+% Copyright (c) Anne Urai, 2018
+% anne.urai@gmail.com
+
 
 clear; close all; clc;
 addpath(genpath('~/code/Tools'));

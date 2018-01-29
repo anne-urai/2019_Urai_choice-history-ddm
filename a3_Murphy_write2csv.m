@@ -55,4 +55,3 @@ t.coherence             = [];
 writetable(t, sprintf('~/Data/HDDM/Murphy/murphy_hddm.csv'));
 disp('done!');
 
-      

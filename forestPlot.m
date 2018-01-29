@@ -1,5 +1,13 @@
 function forestPlot(alldat)
 
+% Code to fit the history-dependent drift diffusion models described in
+% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+%
+% MIT License
+% Copyright (c) Anne Urai, 2018
+% anne.urai@gmail.com
+
+
 ds = [17 10 16 15 1 2 3 7 8 9]; % from the e1b collection script
 ds = length(alldat):-1:1;
 close all;

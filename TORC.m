@@ -1,5 +1,12 @@
 %% read in a TORC audiofile from Jan-Willem and plot the signal and noise timecourses
 
+% Code to fit the history-dependent drift diffusion models described in
+% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+%
+% MIT License
+% Copyright (c) Anne Urai, 2018
+% anne.urai@gmail.com
+
 cd ~/Downloads/sounds/
 
 [target, Fs]      = audioread('TORC_TARGET.wav');

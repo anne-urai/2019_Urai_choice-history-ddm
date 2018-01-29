@@ -1,18 +1,25 @@
 function b2_HDDM_readIntoMatlab(datasets)
 
+% Code to fit the history-dependent drift diffusion models described in
+% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+%
+% MIT License
+% Copyright (c) Anne Urai, 2018
+% anne.urai@gmail.com
+
 addpath(genpath('~/code/Tools'));
 close all; clc;
 warning off MATLAB:table:ModifiedVarnames % skip this warning
 
-    for d = 1:length(datasets),
-        
-        usr = getenv('USER');
-        switch usr
-            case 'anne'
-                mypath = '~/Data/HDDM';
-            case 'aeurai'
-                mypath  = '/nfs/aeurai/HDDM';
-        end
+for d = 1:length(datasets),
+    
+    usr = getenv('USER');
+    switch usr
+        case 'anne'
+            mypath = '~/Data/HDDM';
+        case 'aeurai'
+            mypath  = '/nfs/aeurai/HDDM';
+    end
     
     usepath = sprintf('%s/%s/', mypath, datasets{d});
     savepath = sprintf('%s/summary/%s', mypath, datasets{d});
@@ -35,22 +42,22 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
         'stimcoding_sz_dc_prevresp', ...
         'stimcoding_sz_z_prevresp', ...
         'stimcoding_sz_dc_z_prevresp', ...
-		'stimcoding_dc_z_prevresp_pharma' ...
-		'stimcoding_dc_prevresp_sessions', ...
+        'stimcoding_dc_z_prevresp_pharma' ...
+        'stimcoding_dc_prevresp_sessions', ...
         'stimcoding_dc_z_prevresp_sessions', ...
-		'regress_nohist', ...
-		'regress_dc_prevresp', ...
-		'regress_dc_z_prevresp', ...
-		'regress_dc_prevresp_prevrt', ...
-		'regress_dc_z_prevresp_prevrt'};
-
+        'regress_nohist', ...
+        'regress_dc_prevresp', ...
+        'regress_dc_z_prevresp', ...
+        'regress_dc_prevresp_prevrt', ...
+        'regress_dc_z_prevresp_prevrt'};
+    
     switch datasets{d}
         case 'RT_RDK'
             subjects = [3:15 17:25];
         case {'MEG', 'MEG_MEGsessions', 'MEG_750ms'}
             subjects = 2:65;
         case {'MEG_MEGdata'}
-			subjects = 2:65; subjects(ismember(subjects, [11 16 31 37])) = [];
+            subjects = 2:65; subjects(ismember(subjects, [11 16 31 37])) = [];
         case {'Anke_2afc_sequential', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_alternating'},
             subjects = [1:7 9 11:16 18:21 23 24 26 27];
         case {'NatComm', 'NatComm_500ms'}
@@ -180,9 +187,9 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
                         varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
                         varnames{v} = regexprep(varnames{v}, '\(0.3\)', '_c30');
                     end
-                     
+                    
                 case {'Anke_2afc_neutral', 'Anke_2afc_sequential', 'Anke_2afc_repetitive', 'Anke_2afc_alternating', ...
-                'Bharath_fMRI', 'Anke_MEG'}
+                        'Bharath_fMRI', 'Anke_MEG'}
                     
                     varnames{v} = regexprep(varnames{v}, '1.0', '1');
                     % recode coherence levels in Anke's data
@@ -192,41 +199,41 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
                     varnames{v} = regexprep(varnames{v}, '\(0.2\)', '_c20');
                     varnames{v} = regexprep(varnames{v}, '\(0.4\)', '_c40');
                     varnames{v} = regexprep(varnames{v}, '\(0.6\)', '_c60');
-					
-					% also for anke's meg data
+                    
+                    % also for anke's meg data
                     varnames{v} = regexprep(varnames{v}, '\(0.03\)', '_c3');
                     varnames{v} = regexprep(varnames{v}, '\(0.09\)', '_c9');
                     varnames{v} = regexprep(varnames{v}, '\(0.81\)', '_c81');
                     varnames{v} = regexprep(varnames{v}, '\(0.27\)', '_c27');
-					
-				end
-			
-			if strfind(varnames{v}, 'transitionprob'),
-				
-				if strfind(mdls{m}, 'regress'),
-				
-				% rename variables in regression models
-				varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\[20.0\]\:prevresp', 'prevresp_alt');
-				varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\[50.0\]\:prevresp', 'prevresp_neu');
-				varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\[80.0\]\:prevresp', 'prevresp_rep');
+                    
+            end
+            
+            if strfind(varnames{v}, 'transitionprob'),
                 
-				varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\(20.0\)', '_alt');
-				varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\(50.0\)', '_neu');
-				varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\(80.0\)', '_rep');
-             
-			elseif strfind(mdls{m}, 'stimcoding'),
-				
-                % some crazy rounding errors
-                % recode transition probabilities in Anke's data
-                varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(20.0\)', '_alt');
-                varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(50.0\)', '_neu');
-                varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(80.0\)', '_rep');
-
-                varnames{v} = regexprep(varnames{v}, '20.0\)', '_alt');
-                varnames{v} = regexprep(varnames{v}, '50.0\)', '_neu');
-                varnames{v} = regexprep(varnames{v}, '80.0\)', '_rep');
-			end
-        	end
+                if strfind(mdls{m}, 'regress'),
+                    
+                    % rename variables in regression models
+                    varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\[20.0\]\:prevresp', 'prevresp_alt');
+                    varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\[50.0\]\:prevresp', 'prevresp_neu');
+                    varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\[80.0\]\:prevresp', 'prevresp_rep');
+                    
+                    varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\(20.0\)', '_alt');
+                    varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\(50.0\)', '_neu');
+                    varnames{v} = regexprep(varnames{v}, 'C\(transitionprob\)\(80.0\)', '_rep');
+                    
+                elseif strfind(mdls{m}, 'stimcoding'),
+                    
+                    % some crazy rounding errors
+                    % recode transition probabilities in Anke's data
+                    varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(20.0\)', '_alt');
+                    varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(50.0\)', '_neu');
+                    varnames{v} = regexprep(varnames{v}, '\:C\(transitionprob\)\(80.0\)', '_rep');
+                    
+                    varnames{v} = regexprep(varnames{v}, '20.0\)', '_alt');
+                    varnames{v} = regexprep(varnames{v}, '50.0\)', '_neu');
+                    varnames{v} = regexprep(varnames{v}, '80.0\)', '_rep');
+                end
+            end
             
             assert(isempty(strfind(varnames{v}, 'transitionprob')), 'no correct parsing')
             % recode some stuff
