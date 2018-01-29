@@ -66,5 +66,5 @@ pgm.add_edge("svv", "x")
 
 # Render and save.
 pgm.render()
-pgm.figure.savefig("exoplanets.pdf")
-pgm.figure.savefig("exoplanets.png", dpi=150)
+pgm.figure.savefig("HDDM.pdf")
+pgm.figure.savefig("HDDM.png", dpi=150)

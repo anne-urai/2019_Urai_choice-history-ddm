@@ -28,7 +28,7 @@ datasets = datasets(1:5);
 
 % go to code
 try
-    cd('/Users/anne/Drive/Dropbox/code/RT_RDK');
+    cd('/Users/anne/Desktop/code/serialDDM');
 end
 
 % from Thomas, green blue grey
@@ -38,28 +38,35 @@ colors = [178,223,138; 166,206,227] ./ 256; % lighter
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %% PREPARING DATA
-if 0,
+if 1,
     b2_HDDM_readIntoMatlab(datasets);
     b2b_Gsq_readIntoMatlab(datasets);
     b3_makeDataframe(datasets);
 end
 
 disp('starting');
-e3_serialBias_SfN_Posteriors_StartingPoint;
-assert(1==0)
+
+% ======================= %
+% SCHEMATIC/HYPOTHESES
+% ======================= %
+
+f0_schematic_DDM_bias; % figure 3a
+
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 
-% e1_serialBias_SfN_DIC;
-% e3_serialBias_SfN_repetitionRange;
-% e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+e1_serialBias_SfN_DIC;
+e3_serialBias_SfN_repetitionRange;
+e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 
 % % show the fits separately for dc and z
 % alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits; % figure 4
 % forestPlot(alldat);
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_indep.pdf'));
+
+e3_serialBias_SfN_Posteriors_StartingPoint;
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
@@ -68,12 +75,12 @@ assert(1==0)
 close all;
 for sz = [0 1],
     for Gsq = [0 1],
-        
+
         if Gsq == 1 && sz == 1, continue; end % hierarchical sampling with sz takes forever
-        
+
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz); % figure 4
         forestPlot(alldat);
-        
+
         switch Gsq
             case 1
                 filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_Gsq.pdf', sz);
@@ -81,18 +88,6 @@ for sz = [0 1],
                 filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_HDDM.pdf', sz);
         end
         print(gcf, '-dpdf', filename);
-        
-%         
-%         forestPlot(alldat(1:9));
-%         
-%         switch Gsq
-%             case 1
-%                 filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_Gsq_biased.pdf', sz);
-%             case 0
-%                 filename = sprintf('~/Data/serialHDDM/forestplot_sz%d_HDDM_biased.pdf', sz);
-%         end
-%         print(gcf, '-dpdf', filename);
-%         disp(filename);
     end
 end
 
@@ -103,8 +98,6 @@ end
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma(); % figure 4
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
-
-assert(1==0)
 
 % ======================= %
 % MODEL FREE CONFIRMATION
@@ -134,10 +127,3 @@ e6_serialBias_SfN_modelFree_CRF_PPC
 %e3_serialBias_SfN_Posteriors_StartingPoint;
 
 % sv_comparison;
-
-% ======================= %
-% SCHEMATIC/HYPOTHESES
-% ======================= %
-
-f0_schematic_DDM_bias; % figure 3a
-

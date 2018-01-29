@@ -2,10 +2,12 @@
 # encoding: utf-8
 
 """
-Anne Urai, 2017
-takes input arguments from stopos
-Important: on Cartesius, call module load python/2.7.9 before running
-(the only environment where HDDM is installed)
+Code to fit the history-dependent drift diffusion models described in
+Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+
+MIT License
+Copyright (c) Anne Urai, 2018
+anne.urai@gmail.com
 """
 
 # ============================================ #
@@ -120,7 +122,7 @@ def concat_models(mypath, model_name):
                 print model_filename
                 thism                 = hddm.load(model_filename)
                 allmodels.append(thism) # now append into a list
-                
+
         # ============================================ #
         # CHECK CONVERGENCE
         # ============================================ #
@@ -275,7 +277,7 @@ models = ['stimcoding_nohist', # 0
     'regress_dc_z_prevresp_motorslope', # 27
     'regress_dc_z_prevresp_motorstart', # 28
     'stimcoding_dc_z_prevresp_sessions', # 29
-    ] 
+    ]
 
 # datasets = ['RT_RDK', # 0
 #     'MEG', # 1
@@ -292,10 +294,9 @@ models = ['stimcoding_nohist', # 0
 #     'NatComm_500ms', # 12
 #     'MEG_750ms', # 13
 #     'JW_yesno_2500ms'] # 14
-    
-datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'MEG_MEGsessions',
-    'Bharath_fMRI', 'Anke_2afc_sequential', 'Anke_MEG']
-    
+
+datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG'] #'MEG_MEGsessions', 'Bharath_fMRI', 'Anke_2afc_sequential', 'Anke_MEG']
+
 # recode
 if isinstance(d, int):
     d = range(d,d+1) # makes a list out of an integer
@@ -327,10 +328,10 @@ for dx in d:
             # get the csv file for this dataset
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-            
+
             # remove RTs below 250 ms
             mydata = mydata.loc[mydata.rt > 0.250,:]
-            
+
             # correct a weirdness in Anke's data
             if 'transitionprob' in mydata.columns:
                 mydata.transitionprob = mydata.transitionprob * 100;
@@ -394,15 +395,15 @@ for dx in d:
                 nsmp = 50
             else:
                 nsmp = 100
-            
+
             ppc = hddm.utils.post_pred_gen(m, append_data=True, samples=nsmp)
-            
+
             # make the csv smaller, save disk space
-            savecols = list(set(ppc.columns) & set(['rt','rt_sampled', 'response_sampled', 
-                        'index', 'stimulus', 'response', 'prevresp', 'subj_idx', 
+            savecols = list(set(ppc.columns) & set(['rt','rt_sampled', 'response_sampled',
+                        'index', 'stimulus', 'response', 'prevresp', 'subj_idx',
                         'transitionprob', 'coherence', 'prevcorrect']))
             ppc = ppc[savecols]
-           
+
             # save as pandas dataframe
             ppc.to_csv(os.path.join(mypath, models[vx], 'ppc_data.csv'), index=True)
             elapsed = time.time() - starttime
@@ -419,7 +420,7 @@ for dx in d:
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
             mydata      = mydata[mydata.rt > 0.25] # remove superfast responses
-            
+
             subj_params = []
             bic         = []
             for subj_idx, subj_data in mydata.groupby('subj_idx'):
@@ -429,9 +430,8 @@ for dx in d:
                 thismodel.update({'subj_idx':subj_idx}) # keep original subject number
                 subj_params.append(thismodel)
                 bic.append(m_subj.bic_info)
-                
+
             params = pd.DataFrame(subj_params)
             params.to_csv(os.path.join(mypath, models[vx], 'Gsquare.csv'))
             bic = pd.DataFrame(bic)
             bic.to_csv(os.path.join(mypath, models[vx], 'BIC.csv'))
-           

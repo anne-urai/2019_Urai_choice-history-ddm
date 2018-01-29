@@ -1,3 +1,5 @@
+%% read in a TORC audiofile from Jan-Willem and plot the signal and noise timecourses
+
 cd ~/Downloads/sounds/
 
 [target, Fs]      = audioread('TORC_TARGET.wav');

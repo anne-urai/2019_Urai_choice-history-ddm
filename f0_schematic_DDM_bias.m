@@ -12,8 +12,7 @@ if ~exist('seed', 'var'), seed = 100; end
 disp(seed);
 
 % use code by Peter Murphy to compute RT distributions
-addpath('/Users/anne/Desktop/code/analyticalDDM/DDM');
-addpath('~/code/analyticalDDM/DDM');
+addpath('/analyticalDDM/DDM');
 addpath(genpath('~/code/Tools'));
 
 tmax = 0.7;
