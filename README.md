@@ -5,7 +5,7 @@ Code and data for
 
 The summary csv files, including history information, are all in the Data subfolder and have been named using the abbreviations described in the paper.
 
-To reproduce the figures, install the HDDM package (http://ski.clps.brown.edu/hddm_docs/manual.html). Then run the HDDM models using b1_HDDM_run.py (the models are specified in hddm_models.py). Easiest is to use a batch job submission system, and do e.g.
+To reproduce the figures, install the HDDM package (http://ski.clps.brown.edu/hddm_docs/index.html). Then run the HDDM models using b1_HDDM_run.py (the models are specified in hddm_models.py). Easiest is to use a batch job submission system, and do e.g.
 <code>
 python b1_HDDM_run.py -r 1 -d $d -v $v -i $i -s $s
 </code>
