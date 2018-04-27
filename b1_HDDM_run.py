@@ -114,7 +114,7 @@ def concat_models(mypath, model_name):
 
         allmodels = []
         print ("appending models for %s" %model_name)
-        for trace_id in range(15): # how many chains were run?
+        for trace_id in range(30): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
 
             modelExists           = os.path.isfile(model_filename)
@@ -248,54 +248,18 @@ def cornerplot(mypath, datasetname, modelname):
 
 # which model are we running at the moment?
 models = ['stimcoding_nohist', # 0
-    'stimcoding_dc_prevresp', # 1
-    'stimcoding_z_prevresp', # 2
-    'stimcoding_dc_z_prevresp', # 3
-    'stimcoding_dc_prevcorrect', # 4
-    'stimcoding_z_prevcorrect', # 5
-    'stimcoding_dc_z_prevcorrect', # 6
-    'regress_dc_z_prevresp', # 7
-    'regress_dc_z_prevresp_prevrt', # 8
-    'regress_dc_z_prev2resp', # 9
-    'regress_dc_z_prev3resp', # 10
-    'regress_dc_z_prevresp_prevstim_prevrt_prevpupil', # 11
-    'stimcoding_dc_z_prevresp_pharma', #12
-    'stimcoding_dc_prevresp_sessions', # 13
-    'regress_dc_z_visualgamma', #14
-    'regress_dc_z_motorslope', #15
-    'regress_dc_z_motorstart', #16
-    'stimcoding_sz_nohist', # 17
-    'stimcoding_sz_dc_prevresp', # 18
-    'stimcoding_sz_z_prevresp', # 19
-    'stimcoding_sz_dc_z_prevresp', # 20
-    'regress_dc_prevresp', # 21
-    'regress_dc_prevresp_prevrt', #22
-    'regress_nohist', # 23
-    'regress_dc_prevcorrect_prevrt', # 24
-    'regress_dc_prevcorrect', # 25
-    'regress_dc_z_prevresp_visualgamma', # 26
-    'regress_dc_z_prevresp_motorslope', # 27
-    'regress_dc_z_prevresp_motorstart', # 28
-    'stimcoding_dc_z_prevresp_sessions', # 29
-    ]
+    'stimcoding_dc_prevresp', #1
+    'stimcoding_z_prevresp', #2
+    'stimcoding_dc_z_prevresp', #3
+    'stimcoding_dc_z_prevresp_st', #4
+    'stimcoding_dc_z_prevresp_pharma', #5
+    'stimcoding_dc_z_prevcorrect',#6
+    'stimcoding_prevcorrect',#7
+    'stimcoding_dc_z_prev2resp'] #8
 
-# datasets = ['RT_RDK', # 0
-#     'MEG', # 1
-#     'NatComm', # 2
-#     'Anke_merged', # 3
-#     'JW_yesno', # 4
-#     'Bharath_fMRI', # 5
-#     'Murphy', # 6
-#     'MEG_MEGdata', # 7
-#     'JW_PNAS', # 8
-#     'JW_fMRI', # 9
-#     'Anke_2afc_sequential', #10
-#     'Anke_MEG', #11
-#     'NatComm_500ms', # 12
-#     'MEG_750ms', # 13
-#     'JW_yesno_2500ms'] # 14
-
-datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG'] #'MEG_MEGsessions', 'Bharath_fMRI', 'Anke_2afc_sequential', 'Anke_MEG']
+datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
+    'Anke_MEG_neutral', 'Bharath_fMRI_neutral'] 
+#'MEG_MEGsessions', 'Bharath_fMRI', 'Anke_2afc_sequential', 'Anke_MEG']
 
 # recode
 if isinstance(d, int):
@@ -330,7 +294,7 @@ for dx in d:
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
 
             # remove RTs below 250 ms
-            mydata = mydata.loc[mydata.rt > 0.250,:]
+            # mydata = mydata.loc[mydata.rt > 0.250,:]
 
             # correct a weirdness in Anke's data
             if 'transitionprob' in mydata.columns:
@@ -341,25 +305,24 @@ for dx in d:
             m = make_model(mypath, mydata, models[vx], trace_id)
 
             # now sample and save
-            # if os.path.exists(model_filename):
-        #         pass # skip if this model i has been run
-        #     elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
-        #         pass # skip if this model has been concatenated
-        #     else:
-        #
-            # only run if this hasnt been done, and there is no concatenated master model present
-            run_model(m, mypath, models[vx], trace_id, n_samples)
-            elapsed = time.time() - starttime
+            if os.path.exists(model_filename):
+                pass # skip if this model i has been run
+            elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
+                pass # skip if this model has been concatenated
+            else:
+                # only run if this hasnt been done, and there is no concatenated master model present
+                run_model(m, mypath, models[vx], trace_id, n_samples)
+                elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
             # ================================================= #
             # important, concat after running to save disk space
             # ================================================= #
 
-            if trace_id == 14: # and not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
+            if trace_id == 29: # and not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
                 # https://stackoverflow.com/questions/35795452/checking-if-a-list-of-files-exists-before-proceeding
                 filelist = []
-                for t in range(15):
+                for t in range(30):
                     filelist.append(os.path.join(mypath, models[vx], 'modelfit-md%d.model'%t))
 
                 print filelist
@@ -376,7 +339,7 @@ for dx in d:
                 concat_models(mypath, models[vx])
 
             # make corner plot
-            if trace_id == 14 and os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
+            if trace_id == 29 and os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
                 cornerplot(mypath, datasets[dx], models[vx])
 
         elif runMe == 2:
@@ -419,7 +382,7 @@ for dx in d:
             # get the csv file for this dataset
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-            mydata      = mydata[mydata.rt > 0.25] # remove superfast responses
+            # mydata      = mydata[mydata.rt > 0.25] # remove superfast responses
 
             subj_params = []
             bic         = []

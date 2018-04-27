@@ -1,4 +1,4 @@
-function [] = a0_parameterFiles(fname)
+function [] = a0_parameterFiles()
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -11,10 +11,10 @@ function [] = a0_parameterFiles(fname)
 % parameter file for HDDM
 % ============================================ #s
 
-nsmp       = [10000]
-datasets   = [6:8]; % RT-RDK and MEG-PL
-models     = [0:6]; % the nr of the models
-nrTraces   = 15; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
+nsmp       = [5000]
+datasets   = [0:6]; % RT-RDK and MEG-PL
+models     = [0:8]; % the nr of the models
+nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
 for n = nsmp,
