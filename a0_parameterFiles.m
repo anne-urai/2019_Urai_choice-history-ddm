@@ -1,3 +1,4 @@
+
 function [] = a0_parameterFiles()
 
 % Code to fit the history-dependent drift diffusion models described in
@@ -12,7 +13,7 @@ function [] = a0_parameterFiles()
 % ============================================ #s
 
 nsmp       = [5000]
-datasets   = [0:6]; % RT-RDK and MEG-PL
+datasets   = [0:5]; % RT-RDK and MEG-PL
 models     = [0:8]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
@@ -42,3 +43,4 @@ end
 % write to a file
 dlmwrite('hddmparams_PPC', alldat, 'delimiter', ' ');
 size(alldat)
+%% for PPC & chiSquare

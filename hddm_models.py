@@ -282,12 +282,12 @@ def make_model(mypath, mydata, model_name, trace_id):
     # add a model where previous reward changes drift rate / boundary separation
     # ============================================ #
 
-    elif model_name == 'stimcoding_prevcorrect:
+    elif model_name == 'stimcoding_prevcorrect':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
 
-        if if len(mydata.coherence.unique()) > 1:
+        if len(mydata.coherence.unique()) > 1:
          m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
              drift_criterion=True, bias=True, p_outlier=0.05,
              include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
@@ -598,12 +598,12 @@ def make_model(mypath, mydata, model_name, trace_id):
     # add a model where previous reward changes drift rate / boundary separation
     # ============================================ #
 
-    elif model_name == 'stimcoding_prevcorrect:
+    elif model_name == 'stimcoding_prevcorrect':
 
         # get the right variable coding
         mydata = recode_4stimcoding(mydata)
 
-        if if len(mydata.coherence.unique()) > 1:
+        if len(mydata.coherence.unique()) > 1:
          m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
              drift_criterion=True, bias=True, p_outlier=0.05,
              include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
