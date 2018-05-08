@@ -558,13 +558,16 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'stimcoding_dc_z_prevresp_pharma':
 
-        # get the right variable coding
-        mydata = recode_4stimcoding(mydata)
+        if 'drug' in mydata.columns:
+            # get the right variable coding
+            mydata = recode_4stimcoding(mydata)
 
-        m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
-            drift_criterion=True, bias=True, p_outlier=0.05,
-            include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
-            depends_on={'dc':['prevresp', 'drug'], 'z':['prevresp', 'drug']})
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'dc':['prevresp', 'drug'], 'z':['prevresp', 'drug']})
+        else:
+            m = [] # don't return a model, won't run
 
     # ============================================ #
     # STIMCODING PREVRESP + PREVCORRECT

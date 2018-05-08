@@ -59,7 +59,7 @@ parser.add_option ( "-d", "--dataset",
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(0,11),
+        default = range(0,9),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
@@ -103,6 +103,8 @@ def run_model(m, mypath, model_name, trace_id, n_samples):
     text_file.close()
 
 def concat_models(mypath, model_name):
+    
+    nchains = 30
 
     # CHECK IF COMBINED MODEL EXISTS
     if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and  (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
@@ -114,7 +116,7 @@ def concat_models(mypath, model_name):
 
         allmodels = []
         print ("appending models for %s" %model_name)
-        for trace_id in range(30): # how many chains were run?
+        for trace_id in range(nchains): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
 
             modelExists           = os.path.isfile(model_filename)
@@ -281,36 +283,39 @@ for dx in d:
         thispath = os.path.join(mypath, models[vx])
         if not os.path.exists(thispath):
             os.mkdir(thispath)
+        
+        # get the csv file for this dataset
+        filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
+        mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
 
+        # remove RTs below 250 ms
+        # mydata = mydata.loc[mydata.rt > 0.250,:]
+
+        # correct a weirdness in Anke's data
+        if 'transitionprob' in mydata.columns:
+            mydata.transitionprob = mydata.transitionprob * 100;
+            mydata.transitionprob = mydata.transitionprob.round();
+    
         if runMe == 1:
 
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
-
-            # get the csv file for this dataset
-            filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
-            mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-
-            # remove RTs below 250 ms
-            # mydata = mydata.loc[mydata.rt > 0.250,:]
-
-            # correct a weirdness in Anke's data
-            if 'transitionprob' in mydata.columns:
-                mydata.transitionprob = mydata.transitionprob * 100;
-                mydata.transitionprob = mydata.transitionprob.round();
-
-            # get the model specification, pass data
-            m = make_model(mypath, mydata, models[vx], trace_id)
-
+            
             # now sample and save
             if os.path.exists(model_filename):
                 pass # skip if this model i has been run
             elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
                 pass # skip if this model has been concatenated
+            elif models[vx] == 'stimcoding_dc_z_prevresp_pharma' and not 'drug' in mydata.columns:
+                pass # makes no sense, don't run
             else:
+
+                # get the model specification, pass data
+                m = make_model(mypath, mydata, models[vx], trace_id)
                 # only run if this hasnt been done, and there is no concatenated master model present
                 run_model(m, mypath, models[vx], trace_id, n_samples)
-                elapsed = time.time() - starttime
+                
+            elapsed = time.time() - starttime
             print( "Elapsed time for %s, %s, %d samples: %f seconds\n" %(models[vx], datasets[dx], n_samples, elapsed))
 
             # ================================================= #
