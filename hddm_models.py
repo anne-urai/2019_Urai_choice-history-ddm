@@ -644,7 +644,26 @@ def make_model(mypath, mydata, model_name, trace_id):
               drift_criterion=True, bias=True, p_outlier=0.05,
               include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
               depends_on={'dc':['prev2resp'], 'z':['prev2resp']})
-              
+
+    # ============================================ #
+    # MULTIPLICATIVE DRIFT BIAS
+    # ============================================ #
+
+    # this is the model that will generate most of the figures
+    elif model_name == 'stimcoding_dc_z_prevresp_multiplicative':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # this only makes sense with multiple coherence levels
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['coherence', 'prevresp'], 'z':['prevresp']})
+        else:
+            m = []
+                
     # ============================================ #
     # MEG DATA
     # ============================================ #
