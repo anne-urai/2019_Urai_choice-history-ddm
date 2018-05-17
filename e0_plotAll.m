@@ -27,11 +27,9 @@ switch usr
 end
 
 % neutral vs biased plotsC
-datasets = {'Murphy', 'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG', 'MEG_MEGsessions', 'Bharath_fMRI', 'Anke_2afc_sequential', 'Anke_MEG'};
+datasets = {'Murphy', 'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG', 'Anke_MEG_neutral'};
 datasetnames = { {'Visual motion' '2AFC (RT)'},  {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
-    {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'},  {'Visual motion' '2IFC (FD) #2'}, ...
-    {'Bharath fMRI' ''}, {'Anke JoN' ''}, {'Anke MEG' ''}};
-datasets = datasets(1:5);
+    {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'},  {'Visual motion' '2AFC (FD)'}};
 
 % go to code
 try
@@ -43,11 +41,12 @@ colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
 colors = [51,160,44; 31,120,180] ./ 256;
 colors = [178,223,138; 166,206,227] ./ 256; % lighter
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
+colors = [178,24,43; 33,102,172] ./ 256; % red blue
 
 %% PREPARING DATA
 if 1,
-    b2_HDDM_readIntoMatlab(datasets);
-    b2b_Gsq_readIntoMatlab(datasets);
+  %  b2_HDDM_readIntoMatlab(datasets);
+  %  b2b_Gsq_readIntoMatlab(datasets);
     b3_makeDataframe(datasets);
 end
 
@@ -134,4 +133,3 @@ e6_serialBias_SfN_modelFree_CRF_PPC
 %e3_serialBias_SfN_Posteriors_StartingPoint;
 
 % sv_comparison;
-
