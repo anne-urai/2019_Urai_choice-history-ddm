@@ -24,7 +24,7 @@ doText = true;
 
 switch sz
     case 1
-        whichmdls = ['stimcodingsz'];
+        whichmdls = ['stimcodingst'];
     case 0
         whichmdls = ['stimcoding'];
 end

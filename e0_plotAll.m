@@ -44,10 +44,11 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 colors = [178,24,43; 33,102,172] ./ 256; % red blue
 
 %% PREPARING DATA
-if 1,
-  %  b2_HDDM_readIntoMatlab(datasets);
-  %  b2b_Gsq_readIntoMatlab(datasets);
+if 0,
+    b2_HDDM_readIntoMatlab(datasets);
+    b2b_Gsq_readIntoMatlab(datasets);
     b3_makeDataframe(datasets);
+    b4_renamePPCfiles(datasets);
 end
 
 disp('starting');
@@ -79,10 +80,10 @@ e3_serialBias_SfN_Posteriors_StartingPoint;
 % ======================= %
 
 close all;
-for sz = [0 1],
+for st = [0 1],
     for Gsq = [0 1],
 
-        if Gsq == 1 && sz == 1, continue; end % hierarchical sampling with sz takes forever
+        % if Gsq == 1 && st == 1, continue; end % hierarchical sampling with sz takes forever
 
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, sz); % figure 4
         forestPlot(alldat);
@@ -97,6 +98,15 @@ for sz = [0 1],
     end
 end
 
+% ======================= %
+% PREVCORRECT
+% ======================= %
+
+alldat = e1b_serialBias_SfN_ModelFreeCorrelation_prevCorrect;
+forestPlot(alldat);
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf'));
+
+
 % ========================= %
 % MEG PHARMA
 % ========================= %
@@ -109,27 +119,6 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
 % MODEL FREE CONFIRMATION
 % ======================= %
 
-e6_serialBias_SfN_modelFree_CRF_PPC
+e6_serialBias_SfN_modelFree_CRF_PPC;
 
-% ======================= %
-% PREVCORRECT
-% ======================= %
 
-% alldat = e1b_serialBias_SfN_ModelFreeCorrelation_prevCorrect;
-% forestPlot(alldat);
-% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf'));
-
-% ======================= %
-% REGRESSION MODELS
-% ======================= %
-
-% 1. compare dic between models with just history and with neural data
-%e11_serialBias_MEGregression_DIC
-%e11_serialBias_MEGregression_posteriors
-
-% e3_serialBias_SfN_RTmodulation;
-
-% POSTERIORS OF STARTING POINT SHIFT
-%e3_serialBias_SfN_Posteriors_StartingPoint;
-
-% sv_comparison;

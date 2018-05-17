@@ -20,7 +20,7 @@ if ~exist('seed', 'var'), seed = 100; end
 disp(seed);
 
 % use code by Peter Murphy to compute RT distributions
-addpath('/analyticalDDM/DDM');
+addpath('analyticalDDM/DDM');
 addpath(genpath('~/code/Tools'));
 
 tmax = 0.7;
@@ -169,8 +169,7 @@ tightfig;
 print(gcf, '-depsc', sprintf('~/Data/serialHDDM/DDMschematic.eps'));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic.pdf'));
 
-% SEPARATE UNBIASED PLOT
-
+% SEPARATE UNBIASED PLT
 tmax = 0.7;
 %% make 3 sets of distributions
 % without any bias
@@ -201,6 +200,7 @@ defcfg = cfg;
 
 %% make an overview of the two biasing mechanisms in the DDM
 
+if 0,
 close all;
 subplot(331); hold on;
 arrow([-0.1 cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
@@ -245,6 +245,7 @@ xlim([-0.1 max(cfg.time)]);
 tightfig;
 print(gcf, '-depsc', sprintf('~/Data/serialHDDM/DDMunbiased.eps'));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMunbiased.pdf'));
+end
 end
 
 

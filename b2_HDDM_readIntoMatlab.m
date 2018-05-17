@@ -302,7 +302,7 @@ for d = 1:length(datasets),
                     % separate variable for the percentiles
                     varname = [flds{p}(1:end-5) '_prct__' thismdlname];
                     try
-                        results.(varname) = individuals.(flds{p});
+                       % results.(varname) = individuals.(flds{p});
                     end
                 end
             end

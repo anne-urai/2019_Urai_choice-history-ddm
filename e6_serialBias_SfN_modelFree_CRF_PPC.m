@@ -36,21 +36,12 @@ allds.slow = nan(length(datasets), length(models));
 
 for q = 2; %:length(qntls),
     for d = 1:length(datasets),
-        
-        switch datasets{d}
-            case {'Bharath_fMRI', 'Anke_MEG', 'Anke_2afc_sequential', 'Anke_merged'}
-                tps = [20 80];
-            otherwise
-                tps = 0;
-        end
-        
+
         % plot
         close all;
         subplot(441); hold on;
         
         for tp = 1:length(tps),
-            
-            % {colors(1,:), colors(2, :)}, ...
             
             for m = 1:length(models),
                 
