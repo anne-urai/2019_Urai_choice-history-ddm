@@ -44,13 +44,14 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 colors = [178,24,43; 33,102,172] ./ 256; % red blue
 
 %% PREPARING DATA
-if 0,
-    b2_HDDM_readIntoMatlab(datasets);
-    b2b_Gsq_readIntoMatlab(datasets);
-    b3_makeDataframe(datasets);
+if 1,
+    %b2_HDDM_readIntoMatlab(datasets);
+    %b2b_Gsq_readIntoMatlab(datasets);
+    %b3_makeDataframe(datasets);
     b4_renamePPCfiles(datasets);
 end
 
+assert(1==0)
 disp('starting');
 
 % ======================= %

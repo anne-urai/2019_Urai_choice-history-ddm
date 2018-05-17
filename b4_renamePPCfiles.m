@@ -2,8 +2,6 @@ function b4_renamePPCfiles(datasets)
 
 close all; clc;
 mypath  = '/nfs/aeurai/HDDM';
-
-usepath = sprintf('%s/%s/', mypath, datasets{d});
 mdls = {'stimcoding_nohist', ...
 'stimcoding_dc_prevresp', ...
 'stimcoding_z_prevresp', ...
@@ -17,7 +15,9 @@ mdls = {'stimcoding_nohist', ...
 
 for d = 1:length(datasets),
 for m = 1:length(mdls),
-	movefile(sprintf('%s/%s/%s/ppc_data.csv', usepath, datasets{d}, mdls{m}), ...
-	sprintf('%s/summary/%s/%s_ppc_data.csv', usepath, datasets{d}, mdls{m}));
+	try
+	copyfile(sprintf('%s/%s/%s/ppc_data.csv', mypath, datasets{d}, mdls{m}), ...
+	sprintf('%s/summary/%s/%s_ppc_data.csv', mypath, datasets{d}, mdls{m}));
+end
 end
 end
