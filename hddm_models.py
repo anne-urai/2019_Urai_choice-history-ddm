@@ -51,59 +51,6 @@ def recode_4stimcoding(mydata):
         mydata.prev3correct[mydata.prev3resp == mydata.prev3stim] = 1
     except:
         pass
-#!/usr/bin/env python
-# encoding: utf-8
-
-"""
-Code to fit the history-dependent drift diffusion models described in
-Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
-
-MIT License
-Copyright (c) Anne Urai, 2018
-anne.urai@gmail.com
-"""
-import numpy as np
-import os, fnmatch
-import hddm
-from IPython import embed as shell
-
-# prepare link function for the regression models
-def z_link_func(x):
-    return 1 / (1 + np.exp(-(x.values.ravel())))
-
-def balance_designmatrix(mydata):
-    # remove subjects who did not do all conditions
-    for i, sj in enumerate(mydata.subj_idx.unique()):
-        sessions = mydata[mydata.subj_idx == sj].session.unique()
-        if len(sessions) < len(mydata.session.unique()):
-            mydata = mydata[mydata.subj_idx != sj] # drop this subject
-    return mydata
-
-def recode_4stimcoding(mydata):
-    # split into coherence and stimulus identity
-    mydata['coherence'] = mydata.stimulus.abs()
-    mydata.stimulus     = np.sign(mydata.stimulus)
-    # for stimcoding, the two identities should be 0 and 1
-    mydata.ix[mydata['stimulus']==-1,'stimulus'] = 0
-    if len(mydata.stimulus.unique()) != 2:
-        raise ValueError('Stimcoding needs 2 stimulus types')
-
-    # also create a binary prevcorrect
-    mydata['prevcorrect']     = mydata.prevresp
-    mydata.prevcorrect[mydata.prevresp != mydata.prevstim] = 0
-    mydata.prevcorrect[mydata.prevresp == mydata.prevstim] = 1
-
-    try:
-        # also create a binary prevcorrect
-        mydata['prev2correct']     = mydata.prevresp
-        mydata.prev2correct[mydata.prev2resp != mydata.prev2stim] = 0
-        mydata.prev2correct[mydata.prev2resp == mydata.prev2stim] = 1
-        # also create a binary prevcorrect
-        mydata['prev3correct']     = mydata.prevresp
-        mydata.prev3correct[mydata.prev3resp != mydata.prev3stim] = 0
-        mydata.prev3correct[mydata.prev3resp == mydata.prev3stim] = 1
-    except:
-        pass
 
     return mydata
 

@@ -27,7 +27,6 @@ results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, lengt
 results.drug    = repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
 results.criterionshift_prct = nan(height(results), 2); % will contain two points for error bars
 
-
 if any(~cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'transitionprob'))),
     results.criterionshift_neutral = nan(size(results.criterionshift));
     results.criterionshift_alternating = nan(size(results.criterionshift));
@@ -45,6 +44,12 @@ if sum(strcmp(alldata.Properties.VariableNames, 'coherence')) > 0,
         vrnm = ['dprime_c' num2str(cohlevels(c)*100)];
         vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
         results.(vrnm) = nan(size(results.dprime));
+        
+        % ALSO COMPUTE REPETITION SEPARATELY FOR EACH LEVEL OF COHERENCE
+        vrnm = ['repetition_c' num2str(cohlevels(c)*100)];
+        vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
+        results.(vrnm) = nan(size(results.dprime));
+        
     end
 end
 
@@ -165,6 +170,18 @@ for sj = subjects,
         results.rt(icnt)            = nanmedian(data.rt);
         results.bias(icnt)          = nanmean(data.response);
 
+            % measure of repetition behaviour
+        % data.repeat = [~(abs(diff(data.response)) > 0); NaN];
+        % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
+
+        % 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
+        data.repeat = [NaN; (diff(data.response) == 0)];
+        data.stimrepeat = [NaN; (diff(data.response) == 0)];
+        wrongTrls   = ([NaN; diff(data.trial)] ~= 1);
+        data.repeat(wrongTrls) = NaN;
+        data.stimrepeat(wrongTrls) = NaN;
+
+        
         if sum(strcmp(data.Properties.VariableNames, 'coherence')) > 0,
             cohlevels = unique(data.coherence);
             for c = 1:length(cohlevels),
@@ -177,26 +194,21 @@ for sj = subjects,
               if cohlevels(c) > 0,
                 assert(~isnan(results.(vrnm)(icnt)));
               end
+              
+              %% ALSO COMPUTE REPETITION SEPARATELY FOR EACH LEVEL OF COHERENCE
+              vrnm = ['repetition_c' num2str(cohlevels(c)*100)];
+              vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
+              results.(vrnm)(icnt) = nanmean(data.repeat(data.coherence == cohlevels(c)));
             end
         end
 
-        % measure of repetition behaviour
-        % data.repeat = [~(abs(diff(data.response)) > 0); NaN];
-        % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
-
-        % 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
-        data.repeat = [NaN; (diff(data.response) == 0)];
-        data.stimrepeat = [NaN; (diff(data.response) == 0)];
-        wrongTrls   = ([NaN; diff(data.trial)] ~= 1);
-        data.repeat(wrongTrls) = NaN;
-        data.stimrepeat(wrongTrls) = NaN;
-
+    
         results.repetition(icnt)        = nanmean(data.repeat);
         results.stimrepetition(icnt)    = nanmean(data.stimrepeat);
 
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
-        results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
+        results.repetition_preverror(icnt)   = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
 
         % criterion based on repetition and stimulus sequences
         [~, c] = dprime(data.stimrepeat, data.repeat);

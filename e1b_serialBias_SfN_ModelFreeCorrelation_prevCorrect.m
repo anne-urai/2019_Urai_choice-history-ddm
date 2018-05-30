@@ -17,7 +17,7 @@ if ~exist('sz', 'var'),  sz = 0; end
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
-doText = true;
+doText = false;
 
 switch sz
     case 1
@@ -29,7 +29,7 @@ end
 close all;
 for d = length(datasets):-1:1
     disp(datasets{d});
-        
+    
     if Gsq,
         results = readtable(sprintf('%s/summary/%s/allindividualresults_Gsq.csv', mypath, datasets{d}));
     else
@@ -48,22 +48,36 @@ for d = length(datasets):-1:1
     results.v_prevresp_correct = ...
         results.(['dc_1_1__' whichmdls 'dczprevcorrect']) - results.(['dc_1_2__' whichmdls 'dczprevcorrect']);
     
-    results.z_prevresp_error = ...
-        results.(['z_0_1__' whichmdls 'dczprevcorrect']) - results.(['z_0_2__' whichmdls 'dczprevcorrect']);
-    results.v_prevresp_error = ...
-        results.(['dc_0_1__' whichmdls 'dczprevcorrect']) - results.(['dc_0_2__' whichmdls 'dczprevcorrect']);
+    try
+        results.z_prevresp_error = ...
+            results.(['z_0_1__' whichmdls 'dczprevcorrect']) - results.(['z_0_2__' whichmdls 'dczprevcorrect']);
+        results.v_prevresp_error = ...
+            results.(['dc_0_1__' whichmdls 'dczprevcorrect']) - results.(['dc_0_2__' whichmdls 'dczprevcorrect']);
+    catch
+        results.z_prevresp_error = ...
+            results.z_c10__stimcodingdczprevcorrect - results.(['z_0_2__' whichmdls 'dczprevcorrect']);
+        results.v_prevresp_error = ...
+            results.dc_c10__stimcodingdczprevcorrect - results.(['dc_0_2__' whichmdls 'dczprevcorrect']);
+    end
+        
     
     % assign to structure
     allresults(1).z_prevresp     = results.z_prevresp_correct;
     allresults(1).v_prevresp     = results.v_prevresp_correct;
     allresults(1).criterionshift = results.repetition;
     alltitles{1}                 = cat(2, datasetnames{d}{1}, ' - ', 'Correct');
-
+    allresults(1).marker 			= 'o';
+    allresults(1).meancolor 		= [0 0 0];
+    allresults(1).scattercolor	 	= [0.5 0.5 0.5];
+    
     % also after error choices
     allresults(2).z_prevresp     = results.z_prevresp_error;
     allresults(2).v_prevresp     = results.v_prevresp_error;
     allresults(2).criterionshift = results.repetition;
     alltitles{2}                 = cat(2, datasetnames{d}{1}, ' - ', 'Error');
+    allresults(2).marker        = 's';
+    allresults(2).meancolor 		= [ 0.894117647058824         0.101960784313725         0.109803921568627];
+    allresults(2).scattercolor	 	= [ 0.984313725490196         0.705882352941177         0.682352941176471];
     
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
     close all;
@@ -89,16 +103,16 @@ for d = length(datasets):-1:1
     
     % move together
     sp2.Position(1) = sp2.Position(1) - 0.08;
-    ss = suplabel(datasetnames{d}{1}, 't');
+    ss = suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
     set(ss, 'fontweight', 'normal');
     ss.FontWeight = 'normal';
     ss.Position(2) = ss.Position(2) - 0.03;
     
     % add colored axes after suplabel (which makes them black)
-    xlabel(sp1, 'History bias in z');
-    set(sp1, 'xcolor', colors(2, :));
-    xlabel(sp2, 'History bias in v');
-    set(sp2, 'xcolor', colors(1, :));
+    xlabel(sp1, 'History shift in z');
+    set(sp1, 'xcolor', colors(1, :));
+    xlabel(sp2, 'History shift in v_{bias}');
+    set(sp2, 'xcolor', colors(2, :));
     
     if doText,
         %% add line between the two correlation coefficients
@@ -108,7 +122,7 @@ for d = length(datasets):-1:1
         end
         title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
     end
-
+    
     tightfig;
     if Gsq,
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_Gsq_modelfree_prevcorrect_sz%d_d%d.pdf', d, sz));
@@ -133,7 +147,7 @@ for d = length(datasets):-1:1
         alldat(cnt).bfv = corrbf(r(1,2), numel(allresults(a).v_prevresp));
         
         alldat(cnt).datasets = datasets{d};
-        alldat(cnt).datasetnames = alltitles{a};
+        alldat(cnt).datasetnames = datasetnames{d};
         
         % also add the difference in r, Steigers test
         [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).z_prevresp);
@@ -146,83 +160,13 @@ for d = length(datasets):-1:1
         alldat(cnt).corrdiff_ci = rhodiffci;
         alldat(cnt).pdiff = pval;
         
+            
+        alldat(cnt).marker          = allresults(a).marker;
+        alldat(cnt).scattercolor    = allresults(a).scattercolor;
+        alldat(cnt).meancolor       = allresults(a).meancolor;
+        
         cnt = cnt + 1;
     end
 end
-
-end
-
-function [rho, tt, handles] = plotScatter(allresults, fld, legendWhere, doText)
-
-doText = 0;
-
-% overall correlation
-x = cat(1, allresults(:).(fld));
-y = cat(1, allresults(:).criterionshift);
-% show line
-axis square;
-
-% show lines to indicate origin
-xlims = [min(x) max(x)];
-ylims = [min(y) max(y)];
-plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
-plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2); % if p(repeat), 0.5
-
-% color in different grouos
-colors = cbrewer('qual', 'Paired', 10);
-transitioncolors = [[0.5 0.5 0.5]; colors([5], :)];
-meancolors = [0 0 0; colors([6], :)];
-markers = {'o', 's'}; %also indicate with different markers
-
-for a = length(allresults):-1:1, % neutral last
-    
-    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
-    
-    if pval < 0.05,
-        % CORRELATION LINE SEPARATELY FOR EACH DATASET?
-        p = polyfit(allresults(a).(fld), allresults(a).criterionshift, 1);
-        xrangeextra = 0.15*range(allresults(a).(fld));
-        xrange = linspace(min(allresults(a).(fld))- xrangeextra, ...
-            max(allresults(a).(fld))+xrangeextra, 100);
-        yrange = polyval(p, xrange);
-        l = plot(xrange, yrange);
-        l.Color = meancolors(a, :);
-        l.LineWidth = 0.5;
-        l.LineStyle = '-';
-        %else
-        % l.LineStyle = ':';
-    end
-    
-    % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
-    s  = scatter(allresults(a).(fld), allresults(a).criterionshift, 10, 'w', markers{a});
-	set(s, 'markerfacecolor', transitioncolors(a, :));
-	handles{a} = s;
-    
-end
-
-for a = length(allresults):-1:1, % neutral last
-    % also add the group mean
-    p = ploterr(nanmean(allresults(a).(fld)), nanmean(allresults(a).criterionshift), 2*nanstd(allresults(a).(fld)) ./ sqrt(length(allresults(a).(fld))), ...
-        2*nanstd(allresults(a).criterionshift) ./ sqrt(length(allresults(a).criterionshift)), '.', 'abshhxy', 0);
-    set(p(1), 'markersize', 0.1, 'color', meancolors(a, :)); % tiny marker
-    set(p(2), 'color', meancolors(a, :), 'linewidth', 1);
-    set(p(3), 'color', meancolors(a, :), 'linewidth', 1);
-end
-
-axis tight; offsetAxes;
-
-if doText,
-    % PRINT THE CORRELATION COEFFICIENT
-    txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
-    if pval < 0.001,
-        txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
-    end
-    tt = text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
-        min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
-        txt, 'fontsize', 5);
-else
-    tt = [];
-end
-set(gca, 'color', 'none');
 
 end

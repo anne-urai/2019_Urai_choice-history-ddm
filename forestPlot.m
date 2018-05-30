@@ -74,14 +74,15 @@ plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 disp('z bayes factor');
 bf = prod([alldat(ds).bfz])
 if bf < 100,
-    title(sprintf('BF_{10} < 1/100'));
+    t = title(sprintf('BF_{10} < 1/100'));
 elseif bf > 100,
-    title(sprintf('BF_{10} > 100'));
+    t = title(sprintf('BF_{10} > 100'));
 elseif bf < 1,
-    title(sprintf('BF_{10} = 1/%.2f', 1/bf));
+    t = title(sprintf('BF_{10} = 1/%.2f', 1/bf));
 elseif bf > 1,
-    title(sprintf('BF_{10} = %.2f', bf));
+    t = title(sprintf('BF_{10} = %.2f', bf));
 end
+t.Position(2) = t.Position(2) - 1.2;
 
 %% NOW FOR DRIFT CRITERION
 % MAKE AN OVERVIEW PLOT
@@ -95,7 +96,6 @@ end
 plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
 for d = 1:length(ds),
-    
 
     % determine color and marker
     try
@@ -133,19 +133,19 @@ plot(nanmean([alldat(ds).corrv]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]));
 disp('v bayes factor');
 
-bf = prod([alldat(ds).bfv])
+bf = prod([alldat(ds).bfv]);
 if bf < 100,
-    title(sprintf('BF_{10} < 1/100'));
+    t = title(sprintf('BF_{10} < 1/100'));
 elseif bf > 100,
-    title(sprintf('BF_{10} > 100'));
+    t = title(sprintf('BF_{10} > 100'));
 elseif bf < 1,
-    title(sprintf('BF_{10} = 1/%.2f', 1/bf));
+    t = title(sprintf('BF_{10} = 1/%.2f', 1/bf));
 elseif bf > 1,
-    title(sprintf('BF_{10} = %.2f', bf));
+    t = title(sprintf('BF_{10} = %.2f', bf));
 end
-
+t.Position(2) = t.Position(2) - 1.2;
 % move closer together
-sp2.Position(1) = sp2.Position(1) - 0.05;
+sp2.Position(1) = sp2.Position(1) - 0.07;
 
 %% ADD TEXT
 for d = 1:length(ds),
@@ -159,10 +159,10 @@ for d = 1:length(ds),
         'fontsize', 4);
 end
 
-
 % DO STATS ACROSS DATASETS!
 % [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]), fisherz([alldat(ds).corrz]));
-[~, h] = suplabel('Correlation with P(repeat)', 'x');
+[ss, h] = suplabel('Correlation with P(repeat)', 'x');
+ss.Position(2) = ss.Position(2) + 0.015;
 set(h, 'color', 'k');
 tightfig;
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));

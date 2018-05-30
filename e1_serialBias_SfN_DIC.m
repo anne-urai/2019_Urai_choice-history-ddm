@@ -23,16 +23,16 @@ for s = 1:length(types),
         'dc_z_prevresp', 'nohist'};
     for d = 1:length(datasets),
         close all;
-        subplot(4, 6, 1);
+        subplot(4, 5, 1);
         getPlotDIC(mdls, types{s}, d);
-        title(datasetnames{d}{1});
+        title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'Both'});
         
-		if ismember(d, [1 4]),
+		%if ismember(d, [1 4]),
         	ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
-		else
-			ylabel({' '; ' '});
-		end
+		%else
+		%	ylabel({' '; ' '});
+		%end
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevresp_d%d.pdf', types{s}, d));
         fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_%s_prevresp_d%d.pdf \n', types{s}, d);

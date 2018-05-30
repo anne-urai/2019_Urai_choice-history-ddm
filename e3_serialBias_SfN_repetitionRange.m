@@ -17,7 +17,7 @@ colormap(cmap);
 for d = 1:length(datasets),
     
     close all;
-    subplot(6,6,1); hold on;
+    subplot(4,4,1); hold on;
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     dat = dat(dat.session == 0, :);
     if d == 5
@@ -39,8 +39,8 @@ for d = 1:length(datasets),
     y = ylabel(datasetnames{d});
     
     y.Rotation = y.Rotation + 180;
-    y.Position(1) = y.Position(1) + 0.3;
-    y.Position(2) = y.Position(2) - 1.5;
+    y.Position(1) = y.Position(1) + 0.27;
+    y.Position(2) = y.Position(2) - 2;
     
     xlabel('P(repeat)');
     offsetAxes;
@@ -48,7 +48,7 @@ for d = 1:length(datasets),
     %axis square;
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     % text(0.7, 0, '.w');
-    subplot(6,6,2); plot(0,0,'.w', 'color', 'w'); axis off;
+    subplot(4,20,5); plot(0,0,'.w', 'color', 'w'); axis off;
     % offsetAxes;
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetitionRange_d%d.pdf',d));

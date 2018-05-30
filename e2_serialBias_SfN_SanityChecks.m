@@ -62,11 +62,11 @@ for d = 1:length(datasets),
         allcohs = repmat(cohs', size(alldrift, 1), 1);
         colors  = cbrewer('seq', 'PuBuGn', numel(unique(allcohs(:))) + 5);
         colors  = colors([3:end-4 end], :);
-		try
-        g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
-	catch
-		assert(1==0)
-	end
+        try
+            g       = gscatter(alldprime(:), alldrift(:), allcohs(:), colors, [], 2, [], 0);
+        catch
+            assert(1==0)
+        end
         
         box off;
         for gi = 1:length(g),
@@ -120,7 +120,7 @@ for d = 1:length(datasets),
     % end
     
     offsetAxes; box off;
-    title(datasetnames{d}{1});
+    title(datasetnames{d});
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_driftrate_d%d.pdf',d));
@@ -181,7 +181,7 @@ for d = 1:length(datasets),
         % ========================================== %
         
         close all;
-        subplot(551);
+        subplot(441);
         
         % take group-level means and quantiles from the posteriors
         load(sprintf('%s/summary/%s/stimcoding_nohist_all.mat', mypath, datasets{d}));
@@ -211,6 +211,11 @@ for d = 1:length(datasets),
             end
         end
         
+        switch datasets{d}
+            case 'Anke_MEG_neutral'
+                cohlevels = [0 3 9 20 30];
+        end
+        
         hold on;
         for c = 1:length(cohlevels),
             h = ploterr(cohlevels(c), cohdat(3, c), ...
@@ -221,22 +226,25 @@ for d = 1:length(datasets),
         end
         set(gca, 'xtick', cohlevels);
         ylabel('Drift rate (v)');
-                
+        
         switch datasets{d}
             case {'NatComm', 'NatComm_500ms'}
                 xlabel('\Delta % coherence');
-                set(gca, 'xticklabel', {'', '', '', '5', '10', '20', '30'});                
+                set(gca, 'xticklabel', {'', '', '', '5', '10', '20', '30'});
+            case 'Anke_MEG_neutral'
+                xlabel('Coherence (%)');
+                set(gca, 'xticklabel', {'0', '3', '9', '27', '81'});
         end
         
-        axis square; axis tight; 
+        axis square; axis tight;
         xlim([-2 max(get(gca, 'xlim'))]);
         offsetAxes;
         print(gcf, '-depsc', sprintf('~/Data/serialHDDM/figure1b_inset_d%d.eps',d));
         
         tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_inset_d%d.pdf',d));
-
-
+        
+        
     end
     
 end

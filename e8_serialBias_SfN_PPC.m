@@ -15,14 +15,14 @@ global datasets datasetnames mypath
 % MODULATION OF SERIAL CHOICE BIAS
 % ========================================== %
 
+% datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
 plotWhich = 'stimcoding'; % {'error', 'biased', 'stimcoding'};
-choiceCat = {{'Left', 'Right'}, {'no', 'yes'}, {'no','yes'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}, ...
-{'down', 'up'}, {'down', 'up'}, {'down', 'up'}};
+choiceCat = {{'no', 'yes'}, {'no','yes'}, {'left', 'right'}, {'down', 'up'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}};
 
 for d = 1:length(datasets),
     close all;
     
-    if ~exist(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}), 'file'),
+    if ~exist(sprintf('%s/summary/%s/%s_ppc_data.csv', mypath, datasets{d}, 'stimcoding_nohist'), 'file'),
         fprintf('cannot find %s/stimcoding_nohist/ppc_data.csv \n', datasets{d});
         continue;
     else
@@ -30,7 +30,7 @@ for d = 1:length(datasets),
     end
     
     % get traces for the model with pupil and rt modulation
-    ppc = readtable(sprintf('%s/%s/stimcoding_nohist/ppc_data.csv', mypath, datasets{d}));
+    ppc = readtable(sprintf('%s/summary/%s/%s_ppc_data.csv', mypath, datasets{d}, 'stimcoding_nohist'));
     ppc.correct                        = (ppc.stimulus == ppc.response);
     ppc.repeat                         = zeros(size(ppc.response));
     ppc.repeat(ppc.response == (ppc.prevresp > 0)) = 1;
@@ -108,7 +108,7 @@ for d = 1:length(datasets),
     for i = 1:length(ix),
         %subplot(4,4,(i-1)*4+1);
         % subplot(4,4,1);
-        sph{i} = subplot(4,10 ,i);
+        sph{i} = subplot(4,10,i);
         hold on;
         for r = 1:length(rx),
             histogram_smooth(abs(ppc.rt(ppc.stimulus == ix(i) & ppc.response == rx(r))), ...
@@ -147,8 +147,11 @@ for d = 1:length(datasets),
     text(maxRT*0.7, max(ylims)*0.6, sprintf('"%s"', capitalize(choiceCat{d}{1})), 'color', bestcolor(1, :), 'fontsize', 6);
     text(maxRT*0.7, max(ylims)*0.5, sprintf('"%s"', capitalize(choiceCat{d}{2})), 'color', bestcolor(2, :), 'fontsize', 6);
    
-    set(gcf, 'color', 'none');
-	set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    %set(gcf, 'color', 'none');
+    set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    [ss, h1] =  suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
+    ss.Position(2) = ss.Position(2) + 0.04;
+    
     tightfig;
     switch plotWhich
         case 'error'

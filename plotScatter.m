@@ -22,8 +22,7 @@ ylims = [min(y) max(y)];
 plot([0 0], ylims, 'color', [0.5 0.5 0.5], 'linewidth', 0.2);
 plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2); % if p(repeat), 0.5
 
-
-for a = length(allresults):-1:1, % neutral last
+for a = 1:length(allresults), % neutral last
     
     [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
     
@@ -38,18 +37,18 @@ for a = length(allresults):-1:1, % neutral last
         l.Color = allresults(a).meancolor;
         l.LineWidth = 0.5;
         l.LineStyle = '-';
-        %else
+        % else
         % l.LineStyle = ':';
     end
     
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
-    s  = scatter(allresults(a).(fld), allresults(a).criterionshift, 10, 'w', allresults(a).marker);
-	set(s, 'markerfacecolor', allresults(a).scattercolor);
+    s  = scatter(allresults(a).(fld), allresults(a).criterionshift, 7, allresults(a).scattercolor, allresults(a).marker);
+	%set(s, 'markerfacecolor', allresults(a).scattercolor);
 	handles{a} = s;
-    
+     
 end
 
-for a = length(allresults):-1:1, % neutral last
+for a = 1:length(allresults), % neutral last
     % also add the group mean
     p = ploterr(nanmean(allresults(a).(fld)), nanmean(allresults(a).criterionshift), 2*nanstd(allresults(a).(fld)) ./ sqrt(length(allresults(a).(fld))), ...
         2*nanstd(allresults(a).criterionshift) ./ sqrt(length(allresults(a).criterionshift)), '.', 'abshhxy', 0);

@@ -20,7 +20,7 @@ if ~exist('sz', 'var'),  sz = 0; end
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
-doText = true;
+doText = false;
 
 switch sz
     case 1
@@ -56,67 +56,68 @@ for d = length(datasets):-1:1
             % THEN PLOT THESE SEPARATELY
             
             % use the stimcoding difference only from alternating
-			
+            
             allresults(1).z_prevresp        = results.(['z_1_50_0__' whichmdls 'dczprevresp']) - results.(['z_2_50_0__' whichmdls 'dczprevresp']);
             allresults(1).v_prevresp        = results.(['dc_1_50_0__' whichmdls 'dczprevresp']) - results.(['dc_2_50_0__' whichmdls 'dczprevresp']);
             allresults(1).criterionshift    = results.repetition_neutral;
             allresults(1).subjnr            = results.subjnr;
             alltitles{1}                    = {datasetnames{d}{1}, '- Neutral'};
-			allresults(1).marker 			= markers{1};
-			allresults(1).meancolor 		= meancolors(1, :);
-			allresults(1).scattercolor	 	= transitioncolors(1, :);
+            allresults(1).marker 			= markers{1};
+            allresults(1).meancolor 		= meancolors(1, :);
+            allresults(1).scattercolor	 	= transitioncolors(1, :);
             
             allresults(2).z_prevresp        = results.(['z_1_20_0__' whichmdls 'dczprevresp']) - results.(['z_2_20_0__' whichmdls 'dczprevresp']);
             allresults(2).v_prevresp        = results.(['dc_1_20_0__' whichmdls 'dczprevresp']) - results.(['dc_2_20_0__' whichmdls 'dczprevresp']);
             allresults(2).criterionshift    = results.repetition_alternating;
             allresults(2).subjnr            = results.subjnr;
             alltitles{2}                    = {datasetnames{d}{1}, '- Alternating'};
-			allresults(2).marker 			= markers{2};
-			allresults(2).meancolor 		= meancolors(2, :);
-			allresults(2).scattercolor	 	= transitioncolors(2, :);
-			
+            allresults(2).marker 			= markers{2};
+            allresults(2).meancolor 		= meancolors(2, :);
+            allresults(2).scattercolor	 	= transitioncolors(2, :);
+            
             allresults(3).z_prevresp        = results.(['z_1_80_0__' whichmdls 'dczprevresp']) - results.(['z_2_80_0__' whichmdls 'dczprevresp']);
             allresults(3).v_prevresp        = results.(['dc_1_80_0__' whichmdls 'dczprevresp']) - results.(['dc_2_80_0__' whichmdls 'dczprevresp']);
             allresults(3).criterionshift    = results.repetition_repetitive;
             allresults(3).subjnr            = results.subjnr;
             alltitles{3}                    = {datasetnames{d}{1}, '- Repetitive'};
-			allresults(3).marker 			= markers{3};
-			allresults(3).meancolor 		= meancolors(3, :);
-			allresults(3).scattercolor	 	= transitioncolors(3, :);      
-			       
+            allresults(3).marker 			= markers{3};
+            allresults(3).meancolor 		= meancolors(3, :);
+            allresults(3).scattercolor	 	= transitioncolors(3, :);
+            
         otherwise
-            
-            try
-                % use the stimcoding difference
+            if sz == 1,
                 results.z_prevresp = ...
-                    results.(['z_1__' whichmdls 'dczprevresp']) - results.(['z_2__' whichmdls 'dczprevresp']);
+                    results.z_1__stimcodingdczprevrespst - results.z_2__stimcodingdczprevrespst;
                 results.v_prevresp = ...
-                    results.(['dc_1__' whichmdls 'dczprevresp']) - results.(['dc_2__' whichmdls 'dczprevresp']);
-            catch
-				try
-                results.z_prevresp = ...
-                    results.(['z_1_0__' whichmdls 'dczprevresp']) - results.(['z_2_0__' whichmdls 'dczprevresp']);
-                results.v_prevresp = ...
-                    results.(['dc_1_0__' whichmdls 'dczprevresp']) - results.(['dc_2_0__' whichmdls 'dczprevresp']);
-				catch
-					results.z_prevresp = nan(size(results.repetition));
-	                results.v_prevresp = nan(size(results.repetition));
-					
-				end
-			end
-            
+                    results.dc_1__stimcodingdczprevrespst - results.dc_2__stimcodingdczprevrespst;
+            else
+                
+                
+                try
+                    % use the stimcoding difference
+                    results.z_prevresp = ...
+                        results.(['z_1__' whichmdls 'dczprevresp']) - results.(['z_2__' whichmdls 'dczprevresp']);
+                    results.v_prevresp = ...
+                        results.(['dc_1__' whichmdls 'dczprevresp']) - results.(['dc_2__' whichmdls 'dczprevresp']);
+                catch
+                    results.z_prevresp = ...
+                        results.(['z_1_0__' whichmdls 'dczprevresp']) - results.(['z_2_0__' whichmdls 'dczprevresp']);
+                    results.v_prevresp = ...
+                        results.(['dc_1_0__' whichmdls 'dczprevresp']) - results.(['dc_2_0__' whichmdls 'dczprevresp']);
+                end
+            end
             results.criterionshift = results.repetition;
             
             % assign to structure
             allresults(1).z_prevresp     = results.z_prevresp;
             allresults(1).v_prevresp     = results.v_prevresp;
             allresults(1).criterionshift = results.criterionshift;
-			
-			allresults(1).marker 			= markers{1};
-			allresults(1).meancolor 		= meancolors(1, :);
-			allresults(1).scattercolor	 	= transitioncolors(1, :);
+            
+            allresults(1).marker 			= markers{1};
+            allresults(1).meancolor 		= meancolors(1, :);
+            allresults(1).scattercolor	 	= transitioncolors(1, :);
             alltitles{1} 					= {datasetnames{d}{1} datasetnames{d}{2}}; % use only the dataset title
-			
+            
     end
     
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
@@ -143,12 +144,12 @@ for d = length(datasets):-1:1
     
     % move together
     sp2.Position(1) = sp2.Position(1) - 0.08;
-	try
-    	ss = suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
-	catch
-		ss = suplabel(datasetnames{d}{1}, 't');
-	end
-
+    try
+        ss = suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
+    catch
+        ss = suplabel(datasetnames{d}{1}, 't');
+    end
+    
     set(ss, 'fontweight', 'normal');
     ss.FontWeight = 'normal';
     ss.Position(2) = ss.Position(2) - 0.03;
@@ -168,7 +169,7 @@ for d = length(datasets):-1:1
         tt = title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
         tt.Position(2) = tt.Position(2) - 0.008;
     end
-
+    
     tightfig;
     if Gsq,
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1c_Gsq_modelfree_stimcoding_sz%d_d%d.pdf', sz, d));
@@ -205,10 +206,10 @@ for d = length(datasets):-1:1
         alldat(cnt).corrdiff = rhodiff;
         alldat(cnt).corrdiff_ci = rhodiffci;
         alldat(cnt).pdiff = pval;
-		
-		alldat(cnt).marker = allresults(a).marker;
-		alldat(cnt).scattercolor = allresults(a).scattercolor;
-		alldat(cnt).meancolor = allresults(a).meancolor;
+        
+        alldat(cnt).marker = allresults(a).marker;
+        alldat(cnt).scattercolor = allresults(a).scattercolor;
+        alldat(cnt).meancolor = allresults(a).meancolor;
         
         cnt = cnt + 1;
     end
