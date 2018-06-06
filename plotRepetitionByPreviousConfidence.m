@@ -2,7 +2,7 @@ function plotRepetitionByPreviousConfidence
 % Anne Urai, 2018
 % anne.urai@gmail.com
 
-clear all; clc; 
+clear all; clc;
 nbins = 2;
 
 %% determine how the figures will look
@@ -22,8 +22,8 @@ switch usr
         mypath  = '/nfs/aeurai/HDDM';
 end
 
-datasets = {'Murphy', 'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG', 'Anke_2afc_sequential', 'Anke_MEG'};
-datasetnames = { {'Murphy 2014'},  {'de Gee 2014'}, {'de Gee 2017'}, ...
+datasets = {'JW_PNAS', 'JW_yesno', 'NatComm', 'MEG'};
+datasetnames = {{'de Gee 2014'}, {'de Gee 2017'}, ...
     {'Urai 2017'}, {'Urai in prep'},  {'Braun 2018'}, {'Braun in prep'}, {'Talluri in prep'}};
 
 addpath(genpath('~/Desktop/code/gramm/'));
@@ -35,7 +35,7 @@ whichVars = {'prev_rt', 'prev_difficulty'};
 for v = 1:length(whichVars),
     
     dattotal = {}; close all;
-    for d = 1:length(datasets),
+    for d = 3; %:length(datasets),
         
         close all;
         csv_file = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
@@ -57,17 +57,18 @@ for v = 1:length(whichVars),
             else
                 continue;
             end
-            lb1 = 'hard'; lb2 = 'easy';
-            axlb = 'Previous difficulty';
+            lb1 = 'hard stim'; lb2 = 'easy stim';
+            axlb = {'Previous uncertainty'; '(task difficulty)'};
         else
-            lb1 = 'fast'; lb2 = 'slow';
-            axlb = 'Previous RT';
+            lb1 = 'slow RT'; lb2 = 'fast RT';
+            axlb = {'Previous uncertainty'; '(response time)'};
+            dat.prevrt = -dat.prevrt; % flip around!
         end
         
         %% COMPUTE REPETITION PROBABILITY AS A FUNCTION OF PREVIOUS RT
         % TODO: WITHIN EACH PARTICIPANT!
         dat              = sortrows(dat, 'subj_idx');
-        zscore_bin       = @(x) {discretize(x, [-inf quantile(x, nbins), inf])};
+        zscore_bin       = @(x) {discretize(x, [-inf quantile(x, nbins), inf])}; % flip around
         tmp              = splitapply(zscore_bin, dat.prevrt, findgroups(dat.subj_idx));
         dat.prev_rt_bin  = vertcat(tmp{:});
         
@@ -93,38 +94,82 @@ for v = 1:length(whichVars),
         repeat_norm_mat  = vertcat(repeat_norm{:});
         dat2.repeat_norm = repeat_norm_mat;
         dattotal{end+1}  = dat2;
+        
+        %% ADD A GRAND AVERAGE SUBJECT
+        dattotal        = vertcat(dattotal{:});
+        %     [gr, prevRT, prevCorrect] = findgroups(dattotal.prev_rt, dattotal.prev_correct);
+        %     dat3            = array2table([prevRT, prevCorrect], 'variablenames', {'prev_rt', 'prev_correct'});
+        %     dat3.repeat     = splitapply(@nanmean, dattotal.repeat_norm, gr);
+        %     dat3.repeat_norm     = splitapply(@nanmean, dattotal.repeat_norm, gr);
+        %     dat3.subj_idx   = repmat(0, height(dat3), 1);
+        %     dat3.dataset    = repmat({'Average'}, height(dat3), 1);
+        %     dat3.datasetnr  = repmat(0, height(dat3), 1);
+        %     dat3.subgroup   = repmat({'All'}, height(dat3), 1);
+        %     dattotal        = vertcat(dattotal, dat3);  % merge
+        %
+        %% USE GRAMM TO PLOT
+        g(1,v) = gramm('x', dattotal.prev_rt,'y', dattotal.repeat, 'color', dattotal.prev_correct);
+        g(1,v).facet_wrap(dattotal.dataset, 'ncols',1);
+        % g.geom_hline('yintercept', 0.5, 'style', '-', 'linewidth', 0.5);
+        % Plot linear fits of the data with associated confidence intervals
+        g(1,v).stat_summary('setylim', 1);
+        % Set appropriate names for legends
+        g(1,v).set_names('column', '', 'x', axlb, 'y',...
+            'P(repeat)', 'color','Previous correct');
+        % Do the actual drawing
+        lb = repmat({' '}, 1, nbins-1);
+        g(1,v).axe_property('PlotBoxAspectRatio', [1 1 1], 'ylim', [0.45 0.6], ...
+            'ytick', 0.45:0.05:0.6, ...
+            'xlim', [1 nbins+1], 'xtick', 1:nbins+1, 'xticklabel', {lb1, lb{:}, lb2}); % axis square
+        
     end
-    
-    %% ADD A GRAND AVERAGE SUBJECT
-    dattotal        = vertcat(dattotal{:});
-    [gr, prevRT, prevCorrect] = findgroups(dattotal.prev_rt, dattotal.prev_correct);
-    dat3            = array2table([prevRT, prevCorrect], 'variablenames', {'prev_rt', 'prev_correct'});
-    dat3.repeat     = splitapply(@nanmean, dattotal.repeat_norm, gr);
-    dat3.repeat_norm     = splitapply(@nanmean, dattotal.repeat_norm, gr);
-    dat3.subj_idx   = repmat(0, height(dat3), 1);
-    dat3.dataset    = repmat({'Average'}, height(dat3), 1);
-    dat3.datasetnr  = repmat(0, height(dat3), 1);
-    dat3.subgroup   = repmat({'All'}, height(dat3), 1);
-    dattotal        = vertcat(dattotal, dat3);  % merge
-    
-    %% USE GRAMM TO PLOT
-    g = gramm('x', dattotal.prev_rt,'y', dattotal.repeat, 'color', dattotal.prev_correct);
-    g.facet_wrap(dattotal.dataset, 'ncols',4);
-    % g.geom_hline('yintercept', 0.5, 'style', '-', 'linewidth', 0.5);
-    % Plot linear fits of the data with associated confidence intervals
-    g.stat_summary('setylim', 1);
-    % Set appropriate names for legends
-    g.set_names('column', '', 'x', axlb, 'y',...
-        'P(repeat)', 'color','Previous correct');
-    % Do the actual drawing
-    lb = repmat({' '}, 1, nbins-1);
-    g.axe_property('PlotBoxAspectRatio', [1 1 1], 'ylim', [0.45 0.65], ...
-        'ytick', 0.45:0.05:0.65, ...
-        'xlim', [1 nbins+1], 'xtick', 1:nbins+1, 'xticklabel', {lb1, lb{:}, lb2}); % axis square
-    g.draw();
-    
-    set(gcf,'PaperPositionMode','auto');
-    set(gcf,'PaperOrientation','landscape');
-    g.export('file_name', sprintf('~/Data/serialHDDM/%s_repetition.pdf', whichVars{v}), 'file_type', 'pdf');
 end
+
+%% ADD THE RELATIONSHIP BETWEEN RT AND CORRECT
+[gr, prevRT, prevCorrect, sj] = findgroups(dat.rt, dat.correct, dat.subj_idx);
+dat2 = array2table([prevRT, prevCorrect, sj], 'variablenames', {'stim', 'correct', 'subj_idx'});
+dat2.repeat = splitapply(@nanmean, dat.repeat, gr);
+
+%% ALSO INCLUDE A NORMALIZED RT
+dat2             = sortrows(dat2, 'subj_idx');
+normalize        = @(x) {x - nanmean(x) + 0.5};
+repeat_norm      = splitapply(normalize, dat2.repeat, findgroups(dat2.subj_idx));
+repeat_norm_mat  = vertcat(repeat_norm{:});
+dat2.repeat_norm = repeat_norm_mat;
+dattotal{end+1}  = dat2;
+
+%% ADD A GRAND AVERAGE SUBJECT
+dattotal        = vertcat(dattotal{:});
+%     [gr, prevRT, prevCorrect] = findgroups(dattotal.prev_rt, dattotal.prev_correct);
+%     dat3            = array2table([prevRT, prevCorrect], 'variablenames', {'prev_rt', 'prev_correct'});
+%     dat3.repeat     = splitapply(@nanmean, dattotal.repeat_norm, gr);
+%     dat3.repeat_norm     = splitapply(@nanmean, dattotal.repeat_norm, gr);
+%     dat3.subj_idx   = repmat(0, height(dat3), 1);
+%     dat3.dataset    = repmat({'Average'}, height(dat3), 1);
+%     dat3.datasetnr  = repmat(0, height(dat3), 1);
+%     dat3.subgroup   = repmat({'All'}, height(dat3), 1);
+%     dattotal        = vertcat(dattotal, dat3);  % merge
+%
+%% USE GRAMM TO PLOT
+g(1,v) = gramm('x', dattotal.prev_rt,'y', dattotal.repeat, 'color', dattotal.prev_correct);
+g(1,v).facet_wrap(dattotal.dataset, 'ncols',1);
+% g.geom_hline('yintercept', 0.5, 'style', '-', 'linewidth', 0.5);
+% Plot linear fits of the data with associated confidence intervals
+g(1,v).stat_summary('setylim', 1);
+% Set appropriate names for legends
+g(1,v).set_names('column', '', 'x', axlb, 'y',...
+    'P(repeat)', 'color','Previous correct');
+% Do the actual drawing
+lb = repmat({' '}, 1, nbins-1);
+g(1,v).axe_property('PlotBoxAspectRatio', [1 1 1], 'ylim', [0.45 0.6], ...
+    'ytick', 0.45:0.05:0.6, ...
+    'xlim', [1 nbins+1], 'xtick', 1:nbins+1, 'xticklabel', {lb1, lb{:}, lb2}); % axis square
+
+% g(1,v).no_legend()
+g.draw();
+set(gcf,'PaperPositionMode','auto');
+set(gcf,'PaperOrientation','landscape');
+g.export('file_name', sprintf('~/Data/serialHDDM/Pouget_repetition.pdf', whichVars{v}), 'file_type', 'pdf');
+
+
 end

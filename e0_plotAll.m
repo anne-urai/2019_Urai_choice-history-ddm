@@ -70,11 +70,18 @@ e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
 e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 e6_serialBias_SfN_modelFree_CRF_PPC;
 strategyPlot;
+
+% ======================= %
+% POSTERIORS
+% ======================= %
+
 e3_serialBias_SfN_Posteriors_StartingPoint;
+% PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
+previousError_a_v;
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
-%% ======================= %
+% ======================= %
 
 close all;
 for st = [0 1],
@@ -106,13 +113,17 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf')
 forestPlot(alldat(2:2:end));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
 
-% PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR
-% SLOWING)
 
+%% ======================= %
+% MOTION ENERGY
+% ======================= %
 
+motionEnergy_filterDots;
+motionEnergy_check; % will generate sanity check figure
+motionEnergy_kernels;
 
 % ========================= %
-% MEG PHARMA
+% MEG PHARMA - do at the end
 % ========================= %
 
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma(); % figure 4
