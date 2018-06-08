@@ -11,119 +11,41 @@ addpath(genpath('~/code/Tools'));
 warning off; close all;
 global mypath datasets datasetnames colors
 
-% ========================================== %
-% MODULATION OF SERIAL CHOICE BIAS
-% use the STIMCODING POSTERIORS!
-% ========================================== %
+colors2 = cbrewer('qual', 'Set2', length(datasets));
+
+% STARTING POINT POSTERIORS 
+close; subplot(3,3,1); hold on;
+plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
 
 for d = 1:length(datasets),
-	traces = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
-	zbias = invlogit(traces.z_trans_1_) - invlogit(traces.z_trans__1_);
-	pval = mean(zbias > 0);
-	fprintf('%s %s, mean zbias %.4f, range %.4f to %.4f, p-value %.4f \n', datasetnames{d}{1}, datasetnames{d}{2}, ...
-	mean(zbias), min(zbias), max(zbias), pval);
-    
-	close all;
-	subplot(4,4,1); hold on;
-	h2 = histogram_smooth(zbias, colors(1, :));
-    
-	% show if these are significant - two sided
-	% https://github.com/jwdegee/2017_eLife/blob/master/hddm_regression.py, line 273
-    
-	axis square; axis tight;
-	set(gca, 'xtick', [min(get(gca, 'xlim')) max(get(gca, 'xlim'))], ...
-	'xticklabel', []);
-	ylim([-0.15 0.05]); set(gca, 'ytick', [-0.15:0.1:0.05]);  
-	hline(0);
-	% offsetAxes_y;
-	offsetAxes;
-   
-	title(datasetnames{d});
-	xlabel('  ');
-	txt = sprintf('p = %.4f', pval);
-	if pval < 0.0001, txt = 'p < 0.0001'; 
-	end
-	text(0.1*mean(get(gca, 'xlim')), median(zbias),  ...
-	txt, 'horizontalalignment', 'left', 'fontsize', 4);
-	set(gca, 'xcolor', 'k', 'ycolor', 'k');
-	ylabel('History shift in z', 'color', colors(1, :));
-
-	tightfig;
-	print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/zbias_posteriors_d%d.pdf', d));
-    
-	traces = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
-	zbias = traces.dc_1_ - traces.dc__1_;
-	pval = mean(zbias < 0);
-	fprintf('%s %s, mean zbias %.4f, range %.4f to %.4f, p-value %.4f \n', datasetnames{d}{1}, datasetnames{d}{2}, ...
-	mean(zbias), min(zbias), max(zbias), pval);
-    
-	close all;
-	subplot(4,4,1); hold on;
-	h2 = histogram_smooth(zbias, colors(2, :));
-    
-	% show if these are significant - two sided
-	% https://github.com/jwdegee/2017_eLife/blob/master/hddm_regression.py, line 273
-    
-	axis square; axis tight;
-	set(gca, 'xtick', [min(get(gca, 'xlim')) max(get(gca, 'xlim'))], ...
-	'xticklabel', []);
-	ylim([-0.4 0.8]); set(gca, 'ytick', [-0.4:0.4:0.8]);
-	hline(0);
-	offsetAxes;
-	
-	title(datasetnames{d});
-	set(gca, 'xcolor', 'k', 'ycolor', 'k');
-
-	ylabel('History shift in v_{bias}', 'color', colors(2, :));
-	xlabel('Probability');
-	txt = sprintf('p = %.4f', pval);
-	if pval < 0.0001, txt = 'p < 0.0001'; 
-	end
-	text(0.1*mean(get(gca, 'xlim')), median(zbias),  ...
-	txt, 'horizontalalignment', 'left', 'fontsize', 4);
-	tightfig;
-	print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/vbias_posteriors_d%d.pdf', d));
-    
+    dat = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
+    difference = dat.z_trans_1_ - dat.z_trans__1_;
+    h = violinPlot(difference, 'color', colors2(d, :), 'showMM', 6, 'xValues', d);
+    legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
 end
 
+set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
+ylabel({'History shift in z'}, 'color', colors(1, :));
+offsetAxes;
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_posteriors_startingpoint.pdf'));
+
+
+% DRIFT BIAS POSTERIORS
+close; subplot(3,3,1); hold on;
+plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
+
+for d = 1:length(datasets),
+    dat = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
+    difference = dat.dc_1_ - dat.dc__1_;
+    h = violinPlot(difference, 'color', colors2(d, :), 'showMM', 6, 'xValues', d);
+    legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
 end
 
-function h = histogram_smooth(x, color2)
+set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
+ylabel({'History shift in v_{bias}'}, 'color', colors(2, :));
+offsetAxes;
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_posteriors_drift bias.pdf'));
 
-[f,xi] = ksdensity(x);
-a1 = area(f, xi, 'edgecolor', 'none', 'facecolor', ...
-color2, 'facealpha', 0.4, 'showbaseline', 'off', 'basevalue', median(x));
-
-% % Make area transparent
-% drawnow; % pause(0.05);  % This needs to be done for transparency to work
-% a1.Face.ColorType = 'truecoloralpha';
-% a1.Face.ColorData(4) = 255 * 0.3; % Your alpha value is the 0.3
-
-% area
-h = plot(f, xi, 'color', color2, 'linewidth', 1);
-set(gca, 'color', 'none');
-
-end
-
-function offsetAxes_y()
-
-if ~exist('ax', 'var'), ax = gca;
-end
-if ~exist('offset', 'var'), offset = 4;
-end
-
-% ax.YLim(1) = ax.YLim(1)-(ax.YTick(2)-ax.YTick(1))/offset;
-ax.YLim(2) = ax.YLim(2)+(ax.YTick(2)-ax.YTick(1))/offset;
-
-% this will keep the changes constant even when resizing axes
-addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
-end
-
-function resetVertex ( ax )
-% repeat for Y (set 2nd row)
-ax.YRuler.Axle.VertexData(2,1) = min(get(ax, 'Ytick'));
-ax.YRuler.Axle.VertexData(2,2) = max(get(ax, 'Ytick'));
-% X, Y and Z row of the start and end of the individual axle.
-ax.XRuler.Axle.VertexData(1,1) = min(get(ax, 'Xtick'));
-ax.XRuler.Axle.VertexData(1,2) = max(get(ax, 'Xtick'));
 end

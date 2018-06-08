@@ -63,8 +63,6 @@ for d = 1:length(datasets),
     dat = readtable(sprintf('%s/%s/stimcoding_prevcorrect/group_traces.csv', mypath, datasets{d}));
     difference = dat.a_0_ - dat.a_1_;
     h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues', d);
-    
-    pval = 
 end
 
 set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');

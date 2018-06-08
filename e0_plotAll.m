@@ -122,6 +122,14 @@ motionEnergy_filterDots;
 motionEnergy_check; % will generate sanity check figure
 motionEnergy_kernels;
 
+% ======================= %
+% SUPPLEMENT
+% created tables with all the group-level parameters
+% ======================= %
+
+
+
+
 % ========================= %
 % MEG PHARMA - do at the end
 % ========================= %
