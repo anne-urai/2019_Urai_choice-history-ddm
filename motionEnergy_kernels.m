@@ -40,15 +40,15 @@ data.behavior.biased(altIdx) = double(~(data.behavior.biased(altIdx))); % flip
 % PSYCHOPHYSICAL KERNELS
 % =============================== %
 
-meanSubtract = 1;
-% only select trials without any objective evidence
-%if meanSubtract,
-data.motionenergy = data.motionenergy_normalized - data.behavior.stimulus .* data.behavior.coherence;
-%else
-% only select trials without any objective evidence
-data.motionenergy = data.motionenergy([data.behavior.coherence] < 10, :);
-data.behavior     = data.behavior([data.behavior.coherence] < 10, :);
-%end
+% use the normalized motion energy, so that the units are % coherence 'up'
+data.motionenergy = data.motionenergy_normalized;
+
+selectTrialNum = 0; % select based on each individual's number of trials?
+if ~selectTrialNum
+    % only select trials without any objective evidence
+    data.motionenergy = data.motionenergy([data.behavior.coherence] < 10, :);
+    data.behavior     = data.behavior([data.behavior.coherence] < 10, :);
+end
 
 % what is the time-course of evidence that leads subjects to make their
 % preferred vs non-preferred choice?
@@ -63,11 +63,29 @@ coh                   = [data.behavior.stimulus .* data.behavior.coherence];
 [gr, sj, coh, pref]   = findgroups(data.behavior.subj_idx, coh, data.behavior.biased);
 biasedkernels         = splitapply(kernelFun, data.motionenergy, (data.behavior.response > 0), gr);
 
+if selectTrialNum
+    % only use those with a minimum trial count
+    minFun                = @(x, y) min([sum(x) sum(~x)]);
+    trialnum              = splitapply(minFun, (data.behavior.response > 0), gr);
+    minTrialCount         = 25;
+    biasedkernels(trialnum < minTrialCount, :) = NaN;
+    
+    scatter(1:length(trialnum), trialnum, 10, coh)
+    cnt = 1;
+    for c = unique(abs(coh))'
+        hold on
+        h{cnt} = histogram(trialnum(abs(coh) == c), 20, 'displaystyle', 'stairs');
+        cnt = cnt + 1;
+    end
+    legend([h{:}], {'0', '3', '9', '27', '81'});
+end
+
 [gr, sj, pref]   = findgroups(sj, pref);
-biasedkernels    = splitapply(@nanmean, biasedkernels, gr);
+meanFun = @(x) nanmean(x, 1); % make sure to average over first dim
+biasedkernels    = splitapply(meanFun, biasedkernels, gr);
 
 % then average over coherence levels within each subject
-subplot(4,4,[1 2]); 
+subplot(4,4,[1 2]);
 hold on;
 colors = cbrewer('qual', 'Set1', 9);
 colors = colors([9 4], :);
@@ -77,15 +95,18 @@ for c = 1:length(cohs),
     b{c} = boundedline(data.timeaxis(13:end), nanmean(biasedkernels(pref == cohs(c), 13:end)), ...
         nanstd(biasedkernels(pref == cohs(c), 13:end)) ./ sqrt(length(unique(sj))), 'cmap', colors(c, :), 'alpha');
     plot(data.timeaxis(13:end), nanmean(biasedkernels(pref == cohs(c), 13:end)), 'color', colors(c, :), 'linewidth', 1);
-
+    
 end
 legend([b{:}], {'non-preferred', 'preferred'}, 'location', 'eastoutside');
 legend boxoff;
-
+axis tight;
 %% do statistics on the timecourse
 % [h, p, stat] = ttest_clustercorr(biasedkernels(pref == 0, :), biasedkernels(pref == 1, :));
 [h, pval] = ttest(biasedkernels(pref == 0, :), biasedkernels(pref == 1, :));
 % [h, crit_p] = fdr_bh(pval, 0.05);
+
+% remove significance during filter rise time
+h(1:12) = 0;
 
 ylims = get(gca, 'Ylim');
 mask = double(h);
@@ -93,9 +114,6 @@ mask(mask==0) = nan;
 mask = ((ylims(2)*0.3)+ylims(1))*mask; % plot a tiny bit above the lower ylim
 plot(data.timeaxis, mask, '.', 'MarkerSize', 10, 'color', 'k');
 
-% boundedline(data.timeaxis, nanmean(biasedkernels), ...
-%     nanstd(biasedkernels) ./ sqrt(length(unique(sj))), 'cmap', [0 0 0], 'alpha');
-% plot(data.timeaxis(13:end), nanmean(biasedkernels(:, 13:end)), 'k', 'linewidth', 2);
 ylabel({'Excess motion'; 'energy fluctuations (%)'});
 xlabel('Time from stimulus onset (s)');
 axis tight; xlim([0 0.75]); set(gca, 'xtick', 0:0.25:0.75);
