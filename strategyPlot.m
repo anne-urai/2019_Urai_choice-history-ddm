@@ -24,7 +24,7 @@ plot([0.3 0.7], [0.5 0.5], 'color', 'k', 'linewidth', 0.5);
 for d = length(datasets):-1:1,
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     dat = dat(dat.session == 0, :);
-    s{d} = scatter(dat.repetition_prevcorrect, dat.repetition_preverror, 5, colors(d, :), markers{d},'MarkerEdgeAlpha', 0.8);
+    s{d} = scatter(dat.repetition_prevcorrect, dat.repetition_preverror, 5, colors(d, :), markers{d});
     legtxt{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
 end
 xlabel('P(repeat) after correct');

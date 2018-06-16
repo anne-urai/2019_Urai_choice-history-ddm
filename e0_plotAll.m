@@ -29,8 +29,8 @@ end
 % neutral vs biased plotsC
 datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
 datasetnames = {{'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
-   {'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
-   {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}};
+    {'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
+    {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}};
 
 % go to code
 try
@@ -123,12 +123,14 @@ motionEnergy_check; % will generate sanity check figure
 motionEnergy_kernels;
 
 % ======================= %
-% SUPPLEMENT
-% created tables with all the group-level parameters
+% SUPPLEMENT - prev2resp
 % ======================= %
 
-
-
+posteriors_prev2resp
+alldat = correlationScatter_prev2resp(); % figure 4
+forestPlot(alldat);
+filename = sprintf('~/Data/serialHDDM/forestplot_prev2resp.pdf');
+print(gcf, '-dpdf', filename);
 
 % ========================= %
 % MEG PHARMA - do at the end

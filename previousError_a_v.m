@@ -36,7 +36,7 @@ for d = 1:length(datasets),
         
         for c = 1:length(driftvars_correct),
             difference = (dat.(driftvars_error{c})) - (dat.(driftvars_correct{c}));            
-            h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues',d+(0.1*c)-0.3, 'distWidth', 0.1);
+            h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues',d+(0.1*c)-0.3, 'distWidth', 0.1, 'histOpt', 1.1);
         end
     end
     legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});

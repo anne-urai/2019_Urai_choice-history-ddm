@@ -1,4 +1,4 @@
-function e6_serialBias_SfN_modelFree_CRF_PPC
+function conditionalAccuracyFunctions
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -36,7 +36,6 @@ for d = 1:length(datasets); %:-1:1,
     close all;
     subplot(441); hold on;
     
-    
     for m = 1:length(models),
         
         switch models{m}
@@ -52,13 +51,6 @@ for d = 1:length(datasets); %:-1:1,
                 % load simulated data - make sure this has all the info we need
                 alldata    = readtable(sprintf('%s/summary/%s/%s_ppc_data.csv', mypath, datasets{d}, models{m}));
                 alldata    = sortrows(alldata, {'subj_idx'});
-        end
-        
-        if ~any(ismember(alldata.Properties.VariableNames, 'transitionprob'))
-            alldata.transitionprob = zeros(size(alldata.subj_idx));
-        else
-            assert(nanmean(unique(alldata.transitionprob)) == 50, 'rescale units');
-            alldata = alldata(alldata.transitionprob == tps(tp), :);
         end
         
         if m < length(models),
@@ -80,6 +72,8 @@ for d = 1:length(datasets); %:-1:1,
         
         % make sure to use absolute RTs!
         alldata.rt = abs(alldata.rt);
+        alldata.correct = ((alldata.stimulus > 0) == alldata.response);
+        assert(nanmean(alldata.correct) > 0.5);
         
         % recode into repeat and alternate for the model
         alldata.repeat = zeros(size(alldata.response));
@@ -108,7 +102,7 @@ for d = 1:length(datasets); %:-1:1,
         % get RT quantiles for choices that are in line with or against the bias
         [gr, sjidx, rtbins] = findgroups(alldata.subj_idx, alldata.rtbins);
         cpres               = array2table([sjidx, rtbins], 'variablenames', {'subj_idx', 'rtbin'});
-        cpres.choice        = splitapply(@nanmean, alldata.biased, gr); % choice proportion
+        cpres.choice        = splitapply(@nanmean, alldata.correct, gr); % choice proportion
         
         % make into a subjects by rtbin matrix
         mat = unstack(cpres, 'choice', 'rtbin');
@@ -140,66 +134,18 @@ for d = 1:length(datasets); %:-1:1,
     axis square;  offsetAxes;
     xlabel('RT (quantiles)');
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
-    ylabel('P(bias)');
+    ylabel('P(correct)');
     
     title(datasetnames{d});
     tightfig;
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     
     if fixedEffects,
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_fixed.pdf', d));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CAF_PPC_d%d_fixed.pdf', d));
     else
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_q2.pdf', d));
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CAF_PPC_d%d_q2.pdf', d));
     end
     fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
 end
-
-savefast(sprintf('~/Data/serialHDDM/allds_cbfs.mat'), 'allds');
-
-% ========================================== %
-%% PLOT ACROSS DATASETS
-% ========================================== %
-
-load(sprintf('~/Data/serialHDDM/allds_cbfs.mat'));
-periods = {'fast', 'slow'};
-
-for p  = 1:2,
-    close all;
-    subplot(3,3,1); hold on;
-    
-    plot([1 5], [nanmean(allds.(periods{p})(:, 5)) nanmean(allds.(periods{p})(:, 5))], '--k');
-    lower =  nanmean(allds.(periods{p})(:, 5)) - 1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
-    plot([1 5], [lower lower], ':k');
-    upper =  nanmean(allds.(periods{p})(:, 5)) + 1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
-    plot([1 5], [upper upper], ':k');
-    
-    for b = 1:4,
-        if ~iscell(thesecolors{b}),
-            bar(b, nanmean(allds.(periods{p})(:, b)), 'edgecolor', 'none', ...
-                'facecolor', thesecolors{b}, 'basevalue', 0.5, 'barwidth', 0.6);
-        else % add bar hatch
-            [ptchs,ptchGrp] = createPatches(b, nanmean(allds.(periods{p})(:, b)), 0.3, thesecolors{b}{1},0, 0.5);
-            hatch(ptchs, [0 8 1], thesecolors{b}{2});
-        end
-    end
-    % now the data
-    b = ploterr(5, nanmean(allds.(periods{p})(:, 5)), [], ...
-        1.96 * nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
-        'ko', 'abshhxy', 0);
-    set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
-    
-    title(sprintf('%s RTs', capitalize(periods{p})));
-    ylabel('P(bias)');
-    set(gca, 'xtick', 1:5, 'xticklabel', {'No history', 'z_{bias}', 'v_{bias}', 'Both', 'Data'}, ...
-        'xticklabelrotation', -30);
-    axis square; axis tight;
-    ylim([0.5 0.56]);
-    set(gca, 'ytick', [0.5:0.02:0.56]);
-    offsetAxes;
-    tightfig;
-    set(gca, 'ycolor', 'k', 'xcolor', 'k');
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_%s.pdf', periods{p}));
-end
-
 
 end
