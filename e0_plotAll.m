@@ -76,6 +76,7 @@ strategyPlot;
 % ======================= %
 
 e3_serialBias_SfN_Posteriors_StartingPoint;
+
 % PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
 previousError_a_v;
 
@@ -131,6 +132,14 @@ alldat = correlationScatter_prev2resp(); % figure 4
 forestPlot(alldat);
 filename = sprintf('~/Data/serialHDDM/forestplot_prev2resp.pdf');
 print(gcf, '-dpdf', filename);
+
+% ========================= %
+% MULTIPLICATIVE VBIAS
+% ========================= %
+
+psychfuncs_vbias_split;
+conditionalAccuracyFunctions;
+multiplicative_vbias;
 
 % ========================= %
 % MEG PHARMA - do at the end

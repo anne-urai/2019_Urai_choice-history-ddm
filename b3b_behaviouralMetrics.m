@@ -20,7 +20,8 @@ varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'bias', 'abs
     'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error', ...
     'rt_valid_slow_correct', 'rt_valid_fast_correct', 'rt_invalid_slow_correct', 'rt_invalid_fast_correct', ...
     'rt_valid_slow_error', 'rt_valid_fast_error', 'rt_invalid_slow_error', 'rt_invalid_fast_error', ...
-    'accuracy_valid_slow', 'accuracy_valid_fast', 'accuracy_invalid_slow', 'accuracy_invalid_fast'};
+    'accuracy_valid_slow', 'accuracy_valid_fast', 'accuracy_invalid_slow', 'accuracy_invalid_fast', ...
+    'posterrorslowing'};
 
 nrSess          = length(unique(alldata.session)) + 1;
 results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, length(varnames)), 'variablenames', varnames);
@@ -169,11 +170,16 @@ for sj = subjects,
         results.accuracy(icnt)      = nanmean(data.correct);
         results.rt(icnt)            = nanmedian(data.rt);
         results.bias(icnt)          = nanmean(data.response);
-
-            % measure of repetition behaviour
+        
+        % post-error slowing
+        prevcorrect = (data.prevstim == data.prevresp);
+        results.posterrorslowing(icnt) = nanmean(data.rt(prevcorrect == 0)) - ...
+            nanmean(data.rt(prevcorrect == 1));
+        
+        % measure of repetition behaviour
         % data.repeat = [~(abs(diff(data.response)) > 0); NaN];
         % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
-
+        
         % 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
         data.repeat = [NaN; (diff(data.response) == 0)];
         data.stimrepeat = [NaN; (diff(data.response) == 0)];
@@ -181,7 +187,6 @@ for sj = subjects,
         data.repeat(wrongTrls) = NaN;
         data.stimrepeat(wrongTrls) = NaN;
 
-        
         if sum(strcmp(data.Properties.VariableNames, 'coherence')) > 0,
             cohlevels = unique(data.coherence);
             for c = 1:length(cohlevels),

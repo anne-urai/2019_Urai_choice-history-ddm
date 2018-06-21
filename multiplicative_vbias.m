@@ -94,7 +94,6 @@ for d = [4 5] % only NatComm and Anke_MEG_neutral, with varying coherence level
     box off; offsetAxes;
     title(datasetnames{d});
     
-    
 end
 
 

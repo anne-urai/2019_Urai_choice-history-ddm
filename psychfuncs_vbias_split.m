@@ -24,9 +24,8 @@ thesecolors = {[0.5 0.5 0.5],  colors(1, :), ...
     colors(2, :), mean(colors([1 2], :)), [0 0 0]};
 
 for RTs = [0 1 2];
-    close all;
-    
     for d = [4 5],
+        close all;
         
         % plot
         for m = 1:length(models),
@@ -63,10 +62,28 @@ for RTs = [0 1 2];
                     % do nothing, keep all
                 case 1
                     % keep fast RTs
+                    for sj = unique(alldata.subj_idx)',
+                        for c = unique(abs(alldata.coherence))',
+                            trls = find(alldata.subj_idx == sj & abs(alldata.coherence) == c);
+                            medRT = nanmedian(alldata.rt(trls));
+                            % remove slow RTs
+                            alldata.rt(alldata.subj_idx == sj & abs(alldata.coherence) == c & ...
+                                alldata.rt > medRT) = NaN;
+                        end
+                    end
                 case 2
                     % keep slow RTs
-                    
+                    for sj = unique(alldata.subj_idx)',
+                        for c = unique(abs(alldata.coherence))',
+                            trls = find(alldata.subj_idx == sj & abs(alldata.coherence) == c);
+                            medRT = nanmedian(alldata.rt(trls));
+                            % remove fast RTs
+                            alldata.rt(alldata.subj_idx == sj & abs(alldata.coherence) == c & ...
+                                alldata.rt < medRT) = NaN;
+                        end
+                    end
             end
+            alldata(isnan(alldata.rt), :) = [];
             
             % recode into repeat and alternate for the model
             alldata.repeat = zeros(size(alldata.response));
