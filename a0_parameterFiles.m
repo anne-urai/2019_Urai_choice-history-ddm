@@ -13,8 +13,8 @@ function [] = a0_parameterFiles()
 % ============================================ #s
 
 nsmp       = [5000]
-datasets   = [0:5]; % RT-RDK and MEG-PL
-models     = [9]; % the nr of the models
+datasets   = [6]; % RT-RDK and MEG-PL
+models     = [0:4 6:9]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
@@ -30,19 +30,9 @@ for n = nsmp,
     end
 end
 
-%% add the MEG st, will take forever so need more parallel chains
-alldat = [];
-for c = 0:29,
-	alldat = [alldat; 1 8 c nsmp];
-end
-for c = 0:60-1,
-alldat = [alldat; 4 4 c 1000];
-end
-
 % write to a file
 dlmwrite('hddmparams', alldat, 'delimiter', ' ');
 size(alldat)
-
 
 % PPC
 alldat = [];
