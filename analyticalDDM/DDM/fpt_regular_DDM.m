@@ -6,7 +6,7 @@ v   = pm(1);        % drift rate
 Ter = pm(2);        % non-decision time
 a   = pm(3);        % boundary separation
 eta = pm(4);        % drift rate variability
-z   = pm(5);          % starting point
+z   = pm(5);        % starting point
 s   = 0.1;          % noise
 
 % Set timing parameters

@@ -170,5 +170,11 @@ offsetAxes;
 tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/prevErrorCorrect_PES_boundarySeparation.pdf'));
 
+% ========================================= %
+% CORRELATE
+% ========================================= %
+
+
+
 
 end
