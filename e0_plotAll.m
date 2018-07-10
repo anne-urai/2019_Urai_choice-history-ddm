@@ -53,7 +53,7 @@ if 0,
 end
 
 disp('starting');
-
+assert(1==0)
 % ======================= %
 % SCHEMATIC/HYPOTHESES
 % ======================= %
@@ -87,12 +87,12 @@ previousError_a_v;
 close all;
 for st = [0 1],
     for Gsq = [0 1],
-        
+
         % if Gsq == 1 && st == 1, continue; end % hierarchical sampling with sz takes forever
-        
+
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, st); % figure 4
         forestPlot(alldat);
-        
+
         switch Gsq
             case 1
                 filename = sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', st);
@@ -148,5 +148,3 @@ multiplicative_vbias;
 alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma(); % figure 4
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
-
-
