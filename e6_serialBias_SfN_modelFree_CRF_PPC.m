@@ -26,7 +26,7 @@ allds.fast  = nan(length(datasets), length(models));
 allds.slow = nan(length(datasets), length(models));
 
 for d = 1:length(datasets);
-    
+
     % plot
     close all;
     subplot(441); hold on;
@@ -173,38 +173,33 @@ for p  = 1:2,
     subplot(3,3,1); hold on;
 
     plot([1 5], [nanmean(allds.(periods{p})(:, 5)) nanmean(allds.(periods{p})(:, 5))], '--k');
-    lower =  nanmean(allds.(periods{p})(:, 5)) - 1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
+    lower =  nanmean(allds.(periods{p})(:, 5)) -  nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
     plot([1 5], [lower lower], ':k');
-    upper =  nanmean(allds.(periods{p})(:, 5)) + 1.96* nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
+    upper =  nanmean(allds.(periods{p})(:, 5)) +  nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets));
     plot([1 5], [upper upper], ':k');
 
+
     for b = 1:4,
-        if ~iscell(thesecolors{b}),
-            bar(b, nanmean(allds.(periods{p})(:, b)), 'edgecolor', 'none', ...
-                'facecolor', thesecolors{b}, 'basevalue', 0.5, 'barwidth', 0.6);
-        else % add bar hatch
-            [ptchs,ptchGrp] = createPatches(b, nanmean(allds.(periods{p})(:, b)), 0.3, thesecolors{b}{1},0, 0.5);
-            hatch(ptchs, [0 8 1], thesecolors{b}{2});
-        end
+        bar(b, nanmean(allds.(periods{p})(:, b+1)), 'edgecolor', 'none', ...
+            'facecolor', thesecolors{b+1}, 'basevalue', 0.5, 'barwidth', 0.6);
     end
+
     % now the data
     b = ploterr(5, nanmean(allds.(periods{p})(:, 5)), [], ...
-        1.96 * nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
+        nanstd(allds.(periods{p})(:, 5)) ./ sqrt(length(datasets)), ...
         'ko', 'abshhxy', 0);
-    set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 4);
+    set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 6);
 
     title(sprintf('%s RTs', capitalize(periods{p})));
     ylabel('P(bias)');
     set(gca, 'xtick', 1:5, 'xticklabel', {'No history', 'z', 'v_{bias}', 'Both', 'Data'}, ...
         'xticklabelrotation', -30);
     axis square; axis tight;
-    ylim([0.5 0.56]);
-    set(gca, 'ytick', [0.5:0.02:0.56]);
+    set(gca, 'ytick', [0.5:0.01:0.54], 'ylim', [0.5 0.545]);
     offsetAxes;
+
     tightfig;
     set(gca, 'ycolor', 'k', 'xcolor', 'k');
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_qual_%s.pdf', periods{p}));
 end
-
-
 end
