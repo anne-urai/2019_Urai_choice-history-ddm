@@ -13,13 +13,13 @@ ds = length(alldat):-1:1;
 close all;
 
 global colors;
-axiscolors = colors; 
+axiscolors = colors;
 
 % MAKE AN OVERVIEW PLOT
 if numel(alldat) == 3,
-subplot(431); 
+    subplot(431);
 else
-subplot(331); 
+    subplot(331);
 end
 hold on;
 % make a vertical line at zero
@@ -33,13 +33,13 @@ for d = 1:length(ds),
         mrk = alldat(ds(d)).marker;
         meancol = alldat(ds(d)).meancolor;
     catch
-		disp('cannot find colors');
-		assert(1==0)
+        disp('cannot find colors');
+        assert(1==0)
         markercolors = cbrewer('qual', 'Paired', 10);
         transitioncolors = [[0.5 0.5 0.5]; markercolors([7 9 5], :)];
         meancolors = [0 0 0; markercolors([8 10 6], :)];
         markers = {'o', 'v', '^', 's'}; %also indicate with different markers
-    
+        
         col 	= transitioncolors(1, :);
         mrk 	= markers{1};
         meancol = meancolors(1, :);
@@ -56,11 +56,11 @@ end
 
 names = {alldat(ds).datasetnames};
 for n = 1:length(names),
-	if numel(names{n}) > 1,
-		names{n} = cat(2, names{n}{1}, ' ', names{n}{2});
-	else
-		names{n} = names{n}{1};
-	end
+    if numel(names{n}) > 1,
+        names{n} = cat(2, names{n}{1}, ' ', names{n}{2});
+    else
+        names{n} = names{n}{1};
+    end
 end
 names = fliplr(names);
 
@@ -87,16 +87,16 @@ t.Position(2) = t.Position(2) - 1.2;
 %% NOW FOR DRIFT CRITERION
 % MAKE AN OVERVIEW PLOT
 if numel(alldat) == 3,
-	sp2 = subplot(432); hold on;
+    sp2 = subplot(432); hold on;
 else
-	sp2 = subplot(332); hold on;
+    sp2 = subplot(332); hold on;
 end
 
 % make a vertical line at zero
 plot([0 0], [0.5 length(ds)+0.5], 'color', [0 0 0], 'linewidth', 0.5);
 
 for d = 1:length(ds),
-
+    
     % determine color and marker
     try
         col = alldat(ds(d)).scattercolor;
@@ -123,7 +123,7 @@ for d = 1:length(ds),
     set(h(2), 'color', col, 'linewidth', 1);
 end
 
-set(gca, 'ytick', 1:length(ds), 'yticklabel', names, 'YAxisLocation', 'right');
+set(gca, 'ytick', 1:length(ds), 'yticklabel', [], 'YAxisLocation', 'right');
 xlabel('History shift in v_{bias}');
 set(gca, 'xcolor', axiscolors(2, :), 'ycolor', 'k');
 xlim([-1 1]); offsetAxes;
@@ -161,9 +161,9 @@ end
 
 % DO STATS ACROSS DATASETS!
 % [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]), fisherz([alldat(ds).corrz]));
-[ss, h] = suplabel('Correlation with P(repeat)', 'x');
-ss.Position(2) = ss.Position(2) + 0.015;
-set(h, 'color', 'k');
+%[ss, h] = suplabel('Correlation with P(repeat)', 'x');
+%ss.Position(2) = ss.Position(2) + 0.015;
+% set(h, 'color', 'k');
 tightfig;
 % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot.pdf'));
 

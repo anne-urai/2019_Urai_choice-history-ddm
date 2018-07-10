@@ -20,7 +20,7 @@ global datasets datasetnames mypath colors
 
 usr = getenv('USER');
 switch usr
-    case 'anne'
+    case {'anne', 'urai'}
         mypath = '~/Data/HDDM';
     case 'aeurai'
         mypath  = '/nfs/aeurai/HDDM';

@@ -26,7 +26,7 @@ for s = 1:length(types),
         subplot(4, 5, 1);
         getPlotDIC(mdls, types{s}, d);
         title(datasetnames{d});
-        set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'Both'});
+        set(gca, 'xtick', 1:3, 'xticklabel', {'z', 'v_{bias}', 'both'});
         
 		%if ismember(d, [1 4]),
         	ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
