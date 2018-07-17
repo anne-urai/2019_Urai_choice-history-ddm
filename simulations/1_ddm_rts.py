@@ -28,6 +28,9 @@ sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'ytick.color':'Black',} )
 sns.plotting_context()
 
+data_folder = '/home/degee/research/model_simulations/ddm_data/'
+fig_folder = '/home/degee/research/model_simulations/ddm_figs/'
+
 t = 5
 dt = 0.01
 timesteps = int(t/dt)
@@ -60,7 +63,7 @@ def do_simulations(params):
     df.loc[:,'stimulus'] = np.concatenate(stimulus)
     df.loc[:,'correct'] = np.array(np.concatenate(stimulus) == np.concatenate(response), dtype=int)
     df.loc[:,'subj_idx'] = params['subj_idx']
-    df.to_csv(os.path.join('ddm_data', 'df_{}.csv'.format(params['subj_idx'])))
+    df.to_csv(os.path.join(data_folder, 'df_{}.csv'.format(params['subj_idx'])))
 
 simulate = False
 nr_trials = int(1e5) #100K
@@ -114,12 +117,12 @@ quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 for i, group in enumerate(groups):
     
     # neutral:
-    df = pd.read_csv(os.path.join('ddm_data', 'df_{}.csv'.format(0)))
+    df = pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(0)))
     mean_correct = df.correct.mean()
     mean_response = df.response.mean()
     
     # load group:
-    df = pd.concat([pd.read_csv(os.path.join('ddm_data', 'df_{}.csv'.format(g))) for g in group], axis=0)
+    df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
     
     # plots:
     fig = plt.figure(figsize=(2,6))
@@ -158,7 +161,7 @@ for i, group in enumerate(groups):
 
     sns.despine(offset=10, trim=True)
     plt.tight_layout()
-    fig.savefig(os.path.join('ddm_figs', 'rt_dists_{}.pdf'.format(i)))
+    fig.savefig(os.path.join(fig_folder, 'rt_dists_{}.pdf'.format(i)))
     
     # plots:
     fig = plt.figure(figsize=(2,2))
@@ -176,5 +179,5 @@ for i, group in enumerate(groups):
     ax.set_ylabel('% choice a')
     sns.despine(offset=10, trim=True)
     plt.tight_layout()
-    fig.savefig(os.path.join('ddm_figs', 'rt_dists_{}_levels.pdf'.format(i)))
+    fig.savefig(os.path.join(fig_folder, 'rt_dists_{}_levels.pdf'.format(i)))
 

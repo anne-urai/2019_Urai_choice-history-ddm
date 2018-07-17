@@ -28,6 +28,9 @@ sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'ytick.color':'Black',} )
 sns.plotting_context()
 
+data_folder = '/home/degee/research/model_simulations/lca_data/'
+fig_folder = '/home/degee/research/model_simulations/lca_figs/'
+
 t = 200
 dt = 1
 timesteps = int(t/dt)
@@ -62,7 +65,7 @@ def do_simulations(params):
     df.loc[:,'stimulus'] = np.concatenate(stimulus)
     df.loc[:,'correct'] = np.array(np.concatenate(stimulus) == np.concatenate(response), dtype=int)
     df.loc[:,'subj_idx'] = params['subj_idx']
-    df.to_csv(os.path.join('lca_data', 'df_{}.csv'.format(params['subj_idx'])))
+    df.to_csv(os.path.join(data_folder, 'df_{}.csv'.format(params['subj_idx'])))
  
 simulate = True
 nr_trials = 25000
@@ -78,8 +81,8 @@ z = 0
 
 # inputs = [np.array(np.vstack([np.repeat(v, timesteps) + np.random.normal(0,0.1,timesteps) for _ in range(int(nr_trials))]), dtype='float16'),
 #             np.array(np.vstack([np.repeat(0, timesteps) + np.random.normal(0,0.1,timesteps) for _ in range(int(nr_trials))]), dtype='float16'),]
-# np.save(os.path.join('lca_data', 'inputs.npy'), inputs)
-inputs = np.load(os.path.join('lca_data', 'inputs.npy'))
+# np.save(os.path.join(data_folder, 'inputs.npy'), inputs)
+inputs = np.load(os.path.join(data_folder, 'inputs.npy'))
 
 sArray = [
     # LCA:
@@ -114,7 +117,7 @@ for i, group in enumerate(groups):
     subj = sArray[i]['subj_idx']
     
     # load group:
-    df = pd.concat([pd.read_csv(os.path.join('lca_data', 'df_{}.csv'.format(g))) for g in group], axis=0)
+    df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
     yes = np.array(df.loc[(df["subj_idx"]==subj), "response"] == 1)
     no = np.array(df.loc[(df["subj_idx"]==subj), "response"] == 0)
     stimulus = np.array(df.loc[(df["subj_idx"]==subj), "stimulus"] == 1)
@@ -150,6 +153,6 @@ for i, group in enumerate(groups):
     sns.despine(offset=10, trim=True)
     plt.legend()
     plt.tight_layout()
-    fig.savefig(os.path.join('lca_figs', 'kernels_{}.pdf'.format(i)))
+    fig.savefig(os.path.join(fig_folder, 'kernels_{}.pdf'.format(i)))
     
     

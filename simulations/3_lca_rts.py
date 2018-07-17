@@ -28,6 +28,9 @@ sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'ytick.color':'Black',} )
 sns.plotting_context()
 
+data_folder = '/home/degee/research/model_simulations/lca_data/'
+fig_folder = '/home/degee/research/model_simulations/lca_figs/'
+
 t = 1000
 dt = 1
 timesteps = int(t/dt)
@@ -61,7 +64,7 @@ def do_simulations(params):
     df.loc[:,'stimulus'] = np.concatenate(stimulus)
     df.loc[:,'correct'] = np.array(np.concatenate(stimulus) == np.concatenate(response), dtype=int)
     df.loc[:,'subj_idx'] = params['subj_idx']
-    df.to_csv(os.path.join('lca_data', 'df_{}.csv'.format(params['subj_idx'])))
+    df.to_csv(os.path.join(data_folder, 'df_{}.csv'.format(params['subj_idx'])))
 
 simulate = True
 nr_trials = int(1e5) #100K
@@ -144,14 +147,14 @@ for i, group in enumerate(groups):
     
     # neutral:
     if i >= 4:
-        df_neutral = pd.read_csv(os.path.join('lca_data', 'df_{}.csv'.format(0)))
+        df_neutral = pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(0)))
     else:
-        df_neutral = pd.read_csv(os.path.join('lca_data', 'df_{}.csv'.format(15)))
+        df_neutral = pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(15)))
     mean_correct = df_neutral.correct.mean()
     mean_response = df_neutral.response.mean()
     
     # load group:
-    df = pd.concat([pd.read_csv(os.path.join('lca_data', 'df_{}.csv'.format(g))) for g in group], axis=0)
+    df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
     
     # plots:
     fig = plt.figure(figsize=(2,6))
@@ -190,7 +193,7 @@ for i, group in enumerate(groups):
 
     sns.despine(offset=10, trim=True)
     plt.tight_layout()
-    fig.savefig(os.path.join('lca_figs', 'rt_dists_{}.pdf'.format(i)))
+    fig.savefig(os.path.join(fig_folder, 'rt_dists_{}.pdf'.format(i)))
     
     # plots:
     fig = plt.figure(figsize=(2,2))
@@ -208,7 +211,7 @@ for i, group in enumerate(groups):
     ax.set_ylabel('% choice a')
     sns.despine(offset=10, trim=True)
     plt.tight_layout()
-    fig.savefig(os.path.join('lca_figs', 'rt_dists_{}_levels.pdf'.format(i)))
+    fig.savefig(os.path.join(fig_folder, 'rt_dists_{}_levels.pdf'.format(i)))
     
 # save combined for DDM fitting:
 groups = [[4], [7], [10], [13],]
@@ -220,7 +223,7 @@ for i, group in enumerate(groups):
     df_combined = pd.concat((df_neutral, df))
     df_combined.loc[:,'subj_idx'] = 0
     df_combined.loc[:,'rt'] = df_combined.loc[:,'rt'] / 200
-    df_combined.to_csv(os.path.join('lca_data', '2018_lca_data_{}.csv'.format(i+1)))
+    df_combined.to_csv(os.path.join(data_folder, '2018_lca_data_{}.csv'.format(i+1)))
     
     # shell()
     

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+## NEEDS WORK, OR SHOULD BE DELETED.... ##
+
 import os
 import numpy as np
 import scipy as sp
@@ -25,6 +27,9 @@ sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'xtick.color':'Black',
     'ytick.color':'Black',} )
 sns.plotting_context()
+
+data_folder = '/home/degee/research/model_simulations/ddm_data/'
+fig_folder = '/home/degee/research/model_simulations/ddm_figs/'
 
 def simulate_DDM(v=1, a=1, z=0.5, dc=0, dc_slope=0, b0_collapse=0, b1_collapse=0, stim=0, nr_trials=1000, dt=0.01):
     
