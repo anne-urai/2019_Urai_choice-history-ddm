@@ -53,6 +53,8 @@ if 0,
 end
 
 disp('starting');
+e6_serialBias_SfN_modelFree_CRF_PPC;
+
 assert(1==0)
 % ======================= %
 % SCHEMATIC/HYPOTHESES

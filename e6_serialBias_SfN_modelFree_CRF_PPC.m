@@ -16,6 +16,7 @@ addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames mypath colors
 qntls = [0.1, 0.3, 0.5, 0.7, 0.9]; % Leite & Ratcliff
+qntls = [0.5 1];
 
 % redo this for each simulation
 models = {'data', 'stimcoding_nohist', 'stimcoding_z_prevresp',  ...
@@ -139,8 +140,14 @@ for d = 1:length(datasets);
 
         % SAVE
         avg = nanmean(mat, 1);
-        allds.fast(d, m) = nanmean(avg(1:2));
-        allds.slow(d, m) = nanmean(avg(end-3:end));
+
+        try
+          allds.fast(d, m) = nanmean(avg(1:2));
+          allds.slow(d, m) = nanmean(avg(end-3:end));
+        catch % median split, only 2 bins
+          allds.fast(d, m) = nanmean(avg(1));
+          allds.slow(d, m) = nanmean(avg(2));
+        end
         allds.all(d, m, :) = avg;
     end
     %  end
@@ -155,8 +162,7 @@ for d = 1:length(datasets);
     tightfig;
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
 
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_q2.pdf', d));
-    fprintf('~/Data/serialHDDM/CRF_PPC_d%d.pdf \n', d);
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_median.pdf', d));
 end
 
 savefast(sprintf('~/Data/serialHDDM/allds_cbfs.mat'), 'allds');
