@@ -14,10 +14,11 @@ usr = getenv('USER');
 switch usr
     case 'aurai' % uke cluster
         path = '~/Data/MEG-PL';
-    case 'aeurai' % cartesius/lisa
+    case 'aeurai'} % cartesius/lisa
         path = '/projects/0/neurodec/Data/MEG-PL';
     case 'anne' % macbook pro
         path = '/Users/anne/Library/Group Containers/G69SCX94XU.duck/Library/Application Support/duck/Volumes/neurodec/Data/MEG-PL';
+    case 'urai'
         path = '/Users/anne/Data/projects/0/neurodec/Data/MEG-PL'; % copied to local!
     otherwise
         error('could not find the data path');

@@ -10,19 +10,11 @@ function b3_makeDataframe(datasets)
 
 close all; clc;
 addpath(genpath('~/code/Tools'));
-warning off;
+warning off; global mypath
 
 % ============================================ %
 % SUMMARIZE EACH DATASET
 % ============================================ %
-
-usr = getenv('USER');
-switch usr
-    case 'anne' % local
-        mypath = '~/Data/HDDM';
-    case 'aeurai' % lisa/cartesius
-        mypath = '/nfs/aeurai/HDDM';
-end
 
 set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1, ...
     'defaultaxestitlefontweight', 'bold', ...
