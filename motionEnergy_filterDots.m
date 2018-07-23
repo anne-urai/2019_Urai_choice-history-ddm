@@ -169,6 +169,7 @@ for sj = subjects,
                     'trialnum'});
                 behav.prevresp      = circshift(behav.response, 1);
                 behav.prevstim      = circshift(behav.stimulus, 1);
+                behav.prevrt        = circshift(behav.stimulus, 1);
                 behav.prevcorrect   = circshift(behav.correct, 1);
                 behav.prev2resp     = circshift(behav.response, 2);
                 behav.prev2stim     = circshift(behav.stimulus, 2);

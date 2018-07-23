@@ -10,7 +10,153 @@ function multiplicative_vbias
 close all; clc;
 addpath(genpath('~/code/Tools'));
 
-global mypath datasets datasetnames colors
+global mypath datasets datasetnames
+
+for d = [4 5],
+    
+    disp(datasets{d});
+    
+        results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+    results = results(results.session == 0, :);
+      switch d
+        case 5
+            cohs = {'0_0625'  '1_25' '2_5' '5' '10' '20' '30'};
+            cohlevels = [0.625 1.25 2.5 5 10 20 30];
+        case 4
+            cohs = {'0' '3' '9' '27' '81'};
+            cohlevels = [0 3 9 27 81];
+            
+    end
+    
+    scattercols  = cbrewer('seq', 'PuBuGn', numel(unique(cohs)) + 5);
+    scattercols  = scattercols([3:end-4 end], :);
+    
+    clear multiplicative single coherencecolors;
+    for c = 1:length(cohs),
+        % dc_0_3_1__stimcodingdczprevrespmultiplicative
+        multiplicative(:, c) = results.(sprintf('v_c%s__stimcodingdczprevrespmultiplicative', cohs{c}));
+        single(:, c) = results.(sprintf('v_c%s__stimcodingdczprevresp', cohs{c}));
+        coherencecolors(:, c) = c*ones(size(results.(sprintf('v_c%s__stimcodingdczprevresp', cohs{c}))));
+    end
+    
+    close all; subplot(441);
+    scatter(single(:), multiplicative(:), 10, coherencecolors(:));
+    xlabel('Single v_{bias}');
+    ylabel('Coherence-dependent v_{bias}');
+    title('Drift rate (v)');
+    axis tight;  axisEqual;
+    colormap(scattercols);
+    axis square; offsetAxes;
+    
+      tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/driftRate_comparison_d%d.pdf', d));
+  
+end
+
+
+%% ALSO SHOW BEHAVIOR: P(BIAS) AND RT
+for d = [4 5],
+    
+    disp(datasets{d});
+    
+    switch d
+        case 5
+            cohs = {'00625'  '0125' '025' '05' '1' '2' '3'};
+            cohlevels = [0.625 1.25 2.5 5 10 20 30];
+        case 4
+            cohs = {'0' '03' '09' '27' '81'};
+            cohlevels = [0 3 9 27 81];
+            
+    end
+    
+    % find the original datafile
+    filename = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
+    alldata  = readtable(sprintf('%s/%s/%s', mypath, datasets{d}, filename.name));
+    
+    % recode into repeat and alternate for the model
+    alldata.repeat = zeros(size(alldata.response));
+    alldata.repeat(alldata.response == (alldata.prevresp > 0)) = 1;
+    
+    % for each observers, compute their bias
+    [gr, sjs] = findgroups(alldata.subj_idx);
+    sjrep = splitapply(@nanmean, alldata.repeat, gr);
+    sjrep = sjs(sjrep < 0.5); % alternators
+    
+    % recode into biased and unbiased choices
+    alldata.biased = alldata.repeat;
+    altIdx = ismember(alldata.subj_idx, sjrep);
+    alldata.biased(altIdx) = double(~(alldata.biased(altIdx))); % flip
+    % biased [0,1] now codes for repeat [0,1] for repeaters and switch
+    % [0,1] for alternaters
+    
+    if numel(unique(alldata.stimulus)) > 2,
+        alldata.stimulus = sign(alldata.stimulus);
+    elseif isequal(unique(alldata.stimulus), [0 1]'),
+        alldata.stimulus = sign(alldata.stimulus - 0.1);
+    end
+    alldata.coherence       = [alldata.coherence .* alldata.stimulus];
+    
+    % from fraction to percent
+    if all(abs(alldata.coherence) < 1),
+        alldata.coherence = alldata.coherence * 100;
+    end
+    
+    clear tab;
+    [gr, sj, coh]   = findgroups(alldata.subj_idx, abs(alldata.coherence));
+    tab.subj_idx    = splitapply(@mean, alldata.subj_idx, gr);
+    tab.coherence   = splitapply(@mean, abs(alldata.coherence), gr);
+    tab = struct2table(tab);
+    tab.repetition = splitapply(@mean, alldata.biased, gr);
+    tab.rt = splitapply(@mean, alldata.rt, gr);
+    
+    sjrep = splitapply(@nanmean, alldata.repeat, findgroups(alldata.subj_idx));
+    
+    % plot RT
+    tab2 = unstack(tab(:, [1 2 4]), 'rt', 'subj_idx');
+    tab2 = tab2{:, 2:end}';
+    tab2_repeat = tab2(sjrep > 0.5, :);
+    tab2_alternate = tab2(sjrep < 0.5, :);
+    
+    close all; subplot(4,4,1); hold on;
+    errorbar(1:length(cohlevels), nanmean(tab2), ...
+        nanstd(tab2) ./ sqrt(sum(~isnan(tab2))),'ok-', 'capsize', 0, 'markerfacecolor', 'w');
+    %errorbar(1:length(cohlevels), nanmean(tab2_alternate), ...
+    %    nanstd(tab2_alternate) ./ sqrt(sum(~isnan(tab2_alternate))),'ob-', 'capsize', 0, 'markerfacecolor', 'w');
+    
+    set(gca, 'xtick', 1:length(cohlevels), 'xticklabel', cohlevels);
+    
+    box off; axis tight; axis square;
+    title(datasetnames{d})
+    xlim([min([0.5 get(gca, 'xlim')]) max(get(gca, 'xlim'))]);
+    offsetAxes;
+    ylabel('Response time (s)');
+    tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/rt_per_coherence_d%d.pdf', d));
+    
+    % BIASED BEHAVIOR
+    tab2 = unstack(tab(:, [1 2 3]), 'repetition', 'subj_idx');
+    tab2 = tab2{:, 2:end}';
+    tab2_repeat = tab2(sjrep > 0.5, :);
+    tab2_alternate = tab2(sjrep < 0.5, :);
+    
+    close all; subplot(4,4,1); hold on;
+    errorbar(1:length(cohlevels), nanmean(tab2), ...
+        nanstd(tab2) ./ sqrt(sum(~isnan(tab2))),'ok-', 'capsize', 0, 'markerfacecolor', 'w');
+    %errorbar(1:length(cohlevels), nanmean(tab2_alternate), ...
+    %    nanstd(tab2_alternate) ./ sqrt(sum(~isnan(tab2_alternate))),'ob-', 'capsize', 0, 'markerfacecolor', 'w');
+    
+    set(gca, 'xtick', 1:length(cohlevels), 'xticklabel', cohlevels);
+    
+    box off; axis tight; axis square;
+    title(datasetnames{d})
+    xlim([min([0.5 get(gca, 'xlim')]) max(get(gca, 'xlim'))]);
+    offsetAxes;
+    ylabel('P(bias)');
+    tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_per_coherence_d%d.pdf', d));
+    
+end
+
 
 % ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
@@ -19,7 +165,6 @@ global mypath datasets datasetnames colors
 for d = [4 5] % only NatComm and Anke_MEG_neutral, with varying coherence level
     disp(datasets{d});
     figure;
-    
     
     results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     results = results(results.session == 0, :);
@@ -45,7 +190,7 @@ for d = [4 5] % only NatComm and Anke_MEG_neutral, with varying coherence level
             results.(sprintf('dc_0_%s_2__stimcodingdczprevrespmultiplicative', cohs{c}));
         thiscoh = num2str(cohlevels(c));
         if d == 4,
-            % thiscoh = num2str(cohlevels(c) * 100);
+            thiscoh = num2str(cohlevels(c) * 100);
         end
         allresults(c).criterionshift    = results.(['repetition_c' regexprep(thiscoh, '\.', '\_')]);
         allresults(c).subjnr            = results.subjnr;
@@ -63,19 +208,12 @@ for d = [4 5] % only NatComm and Anke_MEG_neutral, with varying coherence level
     %% start with baseline: vbias (in direction of bias) for the single-vbias model
     vbias_single = results.dc_1__stimcodingdczprevresp - results.dc_2__stimcodingdczprevresp;
     vbias_single(results.repetition < 0.5, :) =  - vbias_single(results.repetition < 0.5, :);
-    
-    plot([1 length(cohlevels)], [nanmean(vbias_single) nanmean(vbias_single)], '-', 'color', [0 0 0]);
-    s1 =  scatter(1:length(unique(cohlevels)), nanmean(vbias_single)*ones(1, length(unique(cohlevels))), 25, unique(cohlevels), 'o', 'filled');
-    s1.MarkerEdgeColor = 'k';
+    errorbar(1:length(cohlevels), nanmean(vbias_single)*ones(size(cohlevels)), ...
+        nanstd(vbias_single) ./ sqrt(length(vbias_single)) *ones(size(cohlevels)),'ok-', 'capsize', 0, 'markerfacecolor', 'w');
     
     %% then the model with difficulty-dependent vbias
-    
-    plot(1:length(unique(cohlevels)),   nanmean(vbias_all), '-', 'color',[0 0 0]);
-    s2 = scatter(1:length(unique(cohlevels)),   nanmean(vbias_all), 25, unique(cohlevels), 's', 'filled');
-    s2.MarkerEdgeColor = 'k';
-    
-    % plot(1:length(cohlevels), (vbias_all), '-', 'color', [0.8 0.8 0.8], 'linewidth', 0.5);
-    %boundedline(1:length(cohlevels), nanmean(vbias_all), nanstd(vbias_all) ./ sqrt(length(results.repetition)));
+    errorbar(1:length(cohlevels), nanmean(vbias_all), ...
+        nanstd(vbias_all) ./ sqrt(length(vbias_single)) ,'sr-', 'capsize', 0, 'markerfacecolor', 'w');
     set(gca, 'xtick', 1:length(cohlevels), 'xticklabel', cohlevels);
     
     box off; axis tight; axis square;
@@ -121,50 +259,9 @@ for d = [4 5] % only NatComm and Anke_MEG_neutral, with varying coherence level
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/vbias_per_coherence_d%d.pdf', d));
-    %
-    %     % for every subject, get a beta weight
-    %     b = nan(size(vbias_all, 1), 2);
-    %     for sj = 1:size(vbias_all, 1),
-    %         b(sj, :) = glmfit(vbias_all(sj, :)', 1:length(cohlevels));
-    %
-    %         r = corr(vbias_all(sj, :)', transpose(1:length(cohlevels)), 'type', 'pearson');
-    %         b(sj, 2) = r;
-    %     end
-    %     figure;
-    %     subplot(221); plotBetasSwarm(b(results.repetition < 0.5, 2)); title('Alternators');
-    %     subplot(222); plotBetasSwarm(b(results.repetition > 0.5, 2));  title('Repeaters');
-    %     subplot(223); plotBetasSwarm(b(:, 2));  title('All');
-    %
-    %
-    %     %% make a nice looking, small subplot
-    %     figure;
-    %     subplot(381);
-    %     scatter(ones(size(b(:, 2))), b(:, 2), 10, [0.5 0.5 0.5], 'jitter', 'on', 'jitteramount', 0.1);
-    %     hold on;
-    %     plot([0.9 1.1], [nanmean(b(:, 2)) nanmean(b(:, 2)) ], 'k');
-    %     % xlim([0.85 1.105]);
-    %
-    %     p = permtest(b(:, 2));
-    %     mysigstar(gca, 1, max(get(gca, 'ylim')), p);
-    %
-    %     set(gca, 'xtick', [0.95 1.05], 'xticklabel', []);
-    %     ylabel('\rho');
-    %     %axis tight;
-    %     offsetAxes;
-    %     tightfig;
-    %     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/vbias_per_coherence_beta_ d%d.pdf', d));
-    %
+    
 end
 
-for d = [4 5],
-    
-    disp(datasets{d});
-    
-    
-    results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-    results = results(results.session == 0, :);
-    
-    
-    
+
 end
 

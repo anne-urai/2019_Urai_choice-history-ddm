@@ -28,32 +28,31 @@ for f = 2:length(files),
     avg = splitapply(@nanmean, nanmean(data.motionenergy_normalized(:, 13:end), 2), gr);
     subplot(223); plot(idx, avg, 'o'); refline(1);
     
+    % remove the trials that cannot be used
+    wrongTrls       = ([NaN; diff(dat.trial)] ~= 1);
+    data.behavior.prevresp(wrongTrls) = NaN;
+    
     % SAVE THE NORMALIZED RESULTS
     savefast(sprintf('%s/%s', path, files{f}), 'data');
     
+    %% make one with only neutral data
+    data.motionenergy = data.motionenergy(data.behavior.transitionprob == 0.5, :);
+    data.motionenergy_normalized = data.motionenergy_normalized(data.behavior.transitionprob == 0.5, :);
+    data.behavior = data.behavior(data.behavior.transitionprob == 0.5, :);
+    savefast(sprintf('%s/%s', path, 'motionEnergyData_AnkeMEG_neutral.mat'), 'data');
+
     % =============================== %
     % WRITE TO CSV FOR HDDM
     % =============================== %
     
     dat = data.behavior;
-    
-    % include previous trial info
-    dat.prevresp    = circshift(dat.response, 1);
-    dat.prevstim    = circshift(dat.stimulus, 1);
-    dat.prevrt      = circshift(dat.RT, 1);
-    
-    dat.prev2resp    = circshift(dat.response, 2);
-    dat.prev2stim    = circshift(dat.stimulus, 2);
-    
+    dat.prevrt = circshift(dat.RT, 1);
+
     % recode
     dat.Properties.VariableNames{'RT'}          = 'rt'; % from stimulus offset?
     dat.Properties.VariableNames{'trialnum'}    = 'trial';
     dat.stimulus    = dat.coherence .* dat.stimulus;
     dat.response    = (dat.response > 0);
-    
-    % remove the trials that cannot be used
-    wrongTrls       = ([NaN; diff(dat.trial)] ~= 1);
-    dat(wrongTrls, :) = [];
     
     % take only a subset of variables for hddm fits
     dat             = dat(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', 'coherence', ...

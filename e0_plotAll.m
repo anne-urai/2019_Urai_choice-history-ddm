@@ -56,7 +56,8 @@ end
 disp('starting');
 e6_serialBias_SfN_modelFree_CRF_PPC;
 
-assert(1==0)
+assert(1==0);
+
 % ======================= %
 % SCHEMATIC/HYPOTHESES
 % ======================= %
@@ -142,7 +143,18 @@ print(gcf, '-dpdf', filename);
 
 psychfuncs_vbias_split;
 conditionalAccuracyFunctions;
+
+% single vs. coherence-dependent vbias
 multiplicative_vbias;
+multiplicative_vbias_residuals_scatter;
+multiplicative_vbias_DIC;
+
+% ========================= %
+% KOSTIS' O-U MODELS
+% ========================= %
+
+kostis_makeTable;
+kostis_plotOU;
 
 % ========================= %
 % MEG PHARMA - do at the end

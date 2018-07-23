@@ -16,8 +16,8 @@ global mypath datasets datasetnames
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
-whichMeasures = {'mse', 'corr', 'resid'};
-for w = 1:length(whichMeasures),
+whichMeasures = {'mse', 'corr', 'resid', 'pbias'};
+for w = 4:length(whichMeasures),
     
     models = {'stimcoding_dc_z_prevresp', 'stimcoding_dc_z_prevresp_multiplicative'};
     for d = [4 5] % only NatComm and Anke_MEG_neutral, with varying coherence level
@@ -79,25 +79,24 @@ for w = 1:length(whichMeasures),
             switch whichMeasures{w}
                 case 'mse'
                     mse = nanmean((mat_model-mat_data).^2);
+                    sem = nanstd((mat_model-mat_data).^2) ./ sqrt(size(mat_model, 1))* 1.96;
                 case 'corr'
                     mse = diag(corr(mat_model, mat_data, 'rows', 'pairwise'));
+                    sem  = zeros(size(mse));
                 case 'resid'
                     mse = nanmean(mat_data-mat_model);
+                    sem = nanstd(mat_data - mat_model) ./ sqrt(size(mat_model, 1))* 1.96;
+                case 'pbias';
+                    mse = nanmean(mat_model);
+                    sem = nanstd(mat_model) ./ sqrt(size(mat_model, 1)) * 1.96;
             end
             
             subplot(441); hold on;
+            
             if m == 1,
-                plot(1:length(unique(coh)), mse, '-', 'color', [0 0 0]);
-                s1 =  scatter(1:length(unique(coh)), mse, 20, unique(coh), 'filled');
-                s1.MarkerEdgeColor = 'k';
-                %  scatter(1:length(unique(coh)), mse, 25, [0.3 0.3 0.3]);
-                
+                errorbar(1:length(unique(coh)), mse, sem,'ok-', 'capsize', 0, 'markerfacecolor', 'w');
             elseif m == 2,
-                plot(1:length(unique(coh)), mse, '-', 'color', [0 0 0 ]);
-                s2 = scatter(1:length(unique(coh)), mse, 20, unique(coh), 's', 'filled');
-                s2.MarkerEdgeColor = 'k';
-                
-                %  scatter(1:length(unique(coh)), mse, 25, [0 0 0]);
+                errorbar(1:length(unique(coh)), mse, sem,'sr-', 'capsize', 0, 'markerfacecolor', 'w');
             end
             
         end
@@ -109,6 +108,8 @@ for w = 1:length(whichMeasures),
                 ylabel({'MSE observed', 'vs. predicted P(bias)'});
             case 'resid'
                 ylabel({'Predicted -', 'observed P(bias)'});
+            case 'pbias'
+                ylabel('Predicted P(bias)');
         end
         set(gca, 'xtick', 1:length(unique(coh)), 'xticklabel', unique(coh)*100);
         
