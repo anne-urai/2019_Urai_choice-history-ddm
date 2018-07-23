@@ -2,11 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from IPython import embed as shell
 
-def DDM_traces_get(v=1, z=0.5, dc=0, dc_slope=0, scaling=0.1, stim=0, nr_trials=1000, t=5.0, dt=0.01):
+def DDM_OU_traces_get(v=1, z=0.5, dc=0, dc_slope=0, ou=0, scaling=0.1, stim=0, nr_trials=1000, t=5.0, dt=0.01):
     
     """
     DDM
-    
+
+    z:  Starting point
+    v:  Drift rate
+    dc: Drift criterion
+    ou: Ornstein Uhlenbeck parameter
     """
     
     if stim == 0:
@@ -16,10 +20,10 @@ def DDM_traces_get(v=1, z=0.5, dc=0, dc_slope=0, scaling=0.1, stim=0, nr_trials=
     x1[:,:] = np.NaN
     x1[:,0] = z
     for i in range((int(t/dt))-1):
-        x1[:,i+1] = x1[:,i] + (v + dc + (dc_slope * dt * i)) * dt + np.random.normal(0,1,nr_trials)*np.sqrt(dt)*scaling
+        x1[:,i+1] = x1[:,i] + ((v + dc + ((dc_slope * dt * i) + (ou * x1[:,i]))) * dt) + (np.random.normal(0,1,nr_trials)*np.sqrt(dt)*scaling)
     return x1
     
-def DDM_traces_apply_bounds(x1, a=0.15, b0_collapse=0, b1_collapse=0, dt=0.01):
+def DDM_OU_traces_apply_bounds(x1, a=0.15, b0_collapse=0, b1_collapse=0, dt=0.01):
     
     rt = np.zeros(x1.shape[0])
     response = np.zeros(x1.shape[0])
