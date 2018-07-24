@@ -17,11 +17,12 @@ short break. The expectation is across trials.
 %}
 
 path = '~/Data/psychophysicalKernels';
-load(sprintf('%s/%s', path, 'motionEnergyData_AnkeMEG.mat'));
+load(sprintf('%s/%s', path, 'motionEnergyData_AnkeMEG_neutral.mat'));
 
 % only select neutral
-% data.motionenergy = data.motionenergy([data.behavior.transitionprob] == 0.5, :);
-% data.behavior     = data.behavior([data.behavior.transitionprob] == 0.5, :);
+% data.motionenergy               = data.motionenergy([data.behavior.transitionprob] == 0.5, :);
+% data.motionenergy_normalized    = data.motionenergy_normalized([data.behavior.transitionprob] == 0.5, :);
+% data.behavior                   = data.behavior([data.behavior.transitionprob] == 0.5, :);
 
 % recode into choices that are biased
 data.behavior.repeat = (data.behavior.response == data.behavior.prevresp);

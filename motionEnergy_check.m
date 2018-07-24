@@ -29,7 +29,7 @@ for f = 2:length(files),
     subplot(223); plot(idx, avg, 'o'); refline(1);
     
     % remove the trials that cannot be used
-    wrongTrls       = ([NaN; diff(dat.trial)] ~= 1);
+    wrongTrls       = ([NaN; diff(data.behavior.trialnum)] ~= 1);
     data.behavior.prevresp(wrongTrls) = NaN;
     
     % SAVE THE NORMALIZED RESULTS
