@@ -11,7 +11,7 @@ import seaborn as sns
 import pandas as pd
 from IPython import embed as shell
 
-from models import LCA_traces_get, LCA_traces_apply_timepoint
+from models import LCA_traces_get, two_accumulater_traces_apply_timepoint
 
 sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'axes.linewidth': 0.25, 
@@ -48,13 +48,12 @@ def do_simulations(params):
                                 w=params['w'],
                                 dc=params['dc'],
                                 z=params['z'],
-                                linear=params['linear'],
                                 pre_generated=True,
                                 stim=stim,
                                 nr_trials=params['nr_trials'],
                                 timesteps=timesteps,
                                 )
-        rt_dum, response_dum = LCA_traces_apply_timepoint(x1, x2)
+        rt_dum, response_dum = two_accumulater_traces_apply_timepoint(x1, x2)
         rt.append(rt_dum)
         response.append(response_dum)
         stimulus.append(np.ones(params['nr_trials']) * stim)
@@ -73,8 +72,8 @@ ndt = 0
 
 v = 0
 k = 0.05
-w = 0.054 # neutral
-# w = 0.054 + 0.040 # inhibition dominant
+# w = 0.054 # neutral
+w = 0.054 + 0.040 # inhibition dominant
 a = 0.15
 dc = 0.1
 z = 0
@@ -86,30 +85,21 @@ inputs = np.load(os.path.join(data_folder, 'inputs.npy'))
 
 sArray = [
     # LCA:
-    {'subj_idx':15, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':16, 'v':inputs, 'k':[k,k], 'w':[w+0.040,w+0.040], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':17, 'v':inputs, 'k':[k,k], 'w':[w-0.040,w-0.040], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':18, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.5,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':19, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.002,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':20, 'v':inputs, 'k':[k-0.001,k+0.001], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':21, 'v':inputs, 'k':[k,k], 'w':[w+0.001,w-0.001], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-
-    # OU:
-    {'subj_idx':22, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':23, 'v':inputs, 'k':[k,k], 'w':[w+0.040,w+0.040], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':24, 'v':inputs, 'k':[k,k], 'w':[w-0.040,w-0.040], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':25, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.5,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':26, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.002,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':27, 'v':inputs, 'k':[k-0.001,k+0.001], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':28, 'v':inputs, 'k':[k,k], 'w':[w+0.001,w-0.001], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
+    {'subj_idx':15, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':16, 'v':inputs, 'k':[k,k], 'w':[w+0.040,w+0.040], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':17, 'v':inputs, 'k':[k,k], 'w':[w-0.040,w-0.040], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':18, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.5,z], 'nr_trials':nr_trials},
+    {'subj_idx':19, 'v':inputs, 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.002,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':20, 'v':inputs, 'k':[k-0.001,k+0.001], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':21, 'v':inputs, 'k':[k,k], 'w':[w+0.001,w-0.001], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
     ]
 
 if simulate:
     from joblib import Parallel, delayed
-    n_jobs = 16
+    n_jobs = 8
     res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
     
-groups = [[15], [16], [17], [18], [19], [20], [21], [22], [23], [24], [25], [26], [27], [28], ]
+groups = [[15], [16], [17], [18], [19], [20], [21], ]
 # groups = [[0], [1], [2], ]
 
 for i, group in enumerate(groups):
@@ -129,19 +119,19 @@ for i, group in enumerate(groups):
     if i == 0:
         kernel_yes_ = kernel_yes.copy()
         kernel_no_ = kernel_no.copy()
-    if i == 7:
-        kernel_yes_ = kernel_yes.copy()
-        kernel_no_ = kernel_no.copy()
-        
+    
     x = np.arange(kernel_yes.shape[0]) * dt
     
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(1,1,1)
-    if not i == 0:
-        ax.plot(x, kernel_yes_, lw=1, color='orange', alpha=0.2)
-        ax.plot(x, kernel_no_, lw=1, color='forestgreen', alpha=0.2)
-    ax.plot(x, kernel_yes, lw=1, color='orange', label='choice a')
-    ax.plot(x, kernel_no, lw=1, color='forestgreen', label='choice b')
+    if i == 0:
+        ax.plot(x, kernel_yes_, lw=1, color='orange')
+        ax.plot(x, kernel_no_, lw=1, color='forestgreen')
+    else:
+        # ax.plot(x, kernel_yes, lw=1, color='orange', label='choice a')
+        # ax.plot(x, kernel_no, lw=1, color='forestgreen', label='choice b')
+        ax.plot(x, kernel_yes-kernel_yes_, lw=1, color='orange', label='choice a')
+        ax.plot(x, kernel_no-kernel_no_, lw=1, color='forestgreen', label='choice b')
     
     plt.axhline(0, color='k', lw=0.5)
     # ax.set_ylim(-0.25, 0.25)
@@ -154,5 +144,3 @@ for i, group in enumerate(groups):
     plt.legend()
     plt.tight_layout()
     fig.savefig(os.path.join(fig_folder, 'kernels_{}.pdf'.format(i)))
-    
-    

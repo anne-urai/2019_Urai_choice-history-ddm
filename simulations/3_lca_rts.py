@@ -11,7 +11,7 @@ import seaborn as sns
 import pandas as pd
 from IPython import embed as shell
 
-from models import LCA_traces_get, LCA_traces_apply_bounds
+from models import LCA_traces_get, two_accumulater_traces_apply_bounds
 
 sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'axes.linewidth': 0.25, 
@@ -48,11 +48,10 @@ def do_simulations(params):
                                 w=params['w'],
                                 dc=params['dc'],
                                 z=params['z'],
-                                linear=params['linear'],
                                 pre_generated=False,
                                 stim=stim,
                                 nr_trials=params['nr_trials'],)
-        rt_dum, response_dum = LCA_traces_apply_bounds(x1, x2, a=params['a'],)
+        rt_dum, response_dum = two_accumulater_traces_apply_bounds(x1, x2, a=params['a'],)
         
         rt.append(rt_dum)
         response.append(response_dum)
@@ -80,60 +79,31 @@ z = 0
 
 sArray = [
     
-    # LCA #
-    #######
-    # 6 LCA neutral:
-    {'subj_idx':0, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':1, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':2, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
+    # LCA neutral:
+    {'subj_idx':0, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':1, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':2, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
 
     # LCA starting point bias:
-    {'subj_idx':3, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.1,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':4, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.2,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':5, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.3,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':3, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.1,z], 'nr_trials':nr_trials},
+    {'subj_idx':4, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.2,z], 'nr_trials':nr_trials},
+    {'subj_idx':5, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.3,z], 'nr_trials':nr_trials},
 
     # LCA input bias:
-    {'subj_idx':6, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.004,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':7, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.005,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':8, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.006,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':6, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.004,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':7, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.005,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':8, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.006,dc], 'z':[z,z], 'nr_trials':nr_trials},
 
     # LCA leak bias:
-    {'subj_idx':9, 'v':[v,0], 'k':[k-0.002,k+0.002], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':10, 'v':[v,0], 'k':[k-0.003,k+0.003], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':11, 'v':[v,0], 'k':[k-0.004,k+0.004], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':9, 'v':[v,0], 'k':[k-0.002,k+0.002], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':10, 'v':[v,0], 'k':[k-0.003,k+0.003], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':11, 'v':[v,0], 'k':[k-0.004,k+0.004], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
 
     # LCA inhibition bias:
-    {'subj_idx':12, 'v':[v,0], 'k':[k,k], 'w':[w+0.002,w-0.002], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':13, 'v':[v,0], 'k':[k,k], 'w':[w+0.003,w-0.003], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':14, 'v':[v,0], 'k':[k,k], 'w':[w+0.004,w-0.004], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':12, 'v':[v,0], 'k':[k,k], 'w':[w+0.002,w-0.002], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':13, 'v':[v,0], 'k':[k,k], 'w':[w+0.003,w-0.003], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':14, 'v':[v,0], 'k':[k,k], 'w':[w+0.004,w-0.004], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
     
-    # OU #
-    ######
-    # 6 LCA neutral:
-    {'subj_idx':15, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':16, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':17, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-
-    # LCA starting point bias:
-    {'subj_idx':18, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.1,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':19, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.2,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':20, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.3,z], 'linear':True, 'nr_trials':nr_trials},
-
-    # LCA input bias:
-    {'subj_idx':21, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.004,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':22, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.005,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':23, 'v':[v,0], 'k':[k,k], 'w':[w,w], 'a':[a,a], 'dc':[dc+0.006,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-
-    # LCA leak bias:
-    {'subj_idx':24, 'v':[v,0], 'k':[k-0.002,k+0.002], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':25, 'v':[v,0], 'k':[k-0.003,k+0.003], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':26, 'v':[v,0], 'k':[k-0.004,k+0.004], 'w':[w,w], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-
-    # LCA inhibition bias:
-    {'subj_idx':27, 'v':[v,0], 'k':[k,k], 'w':[w+0.002,w-0.002], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':28, 'v':[v,0], 'k':[k,k], 'w':[w+0.003,w-0.003], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-    {'subj_idx':29, 'v':[v,0], 'k':[k,k], 'w':[w+0.004,w-0.004], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':True, 'nr_trials':nr_trials},
-
     ]
 
 if simulate:
@@ -141,15 +111,12 @@ if simulate:
     n_jobs = 16
     res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
 
-groups = [[0,1,2], [3,4,5], [6,7,8], [9,10,11], [12,13,14], [15,16,17], [18,19,20], [21,22,23], [24,25,26], [27,28,29],]
+groups = [[0,1,2], [3,4,5], [6,7,8], [9,10,11], [12,13,14],]
 quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 for i, group in enumerate(groups):
     
     # neutral:
-    if i >= 4:
-        df_neutral = pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(0)))
-    else:
-        df_neutral = pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(15)))
+    df_neutral = pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(0)))
     mean_correct = df_neutral.correct.mean()
     mean_response = df_neutral.response.mean()
     
@@ -216,9 +183,9 @@ for i, group in enumerate(groups):
 # save combined for DDM fitting:
 groups = [[4], [7], [10], [13],]
 for i, group in enumerate(groups): 
-    df_neutral = pd.read_csv(os.path.join('lca_data', 'df_{}.csv'.format(1)))
+    df_neutral = pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(1)))
     df_neutral.loc[:,'condition'] = 0
-    df = pd.concat([pd.read_csv(os.path.join('lca_data', 'df_{}.csv'.format(g))) for g in group], axis=0)
+    df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
     df.loc[:,'condition'] = 1
     df_combined = pd.concat((df_neutral, df))
     df_combined.loc[:,'subj_idx'] = 0
