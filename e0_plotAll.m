@@ -49,12 +49,13 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 if 0,
     b2_HDDM_readIntoMatlab(datasets);
     b2b_Gsq_readIntoMatlab(datasets);
-    b3_makeDataframe(datasets);
+	b3_makeDataframe(datasets);
     b4_renamePPCfiles(datasets);
 end
 
 disp('starting');
-e3_serialBias_SfN_Posteriors_StartingPoint;
+
+previousError_a_v;
 
 assert(1==0);
 

@@ -127,7 +127,8 @@ for d = 1:length(datasets),
     
     try
         difference = dat.v_0_ - dat.v_1_;
-        h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues', d);
+       % h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues', d);
+	    violinPlot_distribution(d, difference, colors(d, :));
         
     catch % plot separately for each difficulty level
         
@@ -137,7 +138,9 @@ for d = 1:length(datasets),
         
         for c = 1:length(driftvars_correct),
             difference = (dat.(driftvars_error{c})) - (dat.(driftvars_correct{c}));            
-            h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues',d+(0.1*c)-0.3, 'distWidth', 0.1, 'histOpt', 1.1);
+           % h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues',d+(0.1*c)-0.3, 'distWidth', 0.1, 'histOpt', 1.1);
+		    violinPlot_distribution(d+(0.15*c)-0.4, difference, colors(d, :), 25);
+			
         end
     end
 end
@@ -161,7 +164,9 @@ plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
 for d = 1:length(datasets),
     dat = readtable(sprintf('%s/%s/stimcoding_prevcorrect/group_traces.csv', mypath, datasets{d}));
     difference = dat.a_0_ - dat.a_1_;
-    h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues', d);
+    % h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues', d);
+    violinPlot_distribution(d, difference, colors(d, :));
+	
 end
 
 set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');

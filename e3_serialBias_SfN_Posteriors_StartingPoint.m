@@ -48,8 +48,11 @@ plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
 
 for d = 1:length(datasets),
     dat = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
+	disp(datasets{d});
     difference = dat.dc_1_ - dat.dc__1_;
-    h = violinPlot(difference, 'color', colors2(d, :), 'showMM', 6, 'xValues', d);
+    %h = violinPlot(difference, 'color', colors2(d, :), 'showMM', 6, 'xValues', d);
+    violinPlot_distribution(d, difference, colors2(d, :));
+	
     legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
     
     % add something to indicate significance
