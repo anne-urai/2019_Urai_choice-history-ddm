@@ -54,7 +54,7 @@ if 0,
 end
 
 disp('starting');
-e6_serialBias_SfN_modelFree_CRF_PPC;
+e3_serialBias_SfN_Posteriors_StartingPoint;
 
 assert(1==0);
 
@@ -154,6 +154,9 @@ multiplicative_vbias_DIC;
 % ========================= %
 
 kostis_makeTable;
+kostis_plotRamp_correlation;
+kostis_plotRamp_BIC;
+kostis_plotOU_BIC;
 kostis_plotOU;
 
 % ========================= %

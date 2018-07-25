@@ -8,8 +8,6 @@ function [rho, tt, handles] = plotScatter(allresults, fld, legendWhere, doText)
 % Copyright (c) Anne Urai, 2018
 % anne.urai@gmail.com
 
-doText = 0;
-
 % overall correlation
 x = cat(1, allresults(:).(fld));
 y = cat(1, allresults(:).criterionshift);
@@ -61,9 +59,9 @@ axis tight; offsetAxes;
 
 if doText,
     % PRINT THE CORRELATION COEFFICIENT
-    txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
+    txt = {sprintf('r(%d) = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
     if pval < 0.001,
-        txt = {sprintf('r_{%d} = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
+        txt = {sprintf('r(%d) = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
     end
     tt = text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
         min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...
