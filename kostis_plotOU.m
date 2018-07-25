@@ -3,9 +3,14 @@ function kostis_plotOU
 global mypath datasets datasetnames
 
 %% compare correlation coefficients
+close all; 
 results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
-corrplot(results, {'repetition_alldata', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
+corrplot(results, {'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias', 'repetition_alldata'});
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter.pdf'));
+
+close; 
+corrplot(results, {'repetition_alldata', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter_2.pdf'));
 
 %% separately, test correlation coefficients
     
