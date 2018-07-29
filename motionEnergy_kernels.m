@@ -16,6 +16,7 @@ corresponding to natural blocks in the experiment after which participants took 
 short break. The expectation is across trials.
 %}
 
+close all;
 path = '~/Data/psychophysicalKernels';
 load(sprintf('%s/%s', path, 'motionEnergyData_AnkeMEG_neutral.mat'));
 
@@ -24,22 +25,6 @@ load(sprintf('%s/%s', path, 'motionEnergyData_AnkeMEG_neutral.mat'));
 % data.motionenergy_normalized    = data.motionenergy_normalized([data.behavior.transitionprob] == 0.5, :);
 % data.behavior                   = data.behavior([data.behavior.transitionprob] == 0.5, :);
 
-% recode into choices that are biased
-data.behavior.repeat = (data.behavior.response == data.behavior.prevresp);
-
-% for each observers, compute their bias
-[gr, sjs]   = findgroups(data.behavior.subj_idx);
-sjrep       = splitapply(@nanmean, data.behavior.repeat, gr);
-sjrep       = sjs(sjrep < 0.5);
-
-% recode into biased and unbiased choices
-data.behavior.biased = data.behavior.repeat;
-altIdx      = ismember(data.behavior.subj_idx, sjrep);
-data.behavior.biased(altIdx) = double(~(data.behavior.biased(altIdx))); % flip
-
-% =============================== %
-% PSYCHOPHYSICAL KERNELS
-% =============================== %
 
 % use the normalized motion energy, so that the units are % coherence 'up'
 data.motionenergy = data.motionenergy_normalized;
@@ -54,6 +39,67 @@ end
 % what is the time-course of evidence that leads subjects to make their
 % preferred vs non-preferred choice?
 kernelFun       = @(x, y) nanmean(x(y, :)) - nanmean(x(~y, :));
+
+% recode into choices that are biased or not
+data.behavior.repeat = (data.behavior.response == data.behavior.prevresp);
+
+% for each observers, compute their bias
+[gr, sjs]   = findgroups(data.behavior.subj_idx);
+sjrep       = splitapply(@nanmean, data.behavior.repeat, gr);
+sjrep       = sjs(sjrep < 0.5);
+
+% recode into biased and unbiased choices
+data.behavior.biased = data.behavior.repeat;
+altIdx      = ismember(data.behavior.subj_idx, sjrep);
+data.behavior.biased(altIdx) = double(~(data.behavior.biased(altIdx))); % flip
+
+% bin
+coh                   = [data.behavior.stimulus .* data.behavior.coherence];
+[gr, sj, coh]         = findgroups(data.behavior.subj_idx, coh);
+biasedkernels         = splitapply(kernelFun, data.motionenergy, (data.behavior.response > 0), gr);
+
+% average within each subject!
+biasedkernels = splitapply(@nanmean, biasedkernels, findgroups(sj));
+
+% =============================== %
+% PSYCHOPHYSICAL KERNELS - without bias
+% =============================== %
+
+% then average over coherence levels within each subject
+subplot(441);
+hold on;
+colors(1, :) = [0.3 0.3 0.3]; c = 1;
+plot(data.timeaxis, nanmean(biasedkernels), 'color', colors(c, :), 'linewidth', 0.5);
+b{c} = boundedline(data.timeaxis(13:end), nanmean(biasedkernels(:, 13:end)), ...
+    nanstd(biasedkernels(:, 13:end)) ./ sqrt(length(unique(sj))), 'cmap', colors(c, :), 'alpha');
+plot(data.timeaxis(13:end), nanmean(biasedkernels(:, 13:end)), 'color', colors(c, :), 'linewidth', 1);
+axis tight;
+
+% do statistics on the timecourse
+% [h, p, stat] = ttest_clustercorr(biasedkernels(pref == 0, :), biasedkernels(pref == 1, :));
+[h, pval] = ttest(biasedkernels);
+[h, crit_p] = fdr_bh(pval, 0.05);
+
+% remove significance during filter rise time
+h(1:12) = 0;
+
+ylims = get(gca, 'Ylim');
+mask = double(h);
+mask(mask==0) = nan;
+mask = ((ylims(2)*0.1)+ylims(1))*mask; % plot a tiny bit above the lower ylim
+plot(data.timeaxis, mask, '.', 'MarkerSize', 10, 'color', 'k');
+
+ylabel({'Excess motion'; 'energy fluctuations (%)'});
+xlabel('Time from stimulus onset (s)');
+axis tight; xlim([0 0.75]); set(gca, 'xtick', 0:0.25:0.75);
+box off; offsetAxes;
+set(gca, 'xcolor', 'k', 'ycolor', 'k');
+tightfig;
+print(gcf, '-dpdf', '~/Data/serialHDDM/psychophysicalKernels.pdf');
+
+% =============================== %
+% PSYCHOPHYSICAL KERNELS
+% =============================== %
 
 % average those within each subject?
 close all;
@@ -81,8 +127,9 @@ if selectTrialNum
     legend([h{:}], {'0', '3', '9', '27', '81'});
 end
 
+% average within subjects
 [gr, sj, pref]   = findgroups(sj, pref);
-meanFun = @(x) nanmean(x, 1); % make sure to average over first dim
+meanFun          = @(x) nanmean(x, 1); % make sure to average over first dim
 biasedkernels    = splitapply(meanFun, biasedkernels, gr);
 
 % then average over coherence levels within each subject
@@ -101,6 +148,8 @@ end
 legend([b{:}], {'non-preferred', 'preferred'}, 'location', 'eastoutside');
 legend boxoff;
 axis tight;
+
+
 %% do statistics on the timecourse
 % [h, p, stat] = ttest_clustercorr(biasedkernels(pref == 0, :), biasedkernels(pref == 1, :));
 [h, pval] = ttest(biasedkernels(pref == 0, :), biasedkernels(pref == 1, :));
@@ -122,6 +171,8 @@ box off; offsetAxes;
 
 set(gca, 'xcolor', 'k', 'ycolor', 'k');
 tightfig;
-print(gcf, '-dpdf', '~/Data/serialHDDM/psychophysicalKernels.pdf');
+print(gcf, '-dpdf', '~/Data/serialHDDM/psychophysicalKernels_biased.pdf');
+
+
 
 end

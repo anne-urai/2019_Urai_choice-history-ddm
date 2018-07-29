@@ -105,4 +105,27 @@ tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_correlations.pdf'));
 
 
+%% =========================================== %
+% OVERALL LEAK PARAMETER
+% ============================================ %
+
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
+
+close all;
+sp = subplot(3,6,1);
+hold on;
+% plot identity line
+plot([0.8 1.2], [0 0], '-', 'linewidth', 0.5, 'color', [0.5 0.5 0.5]);
+
+lambda = results.ouK_vanilla_dv;
+h = scatter(1*ones(size(lambda)), lambda, 3, colors(3, :), 'jitter', 'on', 'jitteramount', 0.07);
+plot([1-0.1 1+0.1], [nanmean(lambda) nanmean(lambda)], 'k-');
+pval = permtest(lambda);
+mysigstar(gca, 1, max(get(gca, 'ylim')), pval);
+%legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
+ylabel('Effective leak (\lambda)');
+set(gca, 'xtick', [0.9 1.1], 'xticklabel', []); offsetAxes;
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_lambda.pdf'));
+
 end

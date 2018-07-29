@@ -12,75 +12,8 @@ warning off; close all;
 global mypath datasets datasetnames 
 colors = cbrewer('qual', 'Set2', length(datasets));
 
-% % ========================================= %
-% % POST-ERROR SLOWING
-% % ========================================= %
-% 
-% close all;
-% sp = subplot(3,3,1);
-% hold on;
-% % plot identity line
-% plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
-% 
-% for d = 1:length(datasets),
-%     
-%     % COMPUTE POST ERROR SLOWING
-%      filename = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
-%      alldata  = readtable(sprintf('%s/%s/%s', mypath, datasets{d}, filename.name));
-%      alldata.PES = nan(size(alldata.rt));
-%      alldata.correct = ((alldata.stimulus > 0) == (alldata.response > 0));
-%      
-%           % include only cases where the pre-error and post-error trials were correct?
-%      errortrls = find(alldata.correct == 0  ...
-%          & circshift(alldata.correct, 1) == 1 & circshift(alldata.correct, -1) == 1);
-%      errortrls(errortrls < 2) = [];
-%      errortrls(errortrls > (length(alldata.rt) - 1)) = [];
-% 
-%      % compute
-%      alldata.PES(errortrls) = alldata.rt(errortrls + 1) - alldata.rt(errortrls - 1);
-%      
-%      PES = splitapply(@nanmedian, alldata.PES, findgroups(alldata.subj_idx));
-%      h = scatter(d*ones(size(PES)), PES, 3, colors(d, :), 'jitter', 'on', 'jitteramount', 0.05);
-%      plot([d-0.2 d+0.2], [nanmean(PES) nanmean(PES)], 'k-');
-%      pval = permtest(PES);
-%      mysigstar(gca, d, -0.1, pval);
-%      legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
-%      
-% end
-% 
-% ylim([-0.12 0.15]);
-% set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
-% ylabel({'Post-error slowing' 'RT_{e+1} - RT_{e-1}'});
-% offsetAxes;
-% tightfig;
-% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PostErrorSlowing_Dutilh.pdf'));
-
 % ========================================= %
-% % POST ERROR SLOWING - TRADITIONAL
-% % ========================================= %
-% 
-% close all;
-%     subplot(3,3,1); hold on;
-% for d = 1:length(datasets),
-%     
-%     colormap(viridis);
-%     
-%     % COMPUTE POST ERROR SLOWING
-%     results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-%     results = results(results.session == 0, :);
-%     try
-%     scatter(results.a_0__stimcodingprevcorrect - results.a_1__stimcodingprevcorrect, ...
-%         results.v_1__stimcodingprevcorrect - results.v_0__stimcodingprevcorrect, ...
-%         10, results.posterrorslowing);
-%     end
-% end
-% 
-% xlabel('a'); ylabel('v'); colorbar; prettyColorbar('rt');
-% 
-% 
-
-% ========================================= %
-
+% POST-ERROR SLOWING
 % ========================================= %
 
 close all;
