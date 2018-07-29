@@ -55,8 +55,6 @@ end
 
 disp('starting');
 
-previousError_a_v;
-
 assert(1==0);
 
 % ======================= %
