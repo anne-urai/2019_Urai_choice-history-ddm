@@ -35,7 +35,7 @@ datasetnames = {{'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, .
 
 % go to code
 try
-    cd('/Users/anne/Desktop/code/serialDDM');
+    cd('/Users/urai/Documents/code/serialDDM');
 end
 
 % from Thomas, green blue grey
@@ -54,7 +54,6 @@ if 0,
 end
 
 disp('starting');
-
 assert(1==0);
 
 % ======================= %

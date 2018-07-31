@@ -8,8 +8,8 @@ function alldat = kostis_plotRamp_correlation
 % anne.urai@gmail.com
 
 close all; clc;
-global mypath datasets datasetnames colors
-
+global mypath datasets
+d = 4;
 results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
 
 % ============================================ %
@@ -19,8 +19,8 @@ results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', myp
 results.criterionshift = results.repetition_alldata;
 
 % assign to structure
-allresults.z_prevresp     = results.ouK_sp_spbias;
-allresults.v_prevresp     = results.ouK_input_inputbias;
+allresults.z_prevresp     = results.ddmK_rp2_offset;
+allresults.v_prevresp     = results.ddmK_rp2_slope;
 allresults.criterionshift = results.criterionshift;
 
 allresults.marker 			= 'o';
@@ -55,9 +55,9 @@ sp2.Position(1) = sp2.Position(1) - 0.08;
 
 % add colored axes after suplabel (which makes them black)
 
-xlabel(sp2, {'Ramp slope'});
+xlabel(sp2, {'Ramp (slope \beta_1)'});
 set(sp2, 'xcolor', 'k',  'ycolor', 'k');
-xlabel(sp1, {'Ramp offset'});
+xlabel(sp1, {'Static (offset \beta_0)'});
 set(sp1, 'xcolor', 'k', 'ycolor', 'k');
 %% add line between the two correlation coefficients
 txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};

@@ -44,7 +44,7 @@ set(gca, 'xcolor', 'k', 'ycolor', 'k');
 %title(datasetnames{d});
 
 ylabel({'\DeltaBIC from DDM'; 'without history'}, 'interpreter', 'tex');
-set(gca, 'xtick', 1:3, 'xticklabel', {'offset', 'slope', 'offset+slope'}, 'xticklabelrotation', -30);
+set(gca, 'xtick', 1:3, 'xticklabel', {'static', 'ramp', 'static+ramp'}, 'xticklabelrotation', -30);
 
 drawnow; tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/BIC_ramping.pdf'));

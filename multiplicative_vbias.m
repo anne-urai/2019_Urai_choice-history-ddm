@@ -66,7 +66,6 @@ for d = [4 5],
         case 4
             cohs = {'0' '03' '09' '27' '81'};
             cohlevels = [0 3 9 27 81];
-            
     end
     
     % find the original datafile
@@ -152,6 +151,7 @@ for d = [4 5],
     xlim([min([0.5 get(gca, 'xlim')]) max(get(gca, 'xlim'))]);
     offsetAxes;
     ylabel('P(bias)');
+    xlabel('Coherence (%)');
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_per_coherence_d%d.pdf', d));
     
