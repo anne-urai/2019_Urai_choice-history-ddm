@@ -9,7 +9,7 @@ function e1_serialBias_SfN_BIC()
 
 addpath(genpath('~/code/Tools'));
 warning off; close all;
-global datasets datasetnames mypath
+global datasets datasetnames mypath colors
 
 types = {'stimcoding'};
 for s = 1:length(types),
@@ -25,7 +25,7 @@ for s = 1:length(types),
         close all;
         subplot(4, 6, 1);
         getPlotDIC(mdls, d);
-        % title(datasetnames{d});
+         title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'z_{bias}', 'v_{bias}', 'both'});
         
         % if ismember(d, [1]),
@@ -46,7 +46,8 @@ end
 
 function getPlotDIC(mdls, d)
 
-global datasets mypath
+global datasets mypath colors
+colors(3, :) = mean(colors([1 2], :));
 axis square; hold on;
 
 allres = readtable(sprintf('%s/summary/%s/allindividualresults_Gsq.csv', ...
@@ -68,10 +69,10 @@ mdldic = bsxfun(@minus, mdldic, mdldic(:, end));
 mdldic = mdldic(:, 1:end-1);
 
 % sum over observers
-mdldic = mean(mdldic);
+mdldic = sum(mdldic);
 
 % nice looking bargraphs
-colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
+% colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;
 [~, bestMdl] = min(mdldic);
 
 for i = 1:length(mdldic),
