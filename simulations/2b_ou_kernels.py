@@ -36,6 +36,8 @@ dt = 1
 timesteps = int(t/dt)
 print(timesteps)
 
+timepoint=60
+
 def do_simulations(params):
     
     rt = []
@@ -52,7 +54,7 @@ def do_simulations(params):
                                 nr_trials=params['nr_trials'],
                                 timesteps=timesteps,
                                 )
-        rt_dum, response_dum = two_accumulater_traces_apply_timepoint(x1, x2)
+        rt_dum, response_dum = two_accumulater_traces_apply_timepoint(x1, x2, timepoint=timepoint)
         rt.append(rt_dum)
         response.append(response_dum)
         stimulus.append(np.ones(params['nr_trials']) * stim)
@@ -85,7 +87,7 @@ sArray = [
     {'subj_idx':12, 'v':inputs, 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
     {'subj_idx':13, 'v':inputs, 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.5,z], 'nr_trials':nr_trials},
     {'subj_idx':14, 'v':inputs, 'ou':[ou,ou], 'a':[a,a], 'dc':[dc+0.002,dc], 'z':[z,z], 'nr_trials':nr_trials},
-    {'subj_idx':15, 'v':inputs, 'ou':[ou+0.0001,ou-0.0002], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':15, 'v':inputs, 'ou':[ou+0.0004,ou-0.0004], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
     ]
 
 if simulate:
@@ -129,7 +131,7 @@ for i, group in enumerate(groups):
     
     plt.axhline(0, color='k', lw=0.5)
     # ax.set_ylim(-0.25, 0.25)
-    ax.set_xlim(0, t)
+    ax.set_xlim(0, timepoint)
     ax.set_title('choice={}; correct={}'.format(round(df.loc[:, 'response'].mean(), 3), 
                                                 round(df.loc[:, 'correct'].mean(), 3),))
     ax.set_xlabel('Timesteps')

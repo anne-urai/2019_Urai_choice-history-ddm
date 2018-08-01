@@ -77,24 +77,24 @@ z = 0
 sArray = [
     
     # OU neutral:
-    {'subj_idx':0, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':1, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':2, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':0, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':1, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':2, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
 
     # OU starting point bias:
-    {'subj_idx':3, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.3,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':4, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.5,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':5, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.7,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':3, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.3,z], 'nr_trials':nr_trials},
+    {'subj_idx':4, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.5,z], 'nr_trials':nr_trials},
+    {'subj_idx':5, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc,dc], 'z':[z+0.7,z], 'nr_trials':nr_trials},
 
     # OU input bias:
-    {'subj_idx':6, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc+0.004,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':7, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc+0.006,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':8, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc+0.008,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':6, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc+0.004,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':7, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc+0.006,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':8, 'v':[v,0], 'ou':[ou,ou], 'a':[a,a], 'dc':[dc+0.008,dc], 'z':[z,z], 'nr_trials':nr_trials},
 
     # OU leak bias:
-    {'subj_idx':9, 'v':[v,0], 'ou':[ou+0.002,ou-0.002], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':10, 'v':[v,0], 'ou':[ou+0.003,ou-0.003], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
-    {'subj_idx':11, 'v':[v,0], 'ou':[ou+0.004,ou-0.004], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'linear':False, 'nr_trials':nr_trials},
+    {'subj_idx':9, 'v':[v,0], 'ou':[ou+0.002,ou-0.002], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':10, 'v':[v,0], 'ou':[ou+0.003,ou-0.003], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
+    {'subj_idx':11, 'v':[v,0], 'ou':[ou+0.004,ou-0.004], 'a':[a,a], 'dc':[dc,dc], 'z':[z,z], 'nr_trials':nr_trials},
     
     ]
 

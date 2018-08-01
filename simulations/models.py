@@ -112,9 +112,9 @@ def two_accumulater_traces_apply_bounds(x1, x2, a=[0.15, 0.15],):
                 break
     return rt, response
 
-def two_accumulater_traces_apply_timepoint(x1, x2, timestep=None):
+def two_accumulater_traces_apply_timepoint(x1, x2, timepoint=None):
     
-    if timestep:
+    if timepoint:
         response = np.array(x1[:,timepoint] > x2[:,timepoint], dtype=int)
         rt = np.ones(x1.shape[0]) * timepoint
     else:
