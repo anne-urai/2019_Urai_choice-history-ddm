@@ -258,7 +258,7 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_dc_z_prevcorrect',#6
     'stimcoding_prevcorrect',#7
     'stimcoding_dc_z_prev2resp', #8
-    'stimcoding_dc_z_prevresp_multiplicative'] #9
+    'stimcoding_dc_prevresp_multiplicative'] #9
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_neutral', 'Anke_MEG_transition'] 
 
