@@ -161,6 +161,8 @@ for qidx = 1:2,
         
         axis tight; box off;
         set(gca, 'xtick', qntls);
+        set(gca,  'ylim', [0.5 max(get(gca, 'ylim'))]);
+
         axis square;  offsetAxes;
         xlabel('RT (quantiles)');
         set(gca, 'xcolor', 'k', 'ycolor', 'k');
