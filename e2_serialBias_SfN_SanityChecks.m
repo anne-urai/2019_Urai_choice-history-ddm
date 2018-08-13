@@ -143,7 +143,7 @@ for d = 1:length(datasets),
         handles.Box = 'off';
         
         % find the right place for tickmarks
-        if d == 2,
+        if d == 5,
             handles.Ticks = linspace(0.75, 3.25, 7);
             handles.TickLabels = {'0.6' '1.2' '2.5' '5' '10' '20' '30'};
         elseif d == 4,

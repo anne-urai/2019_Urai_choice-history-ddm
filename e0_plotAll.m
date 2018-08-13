@@ -151,6 +151,7 @@ multiplicative_vbias_DIC;
 % KOSTIS' O-U MODELS
 % ========================= %
 
+kostis_driftRate;
 kostis_makeTable;
 kostis_plotRamp_correlation;
 kostis_plotRamp_BIC;

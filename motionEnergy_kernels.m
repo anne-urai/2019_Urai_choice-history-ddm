@@ -18,7 +18,9 @@ short break. The expectation is across trials.
 
 close all;
 path = '~/Data/psychophysicalKernels';
-load(sprintf('%s/%s', path, 'motionEnergyData_AnkeMEG_neutral.mat'));
+
+% either all the data or only neutral
+load(sprintf('%s/%s', path, 'motionEnergyData_AnkeMEG.mat'));
 
 % only select neutral
 % data.motionenergy               = data.motionenergy([data.behavior.transitionprob] == 0.5, :);
@@ -76,9 +78,9 @@ plot(data.timeaxis(13:end), nanmean(biasedkernels(:, 13:end)), 'color', colors(c
 axis tight;
 
 % do statistics on the timecourse
-% [h, p, stat] = ttest_clustercorr(biasedkernels(pref == 0, :), biasedkernels(pref == 1, :));
-[h, pval] = ttest(biasedkernels);
-[h, crit_p] = fdr_bh(pval, 0.05);
+[h, p, stat] = ttest_clustercorr(biasedkernels);
+%[h, pval] = ttest(biasedkernels);
+%[h, crit_p] = fdr_bh(pval, 0.05);
 
 % remove significance during filter rise time
 h(1:12) = 0;

@@ -35,6 +35,8 @@ for f = 2:length(files),
     % SAVE THE NORMALIZED RESULTS
     savefast(sprintf('%s/%s', path, files{f}), 'data');
     
+    keepData = data;
+    
     %% make one with only neutral data
     data.motionenergy = data.motionenergy(data.behavior.transitionprob == 0.5, :);
     data.motionenergy_normalized = data.motionenergy_normalized(data.behavior.transitionprob == 0.5, :);
@@ -45,6 +47,7 @@ for f = 2:length(files),
     % WRITE TO CSV FOR HDDM
     % =============================== %
     
+    data = keepData; % keep all trials
     dat = data.behavior;
     dat.prevrt = circshift(dat.RT, 1);
 
