@@ -258,7 +258,8 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_dc_z_prevcorrect',#6
     'stimcoding_prevcorrect',#7
     'stimcoding_dc_z_prev2resp', #8
-    'stimcoding_dc_prevresp_multiplicative'] #9
+    'stimcoding_dc_prevresp_multiplicative', #9
+    'stimcoding_dc_z_prevresp_multiplicative'] #10
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_neutral', 'Anke_MEG_transition'] 
 
@@ -393,7 +394,8 @@ for dx in d:
             for subj_idx, subj_data in mydata.groupby('subj_idx'):
                 m_subj    = make_model(mypath, subj_data, models[vx], trace_id)
                 # m_subj.find_starting_values() # this may help the fits
-                thismodel = m_subj.optimize('gsquare')
+                # thismodel = m_subj.optimize('gsquare')
+                thismodel = m_subj.optimize('gsquare', quantiles=[0.1, 0.3, 0.5, 0.7, 0.9], n_runs=5)
                 thismodel.update({'subj_idx':subj_idx}) # keep original subject number
                 subj_params.append(thismodel)
                 bic.append(m_subj.bic_info)

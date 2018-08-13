@@ -28,7 +28,7 @@ switch usr
 end
 
 % neutral vs biased plotsC
-datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
+datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG'};
 datasetnames = {{'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
     {'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}};
@@ -46,7 +46,7 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 %colors = [178,24,43; 33,102,172] ./ 256; % red blue
 
 %% PREPARING DATA
-if 0,
+if 1,
     b2_HDDM_readIntoMatlab(datasets);
     b2b_Gsq_readIntoMatlab(datasets);
 	b3_makeDataframe(datasets);

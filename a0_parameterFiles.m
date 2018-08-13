@@ -13,8 +13,8 @@ function [] = a0_parameterFiles()
 % ============================================ #s
 
 nsmp       = [5000]
-datasets   = [0:5]; % RT-RDK and MEG-PL
-models     = [9]; % the nr of the models
+datasets   = [0:6]; % dataset number
+models     = [3]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
