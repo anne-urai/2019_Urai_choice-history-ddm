@@ -60,6 +60,8 @@ params_ddm_rp = array2table([params ll2bic(Gf, 5, notrials)], 'variablenames', {
 load(sprintf('%s/DDM_RP3.mat', kostisPath));
 % So the offset is pars(7) and the slope pars(6)
 params_ddm_rp2 = array2table([params ll2bic(Gf, 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'offset', 'bic'});
+% parameter 6 is the unsigned slope (absolute slope). To convert it into the actual plot just multiply it with the sign(parameter 7) ie sign(offset)
+params_ddm_rp2.slope = params_ddm_rp2.slope .* sign(params_ddm_rp2.offset);
 
 params_ddm.Properties.VariableNames         = cellfun((@(x) cat(2, 'ddmK_vanilla_', x)), params_ddm.Properties.VariableNames, 'un', 0);
 params_ddm_sp.Properties.VariableNames      = cellfun((@(x) cat(2, 'ddmK_z_', x)), params_ddm_sp.Properties.VariableNames, 'un', 0);
@@ -83,5 +85,10 @@ close all;
 corrplot(results, {'repetition_alldata', 'ddmK_rp_slope', 'ddmK_dc_dcbias', ...
     'ddmK_rp2_slope', 'ddmK_rp2_offset'});
 print(gcf, '-dpdf', '~/Data/serialHDDM/kostisData_overview_DDM_ramp.pdf');
+
+close all;
+corrplot(results, {'repetition_alldata', 'repetition'})
+print(gcf, '-dpdf', '~/Data/serialHDDM/repetition_comparison.pdf');
+
 
 end
