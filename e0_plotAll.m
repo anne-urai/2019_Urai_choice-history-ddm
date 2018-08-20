@@ -29,9 +29,13 @@ end
 
 % neutral vs biased plotsC
 datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG'};
+
 datasetnames = {{'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
     {'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}};
+
+% for CCN poster
+datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
 
 % go to code
 try
@@ -69,9 +73,10 @@ f0_schematic_DDM_bias; % figure 3a
 e1_serialBias_SfN_DIC;
 e3_serialBias_SfN_repetitionRange;
 e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+strategyPlot;
+
 e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
 e6_serialBias_SfN_modelFree_CRF_PPC;
-strategyPlot;
 
 % ======================= %
 % POSTERIORS

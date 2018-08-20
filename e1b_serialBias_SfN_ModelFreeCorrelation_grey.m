@@ -136,7 +136,7 @@ for d = length(datasets):-1:1
     
     % compute the difference in correlation
     [rho3, pval3] = corr(cat(1, allresults(:).v_prevresp), cat(1, allresults(:).z_prevresp), ...
-        'rows', 'complete', 'type', 'pearson');
+        'rows', 'complete', 'type', 'spearman');
     if pval3 < 0.05,
         fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
     end

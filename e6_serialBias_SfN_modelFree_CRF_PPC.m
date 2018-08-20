@@ -155,7 +155,7 @@ for qidx = 1:2,
                 allds.fast(d, m) = nanmean(avg(1));
                 allds.slow(d, m) = nanmean(avg(2));
             end
-            allds.all(d, m, :) = avg;
+           % allds.all(d, m, :) = avg;
         end
         %  end
         
@@ -210,13 +210,13 @@ for p  = 1:2,
         'ko', 'abshhxy', 0);
     set(b(1), 'markerfacecolor', 'k', 'markeredgecolor', 'w', 'markersize', 6);
     
-    title(sprintf('%s RTs', capitalize(periods{p})));
-    ylabel('P(bias)');
+    ylabel(sprintf('P(bias) on %s trials', periods{p}));
     set(gca, 'xtick', 1:5, 'xticklabel', {'No history', 'z', 'v_{bias}', 'Both', 'Data'}, ...
         'xticklabelrotation', -30);
     axis square; axis tight;
     set(gca, 'ytick', [0.5:0.01:0.54], 'ylim', [0.5 0.545]);
     offsetAxes;
+    title('All datasets');
     
     tightfig;
     set(gca, 'ycolor', 'k', 'xcolor', 'k');

@@ -17,9 +17,10 @@ global datasets datasetnames mypath
 
 % datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
 plotWhich = 'stimcoding'; % {'error', 'biased', 'stimcoding'};
+plotWhich = 'error';
 choiceCat = {{'no', 'yes'}, {'no','yes'}, {'left', 'right'}, {'down', 'up'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}};
 
-for d = 1:length(datasets),
+for d = 1:length(datasets)-1,
     close all;
     
     if ~exist(sprintf('%s/summary/%s/%s_ppc_data.csv', mypath, datasets{d}, 'stimcoding_nohist'), 'file'),
@@ -48,6 +49,7 @@ for d = 1:length(datasets),
     switch plotWhich
         case 'error'
             ppc.biased = ppc.correct;
+            ppc.response = ppc.biased;
         case 'stimcoding'
             ppc.biased = (ppc.response > 0);
     end
@@ -84,9 +86,10 @@ for d = 1:length(datasets),
     % determine the colors
     switch plotWhich
         case 'error'
-            bestcolor = linspecer(4, 'qualitative');
-            bestcolor = bestcolor([3 2], :);
-            fitcolor = [0 0 0];
+            bestcolor = cbrewer('qual', 'Dark2', 5);
+            bestcolor = bestcolor([2 1], :);
+            fitcolor = cbrewer('qual', 'Set2', 5);
+            fitcolor = fitcolor([2 1], :);
         case 'biased'
             bestcolor = cbrewer('div', 'PiYG', 6);
             bestcolor = bestcolor([1 end], :);
@@ -106,8 +109,6 @@ for d = 1:length(datasets),
     ix = unique(ppc.stimulus);
     rx = unique(ppc.response);
     for i = 1:length(ix),
-        %subplot(4,4,(i-1)*4+1);
-        % subplot(4,4,1);
         sph{i} = subplot(4,10,i);
         hold on;
         for r = 1:length(rx),
@@ -120,37 +121,47 @@ for d = 1:length(datasets),
         offsetAxes_y;
         maxRT = round(max(abs(ppc.rt)));
         if maxRT == 5, maxRT = 4; end
-			if d > 3,maxRT = 3; end
+        if d > 3,maxRT = 3; end
         xlim([0 maxRT]); set(gca, 'xtick', [0 maxRT], 'xminortick', 'on');
-       %  ylabel('Probability');
-       title({'Stimulus', capitalize(choiceCat{d}{i})}, 'color', bestcolor(i, :), 'fontweight', 'normal');
-       set(gca, 'yticklabel', []);
-   	set(gca, 'xcolor', 'k', 'ycolor', 'k');
-	   
+        %  ylabel('Probability');
+        switch plotWhich
+            case 'stimcoding'
+        title({'Stimulus', capitalize(choiceCat{d}{i})}, 'color', bestcolor(i, :), 'fontweight', 'normal');
+        end
+        set(gca, 'yticklabel', []);
+        set(gca, 'xcolor', 'k', 'ycolor', 'k');
+        
     end
     
-    % move together
-    sph{2}.Position(1) = sph{2}.Position(1) - 0.01;
-        
+    try
+        % move together
+        sph{2}.Position(1) = sph{2}.Position(1) - 0.01;
+    end
+    
     % xlabel('RT (s)');
     [ss, h1] = suplabel('RT (s)', 'x');
     ss.Position(2) = ss.Position(2) + 0.04;
-	h1.Color = 'k';
+    h1.Color = 'k';
     [ss, h1] = suplabel('Probability', 'y');
     ss.Position(1) = ss.Position(1) + 0.06;
-	h1.Color = 'k';
-    set(sph{2}, 'ylim', get(sph{1}, 'ylim'));
+    h1.Color = 'k';
+    try
+        set(sph{2}, 'ylim', get(sph{1}, 'ylim'));
+    end
     
     % legend for choices!
-    ylims = get(gca, 'ylim');
-    text(maxRT*0.7, max(ylims)*0.7, 'Choice', 'fontsize', 6);
-    text(maxRT*0.7, max(ylims)*0.6, sprintf('"%s"', capitalize(choiceCat{d}{1})), 'color', bestcolor(1, :), 'fontsize', 6);
-    text(maxRT*0.7, max(ylims)*0.5, sprintf('"%s"', capitalize(choiceCat{d}{2})), 'color', bestcolor(2, :), 'fontsize', 6);
-   
-    %set(gcf, 'color', 'none');
-    set(gca, 'xcolor', 'k', 'ycolor', 'k');
-    [ss, h1] =  suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
-    ss.Position(2) = ss.Position(2) + 0.04;
+    switch plotWhich
+        case 'stimcoding'
+            ylims = get(gca, 'ylim');
+            text(maxRT*0.7, max(ylims)*0.7, 'Choice', 'fontsize', 6);
+            text(maxRT*0.7, max(ylims)*0.6, sprintf('"%s"', capitalize(choiceCat{d}{1})), 'color', bestcolor(1, :), 'fontsize', 6);
+            text(maxRT*0.7, max(ylims)*0.5, sprintf('"%s"', capitalize(choiceCat{d}{2})), 'color', bestcolor(2, :), 'fontsize', 6);
+            
+            %set(gcf, 'color', 'none');
+            set(gca, 'xcolor', 'k', 'ycolor', 'k');
+            [ss, h1] =  suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
+            ss.Position(2) = ss.Position(2) + 0.04;
+    end
     
     tightfig;
     switch plotWhich
@@ -160,7 +171,7 @@ for d = 1:length(datasets),
             print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d_biased.pdf', d));
         case 'stimcoding'
             print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/PPC_d%d_stimcode.pdf', d));
-           % export_fig(sprintf('~/Data/serialHDDM/PPC_d%d_stimcode.eps', d));
+            % export_fig(sprintf('~/Data/serialHDDM/PPC_d%d_stimcode.eps', d));
     end
     
     
@@ -172,14 +183,14 @@ function h = histogram_smooth(x1, x2, color1, color2, fitcolor)
 
 % % manually count so i can plot myself
 % [n, edges] = histcounts(x1, -3:0.1:3, 'normalization', 'pdf');
-% 
+%
 % posidx = find(edges > 0); posidx(posidx > length(n)) = [];
 % negidx = find(edges < 0);
-% 
+%
 % % plot as stairs??
 % %bar(edges(posidx), n(posidx), 'edgecolor', 'none', 'facecolor', color1, 'barwidth', 1);
 % %bar(edges(negidx), n(negidx), 'edgecolor', 'none', 'facecolor', color2, 'barwidth', 1);
-% 
+%
 % % [n, edges] =
 
 % first the fit - make sure this is not normalized to 1!
@@ -192,13 +203,13 @@ function h = histogram_smooth(x1, x2, color1, color2, fitcolor)
 [n2, edges2] = histcounts(x2, -5:0.05:5); % much smaller steps, smoother
 
 % correctionRatio
-%n2 = n2*10; 
+%n2 = n2*10;
 stairs(edges1(1:end-1), n1, 'color', fitcolor, 'linewidth', 1);
 plot(edges2(1:end-1), n2, 'color', color1, 'linewidth', 0.75);
 
 % histogram(x2, -3:0.01:3, 'displaystyle', 'stairs', ...
 %     'edgecolor', fitcolor, 'linewidth', 0.75);
-% 
+%
 % % put the real number of trials on the y-axis
 % histogram(x1, -3:0.1:3, 'displaystyle', 'stairs', ...
 %     'edgecolor', color1, 'linewidth', 0.75);

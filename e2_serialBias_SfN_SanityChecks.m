@@ -51,7 +51,7 @@ for d = 1:length(datasets),
         alldrift  = dat{dat.session == 0, driftvars};
         
         if isempty(alldrift),
-            driftvars = regexp(vars, 'v_0_\w+__stimcodingnohist$', 'match');
+            driftvars = regexp(vars, 'v_\w+__stimcodingnohist$', 'match');
             driftvars = vars((~cellfun(@isempty, driftvars)));
             alldrift  = dat{dat.session == 0, driftvars};
         end
@@ -191,6 +191,10 @@ for d = 1:length(datasets),
         if all(cellfun(@isempty, cohflds)),
             cohflds = regexp(fieldnames(group), 'v_0_[0-9_]*_prct', 'match');
         end
+         if all(cellfun(@isempty, cohflds)),
+            cohflds = regexp(fieldnames(group), 'v_[0-9_]*_prct', 'match');
+        end
+        
         cohflds = cohflds(~cellfun(@isempty, cohflds));
         cohflds = [cohflds{:}];
         cohdat = nan(5, length(cohflds));
@@ -212,7 +216,7 @@ for d = 1:length(datasets),
         end
         
         switch datasets{d}
-            case 'Anke_MEG_neutral'
+            case {'Anke_MEG_neutral', 'Anke_MEG_transition'}
                 cohlevels = [0 3 9 20 30];
         end
         
@@ -231,7 +235,7 @@ for d = 1:length(datasets),
             case {'NatComm', 'NatComm_500ms'}
                 xlabel('\Delta % coherence');
                 set(gca, 'xticklabel', {'', '', '', '5', '10', '20', '30'});
-            case 'Anke_MEG_neutral'
+            case {'Anke_MEG_neutral', 'Anke_MEG_transition'}
                 xlabel('Coherence (%)');
                 set(gca, 'xticklabel', {'0', '3', '9', '27', '81'});
         end

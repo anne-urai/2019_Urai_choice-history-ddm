@@ -15,7 +15,26 @@ global colors
 fz = 10; timefz = 8;
 set(groot, 'defaultaxesfontsize', fz, 'defaultaxestitlefontsizemultiplier', 1);
 
-% random seed will determine how the drifting timecourse looks
+%% ===================================== %%
+% CONDITIONAL BIAS FUNCTIONS
+% ===================================== %%
+
+% close all;
+% subplot(441); hold on;
+% CBF(0, 0.5, [0.3 0.3 0.3]); % no history bias
+% CBF(0.05, 0.5, colors(2, :)); % starting point bias
+% CBF(0, 0.625, colors(1, :)); % drift bias
+% 
+% % layout
+% set(gca, 'xticklabel', [], 'fontsize', timefz);
+% ylabel('Choice bias');
+% xlabel({'Response time'});
+% set(gca, 'yticklabel', []);
+% axis tight; offsetAxes; tightfig;
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBF_schematic.pdf'));
+% close all;
+
+%%  random seed will determine how the drifting timecourse looks
 if ~exist('seed', 'var'), seed = 100; end
 disp(seed);
 
@@ -58,7 +77,7 @@ defcfg = cfg;
 % make an overview of the two biasing mechanisms in the DDM
 % ===================================== %%
 
-subplot(334); hold on;
+close all; subplot(331); hold on;
 arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
 y1 = ddm(cfg);
 
@@ -98,6 +117,8 @@ axis tight;
 set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
 title({'History shift' 'in drift bias'}, 'color', colors(2, :));
+title({'Drift bias (v_{bias})'}, 'color', colors(2, :));
+
 % add two axes manually
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
 plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k--', 'linewidth', 0.5);
@@ -106,13 +127,15 @@ ax = gca;
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
 set(ax, 'xcolor', 'w', 'xtick',[]);
 xlim([min(cfg.time) max(cfg.time)]);
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic_driftbias.pdf'));
 
 %% ===================================== %%
 % now change in starting point
 % ===================================== %%
 
 cfg = defcfg;
-subplot(331); hold on;
+close all; subplot(331); hold on;
 arrow([cfg.time(1) cfg.z], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
 
 % show the unbiased average drift towards two stimuli
@@ -151,12 +174,16 @@ text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
 title({'History shift' 'in starting point'}, 'color', colors(1, :));
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
 plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k--', 'linewidth', 0.5);
+title({'Starting point (z)'}, 'color', colors(1, :));
 
 box off;
 ax = gca;
 addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
 set(ax, 'xcolor', 'w', 'xtick',[]);
 xlim([min(cfg.time) max(cfg.time)]);
+
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic_startingpoint.pdf'));
 
 %% now add the equations!
 %
@@ -173,105 +200,8 @@ xlim([min(cfg.time) max(cfg.time)]);
 
 % save
 % offsetAxes;
-tightfig;
-print(gcf, '-depsc', sprintf('~/Data/serialHDDM/DDMschematic.eps'));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic.pdf'));
 
-%% ===================================== %%
-% CONDITIONAL BIAS FUNCTIONS
-%% ===================================== %%
 
-close all;
-subplot(441); hold on;
-cbf_nobias = CBF(0, 0.5);
-plot(cbf_nobias, 'color', [0.3 0.3 0.3]);
-cbf_dc = CBF(0.01, 0.5);
-plot(cbf_dc, 'color', colors(2, :));
-cbf_z = CBF(0, 0.625);
-plot(cbf_z, 'color', colors(1, :));
-set(gca, 'xtick', 1:length(cbf_z), 'xticklabel', [0.1, 0.3, 0.5, 0.7, 0.9], 'fontsize', timefz);
-ylabel('Choice bias');
-xlabel({'Response time' '(quantiles)'});
-set(gca, 'yticklabel', []);
-%title('Conditional bias functions');
-axis tight; offsetAxes; tightfig;
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBF_schematic.pdf'));
-
-%% make an overview of the two biasing mechanisms in the DDM
-% % SEPARATE UNBIASED PLT
-% tmax = 0.7;
-% %% make 3 sets of distributions
-% % without any bias
-% pm = [0.02 0 0.1 0.001 0.05];
-% [gC_nobias,gE_nobias,ts] = fpt_regular_DDM(pm, tmax);
-% plot(ts, gC_nobias, ts, gE_nobias);
-%
-% % biased drift towards option 1
-% pm(1) = pm(1) * 10;
-% [gC_dc,gE_dc,ts] = fpt_regular_DDM(pm, tmax);
-% plot(ts, gC_dc, ts, gE_dc);
-%
-% % biased starting point towards option 1
-% pm = [0.02 0 0.1 0.001 0.05];
-% pm(5) = pm(5) * 1.4;
-% [gC_z,gE_z,ts] = fpt_regular_DDM(pm, tmax);
-% plot(ts, gC_z, ts, gE_z);
-%
-% %% set parameters
-% cfg.timestep = 0.01; % 100 ms
-% cfg.time     = cfg.timestep:cfg.timestep:tmax;
-% cfg.a        = 1; % bound with, z = 0
-% cfg.cdW      = 0.1; % variance of normally distributed noise
-% cfg.v        = 2.5*cfg.timestep; % drift rate per timestep
-% cfg.z        = 0; % drift rate per timestep
-% cfg.seed     = seed;
-% defcfg = cfg;
-% if 0,
-%     close all;
-%     subplot(331); hold on;
-%     arrow([-0.1 cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
-%     y1 = ddm(cfg);
-%
-%     % show the unbiased average drift towards two stimuli
-%     cfg.cdW = 0;
-%     y = ddm(cfg);
-%     plot(cfg.time, y,'k');
-%     cfg.v = -cfg.v; % flip around drift rate
-%     y = ddm(cfg);
-%     plot(cfg.time, y,'k');
-%
-%     % plot the drift on top
-%     plot(cfg.time, y1, 'color', [0.5 0.5 0.5]);
-%
-%     % add distributions at the top!
-%     plot(ts, scaling*gC_nobias + cfg.a, 'k');
-%     plot(ts, -scaling*gE_nobias - cfg.a, 'k');
-%
-%     %%  layout
-%     axis tight;
-%     set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
-%     text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
-%     % add two axes manually
-%     plot([-0.1 cfg.time(end)], [cfg.a cfg.a], 'k', 'linewidth', 0.5);
-%     plot([-0.1 cfg.time(end)], [-cfg.a -cfg.a], 'k', 'linewidth', 0.5);
-%     box off;
-%
-%     % also show the other paramters
-%     text(0.25, -0.4, 'v', 'fontsize', fz);
-%
-%     % add some non-decision time
-%     plot([0 0], [-cfg.a cfg.a], 'k:');
-%     text(-0.1, 1.2, 'Ter', 'fontsize', fz-1);
-%
-%     ax = gca;
-%     addlistener(ax, 'MarkedClean', @(obj,event)resetVertex(ax));
-%     set(ax, 'xcolor', 'w', 'xtick',[]);
-%     xlim([-0.1 max(cfg.time)]);
-%
-%     tightfig;
-%     print(gcf, '-depsc', sprintf('~/Data/serialHDDM/DDMunbiased.eps'));
-%     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMunbiased.pdf'));
-% end
 end
 
 
@@ -307,40 +237,81 @@ end
 
 
 %% COMPUTE CONDITIONAL BIAS FUNCTIONS %%
-function pbias = CBF(dc, z)
+function pbias = CBF(dc, z, color)
 
-v = 0;
-a = 1;
-time = 0.01:0.01:1;
+time = 0.01:0.01:2;
+
+% from https://github.com/anne-urai/serialDDM/blob/master/simulations/1_ddm_rts.py
+v = 0.1;
+a = 0.1;
+% ndt = 0.1;
+% dc_slope = 0;
+% ou = 0;;
+dt = 0.01;
+scaling = 0.1;
 
 % for X trials, generate RTs and responses
 % generate a sample of evidence for each moment in time
-nsim = 50000;
-RT = nan(1, nsim);
+nsim        = 100000;
+dv          = nan(nsim, numel(time));
+dv(:, 1)    = z*a; % set starting point
+for t = 2:length(time),
+    dv(:, t) = dv(:, t-1) + (v+dc) .* dt + ...
+        normrnd(0, 1, [nsim 1]) .* sqrt(dt) .* scaling;
+end
+
+% apply bounds
+RT  = nan(1, nsim);
 choice = nan(1, nsim);
 
-for i = 1:nsim,
-    
-    evidence            = (v+dc) .* ones(size(time));
-    noise               = normrnd(0, 0.1, size(evidence));
-    noisyevidence       = evidence + noise;
-    integratedevidence  = cumsum(noisyevidence) + z;
-    firstPassage        = min([find(integratedevidence > a, 1) find(integratedevidence < 0, 1)]);
-    
-    if ~isempty(firstPassage),
-        RT(i)               = time(firstPassage);
-        choice(i)           = sign(integratedevidence(firstPassage));
+for n = 1:nsim,
+    for j = 1:length(time),
+        if dv(n,j) >= a,
+            RT(n) = time(j);
+            choice(n) = 1;
+            break
+        elseif dv(n,j) <= 0,
+            RT(n) = time(j);
+            choice(n) = 0;
+            break
+        end
     end
 end
+
+% for i = 1:nsim,
+%     
+%     evidence            = (v+dc) .* dt .* ones(size(time));
+%     noise               = normrnd(0, 1, size(evidence)) .* sqrt(dt) .* scaling;
+%     noisyevidence       = evidence + noise;
+%     noisyevidence(1)    = noisyevidence(1) + z*a;
+%     integratedevidence  = cumsum(noisyevidence);
+%     %integratedevidence  = cumsum(noisyevidence) + z*a;
+%     
+%     % apply bound
+%     [firstPassage, boundPassed] = min([find(integratedevidence >= a, 1) find(integratedevidence <= 0, 1)]);
+%     if ~isempty(firstPassage),
+%         RT(i)               = time(firstPassage);
+%         
+%         switch boundPassed
+%             case 1
+%                 choice(i)           = 1;
+%             case 2
+%                 choice(i)           = -1;
+%             otherwise
+%                 disp(boundPassed);
+%         end
+%     end
+% end
 
 assert(length(unique(RT)) > 1);
 RT = RT(~isnan(RT));
 choice = choice(~isnan(choice));
 
 % get the summary measure for each bin
-rtbin =  discretize(RT, quantile(RT, [0 0.1, 0.3, 0.5, 0.7, 0.9]));
+qntls = quantile(RT, [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]);
+rtbin =  discretize(RT, qntls);
 pbias = splitapply(@nanmean, choice, rtbin);
-%plot(RTs, choiceBias);
+plot([0, 0.1, 0.3, 0.5, 0.7, 0.9], pbias, 'color', color);
 
 
 end

@@ -56,12 +56,12 @@ set(sp3, 'ylim', get(sp1, 'ylim'), 'ytick', get(sp1, 'ytick'));
 
 % compute the difference in correlation
 [rho3, pval3] = corr(cat(1, allresults.sp), cat(1, allresults.input), ...
-    'rows', 'complete', 'type', 'pearson');
+    'rows', 'complete', 'type', 'spearman');
 [rhodiff1, ~, pvalD1] = rddiffci(rho1,rho2,rho3,numel(~isnan( cat(1, allresults(:).criterionshift))), 0.05);
 
 
 [rho3, pval3] = corr(cat(1, allresults.input), cat(1, allresults.leak), ...
-    'rows', 'complete', 'type', 'pearson');
+    'rows', 'complete', 'type', 'spearman');
 [rhodiff2, ~, pvalD2] = rddiffci(rho1,rho2,rho3,numel(~isnan( cat(1, allresults(:).criterionshift))), 0.05);
 
 % move together
@@ -85,14 +85,14 @@ xlabel(sp3, {'Leak bias'});
 set(sp3, 'xcolor', 'k',  'ycolor', 'k');
 
 %% add line between the two correlation coefficients
-txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
+txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
 if pvalD1 < 0.001,
-    txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
+    txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
 end
 
 tt = title(sp1, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'center');
 
-txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
+txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
 if pvalD2 < 0.001,
     txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff2)};
 end

@@ -66,8 +66,13 @@ for f = 2:length(files),
     
     % write
     dat.rt = dat.rt + 0.25;
-    writetable(dat, sprintf('%s/%s', path, regexprep(files{f}, '.mat', '.csv')));
-    writetable(dat, '~/Data/HDDM/Anke_MEG_transition/Anke_MEG_transition.csv');
+    
+    % remove transitionprob for writing
+    dat2             = dat(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', 'coherence', ...
+        'response', 'rt', 'prevstim', 'prevresp', 'prev2resp', 'prev2stim', 'prevrt'});
+    
+    writetable(dat2, sprintf('%s/%s', path, regexprep(files{f}, '.mat', '.csv')));
+    writetable(dat2, '~/Data/HDDM/Anke_MEG_transition/Anke_MEG_transition.csv');
     
     %% NOW ONLY THE NEUTRAL BLOCKS
     dat = dat(dat.transitionprob == 0.5, :);
