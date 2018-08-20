@@ -12,12 +12,12 @@ warning off; close all; clear;
 global datasets datasetnames mypath colors
 
 % redo this for each simulation
-models = {'stimcoding_dc_z_prevresp', 'stimcoding_dc_z_prevresp_multiplicative', 'data'};
+models = {'stimcoding_dc_prevresp', 'stimcoding_dc_prevresp_multiplicative', 'data'};
 % BLACK FOR DATA, BLUE FOR DC_Z, CYAN FOR MULTIPLICATIVE
-cyan = cbrewer('seq', 'GnBu', 10);
-thesecolors = {mean(colors([1 2], :)), cyan(5, :)};
+cyan = cbrewer('seq', 'Blues', 15);
+thesecolors = {colors([2], :), cyan(end, :)};
 
-for d = [5]
+for d = [4 5]
     
     close all; subplot(441); hold on;
     for m = 1:length(models),
@@ -38,7 +38,7 @@ for d = [5]
                 alldata.response    = alldata.response_sampled;
         end
         
-        % in the NCOMMS data, group the 3 easiest coherence levels
+        % in the NCOMMS data, group the 3 easiest coherence levels for dataviz
         if d == 5,
             alldata.coherence = alldata.coherence * 100;
             alldata.coherence(alldata.coherence < 5) = 2.5;
@@ -67,62 +67,18 @@ for d = [5]
         alldata.biased = alldata.repeat;
         alldata.biased(altIdx) = double(~(alldata.biased(altIdx))); % flip
         
-        %         % get RT quantiles for choices that are in line with or against the bias
-        %         [gr, sjidx, cohs, biased] = findgroups(alldata.subj_idx, alldata.stimulus, alldata.pref);
-        %         cpres               = array2table([sjidx, cohs biased], 'variablenames', {'subj_idx', 'coh', 'biased'});
-        %         cpres.choice        = splitapply(@nanmean, alldata.response, gr); % choice proportion
-        %
-        %         % make into a psychometric functions
-        %         mat         = unstack(cpres, 'choice', 'coh');
-        %         mat_pref    = mat{mat.biased == 1, 3:end};
-        %         mat_unpref  = mat{mat.biased == 0, 3:end};
-        %
-        %         %% FIRST, PANEL WITH PREFERRED AND UNPREFERRED PSYCHOMETRIC FUNCTIONS
-        %         switch models{m}
-        %             case 'data'
-        %                 colors2 = cbrewer('qual', 'Set1', 9);
-        %                 colors2 = colors2([9 4], :);
-        %
-        %                 close all; subplot(441); hold on;
-        %                 errorbar(1:length(unique(cohs)), nanmean(mat_pref), ...
-        %                     nanstd(mat_pref) ./ sqrt(size(mat_pref, 1)), ...
-        %                     's-', 'capsize', 0, 'markerfacecolor', 'w', 'color', colors2(1, :), 'markersize', 2);
-        %                 errorbar(1:length(unique(cohs)), nanmean(mat_unpref), ...
-        %                     nanstd(mat_unpref) ./ sqrt(size(mat_pref, 1)), ...
-        %                     'd-', 'capsize', 0, 'markerfacecolor', 'w', 'color', colors2(2, :), 'markersize', 2);
-        %                 xlabel('Sensory evidence (%)');
-        %                 ylabel('Choice fraction');
-        %                 set(gca, 'xtick', 1:length(unique(cohs)), 'xticklabel', unique(cohs));
-        %                 box off; % axis square;
-        %                 title(datasetnames{d});
-        %                 offsetAxes; tightfig;
-        %                 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/psychfunc_biased_%d.pdf', d));
-        %                 close all; subplot(441); hold on;
-        %         end
-        %
-        %         %% COMPUTE BIAS AS A FUNCTION OF ABSOLUTE COHERENCE
-        %         mat_biased = mat_pref - mat_unpref;
-        %         switch d
-        %             case 4
-        %                 mat_biased = mean(cat(3, mat_biased(:, 5:-1:1), mat_biased(:, 5:end)), 3);
-        %             case 5
-        %                 mat_biased =  mean(cat(3, mat_biased(:, 5:-1:1), mat_biased(:, 6:end)), 3);
-        %         end
-        
-        
         clear cpres;        
         % get RT quantiles for choices that are in line with or against the bias
         [gr, sjidx, cohs] = findgroups(alldata.subj_idx, abs(alldata.stimulus));
         cpres               = array2table([sjidx, cohs], 'variablenames', {'subj_idx', 'coh'});
         cpres.choice        = splitapply(@nanmean, alldata.biased, gr); % choice proportion
         
-        % make into a psychometric functions
+        % unstack
         mat         = unstack(cpres, 'choice', 'coh');
-        mat_biased = mat{:, 2:end};
+        mat_biased  = mat{:, 2:end};
 
         switch models{m}
             case 'data'
-
                 errorbar(1:length(unique(abs(alldata.stimulus))), nanmean(mat_biased), ...
                     nanstd(mat_biased) ./ sqrt(size(mat_biased, 1)), ...
                     'o-', 'capsize', 0, 'markerfacecolor', 'k', 'color', 'k', 'markersize', 3);
@@ -137,13 +93,23 @@ for d = [5]
     end
     
     % compare the two model predictions
-    %[h, pval] = ttest(mat_biased_save{3}, mat_biased_save{1}, 'alpha', 0.05/length(unique(abs(alldata.stimulus))));
-    %[h, pval] = ttest(mat_biased_save{3}, mat_biased_save{1}, 'alpha', 0.05/length(unique(abs(alldata.stimulus))));
-    
+    [h, pval] = ttest(mat_biased_save{1}, mat_biased_save{2});
+
+    % plot the significance!
+    [h, crit_p] = fdr_bh(pval, 0.05); % FDR CORRECTION
+    disp(h);
+
+    ylims = get(gca, 'Ylim');
+    mask = double(h);
+    mask(mask==0) = nan;
+    mask = 0.499*mask; % plot a tiny bit above the lower ylim
+    xaxis = 1:length(unique(abs(alldata.stimulus)));
+    plot(xaxis, mask, '-', 'MarkerSize', 10, 'color', [0.5 0.5 0.5], 'linewidth', 1);
     
     xlabel('Evidence strength (%)');
     ylabel('P(bias)');
-    set(gca, 'xtick', 1:length(unique(abs(alldata.stimulus))), 'xticklabel', unique(abs(alldata.stimulus)));
+    set(gca, 'xtick', 1:length(unique(abs(alldata.stimulus))), 'xticklabel', unique(abs(alldata.stimulus)), ...
+        'xcolor', 'k', 'ycolor', 'k');
 
     box off; % axis square;
     title(datasetnames{d});
@@ -152,5 +118,6 @@ for d = [5]
     set(gca,  'ylim', [0.5 max(get(gca, 'ylim'))]);
     offsetAxes; tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/psychfunc_biased_ppc_%d.pdf', d));
+    fprintf('~/Data/serialHDDM/psychfunc_biased_ppc_%d.pdf \n\n', d);
     
 end

@@ -20,7 +20,7 @@ for d = [4 5],
     results = results(results.session == 0, :);
       switch d
         case 5
-            cohs = {'0_0625'  '1_25' '2_5' '5' '10' '20' '30'};
+            cohs = {'c0_0625'  'c1_25' 'c2_5' 'c5' 'c10' 'c20' 'c30'};
             cohlevels = [0.625 1.25 2.5 5 10 20 30];
         case 4
             cohs = {'0' '3' '9' '27' '81'};
@@ -34,9 +34,9 @@ for d = [4 5],
     clear multiplicative single coherencecolors;
     for c = 1:length(cohs),
         % dc_0_3_1__stimcodingdczprevrespmultiplicative
-        multiplicative(:, c) = results.(sprintf('v_c%s__stimcodingdczprevrespmultiplicative', cohs{c}));
-        single(:, c) = results.(sprintf('v_c%s__stimcodingdczprevresp', cohs{c}));
-        coherencecolors(:, c) = c*ones(size(results.(sprintf('v_c%s__stimcodingdczprevresp', cohs{c}))));
+        multiplicative(:, c) = results.(sprintf('v_%s__stimcodingdcprevrespmultiplicative', cohs{c}));
+        single(:, c) = results.(sprintf('v_%s__stimcodingdczprevresp', cohs{c}));
+        coherencecolors(:, c) = c*ones(size(results.(sprintf('v_%s__stimcodingdcprevresp', cohs{c}))));
     end
     
     close all; subplot(441);
@@ -186,8 +186,8 @@ for d = [4 5] % only NatComm and Anke_MEG_neutral, with varying coherence level
     
     for c = 1:length(cohs),
         % dc_0_3_1__stimcodingdczprevrespmultiplicative
-        allresults(c).v_prevresp        = results.(sprintf('dc_0_%s_1__stimcodingdczprevrespmultiplicative', cohs{c})) - ...
-            results.(sprintf('dc_0_%s_2__stimcodingdczprevrespmultiplicative', cohs{c}));
+        allresults(c).v_prevresp        = results.(sprintf('dc_0_%s_1__stimcodingdcprevrespmultiplicative', cohs{c})) - ...
+            results.(sprintf('dc_0_%s_2__stimcodingdcprevrespmultiplicative', cohs{c}));
         thiscoh = num2str(cohlevels(c));
         if d == 4,
             thiscoh = num2str(cohlevels(c) * 100);
