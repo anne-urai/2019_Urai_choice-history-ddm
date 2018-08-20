@@ -17,7 +17,6 @@ global datasets datasetnames mypath
 
 % datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
 plotWhich = 'stimcoding'; % {'error', 'biased', 'stimcoding'};
-plotWhich = 'error';
 choiceCat = {{'no', 'yes'}, {'no','yes'}, {'left', 'right'}, {'down', 'up'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}};
 
 for d = 1:length(datasets)-1,

@@ -18,7 +18,7 @@ datasetnames = {{'Visual motion' '2IFC (FD) #2'}};
 cnt = 1;
 
 Gsq = 0; sz = 0;
-doText = true;
+doText = false;
 
 % ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET

@@ -35,7 +35,7 @@ datasetnames = {{'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, .
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}};
 
 % for CCN poster
-datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
+datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG'};
 
 % go to code
 try
@@ -50,7 +50,7 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 %colors = [178,24,43; 33,102,172] ./ 256; % red blue
 
 %% PREPARING DATA
-if 1,
+if 0,
     b2_HDDM_readIntoMatlab(datasets);
     b2b_Gsq_readIntoMatlab(datasets);
 	b3_makeDataframe(datasets);
@@ -58,69 +58,87 @@ if 1,
 end
 
 disp('starting');
-assert(1==0);
+assert(1==0)
 
 % ======================= %
 % SCHEMATIC/HYPOTHESES
 % ======================= %
 
-f0_schematic_DDM_bias; % figure 3a
+%f0_schematic_DDM_bias; % figure 3a
 
 % ======================= %
 % SANITY CHECKS/ MODEL FITS
 % ======================= %
 
-e1_serialBias_SfN_DIC;
-e3_serialBias_SfN_repetitionRange;
-e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-strategyPlot;
+% e1_serialBias_SfN_DIC;
+% e3_serialBias_SfN_repetitionRange;
+% e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+% strategyPlot;
 
-e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
-e6_serialBias_SfN_modelFree_CRF_PPC;
+% % ======================= %
+% % POSTERIORS
+% % ======================= %
 
-% ======================= %
-% POSTERIORS
-% ======================= %
+% e3_serialBias_SfN_Posteriors_StartingPoint;
 
-e3_serialBias_SfN_Posteriors_StartingPoint;
-
-% PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
+% % PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
 previousError_a_v;
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
 % ======================= %
 
-close all;
-for st = [0 1],
-    for Gsq = [0 1],
+% close all;
+% for st = [0],
+%     for Gsq = [0 1],
 
-        % if Gsq == 1 && st == 1, continue; end % hierarchical sampling with sz takes forever
+%         % if Gsq == 1 && st == 1, continue; end % hierarchical sampling with sz takes forever
 
-        alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, st); % figure 4
-        forestPlot(alldat);
+%         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, st); % figure 4
+%         forestPlot(alldat);
 
-        switch Gsq
-            case 1
-                filename = sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', st);
-            case 0
-                filename = sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', st);
-        end
-        print(gcf, '-dpdf', filename);
-    end
-end
+%         switch Gsq
+%             case 1
+%                 filename = sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', st);
+%             case 0
+%                 filename = sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', st);
+%         end
+%         print(gcf, '-dpdf', filename);
+%     end
+% end
 
-%% ======================= %
-% PREVCORRECT
-% ======================= %
+% %% ======================= %
+% % PREVCORRECT
+% % ======================= %
 
-alldat = e1b_serialBias_SfN_ModelFreeCorrelation_prevCorrect;
-% separate plots for correct and error
-forestPlot(alldat(1:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf'));
-forestPlot(alldat(2:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
+% alldat = e1b_serialBias_SfN_ModelFreeCorrelation_prevCorrect;
+% % separate plots for correct and error
+% forestPlot(alldat(1:2:end));
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf'));
+% forestPlot(alldat(2:2:end));
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
 
+% ========================= %
+% MULTIPLICATIVE VBIAS
+% ========================= %
+
+% psychfuncs_vbias_split;
+% conditionalAccuracyFunctions;
+
+% ========================= %
+%% PPC, THIS PART IS SLOW TO RUN
+% ========================= %
+
+e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+e6_serialBias_SfN_modelFree_CRF_PPC;
+
+% ========================= %
+% single vs. coherence-dependent vbias
+% ========================= %
+
+multiplicative_vbias;
+multiplicative_vbias_residuals_scatter;
+multiplicative_vbias_DIC;
 
 %% ======================= %
 % MOTION ENERGY
@@ -134,23 +152,11 @@ motionEnergy_kernels;
 % SUPPLEMENT - prev2resp
 % ======================= %
 
-posteriors_prev2resp
+posteriors_prev2resp;
 alldat = correlationScatter_prev2resp(); % figure 4
 forestPlot(alldat);
 filename = sprintf('~/Data/serialHDDM/forestplot_prev2resp.pdf');
 print(gcf, '-dpdf', filename);
-
-% ========================= %
-% MULTIPLICATIVE VBIAS
-% ========================= %
-
-psychfuncs_vbias_split;
-conditionalAccuracyFunctions;
-
-% single vs. coherence-dependent vbias
-multiplicative_vbias;
-multiplicative_vbias_residuals_scatter;
-multiplicative_vbias_DIC;
 
 % ========================= %
 % KOSTIS' O-U MODELS

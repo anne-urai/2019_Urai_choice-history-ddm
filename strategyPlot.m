@@ -29,7 +29,7 @@ for d = length(datasets):-1:1,
 end
 xlabel('P(repeat) after correct');
 ylabel('P(repeat) after error');
-set(gca, 'xtick', 0.3:0.2:0.7, 'ytick', 0.3:0.2:0.7);
+set(gca, 'xtick', 0.3:0.2:0.7, 'ytick', 0.3:0.2:0.7, 'xcolor', 'k', 'ycolor', 'k');
 offsetAxes; axis square;
 % 
 % l = legend([s{:}], legtxt);
