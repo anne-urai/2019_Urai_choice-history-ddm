@@ -59,42 +59,39 @@ end
 
 disp('starting');
 
-multiplicative_vbias_psychfuncs_ppc;
-return;
-
 % ======================= %
 % SCHEMATIC/HYPOTHESES
 % ======================= %
 
-f0_schematic_DDM_bias; % figure 3a
-
-% ======================= %
-% SANITY CHECKS/ MODEL FITS
-% ======================= %
-
-e1_serialBias_SfN_DIC;
-e3_serialBias_SfN_repetitionRange;
-e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-strategyPlot;
+% f0_schematic_DDM_bias; % figure 3a
 
 % % ======================= %
-% % POSTERIORS
+% % SANITY CHECKS/ MODEL FITS
 % % ======================= %
 
-e3_serialBias_SfN_Posteriors_StartingPoint;
+% e1_serialBias_SfN_DIC;
+% e3_serialBias_SfN_repetitionRange;
+% e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
+% strategyPlot;
 
-% % PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
-previousError_a_v;
+% % % ======================= %
+% % % POSTERIORS
+% % % ======================= %
+
+% e3_serialBias_SfN_Posteriors_StartingPoint;
+
+% % % PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
+% previousError_a_v;
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
 % ======================= %
 
 close all;
-for st = [0],
+for st = [0 1],
     for Gsq = [0 1],
 
-        % if Gsq == 1 && st == 1, continue; end % hierarchical sampling with sz takes forever
+        if Gsq == 1 && st == 1, continue; end % hierarchical sampling with st is too much
 
         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, st); % figure 4
         forestPlot(alldat);
@@ -108,6 +105,8 @@ for st = [0],
         print(gcf, '-dpdf', filename);
     end
 end
+
+return;
 
 %% ======================= %
 % PREVCORRECT
