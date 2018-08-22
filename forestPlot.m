@@ -7,8 +7,6 @@ function forestPlot(alldat)
 % Copyright (c) Anne Urai, 2018
 % anne.urai@gmail.com
 
-
-ds = [17 10 16 15 1 2 3 7 8 9]; % from the e1b collection script
 ds = length(alldat):-1:1;
 close all;
 

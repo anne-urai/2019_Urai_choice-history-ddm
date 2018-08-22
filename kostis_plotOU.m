@@ -56,12 +56,12 @@ set(sp3, 'ylim', get(sp1, 'ylim'), 'ytick', get(sp1, 'ytick'));
 
 % compute the difference in correlation
 [rho3, pval3] = corr(cat(1, allresults.sp), cat(1, allresults.input), ...
-    'rows', 'complete', 'type', 'spearman');
+    'rows', 'complete', 'type', 'pearson');
 [rhodiff1, ~, pvalD1] = rddiffci(rho1,rho2,rho3,numel(~isnan( cat(1, allresults(:).criterionshift))), 0.05);
 
 
 [rho3, pval3] = corr(cat(1, allresults.input), cat(1, allresults.leak), ...
-    'rows', 'complete', 'type', 'spearman');
+    'rows', 'complete', 'type', 'pearson');
 [rhodiff2, ~, pvalD2] = rddiffci(rho1,rho2,rho3,numel(~isnan( cat(1, allresults(:).criterionshift))), 0.05);
 
 % move together
@@ -85,14 +85,14 @@ xlabel(sp3, {'Leak bias'});
 set(sp3, 'xcolor', 'k',  'ycolor', 'k');
 
 %% add line between the two correlation coefficients
-txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
+txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
 if pvalD1 < 0.001,
-    txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
+    txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
 end
 
 tt = title(sp1, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'center');
 
-txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
+txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
 if pvalD2 < 0.001,
     txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff2)};
 end
@@ -121,6 +121,7 @@ lambda = results.ouK_vanilla_dv;
 h = scatter(1*ones(size(lambda)), lambda, 3, colors(3, :), 'jitter', 'on', 'jitteramount', 0.07);
 plot([1-0.1 1+0.1], [nanmean(lambda) nanmean(lambda)], 'k-');
 pval = permtest(lambda);
+[h, pval] = ttest(lambda)
 mysigstar(gca, 1, max(get(gca, 'ylim')), pval);
 %legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
 ylabel('Effective leak (\lambda)');

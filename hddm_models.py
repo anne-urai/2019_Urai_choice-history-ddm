@@ -542,7 +542,30 @@ def make_model(mypath, mydata, model_name, trace_id):
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
                 depends_on={'dc':['prevresp', 'prevcorrect'], 'z':['prevresp', 'prevcorrect']})
-                
+          
+    elif model_name == 'stimcoding_dc_prevcorrect':
+
+        # only let drift bias vary with previous response and previous outcome
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect', 'transitionprob']})
+        elif len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'dc':['prevresp', 'prevcorrect']})
+
     # ============================================ #
     # STIMCODING PREVRESP + PREVCORRECT
     # add a model where previous reward changes drift rate / boundary separation

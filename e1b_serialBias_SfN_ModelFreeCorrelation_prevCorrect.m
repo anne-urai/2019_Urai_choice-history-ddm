@@ -60,6 +60,7 @@ for d = length(datasets):-1:1
             results.dc_c10__stimcodingdczprevcorrect - results.(['dc_0_2__' whichmdls 'dczprevcorrect']);
     end
         
+    cols = cbrewer('qual', 'Paired', 10);
     
     % assign to structure
     allresults(1).z_prevresp     = results.z_prevresp_correct;
@@ -67,8 +68,8 @@ for d = length(datasets):-1:1
     allresults(1).criterionshift = results.repetition;
     alltitles{1}                 = cat(2, datasetnames{d}{1}, ' - ', 'Correct');
     allresults(1).marker 			= 'o';
-    allresults(1).meancolor 		= [0 0 0];
-    allresults(1).scattercolor	 	= [0.5 0.5 0.5];
+    allresults(1).meancolor 		= [ 0 0 0];
+    allresults(1).scattercolor	 	= [ 0.5 0.5 0.5];
     
     % also after error choices
     allresults(2).z_prevresp     = results.z_prevresp_error;
@@ -76,8 +77,8 @@ for d = length(datasets):-1:1
     allresults(2).criterionshift = results.repetition;
     alltitles{2}                 = cat(2, datasetnames{d}{1}, ' - ', 'Error');
     allresults(2).marker        = 's';
-    allresults(2).meancolor 		= [ 0.894117647058824         0.101960784313725         0.109803921568627];
-    allresults(2).scattercolor	 	= [ 0.984313725490196         0.705882352941177         0.682352941176471];
+    allresults(2).meancolor 		= cols(6, :);
+    allresults(2).scattercolor	 	= cols(5, :);
     
     disp(datasets{d}); disp(numel(unique(results.subjnr)));
     close all;
@@ -95,7 +96,7 @@ for d = length(datasets):-1:1
     
     % compute the difference in correlation
     [rho3, pval3] = corr(cat(1, allresults(:).v_prevresp), cat(1, allresults(:).z_prevresp), ...
-        'rows', 'complete', 'type', 'spearman');
+        'rows', 'complete', 'type', 'pearson');
     if pval3 < 0.05,
         fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
     end
@@ -159,6 +160,7 @@ for d = length(datasets):-1:1
         alldat(cnt).corrdiff = rhodiff;
         alldat(cnt).corrdiff_ci = rhodiffci;
         alldat(cnt).pdiff = pval;
+        alldat(cnt).nsubj  = numel(allresults(a).criterionshift);
         
             
         alldat(cnt).marker          = allresults(a).marker;

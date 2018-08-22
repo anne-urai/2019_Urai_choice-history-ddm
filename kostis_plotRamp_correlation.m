@@ -41,9 +41,9 @@ set(sp2, 'ylim', get(sp1, 'ylim'), 'ytick', get(sp1, 'ytick'));
 
 % compute the difference in correlation
 [rho3, pval3] = corr(cat(1, allresults(:).v_prevresp), cat(1, allresults(:).z_prevresp), ...
-    'rows', 'complete', 'type', 'spearman');
+    'rows', 'complete', 'type', 'pearson');
 if pval3 < 0.05,
-    fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
+    fprintf('warning %s: r = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
 end
 [rhodiff, ~, pval] = rddiffci(rho1,rho2,rho3,numel(~isnan( cat(1, allresults(:).criterionshift))), 0.05);
 
@@ -60,9 +60,9 @@ set(sp2, 'xcolor', 'k',  'ycolor', 'k');
 xlabel(sp1, {'Static (offset \beta_0)'});
 set(sp1, 'xcolor', 'k', 'ycolor', 'k');
 %% add line between the two correlation coefficients
-txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
+txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
 if pval < 0.001,
-    txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
+    txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
 end
 
 tt = title(sp1, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');

@@ -13,8 +13,8 @@ function [] = a0_parameterFiles()
 % ============================================ #s
 
 nsmp       = [5000]
-datasets   = [6]; % dataset number
-models     = [0:4 6:10]; % the nr of the models
+datasets   = [0:4 6]; % dataset number
+models     = [11]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
@@ -22,16 +22,14 @@ for n = nsmp,
     for b = models,
         for a = datasets,
             for c = 0:nrTraces-1, % put all chains of same model together on a node
-				if ~(a == 4 && b == 4),
                 alldat = [alldat; a b c n];
-				end
             end
         end
     end
 end
 
 % write to a file
-%dlmwrite('hddmparams', alldat, 'delimiter', ' ');
+dlmwrite('hddmparams', alldat, 'delimiter', ' ');
 size(alldat)
 
 % PPC

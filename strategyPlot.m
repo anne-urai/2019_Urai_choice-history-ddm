@@ -26,21 +26,22 @@ for d = length(datasets):-1:1,
     dat = dat(dat.session == 0, :);
     s{d} = scatter(dat.repetition_prevcorrect, dat.repetition_preverror, 5, colors(d, :), markers{d});
     legtxt{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
+    alldat{d} = dat(:, {'repetition_prevcorrect', 'repetition_preverror'});
 end
 xlabel('P(repeat) after correct');
 ylabel('P(repeat) after error');
 set(gca, 'xtick', 0.3:0.2:0.7, 'ytick', 0.3:0.2:0.7, 'xcolor', 'k', 'ycolor', 'k');
 offsetAxes; axis square;
-% 
-% l = legend([s{:}], legtxt);
-% l.Box = 'off';
-% subplot(3,3,4); plot(1,1, '.w'); axis off;
-% % hline(0.5); vline(0.5);
-% tightfig;
-% l.Position(2) = l.Position(2)  - .5;
-% l.Position(1) = l.Position(1)  + 0.1;
 
 tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/strategyPlot.pdf'));
+
+% display how many observers are in each quadrant!
+alldat = cat(1, alldat{:});
+
+stay = sum(alldat.repetition_prevcorrect > 0.5 & alldat.repetition_preverror > 0.5)
+alternate = sum((alldat.repetition_prevcorrect < 0.5 & alldat.repetition_preverror < 0.5))
+winstay_loseswitch = sum(alldat.repetition_prevcorrect > 0.5 & alldat.repetition_preverror < 0.5)
+winswitch_losestay = sum(alldat.repetition_prevcorrect < 0.5 & alldat.repetition_preverror > 0.5)
 
 end

@@ -59,6 +59,7 @@ end
 
 disp('starting');
 
+
 % ======================= %
 % SCHEMATIC/HYPOTHESES
 % ======================= %
@@ -72,8 +73,8 @@ disp('starting');
 % e1_serialBias_SfN_DIC;
 % e3_serialBias_SfN_repetitionRange;
 % e2_serialBias_SfN_SanityChecks; % correlate dprime with drift rate
-% strategyPlot;
-
+ % strategyPlot;
+ 
 % % % ======================= %
 % % % POSTERIORS
 % % % ======================= %
@@ -87,26 +88,26 @@ disp('starting');
 % CORRELATIONS WITH P(REPEAT)
 % ======================= %
 
-close all;
-for st = [0 1],
-    for Gsq = [0 1],
+% close all;
+% for st = [0 1],
+%     for Gsq = [0 1],
 
-        if Gsq == 1 && st == 1, continue; end % hierarchical sampling with st is too much
+%         if Gsq == 1 && st == 1, continue; end % hierarchical sampling with st is too much
 
-        alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, st); % figure 4
-        forestPlot(alldat);
+%         alldat = e1b_serialBias_SfN_ModelFreeCorrelation_grey(Gsq, st); % figure 4
+%         forestPlot(alldat);
 
-        switch Gsq
-            case 1
-                filename = sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', st);
-            case 0
-                filename = sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', st);
-        end
-        print(gcf, '-dpdf', filename);
-    end
-end
+%         switch Gsq
+%             case 1
+%                 filename = sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', st);
+%             case 0
+%                 filename = sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', st);
+%         end
+%         print(gcf, '-dpdf', filename);
+%     end
+% end
 
-return;
+% return;
 
 %% ======================= %
 % PREVCORRECT
@@ -119,49 +120,59 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf')
 forestPlot(alldat(2:2:end));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
 
-% ========================= %
-% MULTIPLICATIVE VBIAS
-% ========================= %
+% compare the correlation coefficients for figure 5d
+compareCorrelations_correctError(alldat);
+return;
 
-% multiplicative_vbias;
-multiplicative_vbias_psychfuncs_ppc;
-multiplicative_vbias_DIC;
+% %% DIC comparison
+% previousResponseOutcome_DIC;
 
-% ========================= %
-%% PPC, THIS PART IS SLOW TO RUN
-% ========================= %
+% % strategy plot in 2F
+% strategyPlot;
 
-e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
-e6_serialBias_SfN_modelFree_CRF_PPC;
+% % ========================= %
+% % MULTIPLICATIVE VBIAS
+% % ========================= %
 
-%% ======================= %
-% MOTION ENERGY
-% ======================= %
+% % multiplicative_vbias;
+% multiplicative_vbias_psychfuncs_ppc;
+% multiplicative_vbias_DIC;
 
-motionEnergy_filterDots;
-motionEnergy_check; % will generate sanity check figure
-motionEnergy_kernels;
+% % ========================= %
+% %% PPC, THIS PART IS SLOW TO RUN
+% % ========================= %
 
-% ======================= %
-% SUPPLEMENT - prev2resp
-% ======================= %
+% e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
+% e6_serialBias_SfN_modelFree_CRF_PPC;
 
-posteriors_prev2resp;
-alldat = correlationScatter_prev2resp(); % figure 4
-forestPlot(alldat);
-filename = sprintf('~/Data/serialHDDM/forestplot_prev2resp.pdf');
-print(gcf, '-dpdf', filename);
+% %% ======================= %
+% % MOTION ENERGY
+% % ======================= %
+
+% motionEnergy_filterDots;
+% motionEnergy_check; % will generate sanity check figure
+% motionEnergy_kernels;
+
+% % ======================= %
+% % SUPPLEMENT - prev2resp
+% % ======================= %
+
+% posteriors_prev2resp;
+% alldat = correlationScatter_prev2resp(); % figure 4
+% forestPlot(alldat);
+% filename = sprintf('~/Data/serialHDDM/forestplot_prev2resp.pdf');
+% print(gcf, '-dpdf', filename);
 
 % ========================= %
 % KOSTIS' O-U MODELS
 % ========================= %
 
-kostis_driftRate;
-kostis_makeTable;
-kostis_plotRamp_correlation;
-kostis_plotRamp_BIC;
-kostis_plotOU_BIC;
-kostis_plotOU;
+% kostis_driftRate;
+% kostis_makeTable;
+% kostis_plotRamp_correlation;
+% kostis_plotRamp_BIC;
+% kostis_plotOU_BIC;
+% kostis_plotOU;
 
 % ========================= %
 % MEG PHARMA - do at the end
