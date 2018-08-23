@@ -32,7 +32,7 @@ for d = 1:length(datasets),
     % ylabel(sprintf('%s, n = %d', datasetnames{d}{1}, numel(rep)));
     % show on x-axis what the mean is
     box off; xlim([0.4 0.65]); ylim([1 numel(rep)+0.5]);
-    plot(mean(rep), 0, 'k^', 'markerfacecolor', linspecer(1), 'markeredgecolor', linspecer(1), 'markersize', 2);
+    plot(mean(rep), 0, 'k^', 'markerfacecolor', linspecer(1), 'markeredgecolor', linspecer(1), 'markersize', 3);
     set(gca, 'ytick', [1 numel(rep)], 'xtick', [0.4 0.5 0.6]);
     
     % yyaxis right;

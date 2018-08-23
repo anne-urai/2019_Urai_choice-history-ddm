@@ -15,6 +15,7 @@ function e6_serialBias_SfN_modelFree_CRF_PPC
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames mypath colors
+useBiasedSj = 1;
 
 for qidx = 1:2,
     
@@ -76,12 +77,21 @@ for qidx = 1:2,
             % for each observers, compute their bias
             [gr, sjs] = findgroups(alldata.subj_idx);
             sjrep = splitapply(@nanmean, alldata.repeat, gr);
+
+            % who are the repeating observers?
             sjrep = sjs(sjrep < 0.5);
             
             % recode into biased and unbiased choices
             alldata.biased = alldata.repeat;
             altIdx = ismember(alldata.subj_idx, sjrep);
             alldata.biased(altIdx) = double(~(alldata.biased(altIdx))); % flip
+
+            if useBiasedSj,
+            % for this plot, use only the most extremely biased observers (see email Tobi 23 August)
+            sjbias = splitapply(@nanmean, alldata.biased, gr);
+            usesj = sjs(sjbias > median(sjbias));
+            alldata = alldata(ismember(alldata.subj_idx, usesj), :);
+            end
             
             % ignore if coherence is present but doesn't contain unique values
             if ismember('coherence', alldata.Properties.VariableNames),
@@ -214,7 +224,7 @@ for p  = 1:2,
     set(gca, 'xtick', 1:5, 'xticklabel', {'No history', 'z', 'v_{bias}', 'Both', 'Data'}, ...
         'xticklabelrotation', -30);
     axis square; axis tight;
-    set(gca, 'ytick', [0.5:0.01:0.54], 'ylim', [0.5 0.545]);
+    % set(gca, 'ytick', [0.5:0.01:0.54], 'ylim', [0.5 0.545]);
     offsetAxes;
     title('All datasets');
     
