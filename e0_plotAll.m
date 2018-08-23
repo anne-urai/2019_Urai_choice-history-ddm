@@ -60,9 +60,7 @@ end
 disp('starting');
 
 
-strategyPlot;
-% e3_serialBias_SfN_repetitionRange
-return;
+if 0,
 
 % ======================= %
 % SCHEMATIC/HYPOTHESES
@@ -85,8 +83,9 @@ strategyPlot;
 
 e3_serialBias_SfN_Posteriors_StartingPoint;
 
-PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
+% PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
 previousError_a_v;
+end
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
@@ -111,6 +110,7 @@ for st = [0 1],
     end
 end
 
+
 %% ======================= %
 % PREVCORRECT
 % ======================= %
@@ -124,6 +124,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
 
 % compare the correlation coefficients for figure 5d
 compareCorrelations_correctError(alldat);
+return;
 
 %% DIC comparison
 previousResponseOutcome_DIC;

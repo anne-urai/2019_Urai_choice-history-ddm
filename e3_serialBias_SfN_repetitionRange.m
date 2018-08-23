@@ -35,14 +35,17 @@ for d = 1:length(datasets),
     plot(mean(rep), 0, 'k^', 'markerfacecolor', linspecer(1), 'markeredgecolor', linspecer(1), 'markersize', 3);
     set(gca, 'ytick', [1 numel(rep)], 'xtick', [0.4 0.5 0.6]);
     
-    % yyaxis right;
-    y = ylabel(datasetnames{d});
+    ylabel('# Observers')
+    % % yyaxis right;
+    % y = ylabel(datasetnames{d});s
     
-    y.Rotation = y.Rotation + 180;
-    y.Position(1) = y.Position(1) + 0.27;
-    y.Position(2) = y.Position(2) - 2;
+    % y.Rotation = y.Rotation + 180;
+    % y.Position(1) = y.Position(1) + 0.27;
+    % y.Position(2) = y.Position(2) - 2;
     
+    if d == length(datasets),
     xlabel('P(repeat)');
+end
     offsetAxes;
     
     %axis square;

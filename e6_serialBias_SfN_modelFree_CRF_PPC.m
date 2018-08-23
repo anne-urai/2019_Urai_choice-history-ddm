@@ -15,9 +15,10 @@ function e6_serialBias_SfN_modelFree_CRF_PPC
 addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames mypath colors
-useBiasedSj = 1;
+useBiasedSj = 1; % select only the most biased subjects
+cutoff_quantile = 0;
 
-for qidx = 1:2,
+for qidx = 1,
     
     switch qidx
         case 1
@@ -46,6 +47,7 @@ for qidx = 1:2,
                 case 'data'
                     filename = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
                     alldata  = readtable(sprintf('%s/%s/%s', mypath, datasets{d}, filename.name));
+
                 otherwise
                     if ~exist(sprintf('%s/summary/%s/%s_ppc_data.csv', mypath, datasets{d}, models{m}), 'file'),
                         continue;
@@ -87,10 +89,24 @@ for qidx = 1:2,
             alldata.biased(altIdx) = double(~(alldata.biased(altIdx))); % flip
 
             if useBiasedSj,
-            % for this plot, use only the most extremely biased observers (see email Tobi 23 August)
-            sjbias = splitapply(@nanmean, alldata.biased, gr);
-            usesj = sjs(sjbias > median(sjbias));
-            alldata = alldata(ismember(alldata.subj_idx, usesj), :);
+
+                 switch models{m}
+                 case 'data'
+                % for this plot, use only the most extremely biased observers (see email Tobi 23 August)
+                    sjbias = splitapply(@nanmean, alldata.biased, gr);
+
+                    if cutoff_quantile == 2,
+                        cutoff = median(sjbias);
+                    elseif cutoff_quantile == 0,
+                        cutoff = 0; % keep everyone!
+                    else
+                       cutoff = quantile(sjbias, cutoff_quantile);
+                    end
+                    cutoff = quantile(sjbias, cutoff_quantile);
+                    usesj = sjs(sjbias > cutoff(end)); % only take the subjects who are in the highest quantile
+                end
+                
+                alldata = alldata(ismember(alldata.subj_idx, usesj), :);
             end
             
             % ignore if coherence is present but doesn't contain unique values
@@ -144,11 +160,12 @@ for qidx = 1:2,
             % biased choice proportion
             switch models{m}
                 case 'data'
+                    disp(size(mat))
                     % ALSO ADD THE REAL DATA WITH SEM
                     h = ploterr(qntls, nanmean(mat, 1), [], ...
-                        nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k', 'abshhxy', 0);
-                    set(h(1), 'color', 'k', 'marker', '.', ...
-                        'markerfacecolor', 'k', 'markeredgecolor', 'k', 'linewidth', 0.5, 'markersize', 10, ...
+                       1.96* nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k', 'abshhxy', 0);
+                    set(h(1), 'color', 'k', 'marker', 'o', ...
+                        'markerfacecolor', 'w', 'markeredgecolor', 'k', 'linewidth', 0.5, 'markersize', 3, ...
                         'linestyle', '-');
                     set(h(2), 'linewidth', 0.5);
                 otherwise
@@ -162,6 +179,7 @@ for qidx = 1:2,
                 allds.fast(d, m) = nanmean(avg(1:2));
                 allds.slow(d, m) = nanmean(avg(end-3:end));
             catch % median split, only 2 bins
+                % this is what we'll use for the summary figure 3c
                 allds.fast(d, m) = nanmean(avg(1));
                 allds.slow(d, m) = nanmean(avg(2));
             end
@@ -183,7 +201,7 @@ for qidx = 1:2,
         
         switch qidx
             case 1
-                print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_q2.pdf', d));
+                print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_quantiles_sjCutoff%d.pdf', d, cutoff_quantile));
             case 2
                 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_median.pdf', d));
         end

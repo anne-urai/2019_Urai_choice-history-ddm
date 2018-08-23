@@ -96,7 +96,7 @@ for d = length(datasets):-1:1
     
     % compute the difference in correlation
     [rho3, pval3] = corr(cat(1, allresults(:).v_prevresp), cat(1, allresults(:).z_prevresp), ...
-        'rows', 'complete', 'type', 'pearson');
+        'rows', 'complete', 'type', 'spearman');
     if pval3 < 0.05,
         fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
     end
@@ -117,11 +117,11 @@ for d = length(datasets):-1:1
     
     if doText,
         %% add line between the two correlation coefficients
-        txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
+        txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
         if pval < 0.001,
-            txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
+            txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
         end
-        title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
+        title(txt, 'fontweight', 'normal', 'fontsize', 8, 'horizontalalignment', 'left');
     end
     
     tightfig;
@@ -134,19 +134,28 @@ for d = length(datasets):-1:1
     
     for a = 1:length(allresults),
         
-        % SAVE CORRELATIONS FOR OVERVIEW PLOT
-        [r,p,rlo,rup] = corrcoef(allresults(a).z_prevresp, allresults(a).criterionshift);
-        alldat(cnt).corrz = r(1,2);
-        alldat(cnt).corrz_ci = [rlo(1,2) rup(1,2)];
-        alldat(cnt).pz = p(1,2);
-        alldat(cnt).bfz = corrbf(r(1,2), numel(allresults(a).z_prevresp));
+        % % SAVE CORRELATIONS FOR OVERVIEW PLOT
+        % [r,p,rlo,rup] = corrcoef(allresults(a).z_prevresp, allresults(a).criterionshift);
+        % alldat(cnt).corrz = r(1,2);
+        % alldat(cnt).corrz_ci = [rlo(1,2) rup(1,2)];
+        % alldat(cnt).pz = p(1,2);
+        % alldat(cnt).bfz = corrbf(r(1,2), numel(allresults(a).z_prevresp));
         
-        [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).criterionshift);
-        alldat(cnt).corrv = r(1,2);
-        alldat(cnt).corrv_ci = [rlo(1,2) rup(1,2)];
-        alldat(cnt).pv = p(1,2);
-        alldat(cnt).bfv = corrbf(r(1,2), numel(allresults(a).v_prevresp));
+        % [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).criterionshift);
+        % alldat(cnt).corrv = r(1,2);
+        % alldat(cnt).corrv_ci = [rlo(1,2) rup(1,2)];
+        % alldat(cnt).pv = p(1,2);
+        % alldat(cnt).bfv = corrbf(r(1,2), numel(allresults(a).v_prevresp));
         
+
+           % SAVE CORRELATIONS FOR OVERVIEW PLOT
+        % COMPUTE THE SPEARMANS CORRELATION AND ITS CONFIDENCE INTERVAL!
+        [alldat(cnt).corrz, alldat(cnt).corrz_ci, alldat(cnt).pz, alldat(cnt).bfz] = ...
+            spearmans(allresults(a).z_prevresp, allresults(a).criterionshift);
+
+        [alldat(cnt).corrv, alldat(cnt).corrv_ci, alldat(cnt).pv, alldat(cnt).bfv] = ...
+            spearmans(allresults(a).v_prevresp, allresults(a).criterionshift);
+
         alldat(cnt).datasets = datasets{d};
         alldat(cnt).datasetnames = datasetnames{d};
         

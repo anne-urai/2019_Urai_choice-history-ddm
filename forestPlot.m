@@ -149,12 +149,12 @@ sp2.Position(1) = sp2.Position(1) - 0.07;
 for d = 1:length(ds),
     
     if alldat(ds(d)).pdiff < 0.0001,
-        txt = sprintf('\\Deltar = %.3f, p < 0.0001', alldat(ds(d)).corrdiff);
+        txt = sprintf('\\Delta\\rho = %.3f, p < 0.0001', alldat(ds(d)).corrdiff);
     else
-        txt = sprintf('\\Deltar = %.3f, p = %.4f', alldat(ds(d)).corrdiff, alldat(ds(d)).pdiff);
+        txt = sprintf('\\Delta\\rho = %.3f, p = %.4f', alldat(ds(d)).corrdiff, alldat(ds(d)).pdiff);
     end
-    text(-1.3, length(ds)-d+1, txt, ...
-        'fontsize', 4);
+    text(-1.35, length(ds)-d+1, txt, ...
+        'fontsize', 6);
 end
 
 % DO STATS ACROSS DATASETS!

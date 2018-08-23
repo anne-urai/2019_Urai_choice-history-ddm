@@ -22,9 +22,10 @@ plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2); % if p(repeat)
 
 for a = 1:length(allresults), % neutral last
     
-    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'pearson', 'rows', 'complete');
+    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'spearman', 'rows', 'complete');
     
     if pval < 0.05,
+        
         % CORRELATION LINE SEPARATELY FOR EACH DATASET?
         p = polyfit(allresults(a).(fld)(~isnan(allresults(a).(fld))), allresults(a).criterionshift(~isnan(allresults(a).(fld))), 1);
         xrangeextra = 0.15*range(allresults(a).(fld));
@@ -59,9 +60,9 @@ axis tight; offsetAxes;
 
 if doText,
     % PRINT THE CORRELATION COEFFICIENT
-    txt = {sprintf('r(%d) = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
+    txt = {sprintf('\\rho(%d) = %.3f', length(find(~isnan(y)))-2, rho) sprintf('p = %.3f', pval)};
     if pval < 0.001,
-        txt = {sprintf('r(%d) = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
+        txt = {sprintf('\\rho(%d) = %.3f', length(find(~isnan(y)))-2,rho) sprintf('p < 0.001')};
     end
     tt = text(min(get(gca, 'xlim')) + legendWhere*(range(get(gca, 'xlim'))), ...
         min(get(gca, 'ylim')) + 0.8*(range(get(gca, 'ylim'))), ...

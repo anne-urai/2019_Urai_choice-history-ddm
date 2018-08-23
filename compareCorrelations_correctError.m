@@ -34,7 +34,7 @@ disp(p)
     else
         txt = sprintf('p = %.4f', p);
     end
-    text(0.3, d-0.2, txt, 'fontsize', 4);
+    text(0.3, d-0.2, txt, 'fontsize', 6);
 
 end
 
@@ -51,7 +51,7 @@ end
 set(gca, 'ytick', 1:length(datasets), 'yticklabel', []);
 
 % set(gca, 'ytick', 1:length(datasets), 'yticklabel', []);
-xlabel('\Deltar');
+xlabel('\Delta\rho');
 xlim([-1 1]); 
 offsetAxes;
 

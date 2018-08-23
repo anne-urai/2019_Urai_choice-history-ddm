@@ -181,35 +181,41 @@ for d = length(datasets):-1:1
     for a = 1:length(allresults),
         
         % SAVE CORRELATIONS FOR OVERVIEW PLOT
-        [r,p,rlo,rup] = corrcoef(allresults(a).z_prevresp, allresults(a).criterionshift);
-        alldat(cnt).corrz = r(1,2);
-        alldat(cnt).corrz_ci = [rlo(1,2) rup(1,2)];
-        alldat(cnt).pz = p(1,2);
-        alldat(cnt).bfz = corrbf(r(1,2), numel(allresults(a).z_prevresp));
+        % COMPUTE THE SPEARMANS CORRELATION AND ITS CONFIDENCE INTERVAL!
+        [alldat(cnt).corrz, alldat(cnt).corrz_ci, alldat(cnt).pz, alldat(cnt).bfz] = ...
+            spearmans(allresults(a).z_prevresp, allresults(a).criterionshift);
+
+        [alldat(cnt).corrv, alldat(cnt).corrv_ci, alldat(cnt).pv, alldat(cnt).bfv] = ...
+            spearmans(allresults(a).v_prevresp, allresults(a).criterionshift);
+
+        % alldat(cnt).corrz = r(1,2);
+        % alldat(cnt).corrz_ci = [rlo(1,2) rup(1,2)];
+        % alldat(cnt).pz = p(1,2);
+        % alldat(cnt).bfz = corrbf(r(1,2), numel(allresults(a).z_prevresp));
         
-        [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).criterionshift);
-        alldat(cnt).corrv = r(1,2);
-        alldat(cnt).corrv_ci = [rlo(1,2) rup(1,2)];
-        alldat(cnt).pv = p(1,2);
-        alldat(cnt).bfv = corrbf(r(1,2), numel(allresults(a).v_prevresp));
+        % [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).criterionshift);
+        % alldat(cnt).corrv = r(1,2);
+        % alldat(cnt).corrv_ci = [rlo(1,2) rup(1,2)];
+        % alldat(cnt).pv = p(1,2);
+        % alldat(cnt).bfv = corrbf(r(1,2), numel(allresults(a).v_prevresp));
         
-        alldat(cnt).datasets = datasets{d};
-        alldat(cnt).datasetnames = alltitles{a};
+        alldat(cnt).datasets        = datasets{d};
+        alldat(cnt).datasetnames    = alltitles{a};
         
-        % also add the difference in r, Steigers test
-        [r,p,rlo,rup] = corrcoef(allresults(a).v_prevresp, allresults(a).z_prevresp);
+        % also add the difference in correlation, steigers test
+        [r,p,rlo,rup]               = spearmans(allresults(a).v_prevresp, allresults(a).z_prevresp);
         
-        [rhodiff, rhodiffci, pval] = rddiffci(alldat(cnt).corrz,alldat(cnt).corrv, ...
-            r(1,2), ...
-            numel(allresults(a).v_prevresp), 0.05);
+        [rhodiff, rhodiffci, pval] = rddiffci(alldat(cnt).corrz, alldat(cnt).corrv, ...
+            r, numel(allresults(a).v_prevresp), 0.05);
         
-        alldat(cnt).corrdiff = rhodiff;
-        alldat(cnt).corrdiff_ci = rhodiffci;
-        alldat(cnt).pdiff = pval;
+        alldat(cnt).corrdiff        = rhodiff;
+        alldat(cnt).corrdiff_ci     = rhodiffci;
+        alldat(cnt).pdiff           = pval;
         
-        alldat(cnt).marker = allresults(a).marker;
-        alldat(cnt).scattercolor = allresults(a).scattercolor;
-        alldat(cnt).meancolor = allresults(a).meancolor;
+        % plotting layout for forestPlot
+        alldat(cnt).marker          = allresults(a).marker;
+        alldat(cnt).scattercolor    = allresults(a).scattercolor;
+        alldat(cnt).meancolor       = allresults(a).meancolor;
         
         cnt = cnt + 1;
     end
