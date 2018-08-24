@@ -59,9 +59,6 @@ end
 
 disp('starting');
 
-
-if 0,
-
 % ======================= %
 % SCHEMATIC/HYPOTHESES
 % ======================= %
@@ -85,7 +82,6 @@ e3_serialBias_SfN_Posteriors_StartingPoint;
 
 % PREVIOUS ERROR CHANGES BOUNDARY SEPARATION AND OVERALL DRIFT (POST-ERROR SLOWING)
 previousError_a_v;
-end
 
 % ======================= %
 % CORRELATIONS WITH P(REPEAT)
@@ -124,11 +120,9 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
 
 % compare the correlation coefficients for figure 5d
 compareCorrelations_correctError(alldat);
-return;
 
-%% DIC comparison
+% DIC comparison
 previousResponseOutcome_DIC;
-
 
 % ========================= %
 % MULTIPLICATIVE VBIAS
@@ -139,7 +133,7 @@ multiplicative_vbias_psychfuncs_ppc;
 multiplicative_vbias_DIC;
 
 % ========================= %
-%% PPC, THIS PART IS SLOW TO RUN
+% PPC, THIS PART IS SLOW TO RUN
 % ========================= %
 
 e8_serialBias_SfN_PPC; % figure 2, show that all models fit OK
@@ -152,6 +146,7 @@ e6_serialBias_SfN_modelFree_CRF_PPC;
 motionEnergy_filterDots;
 motionEnergy_check; % will generate sanity check figure
 motionEnergy_kernels;
+motionEnergy_kernels_logistic;
 
 % ======================= %
 % SUPPLEMENT - prev2resp
