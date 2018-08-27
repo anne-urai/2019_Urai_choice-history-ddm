@@ -19,7 +19,7 @@ short break. The expectation is across trials.
 close all;
 path = '~/Data/psychophysicalKernels';
 
-for maxcohlevel = [0,3,9,27,81],
+for maxcohlevel = 27; %[0,3,9,27,81],
     
     close all;
     
@@ -69,7 +69,7 @@ for maxcohlevel = [0,3,9,27,81],
     subplot(441);
     hold on;
     colors(1, :) = [0.3 0.3 0.3]; c = 1;
-    plot(data.timeaxis, nanmean(kernels), 'color', colors(c, :), 'linewidth', 0.5);
+    % plot(data.timeaxis, nanmean(kernels), 'color', colors(c, :), 'linewidth', 0.5);
     b{c} = boundedline(data.timeaxis(13:end), nanmean(kernels(:, 13:end)), ...
         nanstd(kernels(:, 13:end)) ./ sqrt(length(unique(sj))), 'cmap', colors(c, :), 'alpha');
     plot(data.timeaxis(13:end), nanmean(kernels(:, 13:end)), 'color', colors(c, :), 'linewidth', 1);
@@ -77,9 +77,6 @@ for maxcohlevel = [0,3,9,27,81],
     
     % do statistics on the timecourse
     [h, p, stat] = ttest_clustercorr(kernels(:, 13:end));
-    %[h, pval] = ttest(biasedkernels);
-    %[h, crit_p] = fdr_bh(pval, 0.05);
-    
     ylims = get(gca, 'Ylim');
     mask = [zeros(1,12) double(h)];
     mask(mask==0) = nan;
@@ -88,12 +85,12 @@ for maxcohlevel = [0,3,9,27,81],
     
     ylabel({'Excess motion'; 'energy fluctuations (%)'});
     xlabel('Time from stimulus onset (s)');
-    axis tight; xlim([0 0.75]); set(gca, 'xtick', 0:0.25:0.75);
-    box off; ylim([-0.5 2]); offsetAxes;
+    axis tight; xlim([0.2 0.75]); set(gca, 'xtick', 0.2:0.1:0.7);
+    box off; offsetAxes;
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
-    %tightfig;
-    %print(gcf, '-dpdf', '~/Data/serialHDDM/psychophysicalKernels.pdf');
-    
+    tightfig;
+    print(gcf, '-dpdf', '~/Data/serialHDDM/psychophysicalKernels.pdf');
+    close ;
     
     % %% COMPARE THE KERNELS WITH THE O-U EFFECTIVE LEAK PARAMETER
     %
@@ -160,7 +157,7 @@ for maxcohlevel = [0,3,9,27,81],
         % if g == 1, ylabel({'Excess motion'; 'energy fluctuations (%)'}); end
         xlabel('Time from stimulus onset (s)');
         axis tight; xlim([0 0.75]); set(gca, 'xtick', 0:0.25:0.75);
-        box off; % ylim([-0.5 2]); 
+        box off; % ylim([-0.5 2]);
         offsetAxes;
         set(gca, 'xcolor', 'k', 'ycolor', 'k');
         title(capitalize(groups{g}));

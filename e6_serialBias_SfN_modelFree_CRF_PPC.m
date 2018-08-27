@@ -16,7 +16,8 @@ addpath(genpath('~/code/Tools'));
 warning off; close all; clear;
 global datasets datasetnames mypath colors
 useBiasedSj = 1; % select only the most biased subjects
-cutoff_quantile = 0;
+cutoff_quantile = 3;
+whichModels = 1;
 
 for qidx = 1,
     
@@ -27,11 +28,15 @@ for qidx = 1,
             qntls = [0.5 1];
     end
     
-    % redo this for each simulation
-    models = {'data', 'stimcoding_nohist', 'stimcoding_z_prevresp',  ...
-        'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp'};
-    thesecolors = {[0 0 0], [0.5 0.5 0.5],  colors(1, :), ...
-        colors(2, :), mean(colors([1 2], :))};
+    switch whichModels
+        case 1
+            models = {'data', 'stimcoding_nohist', 'stimcoding_dc_z_prevresp'};
+            thesecolors = {[0 0 0], [0.5 0.5 0.5], mean(colors([1 2], :))};
+        case 2
+            models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_z_prevresp'};
+            thesecolors = {[0 0 0],  colors(1, :), mean(colors([1 2], :))};
+    end
+    
     allds.fast  = nan(length(datasets), length(models));
     allds.slow = nan(length(datasets), length(models));
     
@@ -201,7 +206,7 @@ for qidx = 1,
         
         switch qidx
             case 1
-                print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_quantiles_sjCutoff%d.pdf', d, cutoff_quantile));
+                print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_quantiles_sjCutoff%d_whichModels%d.pdf', d, cutoff_quantile, whichModels));
             case 2
                 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CRF_PPC_d%d_median.pdf', d));
         end
@@ -209,8 +214,8 @@ for qidx = 1,
 end
 savefast(sprintf('~/Data/serialHDDM/allds_cbfs.mat'), 'allds');
 
-% ========================================== %
-%% PLOT ACROSS DATASETS
+%% ========================================== %
+% PLOT ACROSS DATASETS
 % ========================================== %
 
 load(sprintf('~/Data/serialHDDM/allds_cbfs.mat'));
