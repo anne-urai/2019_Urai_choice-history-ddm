@@ -59,7 +59,7 @@ end
 
 disp('starting');
 
-previousResponseOutcome_DIC
+e6_serialBias_SfN_modelFree_CRF_PPC(2,1,1,3);
 return;
 
 % ======================= %
