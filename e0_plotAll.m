@@ -59,6 +59,9 @@ end
 
 disp('starting');
 
+previousResponseOutcome_DIC
+return;
+
 % ======================= %
 % SCHEMATIC/HYPOTHESES
 % ======================= %

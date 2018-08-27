@@ -13,7 +13,7 @@ function [] = a0_parameterFiles()
 % ============================================ #s
 
 nsmp       = [5000]
-datasets   = [0:4 6]; % dataset number
+datasets   = [4]; % dataset number
 models     = [11]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 

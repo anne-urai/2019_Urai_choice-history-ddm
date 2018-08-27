@@ -11,13 +11,13 @@ global datasets datasetnames mypath
     
     % 1. STIMCODING, only prevresps
     mdls = {'dc_z_prevresp', ...
-        'dc_z_prevcorrect', 'nohist'};
+        'dc_prevcorrect', 'nohist'};
     for d = 1:length(datasets),
         close all;
         subplot(4, 5, 1);
         getPlotDIC(mdls, 'stimcoding', d);
         title(datasetnames{d});
-        set(gca, 'xtick', 1:2, 'xticklabel', {'choice', 'choice*outcome'}, 'xticklabelrotation', -30);
+        set(gca, 'xtick', 1:2, 'xticklabel', {'dc:c z:c', 'dc:c dc:o'}, 'xticklabelrotation', -30);
         
         %if ismember(d, [1 4]),
             ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
@@ -49,6 +49,7 @@ for m = 1:length(mdls),
     if ~exist(sprintf('%s/summary/%s/%s_%s_all.mat', ...
             mypath, datasets{d}, s, mdls{m}), 'file'),
         disp('cant find this model')
+        assert(1==0)
         continue;
     end
     
