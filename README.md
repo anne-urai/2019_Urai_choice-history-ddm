@@ -9,8 +9,8 @@ To reproduce the figures, install the HDDM package (http://ski.clps.brown.edu/hd
 <code>
 python b1_HDDM_run.py -r 1 -d $d -v $v -i $i -s $s
 </code>
-where -d = 0-4 (datasets), -v = 0-3 (versions of the model), -i = 0-14 (traces, can be changed to whatever the number of cores on a node) and -i = 10.000, the number of samples per trace.
+where -d = 0-6 (datasets), -v = 0-11 (versions of the model), -i = 0-30 (traces, can be changed to whatever the number of cores on a node) and -i = 5.000, the number of samples per trace.
 
-Then, in Matlab run the file e0_plotAll.m, which will read in the models and reproduce all figures.
+Then, in Matlab run the file plotAll.m, which will read in the models and reproduce all figures step-by-step.
 
 For questions, @AnneEUrai / anne.urai@gmail.com.
