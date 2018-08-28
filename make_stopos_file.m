@@ -1,5 +1,5 @@
 
-function [] = a0_parameterFiles()
+function [] = make_stopos_file()
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595

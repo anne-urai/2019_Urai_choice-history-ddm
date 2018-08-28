@@ -1,4 +1,4 @@
-function previousError_a_v
+function post_error_slowing
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595

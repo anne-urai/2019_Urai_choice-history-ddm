@@ -1,4 +1,4 @@
-function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma
+function alldat = individual_correlation_pharma
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -10,7 +10,7 @@ function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_MEGpharma
 close all; clc;
 addpath(genpath('~/code/Tools'));
 
-global mypath datasets datasetnames colors
+global mypath colors
 
 datasets = {'MEG'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!
 % datasets = {'MEG_MEGsessions'}; % CHANGE THIS TO MEG_750MS ONCE FINISHED!

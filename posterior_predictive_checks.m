@@ -1,4 +1,4 @@
-function e8_serialBias_SfN_PPC
+function posterior_predictive_checks
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595

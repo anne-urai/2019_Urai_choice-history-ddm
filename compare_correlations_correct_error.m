@@ -1,4 +1,4 @@
-function compareCorrelations_correctError(alldat)
+function compare_correlations_correct_error(alldat)
 
 global datasets
 % grab the two correlation coefficients from each dataset

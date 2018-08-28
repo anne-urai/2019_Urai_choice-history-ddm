@@ -1,4 +1,4 @@
-function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_prevCorrect
+function alldat = individual_correlation_prevcorrect
 % from the csv table, make an overview of repetition behaviour
 
 % get a huge list with values for each participant

@@ -1,4 +1,4 @@
-function e1_serialBias_SfN_DIC()
+function barplots_DIC()
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595

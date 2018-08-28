@@ -1,5 +1,4 @@
-
-function previousResponseOutcome_DIC
+function barplots_DIC_previousresponse_outcome
 
 addpath(genpath('~/code/Tools'));
 warning off; close all;

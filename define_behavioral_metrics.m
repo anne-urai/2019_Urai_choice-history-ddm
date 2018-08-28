@@ -1,4 +1,4 @@
-function results = b3b_behaviouralMetrics(alldata)
+function results = define_behavioral_metrics(alldata)
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595

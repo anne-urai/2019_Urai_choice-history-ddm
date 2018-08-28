@@ -1,5 +1,5 @@
 
-function b3_makeDataframe(datasets)
+function make_dataframe(datasets)
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -39,7 +39,7 @@ for d = ds,
     end
 
     % compute a bunch of basic things from Matlab
-    results     = b3b_behaviouralMetrics(alldata);
+    results     = define_behavioral_metrics(alldata);
 
     % add personality scores and drug conditions
     switch datasets{d}

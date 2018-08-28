@@ -1,4 +1,4 @@
-function parameterTables
+function make_parameter_tabless
 
 addpath(genpath('~/code/Tools'));
 warning off; close all;

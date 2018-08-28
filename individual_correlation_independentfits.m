@@ -1,4 +1,4 @@
-function alldat = e1b_serialBias_SfN_ModelFreeCorrelation_independentFits
+function alldat = individual_correlation_independentfits
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595

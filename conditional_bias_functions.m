@@ -1,4 +1,4 @@
-function e6_serialBias_SfN_modelFree_CRF_PPC(whichModels, qidx, useBiasedSj, g)
+function conditional_bias_functions(whichModels, qidx, useBiasedSj, g)
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595

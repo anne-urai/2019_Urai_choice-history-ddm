@@ -1,4 +1,4 @@
-function e3_serialBias_SfN_Posteriors_StartingPoint
+function plot_posteriors
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
