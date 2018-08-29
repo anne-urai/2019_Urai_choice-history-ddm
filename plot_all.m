@@ -46,16 +46,16 @@ end
 % from Thomas, green blue grey
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
-%% ========================================== %
+% ========================================== %
 % PREPARING DATA
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-if 0,
+if 1,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
 	make_dataframe(datasets);
-    rename_PPC_files(datasets);
+    % rename_PPC_files(datasets);
 end
 
 disp('starting');
@@ -64,7 +64,7 @@ disp('starting');
 
 % median split, bar plots
 % conditional_bias_functions_collapsed(3,2,0,3);
-conditional_bias_functions_collapsed_summary;
+% conditional_bias_functions_collapsed_summary;
 
 return;
 

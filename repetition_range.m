@@ -42,6 +42,8 @@ for d = 1:length(datasets),
     ylabel('# Observers')   
     if d == length(datasets),
         xlabel('P(repeat)');
+    else
+        set(gca, 'xticklabel', []);
     end
     offsetAxes;
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
