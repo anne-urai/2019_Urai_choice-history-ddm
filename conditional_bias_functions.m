@@ -19,7 +19,7 @@ cutoff_quantile = 3;
 groups = {'alternators', 'repeaters', 'all'};
 
 switch qidx
-case 1
+		case 1
             qntls = [0.1, 0.3, 0.5, 0.7, 0.9]; % Leite & Ratcliff
         case 2
             qntls = [0.5 1];

@@ -13,8 +13,8 @@ function [] = make_stopos_file()
 % ============================================ #s
 
 nsmp       = [5000]
-datasets   = [4]; % dataset number
-models     = [11]; % the nr of the models
+datasets   = [6]; % dataset number
+models     = [0:3]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
