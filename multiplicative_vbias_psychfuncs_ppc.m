@@ -17,7 +17,7 @@ models = {'stimcoding_dc_prevresp', 'stimcoding_dc_prevresp_multiplicative', 'da
 cyan = cbrewer('seq', 'Blues', 15);
 thesecolors = {colors([2], :), cyan(end, :)};
 
-for d = [4 5]
+for d = [2 3],
     
     close all; subplot(441); hold on;
     for m = 1:length(models),
@@ -39,7 +39,8 @@ for d = [4 5]
         end
         
         % in the NCOMMS data, group the 3 easiest coherence levels for dataviz
-        if d == 5,
+        switch datasets{d}
+        case 'NatComm'
             alldata.coherence = alldata.coherence * 100;
             alldata.coherence(alldata.coherence < 5) = 2.5;
         end

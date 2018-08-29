@@ -17,9 +17,9 @@ global datasets datasetnames mypath
 
 % datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_neutral', 'NatComm', 'MEG'};
 plotWhich = 'stimcoding'; % {'error', 'biased', 'stimcoding'};
-choiceCat = {{'no', 'yes'}, {'no','yes'}, {'left', 'right'}, {'down', 'up'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}};
+choiceCat = {{'left', 'right'}, {'down', 'up'}, {'weaker', 'stronger'}, {'weaker', 'stronger'}, {'no', 'yes'}, {'no','yes'}};
 
-for d = 1:length(datasets)-1,
+for d = 1:length(datasets),
     close all;
     
     if ~exist(sprintf('%s/summary/%s/%s_ppc_data.csv', mypath, datasets{d}, 'stimcoding_nohist'), 'file'),
@@ -118,9 +118,11 @@ for d = 1:length(datasets)-1,
         
         axis tight; % axis square;
         offsetAxes_y;
-        maxRT = round(max(abs(ppc.rt)));
+        maxRT = ceil(max(abs(ppc.rt)));
         if maxRT == 5, maxRT = 4; end
-        if d > 3,maxRT = 3; end
+        if maxRT < 3, maxRT = 3; end
+
+        % if d > 3,maxRT = 3; end
         xlim([0 maxRT]); set(gca, 'xtick', [0 maxRT], 'xminortick', 'on');
         %  ylabel('Probability');
         switch plotWhich

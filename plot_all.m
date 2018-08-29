@@ -31,11 +31,13 @@ switch usr
 end
 
 % neutral vs biased plotsC
-datasets = {'JW_PNAS', 'JW_yesno', 'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG'};
+% reorder the datasets: first show the “standard ones” —visual motion 2AFC with 
+% feedback, then 2IFC, and only then yes-no / no feedback. 
+datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno'};
 
-datasetnames = {{'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
-    {'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
-    {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}};
+datasetnames = {{'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
+    {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}, ...
+    {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}};
 
 % go to code
 try
@@ -60,24 +62,22 @@ end
 
 disp('starting');
 
-conditional_bias_functions_collapsed(3,1,1,2);
+posterior_predictive_checks;
+return;
 
 % median split, bar plots
 % conditional_bias_functions_collapsed(3,2,0,3);
 % conditional_bias_functions_collapsed_summary;
 
-return;
-
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
 
-schematic; 
+% schematic; 
 
 % ========================================== %
 % FIGURE 2
 % ========================================== %
-
 repetition_range;
 strategy_plot;
 
@@ -86,7 +86,8 @@ strategy_plot;
 % ========================================== %
 
 barplots_DIC;
-conditional_bias_functions;
+% conditional_bias_functions_collapsed(3,1,1,3);
+% conditional_bias_functions;
 
 % ========================================== %
 % FIGURE 4
@@ -170,6 +171,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', 1));
 alldat = individual_correlation_pharma(); 
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
+
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 6

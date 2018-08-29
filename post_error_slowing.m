@@ -59,8 +59,8 @@ for d = 1:length(datasets),
     
     dat = readtable(sprintf('%s/%s/stimcoding_prevcorrect/group_traces.csv', mypath, datasets{d}));
     
-    if d == 5,
-
+    switch datasets{d}
+    case 'NatComm'
         
         vars    = dat.Properties.VariableNames';
         driftvars_correct   = vars(~cellfun(@isempty, regexp(vars, 'v_\S+_1_0_$')));
@@ -73,7 +73,7 @@ for d = 1:length(datasets),
 			
         end
 
-    elseif d == 4,
+    case 'Anke_MEG_transition'
 
         vars    = dat.Properties.VariableNames';
         driftvars_correct   = vars(~cellfun(@isempty, regexp(vars, 'v_\S+_1_$')));
@@ -83,10 +83,9 @@ for d = 1:length(datasets),
             difference = (dat.(driftvars_error{c})) - (dat.(driftvars_correct{c}));            
            % h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues',d+(0.1*c)-0.3, 'distWidth', 0.1, 'histOpt', 1.1);
             violinPlot_distribution(d+(0.15*c)-0.4, difference, colors(d, :), 25);
-            
         end
         
-    else
+    otherwise
         difference = dat.v_0_ - dat.v_1_;
        % h = violinPlot(difference, 'color', colors(d, :), 'showMM', 6, 'xValues', d);
         violinPlot_distribution(d, difference, colors(d, :));

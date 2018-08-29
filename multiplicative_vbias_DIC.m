@@ -20,7 +20,7 @@ for s = 1:length(types),
     
     % 1. STIMCODING, only prevresps
     mdls = {'dc_z_prevresp','dc_z_prevresp_multiplicative', 'nohist'};
-    for d = [4 5],
+    for d = 2:3,
         close all;
         subplot(2, 4, 1);
         getPlotDIC(mdls, types{s}, d);
