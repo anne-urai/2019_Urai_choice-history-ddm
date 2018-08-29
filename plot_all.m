@@ -51,16 +51,16 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-if 1,
+if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
 	make_dataframe(datasets);
-    % rename_PPC_files(datasets);
+    rename_PPC_files(datasets);
 end
 
 disp('starting');
 
-% conditional_bias_functions_collapsed(3,1,0,3);
+conditional_bias_functions_collapsed(3,1,1,2);
 
 % median split, bar plots
 % conditional_bias_functions_collapsed(3,2,0,3);

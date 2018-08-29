@@ -122,6 +122,7 @@ subplot(3,3,1); hold on;
             	switch models{m}
             	case 'data'
                 % for this plot, use only the most extremely biased observers (see email Tobi 23 August)
+                [gr, sjs] = findgroups(alldata.subj_idx);
                 sjbias = splitapply(@nanmean, alldata.biased, gr);
 
                 if cutoff_quantile == 2,
@@ -201,14 +202,10 @@ subplot(3,3,1); hold on;
                 	plot(qntls, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
                 end
 
-            % SAVE            
-            if qidx == 1,
-            	allds.fast(d, m) = nanmean(avg(1:2));
-            	allds.slow(d, m) = nanmean(avg(end-3:end));
-            elseif qidx == 2, % median split, only 2 bins
+            % SAVE         
+            if  qidx == 2, % median split, only 2 bins
                 % average within each dataset
-                avg = splitapply(@nanmean, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));
-                % average
+                avg = splitapply(@nanmean, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));   
                 allds.fast(:, m) = avg(:, 1);
                 allds.slow(:, m) = avg(:, 2);
             end
@@ -226,7 +223,7 @@ subplot(3,3,1); hold on;
 
 	tightfig;
   	print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_collapsed_q%d_sjCutoff%d_%s_models%d.pdf', ...
-    	qidx, useBiasedSj, groups{g}, whichModels));
+    qidx, useBiasedSj, groups{g}, whichModels));
 
 %% ========================================== %
 % PLOT ACROSS DATASETS - only for median split
