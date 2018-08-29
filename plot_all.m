@@ -46,7 +46,7 @@ end
 % from Thomas, green blue grey
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
-% ========================================== %
+%% ========================================== %
 % PREPARING DATA
 % This will generate the allindividualresults.csv files
 % ========================================== %

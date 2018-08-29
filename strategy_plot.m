@@ -15,28 +15,28 @@ colormap(cmap);
 
 
 for d = length(datasets):-1:1,
-	close all;
-subplot(441); hold on;
-markers = {'d', 's', '^', 'v',  '>', '<'};
-colors = cbrewer('qual', 'Set2', length(datasets));
-
-plot([0.5 0.5], [0.3 0.7], 'color', 'k', 'linewidth', 0.5);
-plot([0.3 0.7], [0.5 0.5], 'color', 'k', 'linewidth', 0.5);
-
+    close all;
+    subplot(441); hold on;
+    markers = {'d', 's', '^', 'v',  '>', '<'};
+    colors = cbrewer('qual', 'Set2', length(datasets));
+    
+    plot([0.5 0.5], [0.3 0.7], 'color', 'k', 'linewidth', 0.5);
+    plot([0.3 0.7], [0.5 0.5], 'color', 'k', 'linewidth', 0.5);
+    
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     dat = dat(dat.session == 0, :);
     s{d} = scatter(dat.repetition_prevcorrect, dat.repetition_preverror, 5, colors(d, :), markers{d});
     legtxt{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
     alldat{d} = dat(:, {'repetition_prevcorrect', 'repetition_preverror'});
-
-xlabel('P(repeat) after correct');
-ylabel('P(repeat) after error');
-set(gca, 'xtick', 0.3:0.2:0.7, 'ytick', 0.3:0.2:0.7, 'xcolor', 'k', 'ycolor', 'k');
-xlim([0.3 0.7]); ylim([0.3 0.7]);
-offsetAxes; axis square;
-
-tightfig;
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/strategyPlot_%d.pdf', d));
+    
+    xlabel('P(repeat) after correct');
+    ylabel('P(repeat) after error');
+    set(gca, 'xtick', 0.3:0.2:0.7, 'ytick', 0.3:0.2:0.7, 'xcolor', 'k', 'ycolor', 'k');
+    xlim([0.3 0.7]); ylim([0.3 0.7]);
+    offsetAxes; axis square;
+    
+    tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/strategyPlot_%d.pdf', d));
 end
 
 % display how many observers are in each quadrant!
