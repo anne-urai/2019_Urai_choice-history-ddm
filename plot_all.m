@@ -31,8 +31,8 @@ switch usr
 end
 
 % neutral vs biased plotsC
-% reorder the datasets: first show the “standard ones” —visual motion 2AFC with 
-% feedback, then 2IFC, and only then yes-no / no feedback. 
+% reorder the datasets: first show the “standard ones” —visual motion 2AFC with
+% feedback, then 2IFC, and only then yes-no / no feedback.
 datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno'};
 
 datasetnames = {{'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
@@ -48,7 +48,7 @@ end
 % from Thomas, green blue grey
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
-% ========================================== %
+%% ========================================== %
 % PREPARING DATA
 % This will generate the allindividualresults.csv files
 % ========================================== %
@@ -56,18 +56,17 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
-	make_dataframe(datasets);
+    make_dataframe(datasets);
     rename_PPC_files(datasets);
 end
 
 disp('starting');
-rename_PPC_files(datasets);
-return;
+
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
 
-% schematic; 
+% schematic;
 
 % ========================================== %
 % FIGURE 2
@@ -88,24 +87,19 @@ for useBiasedSj = [-1 0 1], % all subjects, good ones and remaining
             whichAxes = {'rt', 'quantiles'};
             for w = 1:length(whichAxes),
                 filename = sprintf('~/Data/serialHDDM/conditionalBias_barplots_q%d_%s_sjCutoff%d_%dpercentile_models%d.pdf', ...
-                    qidx, whichAxes{w}, useBiasedSj, subject_cutoff, w);
+                    q, whichAxes{w}, useBiasedSj, subject_cutoff, w);
                 if ~exist(filename, 'file'),
+                    tic;
                     conditional_bias_functions_collapsed(4,q,whichAxes{w},useBiasedSj,subject_cutoff);
                     conditional_bias_functions_collapsed_summary;
                     print(gcf, '-dpdf', filename);
+                    toc;
                 end
             end
         end
     end
 end
-% white & poldrack quantiles
-%conditional_bias_functions_collapsed(4,3,'quantiles', 1,3);
-%conditional_bias_functions_collapsed(4,3,'rt', 1,3);
-
-% conditional_bias_functions_collapsed_summary;
 return;
-
-% conditional_bias_functions_collapsed_summary;
 
 % ========================================== %
 % FIGURE 4
@@ -173,7 +167,7 @@ plot_posteriors;
 % ========================================== %
 
 % a. G-square fit
-alldat = individual_correlation_main(1, 0); 
+alldat = individual_correlation_main(1, 0);
 forestPlot(alldat);
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', 0));
 
@@ -186,7 +180,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', 1));
 % SUPPLEMENTARY FIGURE 5
 % ========================================== %
 
-alldat = individual_correlation_pharma(); 
+alldat = individual_correlation_pharma();
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
 
@@ -204,7 +198,7 @@ post_error_slowing;
 % this has to run before, on the UKE cluster to grab Anke's motionenergy
 % coordinates
 motionEnergy_filterDots;
-motionEnergy_check; 
+motionEnergy_check;
 motionEnergy_kernels;
 % motionEnergy_kernels_logistic;
 
