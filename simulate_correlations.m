@@ -23,6 +23,7 @@ for sj =  1:length(sjgroups)
     ntrials                     = 100:10:2000; % some steps
     between_sj_corr_pearson     = nan(1, length(ntrials));
     between_sj_corr_spearman    = nan(1, length(ntrials));
+    between_sj_corr_slope       = nan(1, length(ntrials));
     
     for n = 1:length(ntrials),
         
@@ -36,7 +37,8 @@ for sj =  1:length(sjgroups)
         
         between_sj_corr_pearson(n)  = corr(var1, var2);
         between_sj_corr_spearman(n) = corr(var1, var2, 'type', 'spearman');
-        
+        p = polyfit(var1, var2, 1);
+        between_sj_corr_slope(n) = p(1);
     end
     
     % ============================================================== %
@@ -44,23 +46,24 @@ for sj =  1:length(sjgroups)
     % ============================================================== %
     
     subplot(2,2,sj);
-    p1 = plot(ntrials, between_sj_corr_pearson);
     hold on;
     grid on;
-    p2 = plot(ntrials, between_sj_corr_spearman);
+    plot(ntrials, between_sj_corr_slope);
+    plot(ntrials, between_sj_corr_pearson);
+    plot(ntrials, between_sj_corr_spearman);
     xlabel('# trials per individual');
     ylabel({'Correlation coefficient', sprintf('across %d subjects', sjgroups(sj))});
     box off; ylim([0.8 1]); set(gca, 'ytick', [0.8:0.025:1]);
-    legend([p1 p2], {'Pearson', 'Spearman'}, 'box', 'off', 'location', 'southeast', 'AutoUpdate','off');
+    legend({'Regression slope', 'Pearson', 'Spearman'}, 'box', 'off', 'location', 'southeast', 'AutoUpdate','off');
     
     if sj == 1,
         % add
         vline(mean(trialcount(correct == 0)), 'color', 'k');
         text(mean(trialcount(correct == 0)), 1.01, 'error trial count', ...
-            'horizontalalignment', 'center', 'backgroundcolor', 'w', 'fontsize', 6);
+            'horizontalalignment', 'center', 'backgroundcolor', 'w', 'fontsize', 7);
         vline(mean(trialcount(correct == 1)), 'color', 'k');
         text(mean(trialcount(correct == 1)), 1.01, 'correct trial count', ...
-            'horizontalalignment', 'center', 'backgroundcolor', 'w', 'fontsize', 6);
+            'horizontalalignment', 'center', 'backgroundcolor', 'w', 'fontsize', 7);
     end
     
 end
