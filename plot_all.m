@@ -61,14 +61,8 @@ if 0,
 end
 
 disp('starting');
-
-posterior_predictive_checks;
+rename_PPC_files(datasets);
 return;
-
-% median split, bar plots
-% conditional_bias_functions_collapsed(3,2,0,3);
-% conditional_bias_functions_collapsed_summary;
-
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
@@ -78,16 +72,40 @@ return;
 % ========================================== %
 % FIGURE 2
 % ========================================== %
-repetition_range;
-strategy_plot;
+%repetition_range;
+%strategy_plot;
 
 % ========================================== %
 % FIGURE 3
 % ========================================== %
 
-barplots_DIC;
-% conditional_bias_functions_collapsed(3,1,1,3);
-% conditional_bias_functions;
+%barplots_DIC;
+% conditional_bias_functions_collapsed(4,1,'quantiles', 1,3);
+% leite & ratcliff
+for useBiasedSj = [-1 0 1], % all subjects, good ones and remaining
+    for subject_cutoff = [50 25 33]
+        for q = [1, 2, 3],
+            whichAxes = {'rt', 'quantiles'};
+            for w = 1:length(whichAxes),
+                filename = sprintf('~/Data/serialHDDM/conditionalBias_barplots_q%d_%s_sjCutoff%d_%dpercentile_models%d.pdf', ...
+                    qidx, whichAxes{w}, useBiasedSj, subject_cutoff, w);
+                if ~exist(filename, 'file'),
+                    conditional_bias_functions_collapsed(4,q,whichAxes{w},useBiasedSj,subject_cutoff);
+                    conditional_bias_functions_collapsed_summary;
+                    print(gcf, '-dpdf', filename);
+                end
+            end
+        end
+    end
+end
+% white & poldrack quantiles
+%conditional_bias_functions_collapsed(4,3,'quantiles', 1,3);
+%conditional_bias_functions_collapsed(4,3,'rt', 1,3);
+
+% conditional_bias_functions_collapsed_summary;
+return;
+
+% conditional_bias_functions_collapsed_summary;
 
 % ========================================== %
 % FIGURE 4

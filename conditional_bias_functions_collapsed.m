@@ -1,4 +1,4 @@
-function conditional_bias_functions_collapsed(whichModels, qidx, useBiasedSj, g)
+function conditional_bias_functions_collapsed(whichModels, qidx, xAxis, useBiasedSj, subject_cutoff)
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -15,14 +15,17 @@ function conditional_bias_functions_collapsed(whichModels, qidx, useBiasedSj, g)
 addpath(genpath('~/code/Tools'));
 warning off; close all; 
 global datasets datasetnames mypath colors
-cutoff_quantile = 3;
+
 groups = {'alternators', 'repeaters', 'all'};
+g = 3; % combine all subjects
 
 switch qidx
 case 1
-    qntls = [0.1, 0.3, 0.5, 0.7, 0.9]; % Leite & Ratcliff
+    qntls = [0.1, 0.3, 0.5, 0.7, 0.9, 1]; % Leite & Ratcliff
 case 2
 	qntls = [0.5 1];
+case 3
+    qntls = [.2, .4, .6, .8, .95]; % white & poldrack
 end
 
 switch whichModels
@@ -35,6 +38,9 @@ case 2
 case 3
 	models = {'data', 'stimcoding_nohist', 'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp'};
 	thesecolors = {[0 0 0], [0.5 0.5 0.5],  colors(1, :), colors(2, :), mean(colors([1 2], :))};
+case 4
+    models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_prevresp'};
+    thesecolors = {[0 0 0], colors(1, :), colors(2, :)};
 end
 
 % ========================================== %
@@ -67,6 +73,17 @@ subplot(3,3,1); hold on;
                     alldata_thisdata.response    = alldata_thisdata.response_sampled;
                 end
 
+                % for those datasets with varying coherence, take only the difficult trials
+                  % FOR THE TWO DATASETS WITH VARYING COHERENCE, REMOVE THE HIGH LEVELS
+                if any(ismember('coherence', alldata_thisdata.Properties.VariableNames)),
+                    if max(alldata_thisdata.coherence) == 81,
+                        alldata_thisdata = alldata_thisdata(alldata_thisdata.coherence < 27, :);
+                    elseif max(alldata_thisdata.coherence) == 0.3,
+                        alldata_thisdata = alldata_thisdata(alldata_thisdata.coherence < 0.1, :);
+                    else % do nothing
+                    end
+                end
+
                 % add some more stuff
                 alldata_thisdata.subj_idx  = alldata_thisdata.subj_idx + 1000*d; % unique identifiers
                 alldata_thisdata = alldata_thisdata(:, {'rt', 'response', 'prevresp', 'subj_idx'});
@@ -75,10 +92,10 @@ subplot(3,3,1); hold on;
             end
             alldata = cat(1, alldata_append{:});
 
-            if m == 1, % preallocate
-            	allds.fast  = nan(numel(datasets), length(models));
-				allds.slow  = nan(numel(datasets), length(models));
-			end
+            %  if m == 1, % preallocate
+            %   allds.fast  = nan(numel(datasets), length(models));
+			% 	allds.slow  = nan(numel(datasets), length(models));
+			% end
 
             % make sure to use absolute RTs!
             alldata.rt = abs(alldata.rt);
@@ -117,89 +134,93 @@ subplot(3,3,1); hold on;
             end
 
             % select only a subset of the observers
-            if useBiasedSj,
+            if useBiasedSj ~= 0,
 
             	switch models{m}
-            	case 'data'
-                % for this plot, use only the most extremely biased observers (see email Tobi 23 August)
-                [gr, sjs] = findgroups(alldata.subj_idx);
-                sjbias = splitapply(@nanmean, alldata.biased, gr);
+                	case 'data'
+                    % for this plot, use only the most extremely biased observers (see email Tobi 23 August)
+                    [gr, sjs] = findgroups(alldata.subj_idx);
+                    sjbias = splitapply(@nanmean, alldata.biased, gr);
+                    % take percentile
+                    cutoff = percentile(sjbias, cutoff_quantile);
 
-                if cutoff_quantile == 2,
-                	cutoff = median(sjbias);
-                elseif cutoff_quantile == 0,
-                        cutoff = 0; % keep everyone!
-                    else
-                    	cutoff = quantile(sjbias, cutoff_quantile);
+                    if useBiasedSj == 1,
+                        usesj = sjs(sjbias > cutoff(end)); % highest
+                    elseif useBiasedSj == -1,
+                        usesj = sjs(sjbias < cutoff(end)); % lowest
                     end
-                    cutoff = quantile(sjbias, cutoff_quantile);
-                    usesj = sjs(sjbias > cutoff(end)); % only take the subjects who are in the highest quantile
                 end
-                
                 alldata = alldata(ismember(alldata.subj_idx, usesj), :);
             end
 
             % divide RT into quantiles for each subject
             discretizeRTs = @(x) {discretize(x, quantile(x, [0, qntls]))};
             alldata(isnan(alldata.rt), :) = [];
+          
+            % discretize into bins of RT
+        	rtbins = splitapply(discretizeRTs, alldata.rt, findgroups(alldata.subj_idx));
+        	alldata.rtbins = cat(1, rtbins{:});
 
-           % ignore if coherence is present but doesn't contain unique values
-           if ismember('coherence', alldata.Properties.VariableNames),
-           	if length(unique(alldata.coherence(~isnan(alldata.coherence)))) == 1,
-           		alldata.coherence = [];
-           	end
-           end
+            % get RT quantiles for choices that are in line with or against the bias
+            [gr, sjidx, rtbins] = findgroups(alldata.subj_idx, alldata.rtbins);
+            cpres               = array2table([sjidx, rtbins], 'variablenames', {'subj_idx', 'rtbin'});
+            cpres.choice        = splitapply(@nanmean, alldata.biased, gr); % choice proportion
+            %cpres.meanrt        = splitapply(@nanmean, alldata.rt, gr); % average RT per bin
 
-            % when there were multiple levels of evidence, do these plots
-            % separately for each level
-            if ~any(ismember('coherence', alldata.Properties.VariableNames))
+            % make into a subjects by rtbin matrix
+            mat_tmp = unstack(cpres, 'choice', 'rtbin');
+            mat     = mat_tmp{:, 2:end}; % remove the last one, only has some weird tail
 
-            	rtbins = splitapply(discretizeRTs, alldata.rt, findgroups(alldata.subj_idx));
-            	alldata.rtbins = cat(1, rtbins{:});
+            % also compute the mean RT for each subject and RT bin
+            rtAvg               = array2table([sjidx, rtbins], 'variablenames', {'subj_idx', 'rtbin'});
+            rtAvg.rt            = splitapply(@nanmean, alldata.rt, gr); % choice proportion
+            xRTs                = unstack(rtAvg, 'rt', 'rtbin');
+            xRTs                = xRTs{:, 2:end}; % remove the last one, only has some weird tail
+            assert(isequal(size(mat), size(xRTs)), 'mismatch');
 
-                % get RT quantiles for choices that are in line with or against the bias
-                [gr, sjidx, rtbins] = findgroups(alldata.subj_idx, alldata.rtbins);
-                cpres               = array2table([sjidx, rtbins], 'variablenames', {'subj_idx', 'rtbin'});
-                cpres.choice        = splitapply(@nanmean, alldata.biased, gr); % choice proportion
+            % else
+            % 	disp('splitting by coherence first');
+
+            % 	[gr, sj, coh] = findgroups(alldata.subj_idx, alldata.coherence);
+            % 	rtbins = splitapply(discretizeRTs, alldata.rt, gr);
+            % 	alldata.rtbins = cat(1, rtbins{:});
+
+            %     % get RT quantiles for choices that are in line with or against the bias
+            %     [gr, sjidx, rtbins, coh] = findgroups(alldata.subj_idx, alldata.rtbins, alldata.coherence);
+            %     cpres               = array2table([sjidx, rtbins, coh], 'variablenames', {'subj_idx', 'rtbin', 'coh'});
+            %     cpres.choice        = splitapply(@nanmean, alldata.biased, gr); % choice proportion
                 
-                % make into a subjects by rtbin matrix
-                mat_tmp = unstack(cpres, 'choice', 'rtbin');
-                mat = mat_tmp{:, 2:end}; % remove the last one, only has some weird tail
-                
-            else
-            	disp('splitting by coherence first');
+            %     thesesjs = unique(cpres.subj_idx);
+            %     mat = nan(length(thesesjs), max(cpres.rtbin));
+            %     for sj = 1:length(thesesjs),
+            %     	for r = 1:max(cpres.rtbin);
+            %     		mat(sj, r) = nanmean(cpres.choice(cpres.subj_idx == thesesjs(sj) & cpres.rtbin == r));
+            %     	end
+            %     end
+            % end
 
-            	[gr, sj, coh] = findgroups(alldata.subj_idx, alldata.coherence);
-            	rtbins = splitapply(discretizeRTs, alldata.rt, gr);
-            	alldata.rtbins = cat(1, rtbins{:});
-
-                % get RT quantiles for choices that are in line with or against the bias
-                [gr, sjidx, rtbins, coh] = findgroups(alldata.subj_idx, alldata.rtbins, alldata.coherence);
-                cpres               = array2table([sjidx, rtbins, coh], 'variablenames', {'subj_idx', 'rtbin', 'coh'});
-                cpres.choice        = splitapply(@nanmean, alldata.biased, gr); % choice proportion
-                
-                thesesjs = unique(cpres.subj_idx);
-                mat = nan(length(thesesjs), max(cpres.rtbin));
-                for sj = 1:length(thesesjs),
-                	for r = 1:max(cpres.rtbin);
-                		mat(sj, r) = nanmean(cpres.choice(cpres.subj_idx == thesesjs(sj) & cpres.rtbin == r));
-                	end
-                end
-            end
-            
             % biased choice proportion
             switch models{m}
-            case 'data'
-            	disp(size(mat))
+                case 'data'
+
+                    switch xAxis
+                    case 'quantiles'
+                        x_axis = qntls;
+                        x_axis_std = [];
+                    case 'rt'
+                        x_axis = mean(xRTs);
+                        x_axis_std = nanstd(xRTs, [], 1) ./ sqrt(size(xRTs, 1));
+                    end
+
                     % ALSO ADD THE REAL DATA WITH SEM/95%CI
-                    h = ploterr(qntls, nanmean(mat, 1), [], ...
+                    h = ploterr(x_axis, nanmean(mat, 1), x_axis_std, ...
                     	1.96 * nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k', 'abshhxy', 0);
                     set(h(1), 'color', 'k', 'marker', 'o', ...
                     	'markerfacecolor', 'w', 'markeredgecolor', 'k', 'linewidth', 0.5, 'markersize', 3, ...
                     	'linestyle', '-');
                     set(h(2), 'linewidth', 0.5);
                 otherwise
-                	plot(qntls, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
+                	plot(x_axis, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
                 end
 
             % SAVE         
@@ -208,33 +229,53 @@ subplot(3,3,1); hold on;
                 avg = splitapply(@nanmean, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));   
                 allds.fast(:, m) = avg(:, 1);
                 allds.slow(:, m) = avg(:, 2);
+            else
+                %mn1 = @(x) nanmean(x, 1);
+                % avg = splitapply(mn1, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));  
+                allds.fast(:, m) = mat(:, 1);
+                allds.slow(:, m) = mat(:, end);
             end
         end
         
     axis tight; box off;
-    set(gca, 'xtick', qntls);
+    set(gca, 'xtick', roundn(x_axis, -2));
 
     axis square;  offsetAxes;
-    xlabel('RT (quantiles)');
+    switch xAxis
+    case 'quantiles'
+        xlabel('Response time (quantile)')
+    case 'rt'
+    xlabel('Response time (s)');
+    end
+
+    switch useBiasedSj
+    case 0
+        title('All subjects');
+    case -1
+        title(sprintf('Least biased %d percentile of subjects', 100-subject_cutoff));
+    case 1
+            title(sprintf('Most biased %d percentile of subjects', subject_cutoff));
+    end
+
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     ylabel(sprintf('P(bias), %s', groups{g}));
-    title('Collapsed across datasets');
+    % title('Collapsed across datasets');
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
 
 	tightfig;
-  	print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_collapsed_q%d_sjCutoff%d_%s_models%d.pdf', ...
-    qidx, useBiasedSj, groups{g}, whichModels));
+
+        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_q%d_%s_sjCutoff%d_%dpercentile_models%d.pdf', ...
+    qidx, xAxis, useBiasedSj, subject_cutoff, whichModels));
+
+  	% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_collapsed_q%d_%s_sjCutoff%d_%s_models%d.pdf', ...
+   %  qidx, xAxis, useBiasedSj, groups{g}, whichModels));
 
 %% ========================================== %
 % PLOT ACROSS DATASETS - only for median split
 % ========================================== %
 
-if qidx ~= 2,
-	return;
-	disp('not saving');
-else
-	savefast(sprintf('~/Data/serialHDDM/allds_cbfs_mediansplit.mat'), 'allds');
-	disp('saved output');
-end
+savefast(sprintf('~/Data/serialHDDM/allds_cbfs_mediansplit.mat'), 'allds', 'models');
+disp('saved output');
+
   
 end
