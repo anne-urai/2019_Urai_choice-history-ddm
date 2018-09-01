@@ -136,7 +136,7 @@ for d = length(datasets):-1:1
     
     % compute the difference in correlation
     [rho3, pval3] = corr(cat(1, allresults(:).v_prevresp), cat(1, allresults(:).z_prevresp), ...
-        'rows', 'complete', 'type', 'pearson');
+        'rows', 'complete', 'type', 'spearman');
     if pval3 < 0.05,
         fprintf('warning %s: rho = %.3f, pval = %.3f \n', datasets{d}, rho3, pval3);
     end
@@ -162,9 +162,9 @@ for d = length(datasets):-1:1
     
     if doText,
         %% add line between the two correlation coefficients
-        txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
+        txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
         if pval < 0.001,
-            txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
+            txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff)};
         end
         tt = title(txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'left');
         tt.Position(2) = tt.Position(2) - 0.008;

@@ -13,7 +13,7 @@ function conditional_bias_functions_collapsed(whichModels, qidx, xAxis, useBiase
 % ========================================== %
 
 addpath(genpath('~/code/Tools'));
-warning off; close all;
+warning off; % close all;
 global datasets datasetnames mypath colors
 
 groups = {'alternators', 'repeaters', 'all'};
@@ -47,8 +47,9 @@ end
 % START
 % ========================================== %
 
-close all;
-subplot(3,3,1); hold on;
+% close all;
+% subplot(3,3,1); 
+hold on;
 
 for m = 1:length(models),
     
@@ -148,7 +149,7 @@ for m = 1:length(models),
                 [gr, sjs] = findgroups(alldata.subj_idx);
                 sjbias = splitapply(@nanmean, alldata.biased, gr);
                 % take percentile
-                cutoff = prctile(sjbias, subject_cutoff);
+                cutoff = prctile(sjbias, 100-subject_cutoff);
                 
                 if useBiasedSj == 1,
                     usesj = sjs(sjbias > cutoff); % highest
@@ -205,7 +206,10 @@ for m = 1:length(models),
     %     end
     % end
     
-    % biased choice proportion
+    % ================================ %
+    % PLOT THE ACTUAL CURVES
+    % ================================ %
+
     switch models{m}
         case 'data'
             
@@ -216,21 +220,27 @@ for m = 1:length(models),
                 case 'rt'
                     x_axis = mean(xRTs);
                     x_axis_std = nanstd(xRTs, [], 1) ./ sqrt(size(xRTs, 1));
+                    ebar_ci = bootci(5000, @mean, xRTs);
+                    x_axis_std = {ebar_ci(1, :), ebar_ci(2, :)}; % CI based on bootstrap
             end
             
+            ebar_ci_sem = 1.96 * nanstd(mat, [], 1) ./ sqrt(size(mat, 1)); % CI based on SEM
+            ebar_ci = bootci(5000, @mean, mat);
+            ebar_ci_sem = {ebar_ci(1, :), ebar_ci(2, :)}; % CI based on bootstrap
+            
             % ALSO ADD THE REAL DATA WITH SEM/95%CI
-            h = ploterr(x_axis, nanmean(mat, 1), x_axis_std, ...
-                1.96 * nanstd(mat, [], 1) ./ sqrt(size(mat, 1)), 'k', 'abshhxy', 0);
+            h = ploterr(x_axis, nanmean(mat, 1), x_axis_std, ebar_ci_sem, 'k', 'abshhxy', 0);
+                        
             set(h(1), 'color', 'k', 'marker', 'o', ...
                 'markerfacecolor', 'w', 'markeredgecolor', 'k', 'linewidth', 0.5, 'markersize', 3, ...
                 'linestyle', '-');
-            set(h(2), 'linewidth', 0.5);
+            set([h(2) h(3)], 'linewidth', 0.5);
         otherwise
             plot(x_axis, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
     end
     
     % SAVE
-    if  qidx == 2, % median split, only 2 bins
+    if  qidx == 3, % median split, only 2 bins
         % average within each dataset
         avg = splitapply(@nanmean, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));
         allds.fast(:, m) = avg(:, 1);
@@ -244,7 +254,8 @@ for m = 1:length(models),
 end
 
 axis tight; box off;
-set(gca, 'xtick', roundn(x_axis, -2));
+set(gca, 'xtick', roundn(x_axis, -2), 'xticklabelrotation', -30);
+ylim([0.5 0.58]);
 
 axis square;  offsetAxes;
 switch xAxis
@@ -254,27 +265,28 @@ switch xAxis
         xlabel('Response time (s)');
 end
 
-switch useBiasedSj
-    case 0
-        title('All subjects');
-    case -1
-        title(sprintf('Least biased %d percentile of subjects', 100-subject_cutoff));
-    case 1
-        title(sprintf('Most biased %d percentile of subjects', subject_cutoff));
-end
+% switch useBiasedSj
+%     case 0
+%         title('All subjects');
+%     case -1
+%         title(sprintf('Least biased %d percentile of subjects', 100-subject_cutoff));
+%     case 1
+%         title(sprintf('Most biased %d percentile of subjects', subject_cutoff));
+% end
 
 set(gca, 'xcolor', 'k', 'ycolor', 'k');
 ylabel(sprintf('P(bias), %s', groups{g}));
+ylabel('Choice bias (fraction)');
 % title('Collapsed across datasets');
 set(gca, 'xcolor', 'k', 'ycolor', 'k');
-
-tightfig;
-
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_q%d_%s_sjCutoff%d_%dpercentile_models%d.pdf', ...
-    qidx, xAxis, useBiasedSj, subject_cutoff, whichModels));
-
-% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_collapsed_q%d_%s_sjCutoff%d_%s_models%d.pdf', ...
-%  qidx, xAxis, useBiasedSj, groups{g}, whichModels));
+% 
+% tightfig;
+% 
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_q%d_%s_sjCutoff%d_%dpercentile_models%d.pdf', ...
+%     qidx, xAxis, useBiasedSj, subject_cutoff, whichModels));
+% 
+% % print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/CBFs_collapsed_q%d_%s_sjCutoff%d_%s_models%d.pdf', ...
+% %  qidx, xAxis, useBiasedSj, groups{g}, whichModels));
 
 %% ========================================== %
 % PLOT ACROSS DATASETS - only for median split
