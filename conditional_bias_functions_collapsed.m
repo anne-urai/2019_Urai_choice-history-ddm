@@ -233,7 +233,7 @@ end
 
 axis tight; box off;
 set(gca, 'xtick', roundn(x_axis, -2), 'xticklabelrotation', -30);
-ylim([0.5 0.56]);
+% ylim([0.5 0.56]);
 
 axis square;  offsetAxes;
 switch xAxis

@@ -63,14 +63,14 @@ end
 disp('starting');
 
 % barplots
-% close all; subplot(3,3,1);
-% conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0); % redo for all subjects
-% tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed_allsubjects.pdf'); % 3b
+close all; subplot(3,3,1);
+conditional_bias_functions_collapsed(4, 3, 'rt', 1, 50); % redo for all subjects
+tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed_biasedsubjects.pdf'); % 3b
 
 % median split
 %conditional_bias_functions_collapsed(4, 2, 'rt', 0, 0); % redo for all subjects
-close all; conditional_bias_functions_collapsed_summary;
-print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots.pdf'); % 3c
+% close all; conditional_bias_functions_collapsed_summary;
+% print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots_biasedsubjects.pdf'); % 3c
 
 return;
 
