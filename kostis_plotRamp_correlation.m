@@ -16,7 +16,7 @@ results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', myp
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
-results.criterionshift = results.repetition_alldata;
+results.criterionshift = results.repetitionK;
 
 % assign to structure
 allresults.z_prevresp     = results.ddmK_rp2_offset;

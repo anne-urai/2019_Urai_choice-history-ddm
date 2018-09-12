@@ -11,8 +11,9 @@ for s=1:length(ss);
     notrials(s)=length(indx);
 end
 
-% function for BIC computation
-ll2bic = @(ll, p, n) 2*ll+p.*log(n');
+% function for BIC computation - treating all subjects as a super subject
+% 2*sum(LL(:,1))+(length(ss)*5).*log(sum(notrials))
+ll2bic = @(ll, p, n) repmat((2*sum(ll) + length(n)*p.*log(sum(n))), length(n), 1);
 
 % ========================================== %
 % 1. first take the O-U values
@@ -57,7 +58,7 @@ ou_table = cat(2, params_ddm, params_ddm_sp, params_ddm_input, params_ddm_lambda
 % add repetition, computed from all of Anke's trials
 load(sprintf('%s/history.mat', kostisPath));
 kk(6, :) = []; % remove this subject
-ou_table.repetition_alldata = kk(:, 2);
+ou_table.repetitionK = kk(:, 2);
 
 % ========================================== %
 % 2. DDM values
@@ -118,16 +119,16 @@ results = results(results.session == 0, :);
 results = cat(2, results, ou_table, ddm_table);
 writetable(results, '/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
 
-corrplot(results, {'repetition_alldata', 'ddmK_z_zbias', 'ddmK_dc_dcbias', 'ddmK_dcz_zbias', 'ddmK_dcz_dcbias'});
+corrplot(results, {'repetitionK', 'ddmK_z_zbias', 'ddmK_dc_dcbias', 'ddmK_dcz_zbias', 'ddmK_dcz_dcbias'});
 print(gcf, '-dpdf', '~/Data/serialHDDM/kostisData_overview_DDM.pdf');
 
 close all;
-corrplot(results, {'repetition_alldata', 'ddmK_rp_slope', 'ddmK_dc_dcbias', ...
+corrplot(results, {'repetitionK', 'ddmK_rp_slope', 'ddmK_dc_dcbias', ...
     'ddmK_rp2_slope', 'ddmK_rp2_offset'});
 print(gcf, '-dpdf', '~/Data/serialHDDM/kostisData_overview_DDM_ramp.pdf');
 
 close all;
-corrplot(results, {'repetition_alldata', 'repetition'})
+corrplot(results, {'repetitionK', 'repetition'})
 print(gcf, '-dpdf', '~/Data/serialHDDM/repetition_comparison.pdf');
 
 

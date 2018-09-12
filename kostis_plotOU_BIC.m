@@ -4,7 +4,7 @@
 % ============================================ %
 global mypath colors
 results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
-mdldic = ([results.ouK_sp_bic results.ouK_input_bic results.ouK_lambda_bic results.ouK_vanilla_bic]);
+mdldic = mean([results.ouK_sp_bic results.ouK_input_bic results.ouK_lambda_bic results.ouK_vanilla_bic]);
 
 close all;
 subplot(4,5,1);
@@ -30,9 +30,9 @@ for i = 1:length(mdldic),
             num2str(round(mdldic(i))), ...
             'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
     elseif mdldic(i) > 0,
-        text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
+        text(i, mdldic(i) - 0.02*range(get(gca, 'ylim')), ...
             num2str(round(mdldic(i))), ...
-            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
+            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
     end
 end
 axis square; axis tight;

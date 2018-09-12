@@ -5,11 +5,11 @@ global mypath
 %% compare correlation coefficients
 close all; 
 results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
-corrplot(results, {'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias', 'repetition_alldata'});
+corrplot(results, {'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias', 'repetitionK'});
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter.pdf'));
 
 close; 
-corrplot(results, {'repetition_alldata', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
+corrplot(results, {'repetitionK', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter_2.pdf'));
 
 %% separately, test correlation coefficients
@@ -20,11 +20,11 @@ y = [results.ouK_input_inputbias results.ouK_lambda_lambdabias];
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
-results.criterionshift = results.repetition_alldata;
+results.criterionshift = results.repetitionK;
 
 % assign to structure
-allresults.sp     = results.ouK_sp_spbias;
-allresults.input     = results.ouK_input_inputbias;
+allresults.sp       = results.ouK_sp_spbias;
+allresults.input    = results.ouK_input_inputbias;
 allresults.leak     = results.ouK_lambda_lambdabias;
 allresults.criterionshift = results.criterionshift;
 

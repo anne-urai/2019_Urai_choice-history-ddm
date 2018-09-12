@@ -7,7 +7,7 @@ results     = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv',
 % assign to structure
 allresults(1).z_prevresp     = results.ddmK_dcz_zbias;
 allresults(1).v_prevresp     = results.ddmK_dcz_dcbias;
-allresults(1).criterionshift = results.criterionshift + 0.5;
+allresults(1).criterionshift = results.repetitionK;
 
 allresults(1).marker 			= 'o';
 allresults(1).meancolor 		= [0 0 0];
