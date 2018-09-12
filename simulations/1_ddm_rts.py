@@ -11,7 +11,8 @@ import seaborn as sns
 import pandas as pd
 from IPython import embed as shell
 
-from models import DDM_traces_get, one_accumulater_traces_apply_bounds
+from sim_tools import DDM_traces_get, one_accumulater_traces_apply_bounds
+from sim_tools import summary_plot, conditional_response_plot
 
 sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'axes.linewidth': 0.25, 
@@ -28,8 +29,10 @@ sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'ytick.color':'Black',} )
 sns.plotting_context()
 
-data_folder = '/home/degee/research/model_simulations/ddm_data/'
-fig_folder = '/home/degee/research/model_simulations/ddm_figs/'
+# data_folder = '/home/degee/research/model_simulations/ddm_data/'
+# fig_folder = '/home/degee/research/model_simulations/ddm_figs/'
+data_folder = '/Users/janwillem/Desktop/simulations/ddm_data/'
+fig_folder = '/Users/janwillem/Desktop/simulations/ddm_figs/'
 
 t = 5
 dt = 0.01
@@ -49,6 +52,7 @@ def do_simulations(params):
                                 stim=stim,
                                 nr_trials=params['nr_trials'],
                                 dt=dt,)
+
         rt_dum, response_dum = one_accumulater_traces_apply_bounds(x1, 
                                 a=params['a'],
                                 b0_collapse=params['b0_collapse'],
@@ -66,7 +70,7 @@ def do_simulations(params):
     df.loc[:,'subj_idx'] = params['subj_idx']
     df.to_csv(os.path.join(data_folder, 'df_{}.csv'.format(params['subj_idx'])))
 
-simulate = True
+simulate = False
 nr_trials = int(1e5) #100K
 
 v = 0.1
@@ -112,10 +116,10 @@ sArray = [
 
 if simulate:
     from joblib import Parallel, delayed
-    n_jobs = 15
+    n_jobs = 3
     res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
 
-groups = [[0,1,2], [3,4,5], [6,7,8], [9,10,11], [12,13,14], [15,16,17], [15,16,17],]
+groups = [[0,1,2], [3,4,5], [6,7,8], [9,10,11], [12,13,14], [15,16,17],]
 quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 for i, group in enumerate(groups):
     
@@ -128,58 +132,10 @@ for i, group in enumerate(groups):
     df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
     
     # plots:
-    fig = plt.figure(figsize=(2,6))
+    quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9]
 
-    # rt distributions:
-    ax = fig.add_subplot(3,1,1)
-    ax.hist(df.loc[(df.response==0), 'rt']*-1.0, color='forestgreen', alpha=0.5, bins=25)
-    ax.hist(df.loc[(df.response==1), 'rt'], color='orange', alpha=0.5, bins=25)
-    ax.set_xlim(-2, 2)
-    ax.set_title('choice={}; correct={}'.format(round(df.loc[:, 'response'].mean(), 3), round(df.loc[:, 'correct'].mean(), 3)))
-    ax.set_xlabel('RT (s)')
-    ax.set_ylabel('Trials (#)')
+    fig = conditional_response_plot(df, quantiles, mean_response)
+    fig.savefig(os.path.join(fig_folder, 'crf_{}.pdf'.format(i)))
 
-    # condition accuracy plots:
-    quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
-    ax = fig.add_subplot(3,1,2)
-    plt.axhline(mean_correct, lw=0.5, color='k')
-    df.loc[:,'rt_bin'] = pd.qcut(df['rt'], quantiles, labels=False)
-    ax.plot(np.array(df.groupby('rt_bin').mean()['rt']), np.array(df.groupby('rt_bin').mean()['correct']), color='k')
-    ax.set_xlim(0,1)
-    ax.set_ylim(0.50, 1)
-    ax.set_title('Conditional accuracy')
-    ax.set_xlabel('RT (s)')
-    ax.set_ylabel('% correct')
-
-    # condition response plots:
-    ax = fig.add_subplot(3,1,3)
-    df.loc[:,'rt_bin'] = pd.qcut(df['rt'], quantiles, labels=False)
-    plt.axhline(mean_response, lw=0.5, color='k')
-    ax.plot(np.array(df.groupby('rt_bin').mean()['rt']), np.array(df.groupby('rt_bin').mean()['response']), color='k')
-    ax.set_xlim(0,1)
-    ax.set_ylim(0.25,0.75)
-    ax.set_title('Conditional response')
-    ax.set_xlabel('RT (s)')
-    ax.set_ylabel('% choice a')
-
-    sns.despine(offset=10, trim=True)
-    plt.tight_layout()
-    fig.savefig(os.path.join(fig_folder, 'rt_dists_{}.pdf'.format(i)))
-    
-    # plots:
-    fig = plt.figure(figsize=(2,2))
-    ax = fig.add_subplot(1,1,1)
-    plt.axhline(mean_response, lw=0.5, color='k')
-    df.loc[:,'rt_bin'] = pd.qcut(df['rt'], quantiles, labels=False)
-    d = df.groupby(['subj_idx', 'rt_bin']).mean().reset_index()
-    for s, a in zip(np.unique(d["subj_idx"]), [0.1, 0.5, 0.9]):
-        ax.plot(d.loc[d["subj_idx"]==s, "rt"], d.loc[d["subj_idx"]==s, "response"], color='k', alpha=a)
-    ax.set_xlim(0,1)
-    ax.set_ylim(0.25,0.75)
-    ax.set_title('choice={}; correct={}'.format(round(d.loc[d["subj_idx"]==np.unique(d["subj_idx"])[1], 'response'].mean(), 3),
-                                                round(d.loc[d["subj_idx"]==np.unique(d["subj_idx"])[1], 'correct'].mean(), 3),))
-    ax.set_xlabel('RT (s)')
-    ax.set_ylabel('% choice a')
-    sns.despine(offset=10, trim=True)
-    plt.tight_layout()
-    fig.savefig(os.path.join(fig_folder, 'rt_dists_{}_levels.pdf'.format(i)))
+    fig = summary_plot(df, quantiles, mean_correct, mean_response)
+    fig.savefig(os.path.join(fig_folder, 'summary_{}.pdf'.format(i)))

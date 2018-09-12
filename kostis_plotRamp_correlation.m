@@ -10,7 +10,7 @@ function alldat = kostis_plotRamp_correlation
 close all; clc;
 global mypath datasets
 d = 4;
-results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 
 % ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET

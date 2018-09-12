@@ -3,8 +3,8 @@
 % DIC COMPARISON BETWEEN RAMPING MODELS
 % ============================================ %
 global mypath colors
-results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_neutral/allindividualresults_kostis.csv');
-mdldic = sum([results.ouK_sp_bic results.ouK_input_bic results.ouK_lambda_bic results.ouK_vanilla_bic]);
+results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
+mdldic = ([results.ouK_sp_bic results.ouK_input_bic results.ouK_lambda_bic results.ouK_vanilla_bic]);
 
 close all;
 subplot(4,5,1);
