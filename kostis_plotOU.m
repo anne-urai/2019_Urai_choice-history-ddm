@@ -1,10 +1,10 @@
 function kostis_plotOU
 
-global mypath datasets datasetnames
+global mypath 
 
 %% compare correlation coefficients
 close all; 
-results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 corrplot(results, {'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias', 'repetition_alldata'});
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter.pdf'));
 
@@ -109,7 +109,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_correlations.pdf'));
 % OVERALL LEAK PARAMETER
 % ============================================ %
 
-results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 
 close all;
 sp = subplot(3,6,1);
@@ -117,7 +117,7 @@ hold on;
 % plot identity line
 plot([0.8 1.2], [0 0], '-', 'linewidth', 0.5, 'color', [0.5 0.5 0.5]);
 
-lambda = results.ouK_vanilla_dv;
+lambda = results.ouK_vanilla_lambda;
 h = scatter(1*ones(size(lambda)), lambda, 3, colors(3, :), 'jitter', 'on', 'jitteramount', 0.07);
 plot([1-0.1 1+0.1], [nanmean(lambda) nanmean(lambda)], 'k-');
 pval = permtest(lambda);

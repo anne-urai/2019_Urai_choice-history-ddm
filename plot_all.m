@@ -66,13 +66,14 @@ disp('starting');
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
 
-% schematic;
+schematic;
 
 % ========================================== %
 % FIGURE 2
 % ========================================== %
-% repetition_range;
-% strategy_plot;
+
+repetition_range;
+strategy_plot;
 
 % ========================================== %
 % FIGURE 3
@@ -88,7 +89,6 @@ tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collap
 conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0); % redo for all subjects
 close all; conditional_bias_functions_collapsed_summary;
 print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots.pdf'); % 3c
-return;
 
 % ========================================== %
 % FIGURE 4
@@ -173,7 +173,6 @@ alldat = individual_correlation_pharma();
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
 
-
 % ========================================== %
 % SUPPLEMENTARY FIGURE 6
 % ========================================== %
@@ -184,12 +183,13 @@ post_error_slowing;
 % SUPPLEMENTARY FIGURE 7
 % ========================================== %
 
-% this has to run before, on the UKE cluster to grab Anke's motionenergy
-% coordinates
+% this has to run before, on the UKE cluster to grab Anke's motionenergy coordinates
 motionEnergy_filterDots;
 motionEnergy_check;
 motionEnergy_kernels;
-% motionEnergy_kernels_logistic;
+
+
+[rho, tt, handles] = plotScatter(allresults, fld, legendWhere, doText)
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 8
