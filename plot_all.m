@@ -61,15 +61,14 @@ end
 
 disp('starting');
 
-% barplots
+ 
 close all; subplot(3,3,1);
-conditional_bias_functions_collapsed(4, 3, 'rt', 1, 50); % redo for all subjects
-tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed_biasedsubjects.pdf'); % 3b
+conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0);
+tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed.pdf'); % 3b
 
-% median split
-%conditional_bias_functions_collapsed(4, 2, 'rt', 0, 0); % redo for all subjects
-% close all; conditional_bias_functions_collapsed_summary;
-% print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots_biasedsubjects.pdf'); % 3c
+% barplots
+close all; conditional_bias_functions_collapsed_summary;
+print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots.pdf'); % 3c
 
 return;
 
@@ -77,14 +76,14 @@ return;
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
 
-% schematic;
+schematic;
 
 % ========================================== %
 % FIGURE 2
 % ========================================== %
 
-% repetition_range;
-% strategy_plot;
+repetition_range;
+strategy_plot;
 
 % ========================================== %
 % FIGURE 3
@@ -93,12 +92,10 @@ return;
 barplots_DIC; %3a
  
 close all; subplot(3,3,1);
-conditional_bias_functions_collapsed(4, 3, 'rt', 1, 50);
+conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0);
 tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed.pdf'); % 3b
 
 % barplots
-conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0); % redo for all subjects
-tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed_allsubjects.pdf'); % 3b
 close all; conditional_bias_functions_collapsed_summary;
 print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots.pdf'); % 3c
 return;
