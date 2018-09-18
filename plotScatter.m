@@ -22,29 +22,30 @@ plot(xlims, [0.5 0.5], 'color', [0.5 0.5 0.5], 'linewidth', 0.2); % if p(repeat)
 
 for a = 1:length(allresults), % neutral last
     
-    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, 'type', 'spearman', 'rows', 'complete');
+    [rho, pval] = corr(allresults(a).(fld), allresults(a).criterionshift, ...
+        'type', 'spearman', 'rows', 'complete');
     
     if pval < 0.05,
         
-        % CORRELATION LINE SEPARATELY FOR EACH DATASET?
-        p = polyfit(allresults(a).(fld)(~isnan(allresults(a).(fld))), allresults(a).criterionshift(~isnan(allresults(a).(fld))), 1);
+        % 18 SEPTEMBER 2018 - SWITCH TO PCA CORRELATION https://elifesciences.org/articles/00638
+        b = deming(allresults(a).(fld)(~isnan(allresults(a).(fld))), allresults(a).criterionshift(~isnan(allresults(a).(fld))));
+        %p = polyfit(allresults(a).(fld)(~isnan(allresults(a).(fld))), allresults(a).criterionshift(~isnan(allresults(a).(fld))), 1);
         xrangeextra = 0.15*range(allresults(a).(fld));
         xrange = linspace(min(allresults(a).(fld))- xrangeextra, ...
             max(allresults(a).(fld))+xrangeextra, 100);
-        yrange = polyval(p, xrange);
+        yrange = polyval(fliplr(b'), xrange);
+        
+        % NOW PLOT
         l = plot(xrange, yrange);
         l.Color = allresults(a).meancolor;
         l.LineWidth = 0.5;
         l.LineStyle = '-';
-        % else
-        % l.LineStyle = ':';
     end
     
     % PLOT ALL DATAPOINTS IN SPECIFIC COLOR
     s  = scatter(allresults(a).(fld), allresults(a).criterionshift, 7, allresults(a).scattercolor, allresults(a).marker);
 	%set(s, 'markerfacecolor', allresults(a).scattercolor);
 	handles{a} = s;
-     
 end
 
 for a = 1:length(allresults), % neutral last

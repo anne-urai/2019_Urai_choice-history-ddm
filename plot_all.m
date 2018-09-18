@@ -61,17 +61,6 @@ end
 
 disp('starting');
 
- 
-close all; subplot(3,3,1);
-conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0);
-tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed.pdf'); % 3b
-
-% barplots
-close all; conditional_bias_functions_collapsed_summary;
-print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots.pdf'); % 3c
-
-return;
-
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
@@ -98,7 +87,6 @@ tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collap
 % barplots
 close all; conditional_bias_functions_collapsed_summary;
 print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots.pdf'); % 3c
-return;
 
 % ========================================== %
 % FIGURE 4
@@ -184,7 +172,6 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', 1));
 alldat = individual_correlation_pharma();
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
-
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 6
