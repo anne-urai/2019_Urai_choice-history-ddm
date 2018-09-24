@@ -118,16 +118,35 @@ barplots_DIC_previousresponse_outcome;
 % ========================================== %
 
 % grab the results from Kostis' fits
-kostis_driftRate;
-kostis_makeTable;
+% kostis_driftRate;
+kostis_makeTable_v2;
 
-% PART 1: RAMPING VS. STATIC DRIFT BIAS
+% a. motion energy filtering: this has to run before, 
+% on the UKE cluster to grab Anke's motionenergy coordinates
+motionEnergy_filterDots;
+motionEnergy_check;
+motionEnergy_kernels;
+
+% a. normal DDM
+kostis_plotDDM_BIC;
+kostis_plotDDM_correlation;
+
+% b. ramping vs. static drift bias
 kostis_plotRamp_correlation;
 kostis_plotRamp_BIC;
 
+% c. DDM with collapsing bounds
+kostis_plotDDMCol_BIC;
+kostis_plotDDMCol_correlation;
+
+
 % PART 2: O-U FITS
 kostis_plotOU_BIC;
-kostis_plotOU;
+kostis_plotOU_correlation;
+
+% PART 2: O-U FITS
+kostis_plotOUD_BIC;
+kostis_plotOUD_correlation;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
@@ -142,8 +161,8 @@ kostis_plotOU;
 
 dprime_driftrate_correlation;
 posterior_predictive_checks;
-% history_kernels;
-% strategy_plot_2-7;
+history_kernels;
+strategy_plot_2-7;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 3
@@ -183,12 +202,7 @@ post_error_slowing;
 % SUPPLEMENTARY FIGURE 7
 % ========================================== %
 
-% this has to run before, on the UKE cluster to grab Anke's motionenergy
-% coordinates
-motionEnergy_filterDots;
-motionEnergy_check;
-motionEnergy_kernels;
-% motionEnergy_kernels_logistic;
+
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 8

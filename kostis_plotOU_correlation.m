@@ -1,16 +1,16 @@
-function kostis_plotOU
+function kostis_plotOU_correlation
 
 global mypath 
 
 %% compare correlation coefficients
 close all; 
 results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
-corrplot(results, {'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias', 'repetitionK'});
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter.pdf'));
-
-close; 
-corrplot(results, {'repetitionK', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter_2.pdf'));
+% corrplot(results, {'ouD_input_inputbias', 'ouD_lambda_lambdabias', 'ouD_sp_spbias', 'repetitionK'});
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter.pdf'));
+% 
+% close; 
+% corrplot(results, {'repetitionKD', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter_2.pdf'));
 
 %% separately, test correlation coefficients
     
@@ -85,16 +85,16 @@ xlabel(sp3, {'Leak bias'});
 set(sp3, 'xcolor', 'k',  'ycolor', 'k');
 
 %% add line between the two correlation coefficients
-txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
+txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
 if pvalD1 < 0.001,
-    txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
+    txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
 end
 
 tt = title(sp1, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'center');
 
-txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
+txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
 if pvalD2 < 0.001,
-    txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff2)};
+    txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff2)};
 end
 
 tt = title(sp3, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'center');

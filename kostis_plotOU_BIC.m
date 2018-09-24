@@ -1,8 +1,9 @@
+function kostis_plotOU_BIC
 
 % ============================================ %
 % DIC COMPARISON BETWEEN RAMPING MODELS
 % ============================================ %
-global mypath colors
+global mypath 
 results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
 mdldic = mean([results.ouK_sp_bic results.ouK_input_bic results.ouK_lambda_bic results.ouK_vanilla_bic]);
 

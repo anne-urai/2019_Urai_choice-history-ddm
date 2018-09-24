@@ -21,7 +21,7 @@ for s = 1:length(types),
     % 1. STIMCODING, only prevresps
     mdls = {'z_prevresp', 'dc_prevresp', ...
         'dc_z_prevresp', 'nohist'};
-    for d = 1:length(datasets),
+    for d = 2:length(datasets),
         close all;
         subplot(4, 6, 1);
         getPlotDIC(mdls, d);
@@ -69,7 +69,7 @@ mdldic = bsxfun(@minus, mdldic, mdldic(:, end));
 mdldic = mdldic(:, 1:end-1);
 
 % sum over observers
-mdldic = sum(mdldic);
+mdldic = nansum(mdldic);
 
 % nice looking bargraphs
 % colors = [141 165 8;  8 141 165; 150 150 150] ./ 256;

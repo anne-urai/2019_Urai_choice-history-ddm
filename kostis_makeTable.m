@@ -2,7 +2,7 @@ function kostis_makeTable
 
 close all; clc;
 global mypath datasets datasetnames
-kostisPath = '~/Data/HDDM/Anke_MEG_neutral/materials_K/models';
+kostisPath = '~/Data/HDDM/Anke_MEG_transition/KostisFits';
 
 % GRAB MOTION ENERGY TO DETERMINE NR OF TRIALS USED FOR THE FIT
 load(sprintf('%s/motionEnergyData_AnkeMEG.mat', kostisPath));
@@ -16,7 +16,7 @@ end
 ll2bic = @(ll, p, n) 2*ll'+p.*log(n');
 
 %% 1. first take the O-U values
-load(sprintf('%s/cartesius_OU/DDM.mat', kostisPath));
+load(sprintf('%s/allmodels.mat', kostisPath));
 params_ddm = array2table([params ll2bic(Gf, 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'bic'});
 
 load(sprintf('%s/cartesius_OU/DDM_SP.mat', kostisPath));

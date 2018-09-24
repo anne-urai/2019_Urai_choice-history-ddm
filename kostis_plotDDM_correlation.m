@@ -1,4 +1,4 @@
-function alldat = kostis_plotRamp_correlation
+function alldat = kostis_plotDDM_correlation
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -8,7 +8,7 @@ function alldat = kostis_plotRamp_correlation
 % anne.urai@gmail.com
 
 close all; clc;
-global mypath datasets
+global mypath datasets colors
 d = 4;
 results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 
@@ -19,13 +19,13 @@ results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', myp
 results.criterionshift = results.repetitionK;
 
 % assign to structure
-allresults.z_prevresp     = results.ddmK_rp2_offset;
-allresults.v_prevresp     = results.ddmK_rp2_slope;
+allresults.z_prevresp     = results.ddmK_dcz_zbias;
+allresults.v_prevresp     = results.ddmK_dcz_dcbias;
 allresults.criterionshift = results.criterionshift;
 
 allresults.marker 			= 'o';
 allresults.meancolor 		= [ 0 0 0];
-allresults.scattercolor	 	= [ 0.5588    0.5824    0.3647];
+allresults.scattercolor	 	= colors(3, :);
 close all;
 
 % PLOT
@@ -55,10 +55,11 @@ sp2.Position(1) = sp2.Position(1) - 0.08;
 
 % add colored axes after suplabel (which makes them black)
 
-xlabel(sp2, {'Ramp (slope \beta_1)'});
+xlabel(sp2, {'Drift bias (dc)'});
 set(sp2, 'xcolor', 'k',  'ycolor', 'k');
-xlabel(sp1, {'Static (offset \beta_0)'});
+xlabel(sp1, {'Starting point (z)'});
 set(sp1, 'xcolor', 'k', 'ycolor', 'k');
+
 %% add line between the two correlation coefficients
 txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff, pval)};
 if pval < 0.001,
@@ -69,7 +70,7 @@ tt = title(sp1, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment
 % tt.Position(2) = tt.Position(2) - 0.008;
 
 tightfig;
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMramp_correlations.pdf'));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/kostisDDM_correlations.pdf'));
 
 
 end
