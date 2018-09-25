@@ -66,6 +66,7 @@ for d = 1:length(datasets),
         % ============================================ %
 
         BIC = readtable(sprintf('%s/%s/BIC.csv', usepath, mdls{m}));
+        % assert(1==0)
         gsq.bic         = BIC.bic;
         gsq.likelihood  = BIC.likelihood;
         gsq.penalty     = BIC.penalty;
@@ -94,6 +95,8 @@ for d = 1:length(datasets),
     if exist('allres', 'var'),
         writetable(allres, sprintf('%s/individualresults_Gsq.csv', savepath));
     end
+
+    allres.bic__stimcodingnohist
 
 end % datasets
 end
