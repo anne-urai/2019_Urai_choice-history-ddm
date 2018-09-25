@@ -6,7 +6,7 @@ global mypath colors
 colors(3, :) = mean(colors([1 2], :));
 
 results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
-mdldic = mean([ results.ddmColl_z_bic results.ddmColl_dc_bic results.ddmColl_dcz_bic results.ddmColl_vanilla_bic]);
+mdldic = mean([ results.ddmColl_z_bic results.ddmColl_dc_bic results.ddmColl_dcz_bic results.ddmK_vanilla_bic]);
 
 close all;
 subplot(4,5,1);
@@ -18,7 +18,7 @@ mdldic = mdldic(1:end-1);
 [~, bestMdl] = min(mdldic);
 
 for i = 1:length(mdldic),
-    b = bar(i, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
+    b = bar(i, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.6, 'BaseValue', -6000, ...
         'edgecolor', 'none');
 end
 
@@ -29,9 +29,9 @@ for i = 1:length(mdldic),
             num2str(round(mdldic(i))), ...
             'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
     elseif mdldic(i) > 0,
-        text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
+        text(i, mdldic(i) - 0.12*range(get(gca, 'ylim')), ...
             num2str(round(mdldic(i))), ...
-            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
+            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
     end
 end
 axis square; axis tight;

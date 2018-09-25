@@ -47,16 +47,16 @@ clearvars -except kostisPath notrials ll2bic
 load(sprintf('%s/allmodels.mat', kostisPath));
 
 params_ddm          = array2table([params ll2bic(outgf(:, 1), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'bic'});
-params_ddm_dc       = array2table([params2 ll2bic(outgf(:, 2), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'dcbias', 'bic'});
-params_ddm_sp       = array2table([params3 ll2bic(outgf(:, 3), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'zbias', 'bic'});
-params_ddm_sp_dc    = array2table([params6 ll2bic(outgf(:, 6), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'dcbias', 'zbias', 'bic'});
+params_ddm_dc       = array2table([params2 ll2bic(outgf(:, 2), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'dcbias', 'bic'});
+params_ddm_sp       = array2table([params3 ll2bic(outgf(:, 3), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'zbias', 'bic'});
+params_ddm_sp_dc    = array2table([params6 ll2bic(outgf(:, 6), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'dcbias', 'zbias', 'bic'});
 %column 6: in params2, params3, params4 is the biasing parameter.
 % multiply by 1,1 and 5 respectively for those models.
-params_ddm_rp       = array2table([params4 ll2bic(outgf(:, 4), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'bic'});
+params_ddm_rp       = array2table([params4 ll2bic(outgf(:, 4), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'bic'});
 params_ddm_rp.slope = params_ddm_rp.slope * 5;
 
 %for params5, column 6: slope (multiply by sign of offset), column 7: offset
-params_ddm_rp2      = array2table([params5 ll2bic(outgf(:, 5), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'offset', 'bic'});
+params_ddm_rp2      = array2table([params5 ll2bic(outgf(:, 5), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'offset', 'bic'});
 params_ddm_rp2.slope = params_ddm_rp2.slope .* sign(params_ddm_rp2.offset);
 
 params_ddm.Properties.VariableNames         = cellfun((@(x) cat(2, 'ddmK_vanilla_', x)), params_ddm.Properties.VariableNames, 'un', 0);
@@ -85,9 +85,9 @@ load(sprintf('%s/DDMCol_allmodels.mat', kostisPath));
 % same column in the parameter matrices as the drift rate variability in
 % the vanilla DDMs above?
 params_ddm          = array2table([params ll2bic(outgf(:, 1), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'bic'});
-params_ddm_dc       = array2table([params2 ll2bic(outgf(:, 2), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'dcbias', 'bic'});
-params_ddm_sp       = array2table([params3 ll2bic(outgf(:, 3), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'zbias', 'bic'});
-params_ddm_sp_dc    = array2table([params4 ll2bic(outgf(:, 4), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'dcbias', 'zbias', 'bic'});
+params_ddm_dc       = array2table([params2 ll2bic(outgf(:, 2), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'dcbias', 'bic'});
+params_ddm_sp       = array2table([params3 ll2bic(outgf(:, 3), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'zbias', 'bic'});
+params_ddm_sp_dc    = array2table([params4 ll2bic(outgf(:, 4), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'dcbias', 'zbias', 'bic'});
 
 params_ddm.Properties.VariableNames         = cellfun((@(x) cat(2, 'ddmColl_vanilla_', x)), params_ddm.Properties.VariableNames, 'un', 0);
 params_ddm_sp.Properties.VariableNames      = cellfun((@(x) cat(2, 'ddmColl_z_', x)), params_ddm_sp.Properties.VariableNames, 'un', 0);
