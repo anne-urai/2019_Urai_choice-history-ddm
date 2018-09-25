@@ -66,7 +66,9 @@ for d = 1:length(datasets),
         % ============================================ %
 
         BIC = readtable(sprintf('%s/%s/BIC.csv', usepath, mdls{m}));
-        gsq.bic = BIC.bic;
+        gsq.bic         = BIC.bic;
+        gsq.likelihood  = BIC.likelihood;
+        gsq.penalty     = BIC.penalty;
 
         % ============================================ %
         % rename to indicate the model

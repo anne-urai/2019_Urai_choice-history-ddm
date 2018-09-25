@@ -32,11 +32,12 @@ end
 % neutral vs biased plotsC
 % reorder the datasets: first show the ?standard ones? ?visual motion 2AFC with
 % feedback, then 2IFC, and only then yes-no / no feedback.
-datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno'};
+datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno', 'Anke_MEG_transition_no81'};
 
 datasetnames = {{'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}, ...
-    {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}};
+    {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
+     {'Visual motion' '2AFC (FD)'}};
 
 % go to code
 try
@@ -52,14 +53,17 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-if 0,
+%datasetnames = datasetnames([2 7]);
+% datasets = datasets([2 7]);
+if 1,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
-    rename_PPC_files(datasets);
+    % rename_PPC_files(datasets);
 end
 
 disp('starting');
+return;
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
