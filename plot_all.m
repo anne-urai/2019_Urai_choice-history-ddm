@@ -55,7 +55,7 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %datasetnames = datasetnames([2 7]);
 % datasets = datasets([2 7]);
-if 1,
+if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
@@ -182,6 +182,7 @@ plot_posteriors;
 alldat = individual_correlation_main(1, 0);
 forestPlot(alldat);
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', 0));
+barplots_BIC;
 
 % b. fit with between-trial variability in non-decision time
 alldat = individual_correlation_main(0, 1); %
