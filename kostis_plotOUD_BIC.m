@@ -43,7 +43,7 @@ set(gca, 'color', 'none');
 set(gca, 'xcolor', 'k', 'ycolor', 'k');
 %title(datasetnames{d});
 
-ylabel({'\DeltaBIC from DDM'; 'without history'}, 'interpreter', 'tex');
+%ylabel({'\DeltaBIC from DDM'; 'without history'}, 'interpreter', 'tex');
 set(gca, 'xtick', 1:3, 'xticklabel', {'offset bias', 'input bias', 'leak bias'}, 'xticklabelrotation', -30);
 
 drawnow; tightfig;

@@ -131,26 +131,13 @@ motionEnergy_filterDots;
 motionEnergy_check;
 motionEnergy_kernels;
 
-% a. normal DDM
-kostis_plotDDM_BIC;
+% a. panel with all BIC plots
+kostis_all_BICs;
+
+% b. for a few correlations, bargraphs of correlation coefficients
 kostis_plotDDM_correlation;
-
-% b. ramping vs. static drift bias
-kostis_plotRamp_correlation;
-kostis_plotRamp_BIC;
-
-% c. DDM with collapsing bounds
-kostis_plotDDMCol_BIC;
 kostis_plotDDMCol_correlation;
-
-
-% PART 2: O-U FITS
-kostis_plotOU_BIC;
-kostis_plotOU_correlation;
-
-% PART 2: O-U FITS
-kostis_plotOUD_BIC;
-kostis_plotOUD_correlation;
+kostis_plotRamp_correlation;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
