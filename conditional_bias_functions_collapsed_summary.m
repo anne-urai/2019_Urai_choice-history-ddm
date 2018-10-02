@@ -22,6 +22,7 @@ dat = [allds.fast(:, 1) allds.slow(:, 1)];
 % compute the bootstrapped 95% CI 
 ebar_ci = bootci(5000, @mean, dat);
 ebar_ci_sem = {ebar_ci(1, :), ebar_ci(2, :)}; % CI based on bootstrap
+ebar_ci_sem = nanstd(dat) ./ sqrt(size(dat, 1)) * 1.96; % CI based on s.e.m.
             
 h = ploterr(1:2, nanmean(dat), [], ebar_ci_sem, 'abshhxy', 0);
 set(h(1), 'color', 'k', 'marker', 'o', ...

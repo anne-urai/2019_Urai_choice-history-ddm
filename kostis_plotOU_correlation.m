@@ -1,16 +1,16 @@
-function kostis_plotOU
+function kostis_plotOU_correlation
 
-global mypath datasets datasetnames
+global mypath 
 
 %% compare correlation coefficients
 close all; 
-results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
-corrplot(results, {'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias', 'repetition_alldata'});
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter.pdf'));
-
-close; 
-corrplot(results, {'repetition_alldata', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter_2.pdf'));
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
+% corrplot(results, {'ouD_input_inputbias', 'ouD_lambda_lambdabias', 'ouD_sp_spbias', 'repetitionK'});
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter.pdf'));
+% 
+% close; 
+% corrplot(results, {'repetitionKD', 'ouK_input_inputbias', 'ouK_lambda_lambdabias', 'ouK_sp_spbias'});
+% print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_scatter_2.pdf'));
 
 %% separately, test correlation coefficients
     
@@ -20,11 +20,11 @@ y = [results.ouK_input_inputbias results.ouK_lambda_lambdabias];
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
 % ============================================ %
 
-results.criterionshift = results.repetition_alldata;
+results.criterionshift = results.repetitionK;
 
 % assign to structure
-allresults.sp     = results.ouK_sp_spbias;
-allresults.input     = results.ouK_input_inputbias;
+allresults.sp       = results.ouK_sp_spbias;
+allresults.input    = results.ouK_input_inputbias;
 allresults.leak     = results.ouK_lambda_lambdabias;
 allresults.criterionshift = results.criterionshift;
 
@@ -85,16 +85,16 @@ xlabel(sp3, {'Leak bias'});
 set(sp3, 'xcolor', 'k',  'ycolor', 'k');
 
 %% add line between the two correlation coefficients
-txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
+txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff1, pvalD1)};
 if pvalD1 < 0.001,
-    txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
+    txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff1)};
 end
 
 tt = title(sp1, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'center');
 
-txt = {sprintf('\\Deltar(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
+txt = {sprintf('\\Delta\\rho(%d) = %.3f, p = %.3f', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3, rhodiff2, pvalD2)};
 if pvalD2 < 0.001,
-    txt = {sprintf('\\Deltar(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff2)};
+    txt = {sprintf('\\Delta\\rho(%d) = %.3f, p < 0.001', length(find(~isnan(cat(1, allresults(:).criterionshift) )))-3,  rhodiff2)};
 end
 
 tt = title(sp3, txt, 'fontweight', 'normal', 'fontsize', 6, 'horizontalalignment', 'center');
@@ -109,7 +109,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OU_correlations.pdf'));
 % OVERALL LEAK PARAMETER
 % ============================================ %
 
-results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_Neutral'));
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 
 close all;
 sp = subplot(3,6,1);
@@ -117,7 +117,7 @@ hold on;
 % plot identity line
 plot([0.8 1.2], [0 0], '-', 'linewidth', 0.5, 'color', [0.5 0.5 0.5]);
 
-lambda = results.ouK_vanilla_dv;
+lambda = results.ouK_vanilla_lambda;
 h = scatter(1*ones(size(lambda)), lambda, 3, colors(3, :), 'jitter', 'on', 'jitteramount', 0.07);
 plot([1-0.1 1+0.1], [nanmean(lambda) nanmean(lambda)], 'k-');
 pval = permtest(lambda);

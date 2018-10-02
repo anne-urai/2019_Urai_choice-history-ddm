@@ -140,9 +140,9 @@ for d = 1:length(datasets),
     end
     
     % xlabel('RT (s)');
-    [ss, h1] = suplabel('RT (s)', 'x');
-    ss.Position(2) = ss.Position(2) + 0.04;
-    h1.Color = 'k';
+        [ss, h1] = suplabel('RT (s)', 'x');
+        ss.Position(2) = ss.Position(2) + 0.04;
+        h1.Color = 'k';
     [ss, h1] = suplabel('Probability', 'y');
     ss.Position(1) = ss.Position(1) + 0.06;
     h1.Color = 'k';
@@ -160,8 +160,8 @@ for d = 1:length(datasets),
             
             %set(gcf, 'color', 'none');
             set(gca, 'xcolor', 'k', 'ycolor', 'k');
-            [ss, h1] =  suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
-            ss.Position(2) = ss.Position(2) + 0.04;
+            %[ss, h1] =  suplabel(cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2}), 't');
+            %ss.Position(2) = ss.Position(2) + 0.04;
     end
     
     tightfig;

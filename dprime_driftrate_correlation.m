@@ -86,7 +86,7 @@ for d = 1:length(datasets),
             ylim([0.4 1.09]);
     end
     xlim([0 ceil(max(get(gca, 'xlim')))]);
-    xlabel('d''');
+    if d == length(datasets), xlabel('d'''); end
     % if d == 1,
     ylabel('Drift rate (v)');
     % end
@@ -120,7 +120,7 @@ for d = 1:length(datasets),
     % end
     
     offsetAxes; box off;
-    title(datasetnames{d});
+    %title(datasetnames{d});
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_driftrate_d%d.pdf',d));

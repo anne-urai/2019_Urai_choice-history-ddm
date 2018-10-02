@@ -1,4 +1,3 @@
-
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
 %
@@ -31,13 +30,14 @@ switch usr
 end
 
 % neutral vs biased plotsC
-% reorder the datasets: first show the “standard ones” —visual motion 2AFC with
+% reorder the datasets: first show the ?standard ones? ?visual motion 2AFC with
 % feedback, then 2IFC, and only then yes-no / no feedback.
-datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno'};
+datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno', 'Anke_MEG_transition_no81'};
 
 datasetnames = {{'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}, ...
-    {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}};
+    {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
+     {'Visual motion' '2AFC (FD)'}};
 
 % go to code
 try
@@ -53,26 +53,30 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
+%datasetnames = datasetnames([2 7]);
+% datasets = datasets([2 7]);
 if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
-    rename_PPC_files(datasets);
+    % rename_PPC_files(datasets);
 end
 
 disp('starting');
+return;
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
 
-% schematic;
+schematic;
 
 % ========================================== %
 % FIGURE 2
 % ========================================== %
-% repetition_range;
-% strategy_plot;
+
+repetition_range;
+strategy_plot;
 
 % ========================================== %
 % FIGURE 3
@@ -81,14 +85,12 @@ disp('starting');
 barplots_DIC; %3a
  
 close all; subplot(3,3,1);
-conditional_bias_functions_collapsed(4, 3, 'rt', 1, 50);
+conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0);
 tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed.pdf'); % 3b
 
 % barplots
-conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0); % redo for all subjects
 close all; conditional_bias_functions_collapsed_summary;
 print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_barplots.pdf'); % 3c
-return;
 
 % ========================================== %
 % FIGURE 4
@@ -120,16 +122,35 @@ barplots_DIC_previousresponse_outcome;
 % ========================================== %
 
 % grab the results from Kostis' fits
-kostis_driftRate;
-kostis_makeTable;
+% kostis_driftRate;
+kostis_makeTable_v2;
 
-% PART 1: RAMPING VS. STATIC DRIFT BIAS
+% a. motion energy filtering: this has to run before, 
+% on the UKE cluster to grab Anke's motionenergy coordinates
+motionEnergy_filterDots;
+motionEnergy_check;
+motionEnergy_kernels;
+
+% a. normal DDM
+kostis_plotDDM_BIC;
+kostis_plotDDM_correlation;
+
+% b. ramping vs. static drift bias
 kostis_plotRamp_correlation;
 kostis_plotRamp_BIC;
 
+% c. DDM with collapsing bounds
+kostis_plotDDMCol_BIC;
+kostis_plotDDMCol_correlation;
+
+
 % PART 2: O-U FITS
 kostis_plotOU_BIC;
-kostis_plotOU;
+kostis_plotOU_correlation;
+
+% PART 2: O-U FITS
+kostis_plotOUD_BIC;
+kostis_plotOUD_correlation;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
@@ -144,6 +165,8 @@ kostis_plotOU;
 
 dprime_driftrate_correlation;
 posterior_predictive_checks;
+history_kernels;
+strategy_plot_2-7;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 3
@@ -159,6 +182,7 @@ plot_posteriors;
 alldat = individual_correlation_main(1, 0);
 forestPlot(alldat);
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_Gsq.pdf', 0));
+barplots_BIC;
 
 % b. fit with between-trial variability in non-decision time
 alldat = individual_correlation_main(0, 1); %
@@ -173,7 +197,6 @@ alldat = individual_correlation_pharma();
 forestPlot(fliplr(alldat));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_pharma.pdf'));
 
-
 % ========================================== %
 % SUPPLEMENTARY FIGURE 6
 % ========================================== %
@@ -184,12 +207,7 @@ post_error_slowing;
 % SUPPLEMENTARY FIGURE 7
 % ========================================== %
 
-% this has to run before, on the UKE cluster to grab Anke's motionenergy
-% coordinates
-motionEnergy_filterDots;
-motionEnergy_check;
-motionEnergy_kernels;
-% motionEnergy_kernels_logistic;
+
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 8
@@ -202,6 +220,4 @@ multiplicative_vbias_DIC;
 % SUPPLEMENTARY FIGURE 9
 % see JW's code in simulations/ folder
 % ========================================== %
-
-
 

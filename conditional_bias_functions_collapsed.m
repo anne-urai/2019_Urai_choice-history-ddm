@@ -184,49 +184,36 @@ for m = 1:length(models),
     xRTs                = unstack(rtAvg, 'rt', 'rtbin');
     xRTs                = xRTs{:, 2:end}; % remove the last one, only has some weird tail
     assert(isequal(size(mat), size(xRTs)), 'mismatch');
-    
-    % else
-    % 	disp('splitting by coherence first');
-    
-    % 	[gr, sj, coh] = findgroups(alldata.subj_idx, alldata.coherence);
-    % 	rtbins = splitapply(discretizeRTs, alldata.rt, gr);
-    % 	alldata.rtbins = cat(1, rtbins{:});
-    
-    %     % get RT quantiles for choices that are in line with or against the bias
-    %     [gr, sjidx, rtbins, coh] = findgroups(alldata.subj_idx, alldata.rtbins, alldata.coherence);
-    %     cpres               = array2table([sjidx, rtbins, coh], 'variablenames', {'subj_idx', 'rtbin', 'coh'});
-    %     cpres.choice        = splitapply(@nanmean, alldata.biased, gr); % choice proportion
-    
-    %     thesesjs = unique(cpres.subj_idx);
-    %     mat = nan(length(thesesjs), max(cpres.rtbin));
-    %     for sj = 1:length(thesesjs),
-    %     	for r = 1:max(cpres.rtbin);
-    %     		mat(sj, r) = nanmean(cpres.choice(cpres.subj_idx == thesesjs(sj) & cpres.rtbin == r));
-    %     	end
-    %     end
-    % end
-    
+
+    % average within datasets first
+    try
+        mat  = splitapply(@nanmean, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));
+        % xRTs = splitapply(@nanmean, xRTs, findgroups(floor(mat_tmp.subj_idx / 1000)));
+    catch
+        assert(1==0)
+    end
+
     % ================================ %
     % PLOT THE ACTUAL CURVES
     % ================================ %
 
     switch models{m}
         case 'data'
-            
             switch xAxis
                 case 'quantiles'
                     x_axis = qntls;
                     x_axis_std = [];
                 case 'rt'
-                    x_axis = mean(xRTs);
-                    x_axis_std = nanstd(xRTs, [], 1) ./ sqrt(size(xRTs, 1));
-                    ebar_ci = bootci(5000, @mean, xRTs);
-                    x_axis_std = {ebar_ci(1, :), ebar_ci(2, :)}; % CI based on bootstrap
+                    x_axis      = mean(xRTs);
+                    ebar_ci     = bootci(5000, @mean, xRTs);
+                    x_axis_std  = {ebar_ci(1, :), ebar_ci(2, :)}; % CI based on bootstrap
+                    x_axis_std  = nanstd(xRTs) ./ sqrt(size(xRTs, 1)) * 1.96;
             end
             
-            ebar_ci_sem = 1.96 * nanstd(mat, [], 1) ./ sqrt(size(mat, 1)); % CI based on SEM
+            % bootstrapped CI
             ebar_ci = bootci(5000, @mean, mat);
             ebar_ci_sem = {ebar_ci(1, :), ebar_ci(2, :)}; % CI based on bootstrap
+            ebar_ci_sem = nanstd(mat) ./ sqrt(size(mat, 1)) * 1.96; % CI based on s.e.m.
             
             % ALSO ADD THE REAL DATA WITH SEM/95%CI
             h = ploterr(x_axis, nanmean(mat, 1), x_axis_std, ebar_ci_sem, 'k', 'abshhxy', 0);
@@ -239,23 +226,14 @@ for m = 1:length(models),
             plot(x_axis, nanmean(mat, 1), 'color', thesecolors{m}, 'linewidth', 1);
     end
     
-    % SAVE
-    if  qidx == 3, % median split, only 2 bins
-        % average within each dataset
-        avg = splitapply(@nanmean, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));
-        allds.fast(:, m) = avg(:, 1);
-        allds.slow(:, m) = avg(:, 2);
-    else
-        %mn1 = @(x) nanmean(x, 1);
-        % avg = splitapply(mn1, mat, findgroups(floor(mat_tmp.subj_idx / 1000)));
-        allds.fast(:, m) = mat(:, 1);
-        allds.slow(:, m) = mat(:, end);
-    end
+    % SAVE lowest and highest quantiles
+    allds.fast(:, m) = mat(:, 1);
+    allds.slow(:, m) = mat(:, end);
 end
 
 axis tight; box off;
 set(gca, 'xtick', roundn(x_axis, -2), 'xticklabelrotation', -30);
-ylim([0.5 0.58]);
+% ylim([0.5 0.56]);
 
 axis square;  offsetAxes;
 switch xAxis
