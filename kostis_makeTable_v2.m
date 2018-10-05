@@ -97,6 +97,34 @@ params_ddm_sp_dc.Properties.VariableNames   = cellfun((@(x) cat(2, 'ddmColl_dcz_
 alltables{2} = cat(2, params_ddm, params_ddm_sp, params_ddm_dc, params_ddm_sp_dc);
 
 % ========================================== %
+% 2b. DDM WITH collapsing bounds, from stimulus onset
+% ========================================== %
+
+% load DDMCol_allmodels.mat % collapsing DDM
+% [a1,x1]=corr(kk(:,2),params2(:,end),'Type','Spearman');% drift-criterion
+% [a2,x2]=corr(kk(:,2),params3(:,end),'Type','Spearman'); % starting point
+% [a3a,x3a]=corr(kk(:,2),params4(:,end),'Type','Spearman');% starting point in hybrid
+% [a3b,x3b]=corr(kk(:,2),params4(:,end-1),'Type','Spearman'); % drift criterion hybrid
+
+clearvars -except kostisPath notrials ll2bic alltables
+load(sprintf('%s/DynDDMCol_allmodels.mat', kostisPath));
+
+% assume that the size of individual bound collapse (hyperbolic) is in the
+% same column in the parameter matrices as the drift rate variability in
+% the vanilla DDMs above?
+% params_ddm          = array2table([params ll2bic(outgf(:, 1), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'bic'});
+params_ddm_dc       = array2table([params2 ll2bic(outgf(:, 2), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'dcbias', 'bic'});
+params_ddm_sp       = array2table([params3 ll2bic(outgf(:, 3), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'zbias', 'bic'});
+params_ddm_sp_dc    = array2table([params4 ll2bic(outgf(:, 4), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'boundcollapse', 'bsp', 'dcbias', 'zbias', 'bic'});
+
+% params_ddm.Properties.VariableNames         = cellfun((@(x) cat(2, 'ddmDColl_vanilla_', x)), params_ddm.Properties.VariableNames, 'un', 0);
+params_ddm_sp.Properties.VariableNames      = cellfun((@(x) cat(2, 'ddmDColl_z_', x)), params_ddm_sp.Properties.VariableNames, 'un', 0);
+params_ddm_dc.Properties.VariableNames      = cellfun((@(x) cat(2, 'ddmDColl_dc_', x)), params_ddm_dc.Properties.VariableNames, 'un', 0);
+params_ddm_sp_dc.Properties.VariableNames   = cellfun((@(x) cat(2, 'ddmDColl_dcz_', x)), params_ddm_sp_dc.Properties.VariableNames, 'un', 0);
+
+alltables{3} = cat(2, params_ddm_sp, params_ddm_dc, params_ddm_sp_dc);
+
+% ========================================== %
 % 3. then take the O-U values
 % ========================================== %
 
@@ -135,7 +163,7 @@ params_ddm_sp.Properties.VariableNames      = cellfun((@(x) cat(2, 'ouK_sp_', x)
 params_ddm_input.Properties.VariableNames   = cellfun((@(x) cat(2, 'ouK_input_', x)), params_ddm_input.Properties.VariableNames, 'un', 0);
 params_ddm_lambda.Properties.VariableNames  = cellfun((@(x) cat(2, 'ouK_lambda_', x)), params_ddm_lambda.Properties.VariableNames, 'un', 0);
 
-alltables{3} = cat(2, params_ddm, params_ddm_sp, params_ddm_input, params_ddm_lambda);
+alltables{4} = cat(2, params_ddm, params_ddm_sp, params_ddm_input, params_ddm_lambda);
 
 % ========================================== %
 % 4. O-U, accumulation during stimulus
@@ -176,7 +204,33 @@ params_ddm_sp.Properties.VariableNames      = cellfun((@(x) cat(2, 'ouD_sp_', x)
 params_ddm_input.Properties.VariableNames   = cellfun((@(x) cat(2, 'ouD_input_', x)), params_ddm_input.Properties.VariableNames, 'un', 0);
 params_ddm_lambda.Properties.VariableNames  = cellfun((@(x) cat(2, 'ouD_lambda_', x)), params_ddm_lambda.Properties.VariableNames, 'un', 0);
 
-alltables{4} = cat(2, params_ddm, params_ddm_sp, params_ddm_input, params_ddm_lambda);
+alltables{5} = cat(2, params_ddm, params_ddm_sp, params_ddm_input, params_ddm_lambda);
+
+
+% ========================================== %
+% 4b. O-U Collapsing, accumulation during stimulus
+% ========================================== %
+
+clearvars -except kostisPath notrials ll2bic alltables
+load(sprintf('%s/OUcollapse_allmodels.mat', kostisPath));
+
+% params_ddm          = array2table([params ll2bic(outgf(:, 1), 6, notrials)], 'variablenames', {'boundary', 'scale', 'T0', 'lambda', 'bsp', 'bic'});
+params_ddm_input    = array2table([params2 ll2bic(outgf(:, 2), 7, notrials)], 'variablenames', {'boundary', 'scale', 'T0', 'collapse', 'bsp', 'inputbias', 'lambda', 'bic'});
+params_ddm_lambda   = array2table([params3 ll2bic(outgf(:, 3), 7, notrials)], 'variablenames', {'boundary', 'scale', 'T0', 'collapse', 'bsp', 'lambdabias', 'lambda','bic'});
+params_ddm_sp       = array2table([params4 ll2bic(outgf(:, 4), 7, notrials)], 'variablenames', {'boundary', 'scale', 'T0', 'collapse', 'bsp', 'spbias', 'lambda', 'bic'});
+
+% column 6: in params2, params3, params4 is the biasing parameter.
+% multiply by 5,1 and 5 respectively for those models.
+params_ddm_input.inputbias = params_ddm_input.inputbias * 5;
+params_ddm_sp.spbias = params_ddm_sp.spbias * 5;
+
+% put into one big table
+% params_ddm.Properties.VariableNames         = cellfun((@(x) cat(2, 'ouDColl_vanilla_', x)), params_ddm.Properties.VariableNames, 'un', 0);
+params_ddm_sp.Properties.VariableNames      = cellfun((@(x) cat(2, 'ouDColl_sp_', x)), params_ddm_sp.Properties.VariableNames, 'un', 0);
+params_ddm_input.Properties.VariableNames   = cellfun((@(x) cat(2, 'ouDColl_input_', x)), params_ddm_input.Properties.VariableNames, 'un', 0);
+params_ddm_lambda.Properties.VariableNames  = cellfun((@(x) cat(2, 'ouDColl_lambda_', x)), params_ddm_lambda.Properties.VariableNames, 'un', 0);
+
+alltables{6} = cat(2, params_ddm_sp, params_ddm_input, params_ddm_lambda);
 
 % ========================================== %
 % CONCATENATE ALL INTO A TABLE

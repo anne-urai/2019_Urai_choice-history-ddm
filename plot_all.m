@@ -136,8 +136,8 @@ kostis_all_BICs;
 
 % b. for a few correlations, bargraphs of correlation coefficients
 kostis_plotDDM_correlation;
-kostis_plotDDMCol_correlation;
 kostis_plotRamp_correlation;
+kostis_plotDDMCol_correlation;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
