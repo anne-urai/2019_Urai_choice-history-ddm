@@ -208,3 +208,12 @@ multiplicative_vbias_DIC;
 % see JW's code in simulations/ folder
 % ========================================== %
 
+
+
+% ========================================== %
+% MEG REGRESSION RESULTS 
+% FOR SFN2018 POSTER
+% ========================================== %
+
+meg_regression_dic;
+meg_regression_posteriors;
