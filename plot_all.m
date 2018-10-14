@@ -139,6 +139,9 @@ kostis_plotDDM_correlation;
 kostis_plotRamp_correlation;
 kostis_plotDDMCol_correlation;
 
+% timecourse of dynamic bias signal, across models
+plot_dynamic_bias_signal;
+
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
 % ========================================== %
