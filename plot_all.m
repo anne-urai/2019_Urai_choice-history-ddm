@@ -131,14 +131,17 @@ motionEnergy_kernels;
 % kostis_driftRate;
 kostis_makeTable_v2;
 
-
 % a. panel with all BIC plots
 kostis_all_BICs;
+
+% same for correlations, one big plot
+kostis_all_correlations;
 
 % b. for a few correlations, bargraphs of correlation coefficients
 kostis_plotDDM_correlation;
 kostis_plotRamp_correlation;
 kostis_plotDDMCol_correlation;
+kostis_plotOUD_correlation;
 
 % timecourse of dynamic bias signal, across models
 plot_dynamic_bias_signal;

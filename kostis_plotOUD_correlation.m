@@ -112,12 +112,12 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OUD_correlations.pdf'));
 results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 
 close all;
-sp = subplot(3,6,1);
+sp = subplot(3,5,1);
 hold on;
 % plot identity line
 plot([0.8 1.2], [0 0], '-', 'linewidth', 0.5, 'color', [0.5 0.5 0.5]);
 
-lambda = results.ouD_vanilla_lambda;
+lambda = results.ouD_lambda_lambda;
 h = scatter(1*ones(size(lambda)), lambda, 3, colors(3, :), 'jitter', 'on', 'jitteramount', 0.07);
 plot([1-0.1 1+0.1], [nanmean(lambda) nanmean(lambda)], 'k-');
 pval = permtest(lambda);
@@ -126,7 +126,33 @@ mysigstar(gca, 1, max(get(gca, 'ylim')), pval);
 %legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
 ylabel('Effective leak (\lambda)');
 set(gca, 'xtick', [0.9 1.1], 'xticklabel', []); offsetAxes;
+title({'O-U model', ''});
 tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OUD_lambda.pdf'));
+
+%% ============================================== %
+% NOW INCLUDING COLLAPSING BOUND
+% ============================================== %
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
+
+close all;
+sp = subplot(3,5,1);
+hold on;
+% plot identity line
+plot([0.8 1.2], [0 0], '-', 'linewidth', 0.5, 'color', [0.5 0.5 0.5]);
+
+lambda = results.ouDColl_input_lambda;
+h = scatter(1*ones(size(lambda)), lambda, 3, colors(3, :), 'jitter', 'on', 'jitteramount', 0.07);
+plot([1-0.1 1+0.1], [nanmean(lambda) nanmean(lambda)], 'k-');
+pval = permtest(lambda);
+[h, pval] = ttest(lambda)
+mysigstar(gca, 1, max(get(gca, 'ylim')), pval);
+%legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
+%ylabel('Effective leak (\lambda)');
+title({'O-U model with', 'collapsing bounds'});
+
+set(gca, 'xtick', [0.9 1.1], 'xticklabel', []); offsetAxes;
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OUDColl_lambda.pdf'));
 
 end

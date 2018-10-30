@@ -14,7 +14,7 @@ kostisPath = '~/Data/HDDM/Anke_MEG_transition/KostisFits';
 
 % nicer colors
 % set(groot, 'defaultaxescolororder', linspecer(5));
-subplot(4,3,[1 2]);
+subplot(4,2,[1 3]);
 
 %% OU
 
@@ -37,7 +37,7 @@ end
 %
 
 hold on;
-plot([1:450]*dt,(min(a(:,1)-a(:,2)-11.5,0))./11.5,'LineWidth',1, 'color', cols2(4, :));
+%plot([1:450]*dt,(min(a(:,1)-a(:,2)-11.5,0))./11.5,'LineWidth',1, 'color', cols2(4, :));
 
 %% DDM Collapsing
 load(sprintf('%s/DynDDMCol_allmodels.mat', kostisPath));
@@ -132,7 +132,11 @@ plot([1:450]*dt,min(a(:,1)-a(:,2)-thr+thr/2,0)./(thr/2),'LineWidth',1, 'color', 
 %% LAYOUT
 l = legend({'O-U: \lambda bias','Collapsing DDM: v_{bias}', ...
     'Collapsing O-U (\lambda<0): input bias','Collapsing O-U (\lambda>0): input bias','Standard DDM: v_{bias}'}, ...
-    'Location', 'EastOutside', 'Box', 'off');
+    'Location', 'SouthOutside', 'Box', 'off');
+
+l = legend({'Collapsing DDM: v_{bias}', ...
+    'Collapsing O-U (\lambda<0): input bias','Collapsing O-U (\lambda>0): input bias','Standard DDM: v_{bias}'}, ...
+    'Location', 'SouthOutside', 'Box', 'off');
 l.Box = 'off';
 
 axis tight; set(gca, 'xtick', 0:0.5:2);
@@ -143,7 +147,7 @@ set(gca, 'ytick', [-1:0.5:0], 'YTicklabel',[0:0.5:1]);
 xlim([-0.05 2]); 
 box off;
 
-subplot(433); axis off;
+subplot(423); axis off;
 tightfig;
 print(gcf, '-dpdf', '~/Data/serialHDDM/effective_bias_timecourse.pdf');
 
