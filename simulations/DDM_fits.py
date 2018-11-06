@@ -46,19 +46,9 @@ data_dir = os.path.join(base_dir, 'ddm_fits_data')
 model_dir = os.path.join(base_dir, 'ddm_fits_model')
 
 datasets = [
-            "2018_ddm_data_1",                      # 0
-            "2018_ddm_data_2",                      # 1
-            "2018_ddm_data_3",                      # 2
-            "2018_ou_data_1",                       # 3
-            "2018_ou_data_2",                       # 4
-            "2018_ou_data_3",                       # 5
-            "2018_ou_data_4",                       # 6
-            "2018_ou_data_5",                       # 7
-            "2018_ou_data_6",                       # 8
-            "2018_lca_data_1",                      # 9
-            "2018_lca_data_2",                      # 10
-            "2018_lca_data_3",                      # 11
-            "2018_lca_data_4",                      # 12
+            "2018_ou_data_1",                       # 0
+            "2018_ou_data_2",                       # 1
+            "2018_ou_data_3",                       # 2
             ]
     
 def fit_ddm_per_group(data, model, model_dir, model_name, samples=5000, burn=1000, thin=1, n_models=3, n_jobs=12):
@@ -112,7 +102,7 @@ def load_ddm_per_subject(model_dir, model_name):
 # version = 0
 
 run = True
-for ds in [0,1,2,3,4,5,6,7,8,9,10,11,12]:
+for ds in [0,1,2,]:
     for version in [0]:
         
         # load analysis info:
