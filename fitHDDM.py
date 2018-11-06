@@ -260,10 +260,15 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_dc_z_prev2resp', #8
     'stimcoding_dc_prevresp_multiplicative', #9
     'stimcoding_dc_z_prevresp_multiplicative', #10
-    'stimcoding_dc_prevcorrect'] #11
+    'stimcoding_dc_prevcorrect', #11
+    'regress_dc_z_visualgamma',  #12
+    'regress_dc_z_motorstart', #13
+    'regress_dc_z_prevresp_visualgamma', #14
+    'regress_dc_z_prevresp_motorstart'] #15
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
-    'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81'] 
+    'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
+    'MEG_MEGdata'] 
 
 # recode
 if isinstance(d, int):

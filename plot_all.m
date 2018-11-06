@@ -121,36 +121,30 @@ barplots_DIC_previousresponse_outcome;
 % FIGURE 6
 % ========================================== %
 
-% grab the results from Kostis' fits
-% kostis_driftRate;
-kostis_makeTable_v2;
-
 % a. motion energy filtering: this has to run before, 
 % on the UKE cluster to grab Anke's motionenergy coordinates
 motionEnergy_filterDots;
 motionEnergy_check;
 motionEnergy_kernels;
 
-% a. normal DDM
-kostis_plotDDM_BIC;
+% grab the results from Kostis' fits
+% kostis_driftRate;
+kostis_makeTable_v2;
+
+% a. panel with all BIC plots
+kostis_all_BICs;
+
+% same for correlations, one big plot
+kostis_all_correlations;
+
+% b. for a few correlations, bargraphs of correlation coefficients
 kostis_plotDDM_correlation;
-
-% b. ramping vs. static drift bias
 kostis_plotRamp_correlation;
-kostis_plotRamp_BIC;
-
-% c. DDM with collapsing bounds
-kostis_plotDDMCol_BIC;
 kostis_plotDDMCol_correlation;
-
-
-% PART 2: O-U FITS
-kostis_plotOU_BIC;
-kostis_plotOU_correlation;
-
-% PART 2: O-U FITS
-kostis_plotOUD_BIC;
 kostis_plotOUD_correlation;
+
+% timecourse of dynamic bias signal, across models
+plot_dynamic_bias_signal;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
@@ -221,3 +215,12 @@ multiplicative_vbias_DIC;
 % see JW's code in simulations/ folder
 % ========================================== %
 
+
+
+% ========================================== %
+% MEG REGRESSION RESULTS 
+% FOR SFN2018 POSTER
+% ========================================== %
+
+meg_regression_dic;
+meg_regression_posteriors;

@@ -48,6 +48,7 @@ set(gca, 'xcolor', 'k', 'ycolor', 'k');
 ylabel({'\DeltaBIC from DDM'; 'without history'}, 'interpreter', 'tex');
 set(gca, 'xtick', 1:3, 'xticklabel', {'z', 'v_{bias}', 'z+v_{bias}'}, 'xticklabelrotation', -30);
 
+%xlabel('DDM');
 drawnow; tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/BIC_DDM.pdf'));
 
