@@ -535,12 +535,12 @@ def make_model(mypath, mydata, model_name, trace_id):
         if len(mydata.coherence.unique()) > 1:
             m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                include=('sv', 'sz'), group_only_nodes=['sz'],
                 depends_on={'v': ['coherence'], 'sv': ['biasgroup']})
         else:
             m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                include=('sv', 'sz'), group_only_nodes=['sz'],
                 depends_on={'sv': ['biasgroup']})
 
     elif model_name == 'stimcoding_dc_z_prevresp_svgroup':
@@ -557,13 +557,13 @@ def make_model(mypath, mydata, model_name, trace_id):
         if len(mydata.coherence.unique()) > 1:
             m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                include=('sv', 'sz'), group_only_nodes=['sz'],
                 depends_on={'v': ['coherence'], 'dc':['prevresp'], 'z':['prevresp'],
                 'sv': ['biasgroup']})
         else:
             m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
                 drift_criterion=True, bias=True, p_outlier=0.05,
-                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                include=('sv', 'sz'), group_only_nodes=['sz'],
                 depends_on={'dc':['prevresp'], 'z':['prevresp'],
                 'sv': ['biasgroup']})
 
