@@ -135,12 +135,12 @@ kostis_makeTable_v2;
 kostis_all_BICs;
 
 % same for correlations, one big plot
-kostis_all_correlations;
+kostis_all_correlations_selected;
 
 % b. for a few correlations, bargraphs of correlation coefficients
-kostis_plotDDM_correlation;
-kostis_plotRamp_correlation;
-kostis_plotDDMCol_correlation;
+% kostis_plotDDM_correlation;
+% kostis_plotRamp_correlation;
+% kostis_plotDDMCol_correlation;
 kostis_plotOUD_correlation;
 
 % timecourse of dynamic bias signal, across models

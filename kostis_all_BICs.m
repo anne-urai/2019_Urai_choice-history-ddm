@@ -34,8 +34,8 @@ model(1).subplot = 1;
 
 model(end+1).data = [ results.ddmK_dc_bic results.ddmK_rp_bic results.ddmK_rp2_bic];
 model(end).vanilla = results.ddmK_vanilla_bic;
-model(end).name = {'2. Standard DDM', 'dynamic v_{bias}'};
-model(end).ticklabels = {'offset', 'ramp', 'offset+ramp'};
+model(end).name = {'2. DDM, dynamic', 'drift bias'};
+model(end).ticklabels = {'constant v_{bias}', 'ramp', 'constant+ramp'};
 cols1 = cbrewer('qual', 'Set1', 8);
 cols2 = cbrewer('qual', 'Dark2', 8);
 model(end).colors = [cols1(2, :); cols2(6, :); nanmean([cols1(2, :); cols2(6, :)])];
@@ -71,9 +71,9 @@ model(end).ylim = [-6500 500];
 model(end).subplot = 3;
 
 model(end+1).data = [results.ouD_sp_bic results.ouD_input_bic results.ouD_lambda_bic];
-model(end).vanilla = results.ouD_vanilla_bic;
-model(end).name = {'4. Dynamic O-U' ''};
-model(end).ticklabels = {'offset bias', 'input bias', '\lambda bias'};
+model(end).vanilla = NaN;
+model(end).name = {'4. Leaky accumulator' ''};
+model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
 model(end).colors = [cols2([5 3 4], :)];
 model(end).basevalue = 0;
 model(end).ylim = [-6500 500];
@@ -81,8 +81,8 @@ model(end).subplot = 4;
 
 model(end+1).data = [results.ouDColl_sp_bic results.ouDColl_input_bic results.ouDColl_lambda_bic];
 model(end).vanilla = NaN;
-model(end).name = {'5. Dynamic O-U' 'collapsing bounds'};
-model(end).ticklabels = {'offset bias', 'input bias', '\lambda bias'};
+model(end).name = {'5. Leaky accumulator' 'collapsing bounds'};
+model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
 model(end).colors = [cols2([5 3 4], :)];
 model(end).basevalue = 0;
 model(end).ylim = [-6500 500];
@@ -110,9 +110,9 @@ for m = 1:length(model),
     mdldic = bsxfun(@minus, mean(model(m).data), mean(baselineModel));
     subplot(2,5,model(m).subplot);     
     hold on;
-    plot([0.5 length(mdldic)+0.5], ...
-        [mean(model(m).vanilla)- mean(baselineModel) mean(model(m).vanilla)-mean(baselineModel)], '-.k');
-    
+%     plot([0.5 length(mdldic)+0.5], ...
+%         [mean(model(m).vanilla)- mean(baselineModel) mean(model(m).vanilla)-mean(baselineModel)], '-.k');
+
     %%%%%%
     for i = 1:length(mdldic),
         b = bar(i, mdldic(i), 'facecolor', model(m).colors(i, :), 'barwidth', 0.7, 'BaseValue', 0, ...

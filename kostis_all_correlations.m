@@ -87,7 +87,7 @@ close all;
 for m = 1:length(model),
     
     %everything relative to the full model
-    subplot(2,5,model(m).subplot);     
+    subplot(2,6,model(m).subplot);     
     hold on;
     xticks = [];
     xticklabels = {};

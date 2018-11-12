@@ -126,7 +126,7 @@ mysigstar(gca, 1, max(get(gca, 'ylim')), pval);
 %legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
 ylabel('Effective leak (\lambda)');
 set(gca, 'xtick', [0.9 1.1], 'xticklabel', []); offsetAxes;
-title({'O-U model', ''});
+title({'Leaky accumulator', ''});
 tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/OUD_lambda.pdf'));
 
@@ -146,10 +146,10 @@ h = scatter(1*ones(size(lambda)), lambda, 3, colors(3, :), 'jitter', 'on', 'jitt
 plot([1-0.1 1+0.1], [nanmean(lambda) nanmean(lambda)], 'k-');
 pval = permtest(lambda);
 [h, pval] = ttest(lambda)
-mysigstar(gca, 1, max(get(gca, 'ylim')), pval);
+mysigstar(gca, 1, 0.95*max(get(gca, 'ylim')), pval);
 %legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
 %ylabel('Effective leak (\lambda)');
-title({'O-U model with', 'collapsing bounds'});
+title({'Leaky accumulator', 'collapsing bounds'});
 
 set(gca, 'xtick', [0.9 1.1], 'xticklabel', []); offsetAxes;
 tightfig;

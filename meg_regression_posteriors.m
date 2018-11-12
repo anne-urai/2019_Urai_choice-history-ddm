@@ -33,9 +33,9 @@ for m = 1:length(mdls),
         
         switch params{p}
             case 'visualgamma'
-                paramname = 'visual gamma';
+                paramname = 'visual \gamma';
             case 'motorstart'
-                paramname = 'motor beta';
+                paramname = 'motor \beta baseline';
         end
         
         sp1 = subplot(4,4,(p-1)*4+1); hold on;

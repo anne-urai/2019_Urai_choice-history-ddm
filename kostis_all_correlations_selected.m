@@ -32,7 +32,7 @@ model(1).colors     = [grey; grey];
 model(1).subplot    = 1;
 
 model(end+1).data = {{results.ddmK_rp2_offset results.ddmK_rp2_slope}};
-model(end).name = {'2. Standard DDM', 'dynamic v_{bias}'};
+model(end).name = {'2. DDM, dynamic', 'drift bias'};
 model(end).ticklabels = {{'offset', 'ramp'}};
 cols1 = cbrewer('qual', 'Set1', 8);
 cols2 = cbrewer('qual', 'Dark2', 8);
@@ -68,7 +68,7 @@ model(end).subplot = 3;
 
 model(end+1).data = {results.ouDColl_input_inputbias};
 model(end).vanilla = NaN;
-model(end).name = {'5. Dynamic O-U' 'collapsing bounds'};
+model(end).name = {'5. Leaky accumulator' 'collapsing bounds'};
 model(end).ticklabels = {'input bias'};
 model(end).colors = grey;
 model(end).subplot = 4;
@@ -88,7 +88,7 @@ close all;
 for m = 1:length(model),
     
     %everything relative to the full model
-    subplot(4,8,model(m).subplot);     
+    subplot(4,7,model(m).subplot);     
     hold on;
     xticks = [];
     xticklabels = {};
@@ -97,7 +97,7 @@ for m = 1:length(model),
     for i = 1:length(model(m).data),
         if ~iscell(model(m).data{i})
                 [rho, ci, pval, bf] = spearmans(model(m).data{i}, baselineModel);
-                b = bar(i, rho, 'facecolor', model(m).colors(i, :), 'barwidth', 0.7, 'BaseValue', 0, ...
+                b = bar(i, rho, 'facecolor', model(m).colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
                     'edgecolor', 'none');
                 errorbar(i, rho, ci(1)-rho, ci(2)-rho, 'k', 'marker', 'none','capsize', 0, 'linewidth', 1);
                 mysigstar(gca, i, 0.05, pval, 'w');
