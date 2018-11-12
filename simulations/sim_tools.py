@@ -85,21 +85,29 @@ def _bounds(a, lower_is_0=True, tmax=5, dt=0.01):
     t = np.arange(0, tmax, dt)
     b1 = np.ones(len(t)) * a
     if lower_is_0:
-        b0 = b1 * 0
+        b0 = np.zeros(len(t))
     else:
         b0 = -b1
     return b1, b0
 
-def _bounds_collapse_linear(a, c1, c0, tmax=5, dt=0.01):
+def _bounds_collapse_linear(a, c1, c0, lower_is_0=True, tmax=5, dt=0.01):
     t = np.arange(0, tmax, dt)
     b1 = (a)-(c1*t)
-    b0 = 0+(c0*t)
+    if lower_is_0:
+        b0 = 0+(c0*t)
+    else:
+        b0 = -b1
     return b1, b0
 
-def _bounds_collapse_hyperbolic(a, c, tmax=5, dt=0.01):
+def _bounds_collapse_hyperbolic(a, c, lower_is_0=True, tmax=5, dt=0.01):
+
     t = np.arange(0, tmax, dt)
     b1 = (a)-a*(t/(t+c))
-    b0 = -b1+a
+    if lower_is_0:
+        b0 = -b1+a
+    else:
+        b0 = -b1
+    
     return b1, b0 
 
 def apply_bounds_diff_trace(x, b1, b0):
