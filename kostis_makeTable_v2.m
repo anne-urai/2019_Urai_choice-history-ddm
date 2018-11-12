@@ -69,11 +69,11 @@ params_ddm_rp2.Properties.VariableNames     = cellfun((@(x) cat(2, 'ddmK_rp2_', 
 alltables{1} = cat(2, params_ddm, params_ddm_sp, params_ddm_dc, params_ddm_sp_dc, params_ddm_rp, params_ddm_rp2);
 
 % ========================================== % 
-% DYNAMIC DDM
+% RAMPING DDM
 % ========================================== % 
 
 clearvars -except kostisPath notrials ll2bic alltables
-load(sprintf('%s/DynDDM_allmodels.mat', kostisPath));
+load(sprintf('%s/D_allmodels.mat', kostisPath));
 
 params_ddm          = array2table([params ll2bic(outgf(:, 1), 5, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'bic'});
 params_ddm_dc       = array2table([params2 ll2bic(outgf(:, 2), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'dcbias', 'bic'});
@@ -81,11 +81,11 @@ params_ddm_dc       = array2table([params2 ll2bic(outgf(:, 2), 6, notrials)], 'v
 %params_ddm_sp_dc    = array2table([params6 ll2bic(outgf(:, 6), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'dcbias', 'zbias', 'bic'});
 %column 6: in params2, params3, params4 is the biasing parameter.
 % multiply by 1,1 and 5 respectively for those models.
-params_ddm_rp       = array2table([params4 ll2bic(outgf(:, 4), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'bic'});
+params_ddm_rp       = array2table([params3 ll2bic(outgf(:, 3), 6, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'bic'});
 %params_ddm_rp.slope = params_ddm_rp.slope * 5;
 
 %for params5, column 6: slope (multiply by sign of offset), column 7: offset
-params_ddm_rp2      = array2table([params3 ll2bic(outgf(:, 3), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'offset', 'bic'});
+params_ddm_rp2      = array2table([params4 ll2bic(outgf(:, 4), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'offset', 'bic'});
 params_ddm_rp2.slope = params_ddm_rp2.slope .* sign(params_ddm_rp2.offset);
 
 params_ddm.Properties.VariableNames         = cellfun((@(x) cat(2, 'ddmD_vanilla_', x)), params_ddm.Properties.VariableNames, 'un', 0);

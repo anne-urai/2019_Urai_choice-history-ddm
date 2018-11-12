@@ -33,11 +33,19 @@ model(1).subplot    = 1;
 
 model(end+1).data = {{results.ddmK_rp2_offset results.ddmK_rp2_slope}};
 model(end).name = {'2. DDM, dynamic', 'drift bias'};
-model(end).ticklabels = {{'offset', 'ramp'}};
+model(end).ticklabels = {{'constant', 'ramp'}};
 cols1 = cbrewer('qual', 'Set1', 8);
 cols2 = cbrewer('qual', 'Dark2', 8);
 model(end).colors = [grey; grey];
 model(end).subplot = 2;
+
+model(end+1).data = {{results.ddmD_rp2_offset results.ddmD_rp2_slope}};
+model(end).name = {'2b. Dynamic DDM', 'drift bias'};
+model(end).ticklabels = {{'constant', 'ramp'}};
+cols1 = cbrewer('qual', 'Set1', 8);
+cols2 = cbrewer('qual', 'Dark2', 8);
+model(end).colors = [grey; grey];
+model(end).subplot = 3;
 
 % model(end+1).data = {results.ddmColl_z_zbias results.ddmColl_dc_dcbias {results.ddmColl_dcz_zbias results.ddmColl_dc_dcbias}};
 % model(3).vanilla = results.ddmColl_vanilla_bic;
@@ -57,7 +65,7 @@ model(end+1).data = {{results.ddmDColl_dcz_zbias results.ddmDColl_dc_dcbias}};
 model(end).name = {'3. Dynamic DDM', 'collapsing bounds'};
 model(end).ticklabels = {{'z_{bias}', 'v_{bias}'}};
 model(end).colors = [grey; grey];
-model(end).subplot = 3;
+model(end).subplot = 4;
 
 % model(end+1).data = {results.ouD_lambda_lambdabias};
 % model(end).vanilla = NaN;
@@ -71,7 +79,7 @@ model(end).vanilla = NaN;
 model(end).name = {'5. Leaky accumulator' 'collapsing bounds'};
 model(end).ticklabels = {'input bias'};
 model(end).colors = grey;
-model(end).subplot = 4;
+model(end).subplot = 5;
 
 % model(8).data = {results.ddmD_dc_dcbias	results.ddmD_rp_slope {results.ddmD_rp2_offset results.ddmD_rp2_slope}};
 % model(8).name = {'g. Dynamic DDM', 'dynamic v_{bias}'};
@@ -88,7 +96,7 @@ close all;
 for m = 1:length(model),
     
     %everything relative to the full model
-    subplot(4,7,model(m).subplot);     
+    subplot(4,max([model(:).subplot]),model(m).subplot);     
     hold on;
     xticks = [];
     xticklabels = {};
