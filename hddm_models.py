@@ -13,6 +13,7 @@ import numpy as np
 import os, fnmatch
 import hddm
 from IPython import embed as shell
+import pandas as pd
 
 # prepare link function for the regression models
 def z_link_func(x):
@@ -515,6 +516,56 @@ def make_model(mypath, mydata, model_name, trace_id):
                 depends_on={'dc':['prevresp', 'drug'], 'z':['prevresp', 'drug']})
         else:
             m = [] # don't return a model, won't run
+
+    # ============================================ #
+    # DOES DRIFT RATE VARIABILITY REDUCE? GROUP
+    # ============================================ #
+
+    elif model_name == 'stimcoding_nohist_svgroup':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # add a group to indicate bias magnitude
+        mydata['repeat'] 	= (mydata.response == (mydata.prevresp > 0))
+        sjrepetition 		= mydata.groupby(['subj_idx'])['repeat'].mean().reset_index()
+        sjrepetition['biasgroup'] = pd.qcut(np.abs(sjrepetition['repeat'] - 0.5), 3, labels=False)
+        mydata2 = pd.merge(mydata, sjrepetition, on='subj_idx', how='inner')
+
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sz'],
+                depends_on={'v': ['coherence'], 'sv': ['biasgroup']})
+        else:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sz'],
+                depends_on={'sv': ['biasgroup']})
+
+    elif model_name == 'stimcoding_dc_z_prevresp_svgroup':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # add a group to indicate bias magnitude
+        mydata['repeat'] 	= (mydata.response == (mydata.prevresp > 0))
+        sjrepetition 		= mydata.groupby(['subj_idx'])['repeat'].mean().reset_index()
+        sjrepetition['biasgroup'] = pd.qcut(np.abs(sjrepetition['repeat'] - 0.5), 3, labels=False)
+        mydata2 = pd.merge(mydata, sjrepetition, on='subj_idx', how='inner')
+
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp'], 'z':['prevresp'],
+                'sv': ['biasgroup']})
+        else:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sz'],
+                depends_on={'dc':['prevresp'], 'z':['prevresp'],
+                'sv': ['biasgroup']})
 
     # ============================================ #
     # STIMCODING PREVRESP + PREVCORRECT

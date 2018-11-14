@@ -1,4 +1,4 @@
-function f0_schematic_DDM_bias(seed)
+function schematic(seed)
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -12,7 +12,7 @@ close all; clc;
 global colors
 % colors = [8 141 165; 141 165 8;  150 150 150] ./ 256;
 
-fz = 10; timefz = 8;
+fz = 8; timefz = 6;
 set(groot, 'defaultaxesfontsize', fz, 'defaultaxestitlefontsizemultiplier', 1);
 
 %% ===================================== %%
@@ -77,7 +77,7 @@ defcfg = cfg;
 % make an overview of the two biasing mechanisms in the DDM
 % ===================================== %%
 
-close all; subplot(331); hold on;
+close all; subplot(441); hold on;
 arrow([cfg.time(1) cfg.z ], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
 y1 = ddm(cfg);
 
@@ -116,8 +116,8 @@ plot(ts, -scaling*gE_dc - cfg.a, 'color', colors(2, :));
 axis tight;
 set(gca, 'ytick', [-cfg.a cfg.z cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
-title({'History shift' 'in drift bias'}, 'color', colors(2, :));
-title({'Drift bias (v_{bias})'}, 'color', colors(2, :));
+%title({'History shift' 'in drift bias'}, 'color', colors(2, :));
+%title({'Drift bias (v_{bias})'}, 'color', colors(2, :));
 
 % add two axes manually
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
@@ -135,7 +135,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/DDMschematic_driftbias.pdf'));
 % ===================================== %%
 
 cfg = defcfg;
-close all; subplot(331); hold on;
+close all; subplot(441); hold on;
 arrow([cfg.time(1) cfg.z], [cfg.time(end) cfg.z], 'linewidth', 0.5, 'length', 4, 'TipAngle', 45);
 
 % show the unbiased average drift towards two stimuli
@@ -171,10 +171,10 @@ plot(ts, -scaling*gE_z - cfg.a, 'color', colors(1, :));
 axis tight;
 set(gca, 'ytick', [-cfg.a 0 cfg.a], 'yticklabel', {'0', 'z', 'a'});
 text(0.83*max(cfg.time), -0.2, 'Time', 'fontsize', timefz);
-title({'History shift' 'in starting point'}, 'color', colors(1, :));
+%title({'History shift' 'in starting point'}, 'color', colors(1, :));
 plot([cfg.time(1) cfg.time(end)], [cfg.a cfg.a], 'k--', 'linewidth', 0.5);
 plot([cfg.time(1) cfg.time(end)], [-cfg.a -cfg.a], 'k--', 'linewidth', 0.5);
-title({'Starting point (z)'}, 'color', colors(1, :));
+%title({'Starting point (z)'}, 'color', colors(1, :));
 
 box off;
 ax = gca;
