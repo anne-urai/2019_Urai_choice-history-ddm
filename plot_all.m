@@ -62,7 +62,9 @@ if 0,
 end
 
 disp('starting');
-compare_svgroups
+
+gelman_rubin
+
 return;
 
 % ========================================== %
@@ -220,7 +222,8 @@ multiplicative_vbias_DIC;
 % SUPPLEMENTARY FIGURE 10, SV-GROUP
 % ========================================== %
 
-compare_svgroups
+compare_svgroups;
+gelman_rubin;
 
 % ========================================== %
 % MEG REGRESSION RESULTS 
