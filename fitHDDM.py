@@ -63,7 +63,7 @@ parser.add_option ( "-v", "--version",
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
-        default = 14,
+        default = 29,
         type = "int",
         help = "Which trace to run, usually 0-60" )
 parser.add_option ( "-s", "--samples",
@@ -107,7 +107,7 @@ def concat_models(mypath, model_name):
     nchains = 30
 
     # CHECK IF COMBINED MODEL EXISTS
-    if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and  (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
+    if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
     else:
         # ============================================ #
@@ -118,8 +118,8 @@ def concat_models(mypath, model_name):
         print ("appending models for %s" %model_name)
         for trace_id in range(nchains): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
-
             modelExists           = os.path.isfile(model_filename)
+
             if modelExists == True: # if not, this model has to be rerun
                 print model_filename
                 thism                 = hddm.load(model_filename)
@@ -132,22 +132,32 @@ def concat_models(mypath, model_name):
         if len(allmodels) == 0:
             return allmodels
 
-        gr = hddm.analyze.gelman_rubin(allmodels)
+        try:
+            gr = hddm.analyze.gelman_rubin(allmodels)
 
-        # save
-        text_file = open(os.path.join(mypath, model_name, 'gelman_rubin.txt'), 'w')
-        for p in gr.items():
-            text_file.write("%s,%s\n" % p)
-            # print a warning when non-convergence is detected
-            # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
-            # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
-            if abs(p[1]-1) > 0.02:
-                print "non-convergence found, %s:%s" %p
-        text_file.close()
-        print "written gelman rubin stats to file"
+            # save
+            text_file = open(os.path.join(mypath, model_name, 'gelman_rubin.txt'), 'w')
+            for p in gr.items():
+                text_file.write("%s,%s\n" % p)
+                # print a warning when non-convergence is detected
+                # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
+                # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
+                if abs(p[1]-1) > 0.02:
+                    print "non-convergence found, %s:%s" %p
+            text_file.close()
+            print "written gelman rubin stats to file"
+        except:
+            pass
 
         # now actually concatenate them, see email Gilles
         m = kabuki.utils.concat_models(allmodels)
+
+        # ============================================ #
+        # SAVE THE FULL MODEL
+        # ============================================ #
+
+        print "concatenated models"
+        m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
 
         # ============================================ #
         # DELETE FILES to save space
@@ -162,13 +172,6 @@ def concat_models(mypath, model_name):
                     os.remove(fl)
         else:
             print "not deleting individual model chains"
-
-        # ============================================ #
-        # SAVE THE FULL MODEL
-        # ============================================ #
-
-        print "concatenated models"
-        m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
 
         # ============================================ #
         # SAVE POINT ESTIMATES

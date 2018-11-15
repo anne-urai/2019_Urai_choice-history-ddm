@@ -21,9 +21,9 @@ alldat = [];
 for n = nsmp,
     for b = models,
         for a = datasets,
-            for c = 0:nrTraces-1, % put all chains of same model together on a node
-                alldat = [alldat; a b c n];
-            end
+            %for c = 0:nrTraces-1, % put all chains of same model together on a node
+                alldat = [alldat; a b 29 n];
+            %end
         end
     end
 end

@@ -32,8 +32,7 @@ end
 % neutral vs biased plotsC
 % reorder the datasets: first show the ?standard ones? ?visual motion 2AFC with
 % feedback, then 2IFC, and only then yes-no / no feedback.
-datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno', 'Anke_MEG_transition_no81'};
-
+datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno'};
 datasetnames = {{'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}, ...
     {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
@@ -63,6 +62,7 @@ if 0,
 end
 
 disp('starting');
+compare_svgroups
 return;
 
 % ========================================== %
@@ -216,6 +216,11 @@ multiplicative_vbias_DIC;
 % ========================================== %
 
 
+% ========================================== %
+% SUPPLEMENTARY FIGURE 10, SV-GROUP
+% ========================================== %
+
+compare_svgroups
 
 % ========================================== %
 % MEG REGRESSION RESULTS 
