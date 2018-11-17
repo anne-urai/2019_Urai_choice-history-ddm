@@ -1,7 +1,7 @@
 
 Code and data for
 
-#### Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595. ####
+#### Urai AE, de Gee JW, Tsetsos K, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595. ####
 
 The summary csv files, including history information, are all in the Data subfolder and have been named using the abbreviations described in the paper.
 
