@@ -62,9 +62,6 @@ if 0,
 end
 
 disp('starting');
-
-gelman_rubin
-
 return;
 
 % ========================================== %
@@ -84,7 +81,7 @@ strategy_plot;
 % FIGURE 3
 % ========================================== %
 
-barplots_DIC; %3a
+barplots_DIC; % 3a
  
 close all; subplot(3,3,1);
 conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0);
