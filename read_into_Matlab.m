@@ -36,13 +36,7 @@ for d = 1:length(datasets),
     'stimcoding_dc_z_prevresp_st', ...
     'stimcoding_dc_z_prevresp_pharma', ...
     'stimcoding_dc_z_prevcorrect', ...
-    'stimcoding_prevcorrect', ...
-    'stimcoding_dc_z_prev2resp', ...
-    'stimcoding_dc_z_prevresp_multiplicative', ...
-    'stimcoding_dc_prevresp_multiplicative', ...
-    'stimcoding_dc_prevcorrect', ...
-    'stimcoding_nohist_svgroup', ...
-    'stimcoding_dc_z_prevresp_svgroup'};
+    'stimcoding_prevcorrect'};
 
     % load the csv file to check the existing subject numbers for later
     csvfile = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
@@ -280,6 +274,7 @@ for d = 1:length(datasets),
 
     disp('making table');
     results = array2table(subjects, 'variablenames', {'subjnr'});
+    results_group = array2table(nan(1,1), 'variablenames', {'subjnr'});
     for m = 1:length(mdls),
         if exist(sprintf('%s/%s_%s.mat', savepath, mdls{m}, 'all'), 'file'),
             load(sprintf('%s/%s_%s.mat', savepath, mdls{m}, 'all'));
@@ -295,6 +290,9 @@ for d = 1:length(datasets),
                     varname = [flds{p}(1:end-5) '__' thismdlname];
                     results.(varname) = individuals.(flds{p})';
 
+                    % also save the group-level 
+                    results_group.(varname) = group.(flds{p});
+
                 elseif ~isempty(strfind(flds{p}, 'prct')),
                     % also save error bounds around each individual datapoint!
                     thismdlname = regexprep(mdls{m}, 'prevresp_prevstim', 'prevrespstim');
@@ -305,15 +303,24 @@ for d = 1:length(datasets),
 
                     % separate variable for the percentiles
                     varname = [flds{p}(1:end-5) '_prct__' thismdlname];
-                    try
-                       % results.(varname) = individuals.(flds{p});
-                    end
                 end
             end
         end
     end
 
-    writetable(results, sprintf('%s/individualresults.csv', savepath));
+
+    % ================================================= % 
+    % ADD GROUP-LEVEL SUMMARY STATS AND DIC
+    % ================================================= % 
+
+    results.dic = nan(size(results.subjnr));
+    results_group.dic = dic.full;
+
+    % append
+    results_full = [results; results_group];
+    % allstuff = load(sprintf('%s/%s_all.mat', savepath, mdls{m}));
+
+    writetable(results_full, sprintf('%s/individualresults.csv', savepath));
 
 end % datasets
 end

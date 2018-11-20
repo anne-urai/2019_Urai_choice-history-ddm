@@ -40,6 +40,11 @@ for d = ds,
 
     % compute a bunch of basic things from Matlab
     results     = define_behavioral_metrics(alldata);
+    results     = [results; array2table(nan(size(results.Properties.VariableNames)), ...
+        'variablenames', results.Properties.VariableNames)];
+    results.session(isnan(results.subjnr)) = 0;
+    results.repetition(isnan(results.subjnr)) = 0;
+    results.subjnr(isnan(results.subjnr)) = 0;
 
     % add personality scores and drug conditions
     switch datasets{d}
@@ -52,6 +57,7 @@ for d = ds,
             results.PSWQ = nan(size(results.dprime));
 
             sjs = unique(results.subjnr)';
+            sjs(sjs == 0) = []; % exclude group average
             for sj = sjs,
                 subjectdata = subjectspecifics(sj);
                 results.drug(results.subjnr == sj)  = {subjectdata.drug};
@@ -80,7 +86,7 @@ for d = ds,
         hddmresults.session = zeros(size(hddmresults.subjnr));
 
         % will only keep session 0 stuff
-        allresults = innerjoin(results, hddmresults);
+        allresults = innerjoin(results, hddmresults, 'keys', {'subjnr', 'session'});
 
         % now add back all the stuff from the different sessions
         allresults2 = tableAppend(allresults, results);
@@ -89,6 +95,7 @@ for d = ds,
         % http://stackoverflow.com/questions/27547463/matlab-delete-duplicate-table-entries-on-multiple-columns
         [~, ind] = unique(allresults2(:, [1 2]), 'rows');
         tab      = allresults2(ind,:);
+        assert(any(ismember(tab.subjnr, 0)), 'group average missing');
 
         % ============================================ %
         % RECODE SESSION-SPECIFIC PARAMETERS
@@ -99,9 +106,6 @@ for d = ds,
             case 'RT_RDK'
                 sessions = 1:5;
             case {'MEG', 'MEG_MEGsessions'};
-                sessions = 1:5;
-            case {'Anke_2afc_serial', 'Anke_2afc_neutral', 'Anke_2afc_repetitive', 'Anke_2afc_altenating'},
-                sessions = 1:6;
             case 'NatComm'
                 sessions = 1:5;
         end
@@ -128,8 +132,6 @@ for d = ds,
                     tab.(newvar)(tab.session == s) = tab.(thisvar)(tab.session == 0);
                     % can happen that there is no session 2-4 (MEG pupil)
                 end
-                % remove the old one
-                % tab(:,{vars{v}}) = [];
             end
         end
 
@@ -137,61 +139,60 @@ for d = ds,
         skippedSession = (isnan(nanmean(tab{:, 3:11}, 2)));
         tab(skippedSession, :) = [];
 
-        % PUT DRIFT BIAS PER SESSION!
-        if whichFit == 1,
-            switch datasets{d}
-                case {'MEG', 'MEG_MEGsessions'}
+        % group-level HDDM estimates - remove sjnr and session nr
+        tab.session(tab.subjnr == 0) = NaN;
+        tab.subjnr(tab.subjnr == 0) = NaN;
 
-                    try
-                        tab.vbias_dczsess = tab.dc_1__stimcodingdczprevresp - tab.dc_2__stimcodingdczprevresp;
-                    catch
-                        tab.vbias_dczsess = nan(size(tab.subjnr));
-                    end
-                    for s = 1:5,
-                        try
-                            s1 = tab.(['dc_1_' num2str(s) '__stimcodingdczprevrespsess'])(tab.session == 0) ...
-                                - tab.(['dc_2_' num2str(s) '__stimcodingdczprevrespsess'])(tab.session == 0);
-                            tab.vbias_dczsess(tab.session == s) = s1(~isnan(s1));
-                        end
-                    end
-
-                    try
-                        tab.zbias_dczsess = tab.z_1__stimcodingdczprevresp - tab.z_2__stimcodingdczprevresp;
-                    catch
-                        tab.zbias_dczsess = nan(size(tab.subjnr));
-                    end
-                    for s = 1:5,
-                        try
-                            s1 = tab.(['z_1_' num2str(s) '__stimcodingdczprevrespsess'])(tab.session == 0) ...
-                                - tab.(['z_2_' num2str(s) '__stimcodingdczprevrespsess'])(tab.session == 0);
-                            tab.zbias_dczsess(tab.session == s) = s1(~isnan(s1));
-                        end
-                    end
-
-                    try
-                        tab.vbias_dcsess = tab.dc_1__stimcodingdcprevresp - tab.dc_2__stimcodingdcprevresp;
-                    catch
-                        tab.vbias_dcsess = nan(size(tab.subjnr));
-                    end
-
-                    for s = 1:5,
-                        try
-                            s1 = tab.(['dc_1_' num2str(s) '__stimcodingdcprevrespsess'])(tab.session == 0) ...
-                                - tab.(['dc_2_' num2str(s) '__stimcodingdcprevrespsess'])(tab.session == 0);
-                            tab.vbias_dcsess(tab.session == s) = s1(~isnan(s1));
-                        end
-                    end
-            end
-        end
+        % ============================================ %
+        % SAVE TO FIGSHARE FOR CLEARER OVERVIEW
+        % ============================================ %
 
         switch whichFit
             case 1
                 writetable(tab, sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+
+                %% ALSO SAVE FOR FIGSHARE
+                tab2 = tab(tab.session == 0 | isnan(tab.session), :);
+
+                switch d
+                case 1
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2afc_rt_hddmfits.csv', mypath));
+                case 2
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2afc_fd_hddmfits.csv', mypath));
+                case 3
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2ifc_fd_1_hddmfits.csv', mypath));
+                case 4
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2ifc_fd_2_hddmfits.csv', mypath));
+                case 5
+                    writetable(tab2, sprintf('%s/summary/visual_contrast_yesno_hddmfits.csv', mypath));
+                case 6
+                    writetable(tab2, sprintf('%s/summary/auditory_yesno_hddmfits.csv', mypath));
+                end
+
             case 2
                 writetable(tab, sprintf('%s/summary/%s/allindividualresults_Gsq.csv', mypath, datasets{d}));
-        end
 
+                %% ALSO SAVE FOR FIGSHARE
+                tab2 = tab(tab.session == 0, :);
+
+                switch d
+                case 1
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2afc_rt_gsquarefits.csv', mypath));
+                case 2
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2afc_fd_gsquarefits.csv', mypath));
+                case 3
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2ifc_fd_1_gsquarefits.csv', mypath));
+                case 4
+                    writetable(tab2, sprintf('%s/summary/visual_motion_2ifc_fd_2_gsquarefits.csv', mypath));
+                case 5
+                    writetable(tab2, sprintf('%s/summary/visual_contrast_yesno_gsquarefits.csv', mypath));
+                case 6
+                    writetable(tab2, sprintf('%s/summary/auditory_yesno_gsquarefits.csv', mypath));
+                end
+        end
         fprintf('%s/summary/%s/allindividualresults.csv \n', mypath,  datasets{d});
+
+
 
     end
 end

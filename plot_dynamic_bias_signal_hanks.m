@@ -1,11 +1,10 @@
 function plot_dynamic_bias_signal_hanks
 
-clear all;
-close all;
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
 cols2 = cbrewer('qual', 'Dark2', 8);
 
-kostisPath = '~/Data/HDDM/Anke_MEG_transition/KostisFits';
+global mypath
+kostisPath = sprintf('%s/Anke_MEG_transition/KostisFits', mypath);
 
 % nicer colors
 subplot(4,3,1);

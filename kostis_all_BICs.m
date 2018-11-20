@@ -14,7 +14,8 @@ colors = [colors; cols1(2, :); cols2(6, :); nanmean([cols1(2, :); cols2(6, :)]);
 % entry point: DDM, DDM-collapsingBounds, ddm-stimOnsetAccumulation
 % OU-stimOnsetAccumulation, OU-stimOnsetAccumulation-collapsingBounds
 
-results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
+% results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
+results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 baselineModel = results.ddmK_vanilla_bic;
 % ddmK = normal DDM, with ramping
 % ddmColl = collapsing bounds

@@ -1,6 +1,8 @@
 
 %%
-path = '~/Data/psychophysicalKernels';
+global mypath
+path = sprintf('%s/Anke_MEG_transition/KostisFits', mypath);
+
 files = {'motionEnergyData_Bharath.mat', 'motionEnergyData_AnkeMEG.mat'};
 axis_square =  @(gramm_obj) gramm_obj.axe_property('PlotBoxAspectRatio', [1 1 1]);
 
@@ -72,18 +74,22 @@ for f = 2:length(files),
         'response', 'rt', 'prevstim', 'prevresp', 'prev2resp', 'prev2stim', 'prevrt'});
     
     writetable(dat2, sprintf('%s/%s', path, regexprep(files{f}, '.mat', '.csv')));
+    try
+         % this is the data that's used for the HDDM fits
     writetable(dat2, '~/Data/HDDM/Anke_MEG_transition/Anke_MEG_transition.csv');
-    
+    end
+
     %% NOW ONLY THE NEUTRAL BLOCKS
     dat = dat(dat.transitionprob == 0.5, :);
     dat             = dat(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', 'coherence', ...
         'response', 'rt', 'prevstim', 'prevresp', 'prev2resp', 'prev2stim', 'prevrt'});
     
     writetable(dat, sprintf('%s/%s', path, regexprep(files{f}, '.mat', '.csv')));
-    writetable(dat, '~/Data/HDDM/Anke_MEG_neutral/Anke_MEG_neutral.csv');
-    
-    %% NOW MAKE A NICE-LOOKING PLOT FOR THE PAPER
-    
+    try
+        writetable(dat, '~/Data/HDDM/Anke_MEG_neutral/Anke_MEG_neutral.csv');
+    end
+
+    %% NOW MAKE A NICE-LOOKING PLOT FOR THE PAPE
     % use the normalized motion energy for these plots
     data.motionenergy = data.motionenergy_normalized;
     

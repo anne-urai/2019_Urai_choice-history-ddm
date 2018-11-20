@@ -95,7 +95,7 @@ for i = 1:length(mdldic),
     elseif mdldic(i) > 0,
         text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
             num2str(round(mdldic(i))), ...
-            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center');
+            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
     end
 end
 axis square; axis tight; 

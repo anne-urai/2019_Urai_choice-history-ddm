@@ -57,20 +57,21 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
-    make_dataframe(datasets);
+    make_dataframe(datasets); % the output of these files are in 
     % rename_PPC_files(datasets);
 end
 
+% the output of this are the files called _hddmfits.csv and _gsquarefits.csv 
+% in https://figshare.com/articles/Choice_history_biases_subsequent_evidence_accumulation/7268558
+
 disp('starting');
 
-gelman_rubin
-
+kostis_makeTable_v2;
 return;
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
 % ========================================== %
-
 schematic;
 
 % ========================================== %
@@ -114,10 +115,11 @@ forestPlot(alldat(2:2:end));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
 
 % compare the correlation coefficients for figure 5d
-compare_correlations_correct_error(alldat);
+% compare_correlations_correct_error(alldat);
 
 % DIC comparison
 barplots_DIC_previousresponse_outcome;
+
 
 % ========================================== %
 % FIGURE 6
@@ -125,13 +127,15 @@ barplots_DIC_previousresponse_outcome;
 
 % a. motion energy filtering: this has to run before, 
 % on the UKE cluster to grab Anke's motionenergy coordinates
-motionEnergy_filterDots;
-motionEnergy_check;
-motionEnergy_kernels;
+% motionEnergy_filterDots;
+motionEnergy_check; % supplementary figure 7a, 7b
 
 % grab the results from Kostis' fits
 % kostis_driftRate;
 kostis_makeTable_v2;
+
+% psychophysical kernel, supplementary figure 7c
+motionEnergy_kernels;
 
 % a. panel with all BIC plots
 kostis_all_BICs;
@@ -139,14 +143,10 @@ kostis_all_BICs;
 % same for correlations, one big plot
 kostis_all_correlations_selected;
 
-% b. for a few correlations, bargraphs of correlation coefficients
-% kostis_plotDDM_correlation;
-% kostis_plotRamp_correlation;
-% kostis_plotDDMCol_correlation;
-kostis_plotOUD_correlation;
+
 
 % timecourse of dynamic bias signal, across models
-plot_dynamic_bias_signal;
+plot_dynamic_bias_signal_hanks;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
@@ -162,7 +162,7 @@ plot_dynamic_bias_signal;
 dprime_driftrate_correlation;
 posterior_predictive_checks;
 history_kernels;
-strategy_plot_2-7;
+strategy_plot_2to7;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 3
@@ -203,14 +203,8 @@ post_error_slowing;
 % SUPPLEMENTARY FIGURE 7
 % ========================================== %
 
-
-
-% ========================================== %
-% SUPPLEMENTARY FIGURE 8
-% ========================================== %
-
-multiplicative_vbias_psychfuncs_ppc;
-multiplicative_vbias_DIC;
+%multiplicative_vbias_psychfuncs_ppc;
+%multiplicative_vbias_DIC;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 9
@@ -230,5 +224,5 @@ gelman_rubin;
 % FOR SFN2018 POSTER
 % ========================================== %
 
-meg_regression_dic;
-meg_regression_posteriors;
+% meg_regression_dic;
+% meg_regression_posteriors;

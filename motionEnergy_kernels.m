@@ -92,12 +92,12 @@ for maxcohlevel = 27; %[0,3,9,27,81],
     print(gcf, '-dpdf', '~/Data/serialHDDM/psychophysicalKernels.pdf');
     close ;
     
-    %% COMPARE THE KERNELS WITH THE O-U EFFECTIVE LEAK PARAMETER
-    results     = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
-    lambda      = results.ouD_vanilla_lambda;
-    kernelDiff  = nanmean(kernels(:, 13:29), 2) - nanmean(kernels(:, 30:45), 2);
-    [rho, pval] = corr(kernelDiff, lambda, 'type', 'spearman');
-    fprintf('\n\nCorrelation between kernels and O-U lambda, Spearmans rho: %.3f, p = %.3f \n', rho, pval);
+    % %% COMPARE THE KERNELS WITH THE O-U EFFECTIVE LEAK PARAMETER
+    % results     = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
+    % lambda      = results.ouD_vanilla_lambda;
+    % kernelDiff  = nanmean(kernels(:, 13:29), 2) - nanmean(kernels(:, 30:45), 2);
+    % [rho, pval] = corr(kernelDiff, lambda, 'type', 'spearman');
+    % fprintf('\n\nCorrelation between kernels and O-U lambda, Spearmans rho: %.3f, p = %.3f \n', rho, pval);
   
 end
 

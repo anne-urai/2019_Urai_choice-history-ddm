@@ -14,29 +14,12 @@ warning off;
 % ========================================== %
 
 % preallocate variables
-varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'bias', 'abscriterion', 'rt', ...
-    'criterionshift', 'criterionshift_prct', ...
-    'repetition_prevcorrect', 'repetition_preverror', ...
-    'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error', ...
-    'rt_valid_slow_correct', 'rt_valid_fast_correct', 'rt_invalid_slow_correct', 'rt_invalid_fast_correct', ...
-    'rt_valid_slow_error', 'rt_valid_fast_error', 'rt_invalid_slow_error', 'rt_invalid_fast_error', ...
-    'accuracy_valid_slow', 'accuracy_valid_fast', 'accuracy_invalid_slow', 'accuracy_invalid_fast', ...
-    'posterrorslowing'};
+varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'repetition', ...
+    'criterionshift', 'repetition_prevcorrect', 'repetition_preverror', 'posterrorslowing'};
 
 nrSess          = length(unique(alldata.session)) + 1;
 results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, length(varnames)), 'variablenames', varnames);
-results.drug    = repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
-results.criterionshift_prct = nan(height(results), 2); % will contain two points for error bars
-
-if any(~cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'transitionprob'))),
-    results.criterionshift_neutral = nan(size(results.criterionshift));
-    results.criterionshift_alternating = nan(size(results.criterionshift));
-    results.criterionshift_repetitive = nan(size(results.criterionshift));
-
-    results.repetition_neutral = nan(size(results.criterionshift));
-    results.repetition_alternating = nan(size(results.criterionshift));
-    results.repetition_repetitive = nan(size(results.criterionshift));
-end
+% results.drug    = repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
 
 % preallocate dprime for different coherence levels
 if sum(strcmp(alldata.Properties.VariableNames, 'coherence')) > 0,
@@ -54,50 +37,50 @@ if sum(strcmp(alldata.Properties.VariableNames, 'coherence')) > 0,
     end
 end
 
-% measures that are modulated by previous trial RT or pupil
-metrics = {'dprime', 'criterion', 'abscriterion', 'accuracy', 'repetition', ...
-    'stimrepetition', 'repetitioncrit', 'criterionshift', 'handshift', ...
-    'nextdprime', 'nextabscriterion'};
-modulation = false;
+% % measures that are modulated by previous trial RT or pupil
+% metrics = {'dprime', 'criterion', 'abscriterion', 'accuracy', 'repetition', ...
+%     'stimrepetition', 'repetitioncrit', 'criterionshift', 'handshift', ...
+%     'nextdprime', 'nextabscriterion'};
+% modulation = false;
 
-if modulation,
+% if modulation,
 
-    % modulation factors
-    factors = {'pupil', 'rt', 'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
-    for m = 1:length(metrics),
-        % first, without modulation
-        results.([metrics{m}]) = nan(size(results.subjnr));
+%     % modulation factors
+%     factors = {'pupil', 'rt', 'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
+%     for m = 1:length(metrics),
+%         % first, without modulation
+%         results.([metrics{m}]) = nan(size(results.subjnr));
 
-        % then modulated by each of the factors
-        for f = 1:length(factors),
-            results.([factors{f} '_' metrics{m} '_corr']) = nan(size(results.subjnr));
-            for b = 1:3, % binned
-                results.(sprintf('%s_%s_bin%d', metrics{m}, factors{f}, b)) = nan(size(results.subjnr));
-            end
-        end
-    end
-end
+%         % then modulated by each of the factors
+%         for f = 1:length(factors),
+%             results.([factors{f} '_' metrics{m} '_corr']) = nan(size(results.subjnr));
+%             for b = 1:3, % binned
+%                 results.(sprintf('%s_%s_bin%d', metrics{m}, factors{f}, b)) = nan(size(results.subjnr));
+%             end
+%         end
+%     end
+% end
 
-% get all data
+% % get all data
 subjects      = unique(alldata.subj_idx)';
-if modulation,
-    alldata.pupil = alldata.decision_pupil;
-end
+% if modulation,
+%     alldata.pupil = alldata.decision_pupil;
+% end
 
-if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'prevrt'))),
-    % normalise previous RT per block
-    blockchange = find(diff(alldata.block) > 0);
-    blocknrs = zeros(height(alldata), 1);
-    for b = 1:length(blockchange)-1,
-        blocknrs(blockchange(b)+1:blockchange(b+1)) = blocknrs(blockchange(b))+1;
-    end
-    blocknrs(blockchange(end)+1:end) = blocknrs(blockchange(end))+1;
-    for b = unique(blocknrs)',
-      try
-        alldata.prevrt(blocknrs == b) = nanzscore(log(alldata.prevrt(blocknrs == b)));
-      end
-    end
-end
+% if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'prevrt'))),
+%     % normalise previous RT per block
+%     blockchange = find(diff(alldata.block) > 0);
+%     blocknrs = zeros(height(alldata), 1);
+%     for b = 1:length(blockchange)-1,
+%         blocknrs(blockchange(b)+1:blockchange(b+1)) = blocknrs(blockchange(b))+1;
+%     end
+%     blocknrs(blockchange(end)+1:end) = blocknrs(blockchange(end))+1;
+%     for b = unique(blocknrs)',
+%       try
+%         alldata.prevrt(blocknrs == b) = nanzscore(log(alldata.prevrt(blocknrs == b)));
+%       end
+%     end
+% end
 
 % recode correct
 if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'correct'))),
@@ -106,12 +89,12 @@ if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'correct'))),
     alldata.correct = (tmpstim == tmpresp);
 end
 
-% only MEG-PL data has starthand
-if isfield(alldata, 'startHand'),
-    alldata.startHand(alldata.startHand > 20) = nan;
-else
-    alldata.startHand = nan(size(alldata.subj_idx));
-end
+% % only MEG-PL data has starthand
+% if isfield(alldata, 'startHand'),
+%     alldata.startHand(alldata.startHand > 20) = nan;
+% else
+%     alldata.startHand = nan(size(alldata.subj_idx));
+% end
 
 % for criterion shift
 alldata.nextstim = circshift(alldata.stimulus, -1);
@@ -166,7 +149,7 @@ for sj = subjects,
         results.dprime(icnt)        = d;
         assert(~isnan(d), 'dprime cannot be NaN');
         results.criterion(icnt)     = c;
-        results.abscriterion(icnt)  = abs(c);
+        % results.abscriterion(icnt)  = abs(c);
         results.accuracy(icnt)      = nanmean(data.correct);
         results.rt(icnt)            = nanmedian(data.rt);
         results.bias(icnt)          = nanmean(data.response);
@@ -209,201 +192,201 @@ for sj = subjects,
 
     
         results.repetition(icnt)        = nanmean(data.repeat);
-        results.stimrepetition(icnt)    = nanmean(data.stimrepeat);
+        % results.stimrepetition(icnt)    = nanmean(data.stimrepeat);
 
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
         results.repetition_preverror(icnt)   = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
 
-        % criterion based on repetition and stimulus sequences
-        [~, c] = dprime(data.stimrepeat, data.repeat);
-        results.repetitioncrit(icnt)    = -c;
+        % % criterion based on repetition and stimulus sequences
+        % [~, c] = dprime(data.stimrepeat, data.repeat);
+        % results.repetitioncrit(icnt)    = -c;
 
         % criterion based on next trial bias, then collapsed
         results.criterionshift(icnt)    = criterionshift(data.response, data.nextstim, data.nextresp);
 
-        % add: a bootstrapped measure of criterionshift for error bars in correlation plot
-        % 05.09.2017, after talk with JW - this takes forever!
-        %bootstat = bootstrp(1000, @criterionshift,data.response,data.nextstim, data.nextresp);
-        %results.criterionshift_prct(icnt, :) = prctile(bootstat, [0.25 0.75]);
+        % % add: a bootstrapped measure of criterionshift for error bars in correlation plot
+        % % 05.09.2017, after talk with JW - this takes forever!
+        % %bootstat = bootstrp(1000, @criterionshift,data.response,data.nextstim, data.nextresp);
+        % %results.criterionshift_prct(icnt, :) = prctile(bootstat, [0.25 0.75]);
 
-        if s == 0,
-            thispersonsbias = results.repetition(icnt) - results.stimrepetition(icnt);
-        end
+        % if s == 0,
+        %     thispersonsbias = results.repetition(icnt) - results.stimrepetition(icnt);
+        % end
 
-        % does the random hand they press cause a bias?
-        results.handshift(icnt)         = criterionshift(data.startHand, data.stimulus, data.response);
+        % % does the random hand they press cause a bias?
+        % results.handshift(icnt)         = criterionshift(data.startHand, data.stimulus, data.response);
 
-        try
-            % pupilstuff
-            results.pupil_error(icnt)       = nanmean(data.pupil(data.correct == 0));
-            results.pupil_correct(icnt)     = nanmean(data.pupil(data.correct == 1));
-        end
+        % try
+        %     % pupilstuff
+        %     results.pupil_error(icnt)       = nanmean(data.pupil(data.correct == 0));
+        %     results.pupil_correct(icnt)     = nanmean(data.pupil(data.correct == 1));
+        % end
 
-        results.rt_error(icnt)          = nanmedian(data.rt(data.correct == 0));
-        results.rt_correct(icnt)        = nanmedian(data.rt(data.correct == 1));
+        % results.rt_error(icnt)          = nanmedian(data.rt(data.correct == 0));
+        % results.rt_correct(icnt)        = nanmedian(data.rt(data.correct == 1));
 
-        % ========================================== %
-        %   for data with transition probability, compute criterionshift separately
-        % ========================================== %
+        % % ========================================== %
+        % %   for data with transition probability, compute criterionshift separately
+        % % ========================================== %
 
-        if s == 0 & any(~cellfun(@isempty, strfind(data.Properties.VariableNames, 'transitionprob'))),
+        % if s == 0 & any(~cellfun(@isempty, strfind(data.Properties.VariableNames, 'transitionprob'))),
 
-            results.criterionshift_neutral(icnt) = criterionshift(data.response(data.transitionprob == 0.5), ...
-                data.nextstim(data.transitionprob == 0.5), data.nextresp(data.transitionprob == 0.5));
-            results.criterionshift_alternating(icnt) = criterionshift(data.response(data.transitionprob == 0.2), ...
-                data.nextstim(data.transitionprob == 0.2), data.nextresp(data.transitionprob == 0.2));
-            results.criterionshift_repetitive(icnt) = criterionshift(data.response(data.transitionprob == 0.8), ...
-                data.nextstim(data.transitionprob == 0.8), data.nextresp(data.transitionprob == 0.8));
+        %     results.criterionshift_neutral(icnt) = criterionshift(data.response(data.transitionprob == 0.5), ...
+        %         data.nextstim(data.transitionprob == 0.5), data.nextresp(data.transitionprob == 0.5));
+        %     results.criterionshift_alternating(icnt) = criterionshift(data.response(data.transitionprob == 0.2), ...
+        %         data.nextstim(data.transitionprob == 0.2), data.nextresp(data.transitionprob == 0.2));
+        %     results.criterionshift_repetitive(icnt) = criterionshift(data.response(data.transitionprob == 0.8), ...
+        %         data.nextstim(data.transitionprob == 0.8), data.nextresp(data.transitionprob == 0.8));
 
-            results.repetition_neutral(icnt) = nanmean(data.repeat(data.transitionprob == 0.5));
-            results.repetition_alternating(icnt) = nanmean(data.repeat(data.transitionprob == 0.2));
-            results.repetition_repetitive(icnt) = nanmean(data.repeat(data.transitionprob == 0.8));
+        %     results.repetition_neutral(icnt) = nanmean(data.repeat(data.transitionprob == 0.5));
+        %     results.repetition_alternating(icnt) = nanmean(data.repeat(data.transitionprob == 0.2));
+        %     results.repetition_repetitive(icnt) = nanmean(data.repeat(data.transitionprob == 0.8));
 
-        end
+        % end
 
-        % ========================================== %
-        % MULDER ET AL. 2012
-        % http://www.jneurosci.org/content/32/7/2335.long
-        % treat the previous choice as a cue
-        % ========================================== %
+        % % ========================================== %
+        % % MULDER ET AL. 2012
+        % % http://www.jneurosci.org/content/32/7/2335.long
+        % % treat the previous choice as a cue
+        % % ========================================== %
 
-        if thispersonsbias < 0, % alternators
-            % only previous trials that are correct
-            validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
-            invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
-            %neutraltrls   = ones(height(data), 1); % only previous correct trls
-        elseif thispersonsbias > 0, % repeaters
-            % only previous trials that are correct
-            validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
-            invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
-            %neutraltrls   = ones(height(data), 1); % only previous correct trls
-        else
-            validtrls       = ones(height(data), 1);
-            invalidtrls     = ones(height(data), 1);
-            %neutraltrls    = ones(height(data), 1)
-        end
+        % if thispersonsbias < 0, % alternators
+        %     % only previous trials that are correct
+        %     validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
+        %     invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
+        %     %neutraltrls   = ones(height(data), 1); % only previous correct trls
+        % elseif thispersonsbias > 0, % repeaters
+        %     % only previous trials that are correct
+        %     validtrls     = ((data.prevresp == data.prevstim) & (data.prevresp == data.stimulus));
+        %     invalidtrls   = ((data.prevresp == data.prevstim) & (data.prevresp ~= data.stimulus));
+        %     %neutraltrls   = ones(height(data), 1); % only previous correct trls
+        % else
+        %     validtrls       = ones(height(data), 1);
+        %     invalidtrls     = ones(height(data), 1);
+        %     %neutraltrls    = ones(height(data), 1)
+        % end
 
-        % data.rt = nanzscore(log(data.rt));
-        results.rt_invalid_fast_correct(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 1 & ...
-            data.prevrt < median(data.prevrt(invalidtrls & data.correct == 1))));
-        results.rt_invalid_slow_correct(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 1 & ...
-            data.prevrt > median(data.prevrt(invalidtrls & data.correct == 1))));
-        results.rt_valid_fast_correct(icnt)    = nanmedian(data.rt(validtrls & data.correct == 1 & ...
-            data.prevrt < median(data.prevrt(validtrls & data.correct == 1))));
-        results.rt_valid_slow_correct(icnt)    = nanmedian(data.rt(validtrls & data.correct == 1 & ...
-            data.prevrt > median(data.prevrt(validtrls & data.correct == 1))));
+        % % data.rt = nanzscore(log(data.rt));
+        % results.rt_invalid_fast_correct(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 1 & ...
+        %     data.prevrt < median(data.prevrt(invalidtrls & data.correct == 1))));
+        % results.rt_invalid_slow_correct(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 1 & ...
+        %     data.prevrt > median(data.prevrt(invalidtrls & data.correct == 1))));
+        % results.rt_valid_fast_correct(icnt)    = nanmedian(data.rt(validtrls & data.correct == 1 & ...
+        %     data.prevrt < median(data.prevrt(validtrls & data.correct == 1))));
+        % results.rt_valid_slow_correct(icnt)    = nanmedian(data.rt(validtrls & data.correct == 1 & ...
+        %     data.prevrt > median(data.prevrt(validtrls & data.correct == 1))));
 
-        results.rt_invalid_fast_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
-            data.prevrt < median(data.prevrt(invalidtrls & data.correct == 0))));
-        results.rt_invalid_slow_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
-            data.prevrt > median(data.prevrt(invalidtrls & data.correct == 0))));
-        results.rt_valid_fast_error(icnt)    = nanmedian(data.rt(validtrls & data.correct == 0 & ...
-            data.prevrt < median(data.prevrt(validtrls & data.correct == 0))));
-        results.rt_valid_slow_error(icnt)    = nanmedian(data.rt(validtrls & data.correct ==0 & ...
-            data.prevrt > median(data.prevrt(validtrls & data.correct == 0))));
+        % results.rt_invalid_fast_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
+        %     data.prevrt < median(data.prevrt(invalidtrls & data.correct == 0))));
+        % results.rt_invalid_slow_error(icnt)  = nanmedian(data.rt(invalidtrls & data.correct == 0 & ...
+        %     data.prevrt > median(data.prevrt(invalidtrls & data.correct == 0))));
+        % results.rt_valid_fast_error(icnt)    = nanmedian(data.rt(validtrls & data.correct == 0 & ...
+        %     data.prevrt < median(data.prevrt(validtrls & data.correct == 0))));
+        % results.rt_valid_slow_error(icnt)    = nanmedian(data.rt(validtrls & data.correct ==0 & ...
+        %     data.prevrt > median(data.prevrt(validtrls & data.correct == 0))));
 
-        results.accuracy_invalid_fast(icnt)    = nanmean(data.correct(invalidtrls & ...
-            data.prevrt < median(data.prevrt(invalidtrls))));
-        results.accuracy_invalid_slow(icnt)    = nanmean(data.correct(invalidtrls & ...
-            data.prevrt > median(data.prevrt(invalidtrls))));
-        results.accuracy_valid_fast(icnt)    = nanmean(data.correct(validtrls & ...
-            data.prevrt < median(data.prevrt(validtrls))));
-        results.accuracy_valid_slow(icnt)    = nanmean(data.correct(validtrls & ...
-            data.prevrt > median(data.prevrt(validtrls))));
+        % results.accuracy_invalid_fast(icnt)    = nanmean(data.correct(invalidtrls & ...
+        %     data.prevrt < median(data.prevrt(invalidtrls))));
+        % results.accuracy_invalid_slow(icnt)    = nanmean(data.correct(invalidtrls & ...
+        %     data.prevrt > median(data.prevrt(invalidtrls))));
+        % results.accuracy_valid_fast(icnt)    = nanmean(data.correct(validtrls & ...
+        %     data.prevrt < median(data.prevrt(validtrls))));
+        % results.accuracy_valid_slow(icnt)    = nanmean(data.correct(validtrls & ...
+        %     data.prevrt > median(data.prevrt(validtrls))));
 
-        % ========================================== %
-        % DPRIME, CRITERION, ABSOLUTE CRITERION
-        % correlation to pupil and RT
-        % ========================================== %
+        % % ========================================== %
+        % % DPRIME, CRITERION, ABSOLUTE CRITERION
+        % % correlation to pupil and RT
+        % % ========================================== %
 
-        if modulation,
-            flds = {'pupil', 'rt', 'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
-            nbins = 8; % with 5 bins, correlation quite unstable
-            for f = 1:length(flds),
+        % if modulation,
+        %     flds = {'pupil', 'rt', 'pupil_correct', 'pupil_error', 'rt_correct', 'rt_error'};
+        %     nbins = 8; % with 5 bins, correlation quite unstable
+        %     for f = 1:length(flds),
 
-                % for error and correct, make a temporary field
-                if strfind(flds{f}, '_correct'),
-                    useFld = data.(flds{f}(1:end-8));
-                    useFld(data.correct == 0) = NaN;
-                elseif strfind(flds{f}, '_error'),
-                    useFld = data.(flds{f}(1:end-6));
-                    useFld(data.correct == 1) = NaN;
-                else
-                    useFld = data.(flds{f});
-                end
+        %         % for error and correct, make a temporary field
+        %         if strfind(flds{f}, '_correct'),
+        %             useFld = data.(flds{f}(1:end-8));
+        %             useFld(data.correct == 0) = NaN;
+        %         elseif strfind(flds{f}, '_error'),
+        %             useFld = data.(flds{f}(1:end-6));
+        %             useFld(data.correct == 1) = NaN;
+        %         else
+        %             useFld = data.(flds{f});
+        %         end
 
-                % sanity check for those without pupil stuff
-                if all(isnan(useFld)), continue; end
+        %         % sanity check for those without pupil stuff
+        %         if all(isnan(useFld)), continue; end
 
-                % ========================================== %
-                % correlate across five bins
-                % ========================================== %
+        %         % ========================================== %
+        %         % correlate across five bins
+        %         % ========================================== %
 
-                binIdx      = discretize(useFld, [-inf quantile(useFld, nbins-1) inf]);
-                try % will put NaNs if not enough trials
-                    a           = splitapply(@nanmean, data.correct, binIdx);
-                    [~, r]      = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
-                    rep         = splitapply(@nanmean, data.repeat, binIdx);
-                    stimrep     = splitapply(@nanmean, data.stimrepeat, binIdx);
-                    cs          = splitapply(@criterionshift, data.response, data.nextstim, data.nextresp, binIdx);
-                    [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
+        %         binIdx      = discretize(useFld, [-inf quantile(useFld, nbins-1) inf]);
+        %         try % will put NaNs if not enough trials
+        %             a           = splitapply(@nanmean, data.correct, binIdx);
+        %             [~, r]      = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
+        %             rep         = splitapply(@nanmean, data.repeat, binIdx);
+        %             stimrep     = splitapply(@nanmean, data.stimrepeat, binIdx);
+        %             cs          = splitapply(@criterionshift, data.response, data.nextstim, data.nextresp, binIdx);
+        %             [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
 
-                    % see corrFunc defined below
-                    results.([flds{f} '_dprime_corr'])(icnt)            = corrFunc(d);
-                    results.([flds{f} '_criterion_corr'])(icnt)         = corrFunc(c);
-                    results.([flds{f} '_abscriterion_corr'])(icnt)      = corrFunc(abs(c));
-                    results.([flds{f} '_accuracy_corr'])(icnt)          = corrFunc(a);
-                    results.([flds{f} '_repetition_corr'])(icnt)        = corrFunc(rep);
-                    results.([flds{f} '_stimrepetition_corr'])(icnt)    = corrFunc(stimrep);
-                    results.([flds{f} '_repetitioncrit_corr'])(icnt)    = corrFunc(-r);
-                    results.([flds{f} '_criterionshift_corr'])(icnt)    = corrFunc(cs);
-                    results.([flds{f} '_nextdprime_corr'])(icnt)        = corrFunc(nextd);
-                    results.([flds{f} '_nextabscriterion_corr'])(icnt)  = corrFunc(abs(nextc));
-                end
+        %             % see corrFunc defined below
+        %             results.([flds{f} '_dprime_corr'])(icnt)            = corrFunc(d);
+        %             results.([flds{f} '_criterion_corr'])(icnt)         = corrFunc(c);
+        %             results.([flds{f} '_abscriterion_corr'])(icnt)      = corrFunc(abs(c));
+        %             results.([flds{f} '_accuracy_corr'])(icnt)          = corrFunc(a);
+        %             results.([flds{f} '_repetition_corr'])(icnt)        = corrFunc(rep);
+        %             results.([flds{f} '_stimrepetition_corr'])(icnt)    = corrFunc(stimrep);
+        %             results.([flds{f} '_repetitioncrit_corr'])(icnt)    = corrFunc(-r);
+        %             results.([flds{f} '_criterionshift_corr'])(icnt)    = corrFunc(cs);
+        %             results.([flds{f} '_nextdprime_corr'])(icnt)        = corrFunc(nextd);
+        %             results.([flds{f} '_nextabscriterion_corr'])(icnt)  = corrFunc(abs(nextc));
+        %         end
 
-                % ========================================== %
-                % divide into 3 bins for viz
-                % ========================================== %
+        %         % ========================================== %
+        %         % divide into 3 bins for viz
+        %         % ========================================== %
 
-                binIdx = discretize(useFld, [-inf quantile(useFld, 2) inf]);
+        %         binIdx = discretize(useFld, [-inf quantile(useFld, 2) inf]);
 
-                [d, c] = splitapply(@dprime, data.stimulus, data.response, binIdx);
-                a      = splitapply(@nanmean, data.correct, binIdx);
-                [~, r] = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
-                rep    = splitapply(@nanmean, data.repeat, binIdx);
-                cs     = splitapply(@criterionshift, data.response, data.nextstim, data.nextresp, binIdx);
-                [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
+        %         [d, c] = splitapply(@dprime, data.stimulus, data.response, binIdx);
+        %         a      = splitapply(@nanmean, data.correct, binIdx);
+        %         [~, r] = splitapply(@dprime, data.stimrepeat, data.repeat, binIdx);
+        %         rep    = splitapply(@nanmean, data.repeat, binIdx);
+        %         cs     = splitapply(@criterionshift, data.response, data.nextstim, data.nextresp, binIdx);
+        %         [nextd, nextc]      = splitapply(@dprime, data.nextstim, data.nextresp, binIdx);
 
-                for b = 1:length(d),
+        %         for b = 1:length(d),
 
-                    results.(sprintf('dprime_%s_bin%d', flds{f}, b))(icnt)      = d(b);
-                    results.(sprintf('criterion_%s_bin%d', flds{f}, b))(icnt)   = c(b);
-                    results.(sprintf('abscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(c(b));
-                    results.(sprintf('accuracy_%s_bin%d', flds{f}, b))(icnt)    = a(b);
+        %             results.(sprintf('dprime_%s_bin%d', flds{f}, b))(icnt)      = d(b);
+        %             results.(sprintf('criterion_%s_bin%d', flds{f}, b))(icnt)   = c(b);
+        %             results.(sprintf('abscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(c(b));
+        %             results.(sprintf('accuracy_%s_bin%d', flds{f}, b))(icnt)    = a(b);
 
-                    % repetition criterion as a function of pupil stuff
-                    results.(sprintf('repetitioncrit_%s_bin%d', flds{f}, b))(icnt)  = -r(b);
+        %             % repetition criterion as a function of pupil stuff
+        %             results.(sprintf('repetitioncrit_%s_bin%d', flds{f}, b))(icnt)  = -r(b);
 
-                    % repetition as a function of pupil stuff
-                    results.(sprintf('repetition_%s_bin%d', flds{f}, b))(icnt)      = rep(b);
-                    results.(sprintf('stimrepetition_%s_bin%d', flds{f}, b))(icnt)      = stimrep(b);
+        %             % repetition as a function of pupil stuff
+        %             results.(sprintf('repetition_%s_bin%d', flds{f}, b))(icnt)      = rep(b);
+        %             results.(sprintf('stimrepetition_%s_bin%d', flds{f}, b))(icnt)      = stimrep(b);
 
-                    % criterionshift
-                    results.(sprintf('criterionshift_%s_bin%d', flds{f}, b))(icnt)  = cs(b);
+        %             % criterionshift
+        %             results.(sprintf('criterionshift_%s_bin%d', flds{f}, b))(icnt)  = cs(b);
 
-                    % next trial dprime and criterion
-                    results.(sprintf('nextdprime_%s_bin%d', flds{f}, b))(icnt)      = nextd(b);
-                    results.(sprintf('nextabscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(nextc(b));
+        %             % next trial dprime and criterion
+        %             results.(sprintf('nextdprime_%s_bin%d', flds{f}, b))(icnt)      = nextd(b);
+        %             results.(sprintf('nextabscriterion_%s_bin%d', flds{f}, b))(icnt)   = abs(nextc(b));
 
-                end
-            end
-        end
+        %         end
+        %     end
+        % end
     end
 end
 
 % correct repition for stimulus repetition by subtraction as well
-results.repetitioncorr = results.repetition - results.stimrepetition;
+% results.repetitioncorr = results.repetition - results.stimrepetition;
 
 end
 

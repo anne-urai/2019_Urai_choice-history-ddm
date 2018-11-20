@@ -1,7 +1,8 @@
 function kostis_makeTable_v2
 
 close all; clc;
-kostisPath = '~/Data/HDDM/Anke_MEG_transition/KostisFits';
+global mypath
+kostisPath = sprintf('%s/Anke_MEG_transition/KostisFits', mypath);
 
 % GRAB MOTION ENERGY TO DETERMINE NR OF TRIALS USED FOR THE FIT
 load(sprintf('%s/motionEnergyData_AnkeMEG.mat', kostisPath));
@@ -269,12 +270,18 @@ load(sprintf('%s/history.mat', kostisPath));
 kk(6, :) = []; % remove this subject
 alltables{end}.repetitionK = kk(:, 2); % add to the big table
 
+global mypath
 % load the main results file
-results = readtable('~/Data/HDDM/summary/Anke_MEG_transition/allindividualresults.csv');
+results = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, 'Anke_MEG_transition'));
 results = results(results.session == 0, :);
 results = cat(2, results, alltables{:});
-writetable(results, '~/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
+writetable(results, sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
 
+% SAVE FOR FIGSHARE
+writetable(cat(2, results(:, {'subjnr', 'repetition'}), alltables{:}), sprintf('%s/summary/visual_motion_2afc_fd_extendedfits.csv', mypath));
+disp(sprintf('%s/summary/visual_motion_2afc_fd_extendedfits.csv', mypath));
+
+% some plots
 corrplot(results, {'repetitionK', 'ddmK_z_zbias', 'ddmK_dc_dcbias', 'ddmK_dcz_zbias', 'ddmK_dcz_dcbias'});
 print(gcf, '-dpdf', '~/Data/serialHDDM/kostisData_overview_DDM.pdf');
 
@@ -284,7 +291,7 @@ corrplot(results, {'repetitionK', 'ddmK_rp_slope', 'ddmK_dc_dcbias', ...
 print(gcf, '-dpdf', '~/Data/serialHDDM/kostisData_overview_DDM_ramp.pdf');
 
 close all;
-corrplot(results, {'repetitionK', 'repetition'})
+corrplot(results, {'repetitionK', 'repetition'});
 print(gcf, '-dpdf', '~/Data/serialHDDM/repetition_comparison.pdf');
 
 
