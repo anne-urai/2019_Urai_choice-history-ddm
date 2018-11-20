@@ -28,7 +28,7 @@ baselineModel = results.repetitionK;
 
 model(1).data       = {{results.ddmK_dcz_zbias results.ddmK_dcz_dcbias}};
 model(1).name       = {'1. Standard DDM' ''};
-model(1).ticklabels = {{'z_{bias}', 'v_{bias}'}};
+model(1).ticklabels = {{'z', 'v_{bias}'}};
 model(1).colors     = [grey; grey];
 model(1).subplot    = 1;
 
@@ -40,13 +40,13 @@ cols2 = cbrewer('qual', 'Dark2', 8);
 model(end).colors = [grey; grey];
 model(end).subplot = 2;
 
-model(end+1).data = {{results.ddmD_rp2_offset results.ddmD_rp2_slope}};
-model(end).name = {'2b. Dynamic DDM', 'drift bias'};
-model(end).ticklabels = {{'constant', 'ramp'}};
-cols1 = cbrewer('qual', 'Set1', 8);
-cols2 = cbrewer('qual', 'Dark2', 8);
-model(end).colors = [grey; grey];
-model(end).subplot = 3;
+% model(end+1).data = {{results.ddmD_rp2_offset results.ddmD_rp2_slope}};
+% model(end).name = {'2b. Dynamic DDM', 'drift bias'};
+% model(end).ticklabels = {{'constant', 'ramp'}};
+% cols1 = cbrewer('qual', 'Set1', 8);
+% cols2 = cbrewer('qual', 'Dark2', 8);
+% model(end).colors = [grey; grey];
+% model(end).subplot = 3;
 
 % model(end+1).data = {results.ddmColl_z_zbias results.ddmColl_dc_dcbias {results.ddmColl_dcz_zbias results.ddmColl_dc_dcbias}};
 % model(3).vanilla = results.ddmColl_vanilla_bic;
@@ -54,7 +54,7 @@ model(end).subplot = 3;
 % model(3).ticklabels = {'z', 'v_{bias}', {'z_{bias}', 'v_{bias}'}};
 % model(3).colors = [colors; mean(colors([1 2], :))];
 % model(3).subplot = 3;
-% 
+%
 % model(7).data = {results.ouK_sp_spbias results.ouK_input_inputbias results.ouK_lambda_lambdabias};
 % model(7).vanilla = results.ouK_vanilla_bic;
 % model(7).name = {'d. Offset O-U'};
@@ -64,9 +64,9 @@ model(end).subplot = 3;
 
 model(end+1).data = {{results.ddmDColl_dcz_zbias results.ddmDColl_dc_dcbias}};
 model(end).name = {'3. Dynamic DDM', 'collapsing bounds'};
-model(end).ticklabels = {{'z_{bias}', 'v_{bias}'}};
+model(end).ticklabels = {{'z', 'v_{bias}'}};
 model(end).colors = [grey; grey];
-model(end).subplot = 4;
+model(end).subplot = 3;
 
 % model(end+1).data = {results.ouD_lambda_lambdabias};
 % model(end).vanilla = NaN;
@@ -80,7 +80,7 @@ model(end).vanilla = NaN;
 model(end).name = {'5. Leaky accumulator' 'collapsing bounds'};
 model(end).ticklabels = {'input bias'};
 model(end).colors = grey;
-model(end).subplot = 5;
+model(end).subplot = 4;
 
 % model(8).data = {results.ddmD_dc_dcbias	results.ddmD_rp_slope {results.ddmD_rp2_offset results.ddmD_rp2_slope}};
 % model(8).name = {'g. Dynamic DDM', 'dynamic v_{bias}'};
@@ -97,7 +97,7 @@ close all;
 for m = 1:length(model),
     
     %everything relative to the full model
-    subplot(4,max([model(:).subplot]),model(m).subplot);     
+    subplot(4,max([model(:).subplot])+3,model(m).subplot);
     hold on;
     xticks = [];
     xticklabels = {};
@@ -105,16 +105,16 @@ for m = 1:length(model),
     %%%%%%
     for i = 1:length(model(m).data),
         if ~iscell(model(m).data{i})
-                [rho, ci, pval, bf] = spearmans(model(m).data{i}, baselineModel);
-                b = bar(i, rho, 'facecolor', model(m).colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
-                    'edgecolor', 'none');
-                errorbar(i, rho, ci(1)-rho, ci(2)-rho, 'k', 'marker', 'none','capsize', 0, 'linewidth', 1);
-                mysigstar(gca, i, 0.05, pval, 'w');
-                xticks = [xticks i];
-                xticklabels = [xticklabels model(m).ticklabels{i}];
-                    
+            [rho, ci, pval, bf] = spearmans(model(m).data{i}, baselineModel);
+            b = bar(i, rho, 'facecolor', model(m).colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
+                'edgecolor', 'none');
+            errorbar(i, rho, ci(1)-rho, ci(2)-rho, 'k', 'marker', 'none','capsize', 0, 'linewidth', 1);
+            mysigstar(gca, i, 0.05, pval, 'w');
+            xticks = [xticks i];
+            xticklabels = [xticklabels model(m).ticklabels{i}];
+            
         else
-        % for the two separately
+            % for the two separately
             xshift = 0.25;
             [rho1, ci, pval, bf] = spearmans(model(m).data{i}{1}, baselineModel);
             b = bar(i-xshift, rho1, 'facecolor', model(m).colors(i, :), 'barwidth', 0.45, 'BaseValue', 0, ...
@@ -123,7 +123,7 @@ for m = 1:length(model),
             mysigstar(gca, i-xshift, 0.05, pval, 'w');
             xticks = [xticks i-xshift];
             xticklabels = [xticklabels model(m).ticklabels{i}{1}];
-
+            pval1 = pval;
             
             % second one
             [rho2, ci, pval, bf] = spearmans(model(m).data{i}{2}, baselineModel);
@@ -133,7 +133,8 @@ for m = 1:length(model),
             mysigstar(gca, i+xshift, 0.05, pval, 'w');
             xticks = [xticks i+xshift];
             xticklabels = [xticklabels model(m).ticklabels{i}{2}];
-
+            pval2 = pval;
+            
             % difference between them
             % compute the difference in correlation
             [rho3] = corr(model(m).data{i}{1}, model(m).data{i}{2}, ...
@@ -141,12 +142,15 @@ for m = 1:length(model),
             [~, ~, pval] = rddiffci(rho1,rho2,rho3, length(baselineModel), 0.05);
             mysigstar(gca, [i-xshift-0.1 i+xshift+0.1], -0.5, pval);
             
+            disp(sprintf('%s, %s rho %f p %s, %s rho %f p %f', ...
+                model(m).name{1}, model(m).ticklabels{i}{1}, rho1, pval1, model(m).ticklabels{i}{2}, rho2, pval2));
+            
         end
     end
-
+    
     % now break the y-axes
     xlim([0.5 length(model(m).data)+0.5]);
-     hline(0, [0 0 0]);
+    hline(0, [0 0 0]);
     ylim([-0.5 1]);
     box off;
     set(gca, 'color', 'none');

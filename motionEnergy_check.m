@@ -99,22 +99,24 @@ for f = 2:length(files),
     stim = data.behavior.coherence .* data.behavior.stimulus;
     close all;
     set(groot, 'defaultAxesColorOrder', coolwarm(9));
-    subplot(6,4,1); % timecourse
+    subplot(4,4,1); % timecourse
     hold on;
     avg = splitapply(@nanmean, data.motionenergy, findgroups(stim));
-    plot(data.timeaxis(1:13), avg(:, 1:13), 'linewidth', 0.5);
-    plot(data.timeaxis(13:end), avg(:, 13:end), 'linewidth', 1.5);
+    plot(data.timeaxis(1:16), avg(:, 1:16), 'linewidth', 0.5);
+    plot(data.timeaxis(16:end), avg(:, 16:end), 'linewidth', 1.5);
     axis tight; xlim([0 0.8]);
     set(gca, 'ytick', unique(stim), 'yticklabel', {'-81', '-27', ' ', ' ', '0', '', ' ', '27', '81'}, 'xtick', 0:0.25:0.75); box off;
-    offsetAxes; %axis square;
+        ylabel('Motion energy (%)');
+
     xlabel('Time from stimulus onset (s)'); % ylabel('Motion energy (%)');
-    
+        offsetAxes; %axis square;
+
     tightfig;
     print(gcf, '-dpdf', '~/Data/serialHDDM/motionEnergyFluctuations_overtime.pdf');
     
    close; subplot(441);
     colormap(coolwarm);
-    scatter(stim, nanmean(data.motionenergy(:, 13:end), 2), 1, stim, 'jitter','on', 'jitterAmount', 1);
+    scatter(stim, nanmean(data.motionenergy(:, 16:end), 2), 1, stim, 'jitter','on', 'jitterAmount', 1);
     xlabel('Motion coherence (%)');
     ylabel('Motion energy (%)');
     set(gca, 'xtick', unique(stim), 'xticklabel', {'-81', '-27', ' ', '', '0', '', ' ', '27', '81'});

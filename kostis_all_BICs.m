@@ -44,43 +44,43 @@ model(end).basevalue = unique(results.ddmK_vanilla_bic);
 model(end).ylim = [-400 200];
 model(end).subplot = 2;
 
-model(end+1).data = [ results.ddmD_dc_bic results.ddmD_rp_bic results.ddmD_rp2_bic];
-model(end).vanilla = results.ddmD_vanilla_bic;
-model(end).name = {'2b. Dynamic DDM', 'drift bias'};
-model(end).ticklabels = {'constant v_{bias}', 'ramp', 'constant+ramp'};
-cols1 = cbrewer('qual', 'Set1', 8);
-cols2 = cbrewer('qual', 'Dark2', 8);
-model(end).colors = [cols1(2, :); cols2(6, :); nanmean([cols1(2, :); cols2(6, :)])];
-model(end).basevalue = unique(results.ddmD_vanilla_bic);
-model(end).ylim = [-8000 0];
-model(end).subplot = 4;
+% model(end+1).data = [ results.ddmD_dc_bic results.ddmD_rp_bic results.ddmD_rp2_bic];
+% model(end).vanilla = results.ddmD_vanilla_bic;
+% model(end).name = {'2b. Dynamic DDM', 'drift bias'};
+% model(end).ticklabels = {'constant v_{bias}', 'ramp', 'constant+ramp'};
+% cols1 = cbrewer('qual', 'Set1', 8);
+% cols2 = cbrewer('qual', 'Dark2', 8);
+% model(end).colors = [cols1(2, :); cols2(6, :); nanmean([cols1(2, :); cols2(6, :)])];
+% model(end).basevalue = unique(results.ddmD_vanilla_bic);
+% model(end).ylim = [-8000 0];
+% model(end).subplot = 4;
 
 model(end+1).data = [results.ddmDColl_z_bic results.ddmDColl_dc_bic results.ddmDColl_dcz_bic];
-model(end).vanilla = NaN;
+model(end).vanilla = results.ddmK_vanilla_bic;
 model(end).name = {'3. Dynamic DDM', 'collapsing bounds'};
 model(end).ticklabels = {'z', 'v_{bias}', 'z+v_{bias}'};
 model(end).colors = [colors; mean(colors([1 2], :))];
 model(end).basevalue = unique(results.ddmD_vanilla_bic);
 model(end).ylim = [-8000 0];
-model(end).subplot = 5;
+model(end).subplot = 4;
 
 model(end+1).data = [results.ouD_sp_bic results.ouD_input_bic results.ouD_lambda_bic];
-model(end).vanilla = NaN;
+model(end).vanilla = results.ddmK_vanilla_bic;
 model(end).name = {'4. Leaky accumulator' ''};
 model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
 model(end).colors = [cols2([5 3 4], :)];
 model(end).basevalue = unique(results.ddmD_vanilla_bic);
 model(end).ylim = [-8000 0];
-model(end).subplot = 6;
+model(end).subplot = 5;
 
 model(end+1).data = [results.ouDColl_sp_bic results.ouDColl_input_bic results.ouDColl_lambda_bic];
-model(end).vanilla = NaN;
+model(end).vanilla = results.ddmK_vanilla_bic;
 model(end).name = {'5. Leaky accumulator' 'collapsing bounds'};
 model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
 model(end).colors = [cols2([5 3 4], :)];
 model(end).basevalue = unique(results.ddmD_vanilla_bic);
 model(end).ylim = [-8000 0];
-model(end).subplot = 7;
+model(end).subplot = 6;
 
 % move subplots closer together
 subplot = @(m,n,p) subtightplot (m, n, p, [0.01 0.03], [0.1 0.01], [0.1 0.01]);
@@ -92,6 +92,9 @@ for m = 1:length(model),
     mdldic = bsxfun(@minus, mean(model(m).data), mean(model(m).basevalue));
     subplot(2,max([model(:).subplot]), model(m).subplot);     
     hold on;
+    
+    vn = unique(model(m).vanilla) - model(m).basevalue;
+    plot([0.5 3.5], [vn vn], 'k-');
     
     %%%%%%
     for i = 1:length(mdldic),
@@ -109,7 +112,7 @@ for m = 1:length(model),
     ylim(model(m).ylim);
     disp(get(gca, 'ylim'))
     
-    if m > 3
+    if m > 0
         for i = 1:length(mdldic)
             text(i, min([0 mdldic(i)]) + 0.05*range(get(gca, 'ylim')), ...
                 num2str(round(mdldic(i))), ...
