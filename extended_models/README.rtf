@@ -1,0 +1,86 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\})}{\leveltext\leveltemplateid1\'02\'00);}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid101\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat2\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid201\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid301\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid401\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid5}
+{\list\listtemplateid6\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat2\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid501\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid6}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}{\listoverride\listid6\listoverridecount0\ls6}}
+\paperw11905\paperh16837\margl1133\margr1133\margb1133\margt1133
+\deftab720
+\pard\tx1150\pardeftab720\partightenfactor0
+
+\f0\b\fs20 \cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 \
+****MATLAB SCRIPTS SHARED HERE were IMPLEMENTED IN MATLAB R2017b ****\
+ALSO please note that all models were fitted using parallel computing implemented in a cluster. we used a series of shell scripts  that in turn called standalone versions of the matlab scripts shared here. the shell scripts and auxiliary files used for fitting  are specific to the cluster\'92s implementation and they are not shared here.\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs22 \cf2 \strokec2 \
+The folder \'93extended_models\'94 consists of 3 subfolders:\
+\
+\pard\tx20\tx360\pardeftab720\li360\fi-360\partightenfactor0
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	1)	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 data_processing\
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	2)	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 default_protocol\
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	3)	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 dynamic_protocol\
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec2 \
+\
+\pard\tx20\tx523\pardeftab720\li523\fi-524\partightenfactor0
+\ls2\ilvl0
+\f0\b\fs32 \cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	1.	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 data_processing\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs22 \cf2 \strokec2 \
+Here, the script \'93descriptives_script.m\'94 takes the raw data (motionEnergy*.mat) and summarises behaviour in RT quantiles. The output of this script is \'93descriptives.mat\'94 that is subsequently used to fit different models. \
+\
+\
+\pard\tx20\tx523\pardeftab720\li523\fi-524\partightenfactor0
+\ls3\ilvl0
+\f0\b\fs32 \cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	2.	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 default_protocol\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs22 \cf2 \strokec2 \
+This folder contains implementations of different models that rely on the default simulation protocol. Each subfolder corresponds to a different model. Please note that the code in the Naive and Drift_Bias folders includes detailed comments. These models can thus be used as reference to understand the other models.\
+\
+\pard\tx20\tx360\pardeftab720\li360\fi-360\partightenfactor0
+\ls4\ilvl0\cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 The general common script structure for each model was as follows:\
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec2 \
+\'97 \'93diffusion_custom2.m\'94 is the name of the function that implements the corresponding model.\
+\'97 \'93cost_fit.m\'94 is the function that calculates the likelihood of a model for a given set of parameters by calling \'93diffusion_custom2.m.\
+\'97 \'93superScript_Step1.m\'94 implements the 1st step of the fitting procedure is implemented.\
+\'97 \'93Bridge_Fits.m\'94 reformats the fits from the 1st step such that they can be refined in the 2nd step.\
+\'97 \'93superScript_Step2.m\'94 implements the 2nd step of the fitting procedure.\
+\
+\
+\pard\tx20\tx360\pardeftab720\li360\fi-360\partightenfactor0
+\ls5\ilvl0\cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 For all models we share the core scripts: cost_fit.m and diffusion_custom2.m.\
+\ls5\ilvl0\cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 For all models except the Naive, the superScript_Step1.m and superScript_Step2.m are common to those scripts in the Drift_Bias folder.\
+\ls5\ilvl0\cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 For the Naive model we have separate superScript_Step1.m and superScript_Step2.m scripts. Also for this model, for illustration purposes, we share the Brige_Fits.m script (common to all models).\
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec2 \
+\pard\tx20\tx523\pardeftab720\li523\fi-524\partightenfactor0
+\ls6\ilvl0
+\f0\b\fs32 \cf2 \kerning1\expnd0\expndtw0 \up0 \nosupersub \ulnone \outl0\strokewidth0 {\listtext	2.	}\cf2 \expnd0\expndtw0\kerning0
+\up0 \nosupersub \ulnone \outl0\strokewidth0 \strokec2 dynamic_protocol\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs22 \cf2 \strokec2 \
+This folder contains implementations of different models that rely on the dynamic simulation protocol. There are two subfolders implementing models with static and collapsing bounds, respectively. Similar to the default protocol, Naive and Drift_Bias scripts are commented in detail and should be use as reference.\
+\
+In static_bounds/Naive we share the superScript_Step*.m files. These files are adjusted relative to the default protocol in order to implement the dynamic protocol. \
+\
+For the remaining models we share the core scripts: cost_fit.m and diffusion_custom2.m.}
