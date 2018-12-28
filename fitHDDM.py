@@ -88,9 +88,8 @@ def run_model(m, mypath, model_name, trace_id, n_samples):
     m.find_starting_values() # this should help the sampling
 
     print "begin sampling"
-    m.sample(n_samples, burn=n_samples/2, thin=2, db='pickle',
+    m.sample(n_samples, burn=n_samples/2, thin=3, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
-    # specify a certain backend? pickle?
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
 
     # ============================================ #
@@ -271,9 +270,22 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_nohist_svgroup', #16
     'stimcoding_dc_z_prevresp_svgroup'] #17
 
+models = ['regress_nohist',
+          'regress_dc_lag1',
+          'regress_z_lag1',
+          'regress_dcz_lag1',
+          'regress_dc_lag2',
+          'regress_z_lag2',
+          'regress_dcz_lag2',
+          'regress_dc_lag3',
+          'regress_z_lag3',
+          'regress_dcz_lag3']
+
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
-    'MEG_MEGdata'] 
+    'MEG_MEGdata']
+
+datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_transition']
 
 # recode
 if isinstance(d, int):

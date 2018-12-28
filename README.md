@@ -12,6 +12,9 @@ python b1_HDDM_run.py -r 1 -d $d -v $v -i $i -s $s
 where -d = 0-6 (datasets), -v = 0-11 (versions of the model), -i = 0-30 (traces, can be changed to whatever the number of cores on a node) and -i = 5.000, the number of samples per trace.
 
 To reproduce all main figures, see <code>plot_all.m</code> which has the overview of the scripts that are called to generate each figure. 
+
+The <code>extended_models</code> folder contains Matlab code to fit the models in Figure 6.
+
 The <code>simulations</code> folder contains Python code to generate Supplementary Figure 8.
 
 For questions, @AnneEUrai / anne.urai@gmail.com.
