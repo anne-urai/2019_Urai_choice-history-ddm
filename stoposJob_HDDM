@@ -1,8 +1,9 @@
 #!/bin/bash
 
-#PBS -o /home/aeurai/jobs
-#PBS -e /home/aeurai/jobs
-#PBS -lnodes=1 -lwalltime=120:00:00 # maximum: 5 days
+#SBATCH -t 5-00:00:00 # maximum 5 days on cartesius
+#SBATCH -N 1
+#SBATCH -o /home/aeurai/jobs/slurm-%A_%a.out
+#SBATCH -e /home/aeurai/jobs/slurm-%A_%a.err
 
 # load necessary modules
 module load stopos
