@@ -51,8 +51,16 @@ for f = 2:length(files),
     
     data = keepData; % keep all trials
     dat = data.behavior;
+    
+    % compute new history terms
     dat.prevrt = circshift(dat.RT, 1);
-
+    dat.prevresp = circshift(dat.response, 1);
+    dat.prevstim = circshift(dat.stimulus, 1);
+    dat.prev2resp = circshift(dat.response, 2);
+    dat.prev2stim = circshift(dat.stimulus, 2);
+    dat.prev3resp = circshift(dat.response, 3);
+    dat.prev3stim = circshift(dat.stimulus, 3);
+    
     % recode
     dat.Properties.VariableNames{'RT'}          = 'rt'; % from stimulus offset?
     dat.Properties.VariableNames{'trialnum'}    = 'trial';
@@ -61,23 +69,24 @@ for f = 2:length(files),
     
     % take only a subset of variables for hddm fits
     dat             = dat(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', 'coherence', ...
-        'response', 'rt', 'prevstim', 'prevresp', 'prev2resp', 'prev2stim', 'prevrt', 'transitionprob'});
+        'response', 'rt', 'prevstim', 'prevresp', 'prev2resp', 'prev2stim',...
+        'prev3resp', 'prev3stim', 'prevrt', 'transitionprob'});
     
     % remove trials with any NaN left in them
     dat(isnan(mean(dat{:, :}, 2)), :) = [];
+    dat(dat.trial < 4, :) = []; % to make sure the prev3resp are continuous, not from previous block/session/subject
     
     % write
     dat.rt = dat.rt + 0.25;
     
     % remove transitionprob for writing
     dat2             = dat(:, {'subj_idx', 'session', 'block', 'trial', 'stimulus', 'coherence', ...
-        'response', 'rt', 'prevstim', 'prevresp', 'prev2resp', 'prev2stim', 'prevrt'});
+        'response', 'rt', 'prevstim', 'prevresp', 'prev2resp', 'prev2stim', 'prev3resp', 'prev3stim', 'prevrt'});
     
     writetable(dat2, sprintf('%s/%s', path, regexprep(files{f}, '.mat', '.csv')));
-    try
-         % this is the data that's used for the HDDM fits
+    
+    % this is the data that's used for the HDDM fits
     writetable(dat2, '~/Data/HDDM/Anke_MEG_transition/Anke_MEG_transition.csv');
-    end
 
     %% NOW ONLY THE NEUTRAL BLOCKS
     dat = dat(dat.transitionprob == 0.5, :);
@@ -89,7 +98,7 @@ for f = 2:length(files),
         writetable(dat, '~/Data/HDDM/Anke_MEG_neutral/Anke_MEG_neutral.csv');
     end
 
-    %% NOW MAKE A NICE-LOOKING PLOT FOR THE PAPE
+    %% NOW MAKE A NICE-LOOKING PLOT FOR THE PAPER
     % use the normalized motion energy for these plots
     data.motionenergy = data.motionenergy_normalized;
     
