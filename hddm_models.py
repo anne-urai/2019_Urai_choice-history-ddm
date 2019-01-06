@@ -156,6 +156,52 @@ def make_model(mypath, mydata, model_name, trace_id):
                 include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
                 depends_on={'dc':['prevresp'], 'z':['prevresp']})
 
+
+    # ============================================ #
+    # different non-decision time per coherence
+    # ============================================ #
+
+    elif model_name == 'stimcoding_nohist_stcoh':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                                    drift_criterion=True, bias=True, p_outlier=0.05,
+                                    include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                                    depends_on={'v': ['coherence'], 't': ['coherence']})
+
+    elif model_name == 'stimcoding_z_prevresp_stcoh':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'z':['prevresp'], 't': ['coherence']})
+
+    elif model_name == 'stimcoding_dc_prevresp_stcoh':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp'], 't': ['coherence']})
+
+    elif model_name == 'stimcoding_dc_z_prevresp_stcoh':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 't': ['coherence'],
+                            'dc':['prevresp'], 'z':['prevresp']})
+
     # ============================================ #
     # also estimate across-trial variability in nondecision time
     # ============================================ #

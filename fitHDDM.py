@@ -270,6 +270,7 @@ models = ['stimcoding_nohist', # 0
     'stimcoding_nohist_svgroup', #16
     'stimcoding_dc_z_prevresp_svgroup'] #17
 
+# new additional models
 models = ['regress_nohist',
           'regress_dc_lag1',
           'regress_z_lag1',
@@ -279,7 +280,12 @@ models = ['regress_nohist',
           'regress_dcz_lag2',
           'regress_dc_lag3',
           'regress_z_lag3',
-          'regress_dcz_lag3']
+          'regress_dcz_lag3',
+          'stimcoding_nohist_stcoh',  # 0
+          'stimcoding_dc_prevresp_stcoh',  # 1
+          'stimcoding_z_prevresp_stcoh',  # 2
+          'stimcoding_dc_z_prevresp_stcoh',  # 3
+          ]
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
@@ -298,6 +304,7 @@ for dx in d:
     # find path depending on location and dataset
     usr = os.environ['USER']
     if 'aeurai' in usr:
+
         mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
     elif 'anne' in usr:
         mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
