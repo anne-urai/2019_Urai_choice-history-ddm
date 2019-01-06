@@ -486,7 +486,7 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'regress_z_lag1':
 
-        z_reg = {'model': 'z ~ 1 + stimulus + prevresp + prevstim', 'link_func': z_link_func}
+        z_reg = {'model': 'z ~ 1  + prevresp + prevstim', 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, z_reg,
             include=['z', 'sv'], group_only_nodes=['sv'],
             group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -494,13 +494,13 @@ def make_model(mypath, mydata, model_name, trace_id):
     elif model_name == 'regress_dcz_lag1':
 
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim', 'link_func': lambda x:x}
-        z_reg = {'model': 'z ~ 1 + stimulus + prevresp + prevstim', 'link_func': z_link_func}
+        z_reg = {'model': 'z ~ 1  + prevresp + prevstim', 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
                                include=['z', 'sv'], group_only_nodes=['sv'],
                                group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
 
     # ============================================ #
-    # LAG 1 AND 2
+    # LAG 2 AND 3
     # ============================================ #
 
     elif model_name == 'regress_dc_lag2':
@@ -512,7 +512,7 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'regress_z_lag2':
 
-        z_reg = {'model': 'z ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim', 'link_func': z_link_func}
+        z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim', 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, z_reg,
             include=['z', 'sv'], group_only_nodes=['sv'],
             group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -520,7 +520,7 @@ def make_model(mypath, mydata, model_name, trace_id):
     elif model_name == 'regress_dcz_lag2':
 
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim', 'link_func': lambda x:x}
-        z_reg = {'model': 'z ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim', 'link_func': z_link_func}
+        z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim', 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
                                include=['z', 'sv'], group_only_nodes=['sv'],
                                group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -534,7 +534,7 @@ def make_model(mypath, mydata, model_name, trace_id):
 
     elif model_name == 'regress_z_lag3':
 
-        z_reg = {'model': 'z ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
+        z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, z_reg,
             include=['z', 'sv'], group_only_nodes=['sv'],
             group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
@@ -542,7 +542,7 @@ def make_model(mypath, mydata, model_name, trace_id):
     elif model_name == 'regress_dcz_lag3':
 
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': lambda x:x}
-        z_reg = {'model': 'z ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
+        z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
                                include=['z', 'sv'], group_only_nodes=['sv'],
                                group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
