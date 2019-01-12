@@ -63,7 +63,9 @@ if 0,
 end
 
 disp('starting');
-nondecisiontime_coherence;
+
+barplots_DIC_regression;
+
 
 return;
 
@@ -187,7 +189,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', 1));
 
 % c. added non-decision time between coherence levels
 
-
+nondecisiontime_coherence;
 
 barplots_DIC_stcoh;
 
@@ -242,3 +244,12 @@ gelman_rubin;
 
 meg_regression_dic;
 meg_regression_posteriors;
+
+% ========================================== %
+% REGRESSION RESULTS, UP TO LAG 3
+% ========================================== %
+
+barplots_DIC_regression;
+kernels_lags_regression;
+
+
