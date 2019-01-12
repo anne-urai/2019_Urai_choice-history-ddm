@@ -20,6 +20,7 @@ set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1.1, 
     'DefaultFigureWindowStyle','normal');
 
 global datasets datasetnames mypath colors
+dbstop if error % for debugging
 
 usr = getenv('USER');
 switch usr
@@ -62,6 +63,8 @@ if 0,
 end
 
 disp('starting');
+nondecisiontime_coherence;
+
 return;
 
 % ========================================== %
@@ -181,6 +184,16 @@ barplots_BIC;
 alldat = individual_correlation_main(0, 1); %
 forestPlot(alldat);
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', 1));
+
+% c. added non-decision time between coherence levels
+
+
+
+barplots_DIC_stcoh;
+
+alldat = individual_correlation_tcoh(); % figure 4
+forestPlot(alldat);
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_tcoh_HDDM.pdf'));
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 5
