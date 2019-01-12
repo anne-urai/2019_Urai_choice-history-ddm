@@ -65,7 +65,7 @@ end
 disp('starting');
 
 barplots_DIC_regression;
-
+kernels_lags_regression;
 
 return;
 

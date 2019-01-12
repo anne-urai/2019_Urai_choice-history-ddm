@@ -36,6 +36,7 @@ for d = 1:length(datasets),
     ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
     drawnow; tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf', d));
+    fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf \n', d)
 end
 
 close all;
