@@ -55,7 +55,7 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %datasetnames = datasetnames([2 7]);
 % datasets = datasets([2 7]);
-if 0,
+if 1,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
