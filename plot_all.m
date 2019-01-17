@@ -53,8 +53,6 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-%datasetnames = datasetnames([2 7]);
-% datasets = datasets([2 7]);
 if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
@@ -63,9 +61,6 @@ if 0,
 end
 
 disp('starting');
-
-kernels_lags_regression;
-
 return;
 
 % ========================================== %

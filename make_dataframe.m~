@@ -41,7 +41,7 @@ for d = ds,
     % compute a bunch of basic things from Matlab
     % ===================================== %
     results     = define_behavioral_metrics(alldata);
-    % ===================================== %
+        % ===================================== %
 
     results     = [results; array2table(nan(size(results.Properties.VariableNames)), ...
         'variablenames', results.Properties.VariableNames)];

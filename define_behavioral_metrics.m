@@ -14,7 +14,7 @@ warning off;
 % ========================================== %
 
 % preallocate variables
-varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'repetition', ...
+varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'repetition', 'repetition2', 'repetition3', ...
     'criterionshift', 'repetition_prevcorrect', 'repetition_preverror', 'posterrorslowing'};
 
 nrSess          = length(unique(alldata.session)) + 1;
@@ -164,8 +164,13 @@ for sj = subjects,
         % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
         
         % 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
-        data.repeat = [NaN; (diff(data.response) == 0)];
+        data.repeat     = [NaN; (diff(data.response) == 0)];
+        assert(1==0)
+        data.repeat2    = [NaN; (diff(data.response) == 0)];
+        data.repeat3    = [NaN; (diff(data.response) == 0)];
+        
         data.stimrepeat = [NaN; (diff(data.response) == 0)];
+        
         wrongTrls   = ([NaN; diff(data.trial)] ~= 1);
         data.repeat(wrongTrls) = NaN;
         data.stimrepeat(wrongTrls) = NaN;
@@ -190,10 +195,11 @@ for sj = subjects,
             end
         end
 
-    
+         % add repetition across lag 1-3
         results.repetition(icnt)        = nanmean(data.repeat);
-        % results.stimrepetition(icnt)    = nanmean(data.stimrepeat);
-
+        results.repetition2(icnt)       = nanmean(data.repeat2);
+        results.repetition3(icnt)       = nanmean(data.repeat3);
+        
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
         results.repetition_preverror(icnt)   = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));

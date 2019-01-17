@@ -116,11 +116,13 @@ end
 
 for d = 1:length(datasets),
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-        
+    
+    % compute p_repeat at longer lags from individual trials
+    
     % compute correlation with p_repeat
-    mat_z(d, :) = [corr(dat.z_prevresp__regressdczlag3, dat.repetition), ...
-        corr(dat.z_prev2resp__regressdczlag3, dat.repetition2) ...
-        corr(dat.z_prev3resp__regressdczlag3, dat.repetition3)];
+    mat_z(d, :) = [corr(dat.z_pre ...
+        nanmean(dat.([mdls(m).types{t}{2} '__' mdls(m).name])) ...
+        nanmean(dat.([mdls(m).types{t}{3} '__' mdls(m).name]))];
     plot(1:3, mat(d, :), 'color', colors(d, :), 'linewidth', 1);
 end
 
