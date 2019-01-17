@@ -10,7 +10,7 @@
 % ========================================== %
 
 clear all; clc; close all;
-set(groot, 'defaultaxesfontsize', 7, 'defaultaxestitlefontsizemultiplier', 1.1, ...
+set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxeslabelfontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
     'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', ...
@@ -55,7 +55,7 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 
 %datasetnames = datasetnames([2 7]);
 % datasets = datasets([2 7]);
-if 1,
+if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
@@ -64,7 +64,6 @@ end
 
 disp('starting');
 
-barplots_DIC_regression;
 kernels_lags_regression;
 
 return;
