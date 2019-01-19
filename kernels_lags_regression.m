@@ -109,7 +109,6 @@ for m = 1:length(mdls),
     
 end
 
-
 % ==================================== %
 % CORRELATIONS PER LAG
 % ==================================== %
@@ -118,9 +117,23 @@ for d = 1:length(datasets),
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
         
     % compute correlation with p_repeat
-    mat_z(d, :) = [corr(dat.z_prevresp__regressdczlag3, dat.repetition), ...
-        corr(dat.z_prev2resp__regressdczlag3, dat.repetition2) ...
-        corr(dat.z_prev3resp__regressdczlag3, dat.repetition3)];
+    for l = 1:3,
+        if l == 1,
+            [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
+            spearmans(dat.z_prevresp__regressdczlag3, dat.repetition);
+               [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
+            spearmans(dat.v_prevresp__regressdczlag3, dat.repetition);
+        else
+            [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
+            spearmans(dat.(['z_prev' num2str(l) 'resp__regressdczlag3']), ...
+                dat.(['repetition' num2str(l)]));
+            [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
+            spearmans(dat.(['v_prev' num2str(l) 'resp__regressdczlag3']), ...
+                dat.(['repetition' num2str(l)]));
+        end
+    end
+
+    assert(1==0)
     plot(1:3, mat(d, :), 'color', colors(d, :), 'linewidth', 1);
 end
 

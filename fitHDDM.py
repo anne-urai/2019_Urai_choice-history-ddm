@@ -285,7 +285,18 @@ models = ['regress_nohist',
           'stimcoding_dc_prevresp_stcoh',  # 1
           'stimcoding_z_prevresp_stcoh',  # 2
           'stimcoding_dc_z_prevresp_stcoh',  # 3
-          ]
+          'regress_dc_lag4', #14
+          'regress_z_lag4',
+          'regress_dcz_lag4',
+          'regress_dc_lag5',
+          'regress_z_lag5',
+          'regress_dcz_lag5',
+          'regress_dc_lag6',
+          'regress_z_lag6',
+          'regress_dcz_lag6',
+          'regress_dc_lag7',
+          'regress_z_lag7',
+          'regress_dcz_lag7'] #25
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 

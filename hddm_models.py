@@ -55,6 +55,21 @@ def recode_4stimcoding(mydata):
 
     return mydata
 
+def add_morelags(mydata):
+
+    # make sure stimulus and response are [-1,1]
+    response = np.sign(mydata.response - 0.1)
+    stimulus = np.sign(mydata.stimulus)
+
+    for lag in range(8):
+        if not 'prev%dresp'%lag in mydata.columns:
+            mydata['prev%dresp'%lag] = np.roll(response, lag)
+
+        if not 'prev%dstim'%lag in mydata.columns:
+            mydata['prev%dstim'%lag] = np.roll(response, lag)
+
+    return mydata
+
 # ============================================ #
 # define the function that will do the work
 # ============================================ #
@@ -574,6 +589,7 @@ def make_model(mypath, mydata, model_name, trace_id):
                                include=['z', 'sv'], group_only_nodes=['sv'],
                                group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
 
+    # LAG 3
     elif model_name == 'regress_dc_lag3':
 
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': lambda x:x}
@@ -593,6 +609,140 @@ def make_model(mypath, mydata, model_name, trace_id):
 
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': lambda x:x}
         z_reg = {'model': 'z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + prev3resp + prev3stim', 'link_func': z_link_func}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+                               include=['z', 'sv'], group_only_nodes=['sv'],
+                               group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    # LAG 4
+    elif model_name == 'regress_dc_lag4':
+
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim""", 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg,
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_z_lag4':
+
+        mydata = add_morelags(mydata)
+
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim""", 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_dcz_lag4':
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim""", 'link_func': lambda x:x}
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim""", 'link_func': z_link_func}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+                               include=['z', 'sv'], group_only_nodes=['sv'],
+                               group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    # LAG 5
+    elif model_name == 'regress_dc_lag5':
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim""", 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg,
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_z_lag5':
+        mydata = add_morelags(mydata)
+
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim""", 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_dcz_lag5':
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim""", 'link_func': lambda x:x}
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim""", 'link_func': z_link_func}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+                               include=['z', 'sv'], group_only_nodes=['sv'],
+                               group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    # LAG 6
+    elif model_name == 'regress_dc_lag6':
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+        + prev6resp + prev6stim""", 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg,
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_z_lag6':
+        mydata = add_morelags(mydata)
+
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+         + prev6resp + prev6stim""", 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_dcz_lag6':
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+         + prev6resp + prev6stim""", 'link_func': lambda x:x}
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+        + prev6resp + prev6stim""", 'link_func': z_link_func}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+                               include=['z', 'sv'], group_only_nodes=['sv'],
+                               group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    # LAG 7
+    elif model_name == 'regress_dc_lag7':
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+        + prev6resp + prev6stim + prev7resp + prev7stim""", 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg,
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_z_lag7':
+        mydata = add_morelags(mydata)
+
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+         + prev6resp + prev6stim + prev7resp + prev7stim""", 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_dcz_lag7':
+        mydata = add_morelags(mydata)
+
+        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim +
+         prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+         + prev6resp + prev6stim + prev7resp + prev7stim""", 'link_func': lambda x:x}
+        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + 
+        prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
+        + prev6resp + prev6stim + prev7resp + prev7stim""", 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
                                include=['z', 'sv'], group_only_nodes=['sv'],
                                group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
