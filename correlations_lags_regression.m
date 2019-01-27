@@ -23,18 +23,18 @@ for d = 1:length(datasets),
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     
     % compute correlation with p_repeat
-    for l = 1:3,
+    for l = 1:7,
         if l == 1,
             [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
-                spearmans(dat.z_prevresp__regressdczlag3, dat.repetition);
+                spearmans(dat.z_prevresp__regressdczlag7, dat.repetition);
             [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
-                spearmans(dat.v_prevresp__regressdczlag3, dat.repetition);
+                spearmans(dat.v_prevresp__regressdczlag7, dat.repetition);
         else
             [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
-                spearmans(dat.(['z_prev' num2str(l) 'resp__regressdczlag3']), ...
+                spearmans(dat.(['z_prev' num2str(l) 'resp__regressdczlag7']), ...
                 dat.(['repetition' num2str(l)]));
             [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
-                spearmans(dat.(['v_prev' num2str(l) 'resp__regressdczlag3']), ...
+                spearmans(dat.(['v_prev' num2str(l) 'resp__regressdczlag7']), ...
                 dat.(['repetition' num2str(l)]));
         end
     end
@@ -43,9 +43,9 @@ end
 % Z CORRELATION KERNELS
 close all;
 subplot(331); hold on;
-plot([1 3], [0 0], 'k', 'linewidth', 0.5);
+plot([1 7], [0 0], 'k', 'linewidth', 0.5);
 for d = 1:length(datasets),
-    plot(1:3, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
+    plot(1:7, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
     h = (mat_z.r(d,:) < 0.05);
     if any(h>0),
         plot(find(h==1), mat_z.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
@@ -53,7 +53,7 @@ for d = 1:length(datasets),
     end
 end
 
-plot(1:3, nanmean(mat_z.r), 'k', 'linewidth', 1);
+plot(1:7, nanmean(mat_z.r), 'k', 'linewidth', 1);
 [h, pval] = ttest(mat_z.r);
 if any(h>0),
     plot(find(h==1), nanmean(mat_z.r(:, (h==1))), 'ok', 'markeredgecolor', 'w', 'markerfacecolor', 'k', 'markersize', 4);
@@ -69,9 +69,9 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_z.pdf'));
 % DC CORRELATION KERNELS
 close all;
 subplot(331); hold on;
-plot([1 3], [0 0], 'k', 'linewidth', 0.5);
+plot([1 7], [0 0], 'k', 'linewidth', 0.5);
 for d = 1:length(datasets),
-    plot(1:3, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
+    plot(1:7, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
     h = (mat_dc.pval(d,:) < 0.05);
     if any(h>0),
         plot(find(h==1), mat_dc.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
@@ -79,7 +79,7 @@ for d = 1:length(datasets),
     end
 end
 
-plot(1:3, nanmean(mat_dc.r), 'k', 'linewidth', 1);
+plot(1:7, nanmean(mat_dc.r), 'k', 'linewidth', 1);
 [h, pval] = ttest(mat_dc.r);
 if any(h>0),
     plot(find(h==1), nanmean(mat_dc.r(:, (h==1))), 'ok', 'markeredgecolor', 'w', 'markerfacecolor', 'k', 'markersize', 4);

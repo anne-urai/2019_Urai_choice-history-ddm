@@ -53,7 +53,7 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-if 1,
+if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
@@ -62,11 +62,10 @@ end
 
 disp('starting');
 
-barplots_DIC_regression;
-
+kernels_lags_bestmodel;
 
 return;
-kernels_lags_regression
+
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
@@ -249,6 +248,6 @@ meg_regression_posteriors;
 % ========================================== %
 
 barplots_DIC_regression;
-kernels_lags_regression;
-
+kernels_lags_bestmodel;
+correlations_lags_regression;
 

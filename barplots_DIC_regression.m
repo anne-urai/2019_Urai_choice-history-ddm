@@ -44,11 +44,12 @@ mdls = {'regress_nohist', ...
 
 for d = 1:length(datasets),
     close all;
-    subplot(3, 2, 1);
+    subplot(4, 4, 1);
     getPlotDIC(mdls, d, colors);
     title(datasetnames{d});
-    set(gca, 'xtick', [1 4 7], 'xticklabel', {'lag 1', 'lag2', 'lag3'}, 'xticklabelrotation', -30);
+    set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', 1:7);
     ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
+    xlabel('Lag (# trials)')
     drawnow; tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf', d));
     fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf \n', d)
@@ -92,7 +93,16 @@ mdldic = mdldic(2:end);
 [~, bestMdl] = min(mdldic);
 
 for i = 1:length(mdldic),
-    b = bar(i, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
+
+    if contains(mdls{i+1}, '_z_'),
+        xpos = i+0.15;
+    elseif contains(mdls{i+1}, '_dc_'),
+        xpos = i;
+    elseif contains(mdls{i+1}, '_dcz_'), 
+        xpos = i-0.15;
+    end
+
+    b = bar(xpos, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.7, 'BaseValue', 0, ...
         'edgecolor', 'none');
 end
 
@@ -108,7 +118,8 @@ end
 %             'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
 %     end
 % end
-axis square; axis tight;
+
+axis tight;
 xlim([0.5 length(mdldic)+0.5]);
 offsetAxes; box off;
 set(gca, 'color', 'none');
