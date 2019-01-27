@@ -62,7 +62,7 @@ end
 
 disp('starting');
 
-kernels_lags_bestmodel;
+barplots_DIC_regression;
 
 return;
 
@@ -249,5 +249,4 @@ meg_regression_posteriors;
 
 barplots_DIC_regression;
 kernels_lags_bestmodel;
-correlations_lags_regression;
 

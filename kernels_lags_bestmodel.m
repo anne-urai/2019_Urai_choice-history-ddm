@@ -177,7 +177,7 @@ for pltidx = 1:length(models),
 	end
 	xlabel('Lags (# trials)');
 	ylabel(regexprep(regexprep(models{pltidx}, '_', ' ~ previous '), 'v ', 'v_{bias} '));
-	set(gca, 'xtick', 1:7);
+	set(gca, 'xtick', 1:7, 'xcolor', 'k', 'ycolor', 'k');
 	axis tight; offsetAxes;
 
 	tightfig;
@@ -212,10 +212,10 @@ if any(h>0),
     	'.k',  'markersize', 10);
 end
 
-ylabel({'Correlation\rho, P(repeat) with' 'z ~ previous response'})
+ylabel({'Correlation, P(repeat) with' 'z ~ previous response'})
 set(gca, 'xtick', 1:7, 'xcolor', 'k', 'ycolor', 'k');
-xlabel('Lag (# trials)');
-axis square; axis tight; 
+xlabel('Lags (# trials)');
+axis tight; 
 ylim([-0.5 1]);
 offsetAxes; tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_z.pdf'));
@@ -240,10 +240,10 @@ if any(h>0),
     	'.k',  'markersize', 10);
 end
 
-ylabel({'Correlation\rho, P(repeat) with' 'v_{bias} ~ previous response'})
+ylabel({'Correlation, P(repeat) with' 'v_{bias} ~ previous response'})
 set(gca, 'xtick', 1:7, 'xcolor', 'k', 'ycolor', 'k');
-xlabel('Lag (# trials)');
-axis square; axis tight; 
+xlabel('Lags (# trials)');
+axis tight; 
 ylim([-0.5 1]);
 offsetAxes; tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_dc.pdf'));

@@ -49,7 +49,7 @@ for d = 1:length(datasets),
     title(datasetnames{d});
     set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', 1:7);
     ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
-    xlabel('Lag (# trials)')
+    xlabel('Lags (# trials)')
     drawnow; tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf', d));
     fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf \n', d)
