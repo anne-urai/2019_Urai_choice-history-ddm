@@ -296,7 +296,14 @@ models = ['regress_nohist',
           'regress_dcz_lag6',
           'regress_dc_lag7',
           'regress_z_lag7',
-          'regress_dcz_lag7'] #25
+          'regress_dcz_lag7', # 25
+          'regress_dc_lag7-10', # 26
+          'regress_z_lag7-10',
+          'regress_dcz_lag7-10',
+          'regress_dc_lag11-15', 
+          'regress_z_lag11-15',
+          'regress_dcz_lag11-15',
+          'regress_dcz_lag7_recode'] # 32
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
