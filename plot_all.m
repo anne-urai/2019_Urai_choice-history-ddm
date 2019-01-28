@@ -62,10 +62,8 @@ end
 
 disp('starting');
 
-barplots_DIC_regression;
-
+kernels_lags_bestmodel
 return;
-
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES

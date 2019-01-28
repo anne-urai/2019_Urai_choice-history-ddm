@@ -1,6 +1,6 @@
-function kernels_lags_bestmodel
+function kernels_lags_fullmodel
 
-global mypath datasets 
+global mypath datasets datasetnames
 addpath(genpath('~/code/Tools'));
 warning off; close all;
 
@@ -24,25 +24,19 @@ mdls = {'regress_nohist', ...
     'regress_z_lag6', ...
     'regress_dc_lag6', ...
     'regress_dcz_lag6', ...
-    'regress_dc_lag7-10', ...
-    'regress_z_lag7-10',...
-    'regress_dcz_lag7-10',...
-    'regress_dc_lag11-15', ...
-    'regress_z_lag11-15',...
-    'regress_dcz_lag11-15'};
+    'regress_z_lag7', ...
+    'regress_dc_lag7', ...
+    'regress_dcz_lag7'};
 
-numlags = 8;
-lagnames = {'1', '2', '3', '4', '5', '6', '7-10', '11-15'};
+alldata.z_correct   = nan(length(datasets), 7);
+alldata.z_error     = nan(length(datasets), 7);
+alldata.v_correct   = nan(length(datasets), 7);
+alldata.v_error     = nan(length(datasets), 7);
 
-alldata.z_correct   = nan(length(datasets), numlags);
-alldata.z_error     = nan(length(datasets), numlags);
-alldata.v_correct   = nan(length(datasets), numlags);
-alldata.v_error     = nan(length(datasets), numlags);
-
-mat_z.r     = nan(length(datasets), numlags);
-mat_z.pval  = nan(length(datasets), numlags);
-mat_dc.r    = nan(length(datasets), numlags);
-mat_dc.pval = nan(length(datasets), numlags);
+mat_z.r     = nan(length(datasets), 7);
+mat_z.pval  = nan(length(datasets), 7);
+mat_dc.r    = nan(length(datasets), 7);
+mat_dc.pval = nan(length(datasets), 7);
 
 for d = 1:length(datasets),
     
@@ -75,21 +69,12 @@ for d = 1:length(datasets),
     bestmodelname = regexprep(mdls{bestMdl+1}, '_', '');
     
     % ========================================================== %
-    % use the full model with both starting point and drift bias for plots
-    % ========================================================== %
-
-    useFullModel = false;
-    if useFullModel,
-        bestmodelname = 'regress_dcz_lag6';
-    end
-    
-    % ========================================================== %
     % 2. FOR THIS MODEL, RECODE INTO CORRECT AND ERROR
     % ========================================================== %
     
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     
-    for l = 1:numlags,
+    for l = 1:7,
         if l == 1,
             lname = [];
         else
@@ -103,7 +88,7 @@ for d = 1:length(datasets),
                 dat.(['z_prev' num2str(lname) 'stim__' bestmodelname]));
         end
     end
-    for l = 1:numlags,
+    for l = 1:7,
         if l == 1,
             lname = [];
         else
@@ -117,7 +102,7 @@ for d = 1:length(datasets),
         end
     end
     
-    for l = 1:numlags,
+    for l = 1:7,
         if l == 1,
             lname = [];
         else
@@ -130,7 +115,7 @@ for d = 1:length(datasets),
                 dat.(['v_prev' num2str(lname) 'stim__' bestmodelname]));
         end
     end
-    for l = 1:numlags,
+    for l = 1:7,
         if l == 1,
             lname = [];
         else
@@ -145,8 +130,7 @@ for d = 1:length(datasets),
     end
     
     % ALSO COMPUTE CORRELATIONS
-    % TO DO: PARTIAL OUT THE EFFECT OF PREVIOUS REPETITIONS!
-    for l = 1:numlags,
+    for l = 1:7,
         
         if l == 1,
             lname = [];
@@ -180,12 +164,12 @@ for pltidx = 1:length(models),
     
     close all;
     sp1 = subplot(4,4,1); hold on;
-    plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
+    plot([1 7], [0 0], 'k', 'linewidth', 0.5);
     
     for d = 1:length(datasets),
-        plot(1:numlags, alldata.(models{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
+        plot(1:7, alldata.(models{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
     end
-    plot(1:numlags, nanmean(alldata.(models{pltidx})), 'k', 'linewidth', 1);
+    plot(1:7, nanmean(alldata.(models{pltidx})), 'k', 'linewidth', 1);
     [h, pval] = ttest(alldata.(models{pltidx}));
     if any(h>0),
         plot(find(h==1), nanmean(alldata.(models{pltidx})(:, (h==1))), ...
@@ -193,7 +177,7 @@ for pltidx = 1:length(models),
     end
     xlabel('Lags (# trials)');
     ylabel(regexprep(regexprep(models{pltidx}, '_', ' ~ previous '), 'v ', 'v_{bias} '));
-    set(gca, 'xtick', 1:numlags, lagnames, 'xticklabel', 'xcolor', 'k', 'ycolor', 'k');
+    set(gca, 'xtick', 1:7, 'xcolor', 'k', 'ycolor', 'k');
     axis tight; offsetAxes;
     
     tightfig;
@@ -211,9 +195,9 @@ end
 % Z CORRELATION KERNELS
 close all;
 subplot(441); hold on;
-plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
+plot([1 7], [0 0], 'k', 'linewidth', 0.5);
 for d = 1:length(datasets),
-    plot(1:numlags, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
+    plot(1:7, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
     h = (mat_z.r(d,:) < 0.05);
     if any(h>0),
         plot(find(h==1), mat_z.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
@@ -221,7 +205,7 @@ for d = 1:length(datasets),
     end
 end
 
-plot(1:numlags, nanmean(mat_z.r), 'k', 'linewidth', 1);
+plot(1:7, nanmean(mat_z.r), 'k', 'linewidth', 1);
 [h, pval] = ttest(mat_z.r);
 if any(h>0),
     plot(find(h==1), nanmean(mat_z.r(:, (h==1))), ...
@@ -229,7 +213,7 @@ if any(h>0),
 end
 
 ylabel({'Correlation, P(repeat) with' 'z ~ previous response'})
-    set(gca, 'xtick', 1:numlags, lagnames, 'xticklabel', 'xcolor', 'k', 'ycolor', 'k');
+set(gca, 'xtick', 1:7, 'xcolor', 'k', 'ycolor', 'k');
 xlabel('Lags (# trials)');
 axis tight;
 ylim([-0.5 1]);
@@ -239,7 +223,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_z.pdf'));
 % DC CORRELATION KERNELS
 close all;
 subplot(441); hold on;
-plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
+plot([1 7], [0 0], 'k', 'linewidth', 0.5);
 for d = 1:length(datasets),
     plot(1:7, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
     h = (mat_dc.pval(d,:) < 0.05);
@@ -249,7 +233,7 @@ for d = 1:length(datasets),
     end
 end
 
-plot(1:numlags, nanmean(mat_dc.r), 'k', 'linewidth', 1);
+plot(1:7, nanmean(mat_dc.r), 'k', 'linewidth', 1);
 [h, pval] = ttest(mat_dc.r);
 if any(h>0),
     plot(find(h==1), nanmean(mat_dc.r(:, (h==1))), ...
@@ -257,7 +241,7 @@ if any(h>0),
 end
 
 ylabel({'Correlation, P(repeat) with' 'v_{bias} ~ previous response'})
-    set(gca, 'xtick', 1:numlags, lagnames, 'xticklabel', 'xcolor', 'k', 'ycolor', 'k');
+set(gca, 'xtick', 1:7, 'xcolor', 'k', 'ycolor', 'k');
 xlabel('Lags (# trials)');
 axis tight;
 ylim([-0.5 1]);
