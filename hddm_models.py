@@ -80,7 +80,6 @@ def add_morelags(mydata):
     mydata['prev11-15resp'] = mydata['prev11resp'] + mydata['prev12resp'] + mydata['prev13resp'] + mydata['prev14resp'] + mydata['prev15resp']
     mydata['prev11-15stim'] = mydata['prev11stim'] + mydata['prev12stim'] + mydata['prev13stim'] + mydata['prev14stim'] + mydata['prev15stim']
 
-    shell()
     return mydata
 
 # ============================================ #
@@ -765,18 +764,17 @@ def make_model(mypath, mydata, model_name, trace_id):
 
         mydata = add_morelags(mydata)
 
-        mydata['prevresp_correct']
-
-        v_reg = {'model': """v ~ 1 + stimulus + prevresp + prevstim + prev2resp + prev2stim +
-         prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
-         + prev6resp + prev6stim + prev7resp + prev7stim""", 'link_func': lambda x:x}
-        z_reg = {'model': """z ~ 1 + prevresp + prevstim + prev2resp + prev2stim + 
-        prev3resp + prev3stim + prev4resp + prev4stim + prev5resp + prev5stim
-        + prev6resp + prev6stim + prev7resp + prev7stim""", 'link_func': z_link_func}
+        v_reg = {'model': """v ~ 1 + stimulus + prev1resp_correct + prev1resp_error 
+        + prev2resp_correct + prev2resp_error + prev3resp_correct + prev3resp_error
+        + prev4resp_correct + prev4resp_error + prev5resp_correct + prev5resp_error
+        + prev6resp_correct + prev6resp_error + prev7resp_correct + prev7resp_error""", 'link_func': lambda x:x}
+        z_reg = {'model': """z ~ 1 + prev1resp_correct + prev1resp_error 
+        + prev2resp_correct + prev2resp_error + prev3resp_correct + prev3resp_error
+        + prev4resp_correct + prev4resp_error + prev5resp_correct + prev5resp_error
+        + prev6resp_correct + prev6resp_error + prev7resp_correct + prev7resp_error""", 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
                                include=['z', 'sv'], group_only_nodes=['sv'],
                                group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
-
 
     # LAG 8-11
     elif model_name == 'regress_dc_lag7-10':
