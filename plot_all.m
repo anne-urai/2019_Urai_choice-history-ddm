@@ -62,7 +62,7 @@ end
 
 disp('starting');
 
-kernels_lags_bestmodel
+kernels_lags_bestmodel;
 return;
 
 % ========================================== %

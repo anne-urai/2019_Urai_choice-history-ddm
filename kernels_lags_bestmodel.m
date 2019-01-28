@@ -33,11 +33,11 @@ mdls = {'regress_nohist', ...
 
 numlags = 8;
 lagnames = {'1', '2', '3', '4', '5', '6', '7-10', '11-15'};
-
-alldata.z_correct   = nan(length(datasets), numlags);
-alldata.z_error     = nan(length(datasets), numlags);
-alldata.v_correct   = nan(length(datasets), numlags);
-alldata.v_error     = nan(length(datasets), numlags);
+vars = {'z_correct', 'z_error', 'v_correct', 'v_error'};
+for m = 1:length(vars),
+    alldata.(vars{m})   = nan(length(datasets), numlags);
+    alldata.([vars{m} '_pval'])   = nan(length(datasets), numlags);
+end
 
 mat_z.r     = nan(length(datasets), numlags);
 mat_z.pval  = nan(length(datasets), numlags);
@@ -78,9 +78,10 @@ for d = 1:length(datasets),
     % use the full model with both starting point and drift bias for plots
     % ========================================================== %
 
-    useFullModel = false;
+    useFullModel = true;
     if useFullModel,
-        bestmodelname = 'regress_dcz_lag6';
+        bestMdl = 9;
+        bestmodelname = 'regressdczlag3';
     end
     
     % ========================================================== %
@@ -88,81 +89,77 @@ for d = 1:length(datasets),
     % ========================================================== %
     
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-    
-    for l = 1:numlags,
-        if l == 1,
-            lname = [];
-        else
-            lname = l;
-        end
-        
-        try
-            
-            alldata.z_correct(d,l) = ...
-                nanmean(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]) + ...
-                dat.(['z_prev' num2str(lname) 'stim__' bestmodelname]));
-        end
-    end
-    for l = 1:numlags,
-        if l == 1,
-            lname = [];
-        else
-            lname = l;
-        end
-        
-        try
-            alldata.z_error(d,l) = ...
+    traces = readtable(sprintf('%s/%s/%s/group_traces.csv', mypath, datasets{d}, mdls{bestMdl+1}));
+
+        for l = 1:numlags,
+            if l == 1,
+                lname = [];
+            else
+                lname = l;
+            end
+                
+        for v = 1:length(vars),
+            try
+                switch vars{v}
+                case 'z_correct'
+                alldata.(vars{v})(d,l) = ...
+                    nanmean(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]) + ...
+                    dat.(['z_prev' num2str(lname) 'stim__' bestmodelname]));
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' num2str(lname) 'resp']) + ...
+                    traces.(['z_prev' num2str(lname) 'stim']), 0);
+
+                case 'z_error'
+                    alldata.z_error(d,l) = ...
                 nanmean(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]) - ...
                 dat.(['z_prev' num2str(lname) 'stim__' bestmodelname]));
-        end
-    end
-    
-    for l = 1:numlags,
-        if l == 1,
-            lname = [];
-        else
-            lname = l;
-        end
-        
-        try
-            alldata.v_correct(d,l) = ...
-                nanmean(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]) + ...
-                dat.(['v_prev' num2str(lname) 'stim__' bestmodelname]));
-        end
-    end
-    for l = 1:numlags,
-        if l == 1,
-            lname = [];
-        else
-            lname = l;
-        end
-        
-        try
-            alldata.v_error(d,l) = ...
+                                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' num2str(lname) 'resp']) - ...
+                    traces.(['z_prev' num2str(lname) 'stim']), 0);
+                case 'v_correct'
+                    alldata.v_correct(d,l) = ...
+                    nanmean(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]) + ...
+                    dat.(['v_prev' num2str(lname) 'stim__' bestmodelname]));
+                                    alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' num2str(lname) 'resp']) + ...
+                    traces.(['v_prev' num2str(lname) 'stim']), 0);
+                case 'v_error'
+                     alldata.v_error(d,l) = ...
                 nanmean(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]) - ...
                 dat.(['v_prev' num2str(lname) 'stim__' bestmodelname]));
+                                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' num2str(lname) 'resp']) - ...
+                    traces.(['v_prev' num2str(lname) 'stim']), 0);
+            end
         end
+
+        end
+    
     end
     
+    % ========================================================== %
     % ALSO COMPUTE CORRELATIONS
     % TO DO: PARTIAL OUT THE EFFECT OF PREVIOUS REPETITIONS!
+    % ========================================================== %
+
     for l = 1:numlags,
+
         
         if l == 1,
             lname = [];
+            repeat = dat.(['repetition' num2str(lname)]);
         else
             lname = l;
+            % stepwise removal of the correlation with previous repetitions
+            repeat = projectout(dat.(['repetition' num2str(lname)]), repeat);
         end
+        disp(repeat)
         
         try
             [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
                 spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                dat.(['repetition' num2str(lname)]));
+                repeat);
         end
         try
             [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
                 spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                dat.(['repetition' num2str(lname)]));
+                repeat);
         end
     end
     
@@ -173,33 +170,39 @@ end
 % ========================================================== %
 
 colors = cbrewer('qual', 'Set2', length(datasets));
-models = {'z_correct', 'z_error', 'v_correct', 'v_error'};
 
 % CREATE FIGURE
-for pltidx = 1:length(models),
+for pltidx = 1:length(vars),
     
     close all;
     sp1 = subplot(4,4,1); hold on;
     plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
     
     for d = 1:length(datasets),
-        plot(1:numlags, alldata.(models{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
+        plot(1:numlags, alldata.(vars{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
+    
+        h = (alldata.([vars{pltidx} '_pval'])(d,:) < 0.05);
+        if any(h>0),
+            plot(find(h==1), alldata.(vars{pltidx})(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
+                'markerfacecolor', colors(d,:), 'markersize', 7);
+        end
     end
-    plot(1:numlags, nanmean(alldata.(models{pltidx})), 'k', 'linewidth', 1);
-    [h, pval] = ttest(alldata.(models{pltidx}));
+
+    % average across datasets
+    plot(1:numlags, nanmean(alldata.(vars{pltidx})), 'k', 'linewidth', 1);
+    [h, pval] = ttest(alldata.(vars{pltidx}));
     if any(h>0),
-        plot(find(h==1), nanmean(alldata.(models{pltidx})(:, (h==1))), ...
+        plot(find(h==1), nanmean(alldata.(vars{pltidx})(:, (h==1))), ...
             'k.', 'markersize', 10);
     end
     xlabel('Lags (# trials)');
-    ylabel(regexprep(regexprep(models{pltidx}, '_', ' ~ previous '), 'v ', 'v_{bias} '));
-    set(gca, 'xtick', 1:numlags, lagnames, 'xticklabel', 'xcolor', 'k', 'ycolor', 'k');
+    ylabel(regexprep(regexprep(vars{pltidx}, '_', ' ~ previous '), 'v ', 'v_{bias} '));
+    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
     axis tight; offsetAxes;
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/regressionkernels_correcterror_%d.pdf', pltidx));
-    
-    
+    fprintf('~/Data/serialHDDM/regressionkernels_correcterror_%d.pdf \n', pltidx)
 end
 
 
@@ -217,7 +220,7 @@ for d = 1:length(datasets),
     h = (mat_z.r(d,:) < 0.05);
     if any(h>0),
         plot(find(h==1), mat_z.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-            'markerfacecolor', colors(d,:), 'markersize', 5);
+            'markerfacecolor', colors(d,:), 'markersize', 7);
     end
 end
 
@@ -229,7 +232,7 @@ if any(h>0),
 end
 
 ylabel({'Correlation, P(repeat) with' 'z ~ previous response'})
-    set(gca, 'xtick', 1:numlags, lagnames, 'xticklabel', 'xcolor', 'k', 'ycolor', 'k');
+set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
 xlabel('Lags (# trials)');
 axis tight;
 ylim([-0.5 1]);
@@ -241,11 +244,11 @@ close all;
 subplot(441); hold on;
 plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
 for d = 1:length(datasets),
-    plot(1:7, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
+    plot(1:numlags, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
     h = (mat_dc.pval(d,:) < 0.05);
     if any(h>0),
         plot(find(h==1), mat_dc.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-            'markerfacecolor', colors(d,:), 'markersize', 5);
+            'markerfacecolor', colors(d,:), 'markersize', 7);
     end
 end
 
@@ -257,7 +260,7 @@ if any(h>0),
 end
 
 ylabel({'Correlation, P(repeat) with' 'v_{bias} ~ previous response'})
-    set(gca, 'xtick', 1:numlags, lagnames, 'xticklabel', 'xcolor', 'k', 'ycolor', 'k');
+set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
 xlabel('Lags (# trials)');
 axis tight;
 ylim([-0.5 1]);

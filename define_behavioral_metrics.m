@@ -164,7 +164,7 @@ for sj = subjects,
         % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
         
         % 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
-        for l = 1:7,
+        for l = 1:16,
             data.(['repeat' num2str(l)])    = double(data.response == circshift(data.response, l));
             wrongTrls = ((data.trial - circshift(data.trial, l)) ~= l);
             data.(['repeat' num2str(l)])(wrongTrls) = NaN;
@@ -193,14 +193,12 @@ for sj = subjects,
             end
         end
 
-         % add repetition across lag 1-3
+         % add repetition across longer lags
+
         results.repetition(icnt)        = nanmean(data.repeat);
-        results.repetition2(icnt)       = nanmean(data.repeat2);
-        results.repetition3(icnt)       = nanmean(data.repeat3);
-        results.repetition4(icnt)       = nanmean(data.repeat4);
-        results.repetition5(icnt)       = nanmean(data.repeat5);
-        results.repetition6(icnt)       = nanmean(data.repeat6);
-        results.repetition7(icnt)       = nanmean(data.repeat7);
+        for l = 2:16,
+            results.(['repetition' num2str(l)])(icnt)       = nanmean(data.(['repeat' num2str(l)]));
+        end
 
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
