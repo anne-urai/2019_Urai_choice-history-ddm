@@ -59,6 +59,7 @@ if 0,
     make_dataframe(datasets);
     % rename_PPC_files(datasets);
 end
+make_dataframe(datasets);
 
 disp('starting');
 

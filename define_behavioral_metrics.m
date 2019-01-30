@@ -79,11 +79,11 @@ end
 icnt = 0;
 for sj = subjects,
     for s = [0 unique(alldata.session)'],
-
+        
         icnt                    = icnt + 1;
         results.subjnr(icnt)    = sj;
         results.session(icnt)   = s;
-
+        
         switch s
             case 0
                 % all sessions together
@@ -92,17 +92,17 @@ for sj = subjects,
                 data                    = alldata(alldata.subj_idx == sj & alldata.session == s, :);
         end
         data(isnan(data.response), :) = [];
-
+        
         % some people don't have pupil data in each session
         if isempty(data),
             fprintf('skipping sj %d, session %d \n', sj, s);
             continue;
         end
-
+        
         % ========================================== %
         % GENERAL STUFF
         % ========================================== %
-
+        
         [d, c] = dprime(data.stimulus, data.response);
         results.dprime(icnt)        = d;
         assert(~isnan(d), 'dprime cannot be NaN');
@@ -127,10 +127,10 @@ for sj = subjects,
             wrongTrls = ((data.trial - circshift(data.trial, l)) ~= l);
             data.(['repeat' num2str(l)])(wrongTrls) = NaN;
         end
-
+        
         data.repeat = data.repeat1;
         data.stimrepeat = [NaN; (diff(data.response) == 0)];
-
+        
         if sum(strcmp(data.Properties.VariableNames, 'coherence')) > 0,
             cohlevels = unique(data.coherence);
             for c = 1:length(cohlevels),
@@ -140,39 +140,51 @@ for sj = subjects,
                 results.(vrnm)(icnt) = ...
                     dprime(data.stimulus(data.coherence == cohlevels(c)), ...
                     data.response(data.coherence == cohlevels(c)));
-              if cohlevels(c) > 0,
-                assert(~isnan(results.(vrnm)(icnt)));
-              end
-              
-              %% ALSO COMPUTE REPETITION SEPARATELY FOR EACH LEVEL OF COHERENCE
-              vrnm = ['repetition_c' num2str(cohlevels(c)*100)];
-              vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
-              results.(vrnm)(icnt) = nanmean(data.repeat(data.coherence == cohlevels(c)));
+                if cohlevels(c) > 0,
+                    assert(~isnan(results.(vrnm)(icnt)));
+                end
+                
+                %% ALSO COMPUTE REPETITION SEPARATELY FOR EACH LEVEL OF COHERENCE
+                vrnm = ['repetition_c' num2str(cohlevels(c)*100)];
+                vrnm = regexprep(vrnm, '\.', '\_'); % replace points in varname
+                results.(vrnm)(icnt) = nanmean(data.repeat(data.coherence == cohlevels(c)));
             end
         end
-
-         % add repetition across longer lags
-        results.repetition(icnt)        = nanmean(data.repeat);
+        
+        % ======================================= %
+        % add repetition across longer lags
+        % for figure 6c
+        % ======================================= %
+        
+        results.repetition(icnt)        = nanmean(data.repeat1);
         for l = 1:16,
-            if l == 1,
-                tmprep = nanmean(data.(['repeat' num2str(l)]));
-            else
-               % and a version where the effect of the previous lag is removed
-                tmprep = nanmean(projectout(data.(['repeat' num2str(l)]), tmprep));
-            end
-            results.(['repetition_corrected' num2str(l)])(icnt) = tmprep;
-            % as well as the normal
             results.(['repetition' num2str(l)])(icnt) = nanmean(data.(['repeat' num2str(l)]));
         end
-
+%         
+%         % ALSO REMOVE THE EFFECT OF MORE RECENT LAGS, TAKE THE RESIDUALS
+%         repetitions_mat = data{:, 18:33};
+%         repetitions_qr  = qr(repetitions_mat);
+%         for l = 2:size(repetitions_mat, 2),
+%             usetrls = find(~isnan(repetitions_mat(:, l)));
+%             cleaned = qr(repetitions_mat(usetrls, 1:l));
+%         
+%         
+%             if l == 1,
+%                 tmprep = nanmean(data.(['repeat' num2str(l)]));
+%             else
+%                 tmprep = nanmean(projectout(data.(['repeat' num2str(l)]), tmprep));
+%             end
+%             results.(['repetition_corrected' num2str(l)])(icnt) = tmprep;
+%         end
+        
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
         results.repetition_preverror(icnt)   = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
-
+        
         % % criterion based on repetition and stimulus sequences
         % [~, c] = dprime(data.stimrepeat, data.repeat);
         % results.repetitioncrit(icnt)    = -c;
-
+        
         % criterion based on next trial bias, then collapsed
         results.criterionshift(icnt)    = criterionshift(data.response, data.nextstim, data.nextresp);
     end
