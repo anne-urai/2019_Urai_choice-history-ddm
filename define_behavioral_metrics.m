@@ -158,11 +158,19 @@ for sj = subjects,
         
   
         % ALSO REMOVE THE EFFECT OF MORE RECENT LAGS, TAKE THE RESIDUALS
-        repetitions_mat = data{:, 18:33};
-        repetitions_qr  = qr(repetitions_mat);
+        repetitions_mat = data{:, {'repeat1', 'repeat2', 'repeat3', 'repeat4', ...
+            'repeat5', 'repeat6', 'repeat7', 'repeat8', 'repeat9', 'repeat10', ...
+            'repeat11', 'repeat12', 'repeat13', 'repeat14', 'repeat15', 'repeat16'}};
+        repetitions_mat(repetitions_mat == 0) = -1;
+        repetitions_mat(isnan(repetitions_mat)) = 0;
+        qr_mat = qr(repetitions_mat);
+        %assert(1==0);
+
         for l = 1:size(repetitions_mat, 2),
-            usetrls = find(~isnan(repetitions_mat(:, l)));
-            cleaned = qr(repetitions_mat(usetrls, 1:l));
+
+            usetrls = find((repetitions_mat(:, l) ~= 0));
+            % use QR decomposition, only on valid trials, to remove the effect of more recent choice sequences
+            cleaned = qr_mat(usetrls, l);
             
             % put back
             data.(['repeat_corrected' num2str(l)]) = nan(size(data.(['repeat' num2str(l)])));
@@ -183,7 +191,9 @@ for sj = subjects,
         for l = 1:16,
             results.(['repetition_corrected' num2str(l)])(icnt) = nanmean(data.(['repeat_corrected' num2str(l)]));
         end
-        results.repetition_corrected1(icnt) = results.repetition1(icnt);
+
+        % for the first lag, no correction (perhaps not necessary?)
+        %results.repetition_corrected1(icnt) = results.repetition1(icnt);
         results.repetition(icnt)        = nanmean(data.repeat1);
         
         % also compute this after error and correct trials

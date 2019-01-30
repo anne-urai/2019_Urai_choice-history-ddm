@@ -137,7 +137,7 @@ for d = 1:length(datasets),
     % TO DO: PARTIAL OUT THE EFFECT OF PREVIOUS REPETITIONS!
     % ========================================================== %
 
-    %covariates = zeros(size(dat.(['repetition' num2str(l)])));
+    % covariates = zeros(size(dat.(['repetition' num2str(l)])));
     for l = 1:numlags,
 
         if l == 1,

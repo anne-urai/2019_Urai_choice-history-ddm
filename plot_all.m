@@ -59,11 +59,11 @@ if 0,
     make_dataframe(datasets);
     % rename_PPC_files(datasets);
 end
-make_dataframe(datasets);
-
 disp('starting');
 
 % barplots_DIC_regression
+    make_dataframe(datasets);
+
 kernels_lags_bestmodel;
 
 return;
