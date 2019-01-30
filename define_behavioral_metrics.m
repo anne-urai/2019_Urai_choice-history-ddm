@@ -156,17 +156,17 @@ for sj = subjects,
         % for figure 6c
         % ======================================= %
         
-        results.repetition(icnt)        = nanmean(data.repeat1);
-        for l = 1:16,
-            results.(['repetition' num2str(l)])(icnt) = nanmean(data.(['repeat' num2str(l)]));
-        end
-%         
-%         % ALSO REMOVE THE EFFECT OF MORE RECENT LAGS, TAKE THE RESIDUALS
-%         repetitions_mat = data{:, 18:33};
-%         repetitions_qr  = qr(repetitions_mat);
-%         for l = 2:size(repetitions_mat, 2),
-%             usetrls = find(~isnan(repetitions_mat(:, l)));
-%             cleaned = qr(repetitions_mat(usetrls, 1:l));
+  
+        % ALSO REMOVE THE EFFECT OF MORE RECENT LAGS, TAKE THE RESIDUALS
+        repetitions_mat = data{:, 18:33};
+        repetitions_qr  = qr(repetitions_mat);
+        for l = 1:size(repetitions_mat, 2),
+            usetrls = find(~isnan(repetitions_mat(:, l)));
+            cleaned = qr(repetitions_mat(usetrls, 1:l));
+            
+            % put back
+            data.(['repeat_corrected' num2str(l)]) = nan(size(data.(['repeat' num2str(l)])));
+            data.(['repeat_corrected' num2str(l)])(usetrls) = cleaned(:, end);
 %         
 %         
 %             if l == 1,
@@ -175,7 +175,16 @@ for sj = subjects,
 %                 tmprep = nanmean(projectout(data.(['repeat' num2str(l)]), tmprep));
 %             end
 %             results.(['repetition_corrected' num2str(l)])(icnt) = tmprep;
-%         end
+        end
+        
+        for l = 1:16,
+            results.(['repetition' num2str(l)])(icnt) = nanmean(data.(['repeat' num2str(l)]));
+        end
+        for l = 1:16,
+            results.(['repetition_corrected' num2str(l)])(icnt) = nanmean(data.(['repeat_corrected' num2str(l)]));
+        end
+        results.repetition_corrected1(icnt) = results.repetition1(icnt);
+        results.repetition(icnt)        = nanmean(data.repeat1);
         
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
