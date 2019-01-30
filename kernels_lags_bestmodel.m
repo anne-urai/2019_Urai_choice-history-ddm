@@ -55,7 +55,6 @@ for d = 1:length(datasets),
         
         if ~exist(sprintf('%s/summary/%s/%s_all.mat', ...
                 mypath, datasets{d}, mdls{m}), 'file'),
-            disp('cant find this model')
             continue;
         end
         
@@ -78,7 +77,7 @@ for d = 1:length(datasets),
     % use the full model with both starting point and drift bias for plots
     % ========================================================== %
 
-    useFullModel = true;
+    useFullModel = false;
     if useFullModel,
         bestMdl = 9;
         bestmodelname = 'regressdczlag3';
@@ -138,29 +137,45 @@ for d = 1:length(datasets),
     % TO DO: PARTIAL OUT THE EFFECT OF PREVIOUS REPETITIONS!
     % ========================================================== %
 
+    %covariates = zeros(size(dat.(['repetition' num2str(l)])));
     for l = 1:numlags,
 
-        
         if l == 1,
             lname = [];
-            repeat = dat.(['repetition' num2str(lname)]);
         else
             lname = l;
-            % stepwise removal of the correlation with previous repetitions
-            repeat = projectout(dat.(['repetition' num2str(lname)]), repeat);
         end
-        disp(repeat)
         
+        repeat = dat.(['repetition_corrected' num2str(l)]);
+        %repeat = dat.(['repetition' num2str(l)]);
+
         try
             [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
                 spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
                 repeat);
         end
+
+        %     [mat_z.r(d, l), mat_z.pval(d,l)] = ...
+        %         partialcorr(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
+        %         repeat, covariates, 'type', 'spearman', 'rows', 'complete');
+        % end
         try
             [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
                 spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
                 repeat);
         end
+
+        % [mat_dc.r(d, l), mat_dc.pval(d,l)] = ...
+        %         partialcorri(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
+        %         repeat, covariates, 'type', 'spearman', 'rows', 'complete');
+        % end
+        %covariates = [covariates repeat];
+
+        % if l == 1,
+        %     covariates = covariates(:, 2:end);
+        % elseif l == 4,
+        %         assert(1==0)
+        % end
     end
     
 end

@@ -1,4 +1,4 @@
-function b2b_Gsq_readIntoMatlab(datasets)
+function read_into_Matlab_gSquare(datasets)
 
 % Code to fit the history-dependent drift diffusion models described in
 % Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
@@ -23,10 +23,11 @@ for d = 1:length(datasets),
     end
 
     disp(usepath);
-    mdls = {'stimcoding_nohist', ...
-    'stimcoding_dc_prevresp', ...
-    'stimcoding_z_prevresp', ...
-    'stimcoding_dc_z_prevresp'};
+    % GRAB ALL MODELS THAT EXIST!
+    mdls = dir(usepath);
+    mdls = mdls(~ismember({mdls.name},{'.','..', '.DS_Store'}));
+    mdls = mdls([mdls.isdir]); % only return directories
+    mdls = {mdls(:).name};
 
     % load the csv file to check the existing subject numbers for later
     csvfile = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
