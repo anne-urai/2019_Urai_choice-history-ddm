@@ -36,8 +36,7 @@ end
 datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno'};
 datasetnames = {{'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}, ...
-    {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}, ...
-     {'Visual motion' '2AFC (FD)'}};
+    {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}};
 
 % go to code
 try
@@ -61,12 +60,13 @@ if 0,
 end
 disp('starting');
 
-% barplots_DIC_regression
-    make_dataframe(datasets);
 
+barplots_DIC_regression
 kernels_lags_bestmodel;
 
 return;
+
+
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES

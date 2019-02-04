@@ -164,7 +164,6 @@ for sj = subjects,
         repetitions_mat(repetitions_mat == 0) = -1;
         repetitions_mat(isnan(repetitions_mat)) = 0;
         qr_mat = qr(repetitions_mat);
-        %assert(1==0);
 
         for l = 1:size(repetitions_mat, 2),
 
@@ -175,14 +174,7 @@ for sj = subjects,
             % put back
             data.(['repeat_corrected' num2str(l)]) = nan(size(data.(['repeat' num2str(l)])));
             data.(['repeat_corrected' num2str(l)])(usetrls) = cleaned(:, end);
-%         
-%         
-%             if l == 1,
-%                 tmprep = nanmean(data.(['repeat' num2str(l)]));
-%             else
-%                 tmprep = nanmean(projectout(data.(['repeat' num2str(l)]), tmprep));
-%             end
-%             results.(['repetition_corrected' num2str(l)])(icnt) = tmprep;
+
         end
         
         for l = 1:16,

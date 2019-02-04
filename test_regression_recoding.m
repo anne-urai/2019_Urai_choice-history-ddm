@@ -5,6 +5,9 @@ addpath(genpath('~/code/Tools'));
 warning off; close all;
 
 for d = 1:length(datasets),
+
+    disp(datasets(d));
+    try
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     dat = dat(dat.session == 0, :);
     %dat = readtable('auditory_yesno_hddmfits.csv');
@@ -38,7 +41,7 @@ for d = 1:length(datasets),
                         dat.(['z_prev' num2str(lname) 'stim__' bestmodelname]));
                 case 'v_correct'
                     alldata.v_correct(:,l) = ...
-                        nanmean(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]) + ...
+                        (dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]) + ...
                         dat.(['v_prev' num2str(lname) 'stim__' bestmodelname]));
                 case 'v_error'
                     alldata.v_error(:,l) = ...
@@ -75,12 +78,13 @@ for d = 1:length(datasets),
     for v = 1:length(plotvars),
         subplot(2,2,v);
         plot(alldata.(plotvars{v}), alldata.([plotvars{v} '_recode']), 'o');
-        grid on; r = refline(1,0); r.Color = 'k'
+        grid on; r = refline(1,0); r.Color = 'k';
+        axisEqual; axis square;
         title(plotvars{v});
     end
     
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/test_%d.pdf', d));
-
+ends
 %     corrplot(alldata, {'z_correct', 'z_error', 'v_correct', 'v_error'}, ...
 %         {'z_error_recode', 'z_correct_recode', 'v_correct_recode', 'v_error_recode'});
 %   
