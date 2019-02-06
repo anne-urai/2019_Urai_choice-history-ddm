@@ -55,11 +55,11 @@ parser.add_option ( "-r", "--run",
         type = "int",
         help = "Force running the model?" )
 parser.add_option ( "-d", "--dataset",
-        default = range(0,7),
+        default = range(0,6),
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(0,9),
+        default = range(25),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
@@ -106,8 +106,9 @@ def concat_models(mypath, model_name):
     nchains = 30
 
     # CHECK IF COMBINED MODEL EXISTS
-    if not (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-md14.model'))) and (os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model'))):
+    if os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model')):
         print os.path.join(mypath, model_name, 'modelfit-combined.model')
+
     else:
         # ============================================ #
         # APPEND MODELS
@@ -158,19 +159,15 @@ def concat_models(mypath, model_name):
         print "concatenated models"
         m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
 
-        # ============================================ #
         # DELETE FILES to save space
-        # ============================================ #
-
-        if len(allmodels) == 15:
-            print "deleting separate chains"
-            for fl in glob.glob(os.path.join(mypath, model_name, 'modelfit-md*.model')):
-                    os.remove(fl)
-            for fl in glob.glob(os.path.join(mypath, model_name, 'modelfit-md*.db')):
-                if not '-md0.db' in fl:
-                    os.remove(fl)
-        else:
-            print "not deleting individual model chains"
+        print "deleting separate chains..."
+        for fl in glob.glob(os.path.join(mypath, models[vx], 'modelfit-md*.model')):
+                print(fl)
+                os.remove(fl)
+        for fl in glob.glob(os.path.join(mypath, models[vx], 'modelfit-md*.db')):
+            if not '-md0.db' in fl:
+                print(fl)
+                os.remove(fl)
 
         # ============================================ #
         # SAVE POINT ESTIMATES
@@ -353,14 +350,32 @@ for dx in d:
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
             
             # now sample and save
-            if os.path.exists(model_filename):
-                pass # skip if this model i has been run
-            elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
-                pass # skip if this model has been concatenated
-            elif models[vx] == 'stimcoding_dc_z_prevresp_pharma' and not 'drug' in mydata.columns:
-                pass # makes no sense, don't run
-            else:
+            if not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and os.path.exists(model_filename):
+                pass # this model has been run but the job isn't finished
+            elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and os.path.exists(model_filename):
+                
+                # there is a concatenated model, but this file still remains - delete!
+                # DELETE FILES to save space
+                print "deleting separate chains..."
+                for fl in glob.glob(os.path.join(mypath, models[vx], 'modelfit-md*.model')):
+                        print(fl)
+                        os.remove(fl)
+                for fl in glob.glob(os.path.join(mypath, models[vx], 'modelfit-md*.db')):
+                    if not '-md0.db' in fl:
+                        print(fl)
+                        os.remove(fl)
 
+            elif os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and not os.path.exists(model_filename):
+                print('model already run and concatenated, exiting...')
+                pass # model has been concatenated, cleanup done
+
+            elif models[vx] == 'stimcoding_dc_z_prevresp_pharma' and not 'drug' in mydata.columns:
+                continue # makes no sense, don't run
+            elif 'stcoh' in models[vx] and not 'coherence' in mydata.columns:
+                continue # makes no sense, don't run
+
+            else:
+                print( "Starting to run %s, %s, %d samples" %(models[vx], datasets[dx], n_samples))
                 # get the model specification, pass data
                 m = make_model(mypath, mydata, models[vx], trace_id)
                 # only run if this hasnt been done, and there is no concatenated master model present
@@ -373,7 +388,7 @@ for dx in d:
             # important, concat after running to save disk space
             # ================================================= #
 
-            if trace_id == 29: # and not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
+            if trace_id == 29 and not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')): # and not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
                 # https://stackoverflow.com/questions/35795452/checking-if-a-list-of-files-exists-before-proceeding
                 filelist = []
                 for t in range(30):
@@ -391,10 +406,6 @@ for dx in d:
 
                 # concatenate the different chains, will save disk space
                 concat_models(mypath, models[vx])
-
-            # make corner plot
-            if trace_id == 29 and os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
-                cornerplot(mypath, datasets[dx], models[vx])
 
         elif runMe == 2:
 

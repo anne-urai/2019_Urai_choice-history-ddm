@@ -12,7 +12,7 @@ warning off; close all;
 global datasets datasetnames mypath colors
 disp(datasets)
 colors(3, :) = mean(colors([1 2], :));
-colors = repmat(colors, 10, 1);
+% colors = repmat(colors, 10, 1);
 
 % ============================================ %
 % DIC COMPARISON BETWEEN DC, Z AND BOTH
@@ -37,11 +37,11 @@ mdls = {'regress_nohist', ...
     'regress_z_lag6', ...
     'regress_dc_lag6', ...
     'regress_dcz_lag6', ...
-    'regress_dc_lag7-10', ...
     'regress_z_lag7-10',...
+    'regress_dc_lag7-10', ...
     'regress_dcz_lag7-10',...
-    'regress_dc_lag11-15', ...
     'regress_z_lag11-15',...
+    'regress_dc_lag11-15', ...
     'regress_dcz_lag11-15'};
 
 numlags = 8;
@@ -49,18 +49,16 @@ lagnames = {'1', '2', '3', '4', '5', '6', '7-10', '11-15'};
 
 for d = 1:length(datasets),
     close all;
-    subplot(4, 4, 1);
+    subplot(4, 6, 1);
     getPlotDIC(mdls, d, colors);
     title(datasetnames{d});
-    set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', lagnames, 'xticklabelrotation', -20);
+    set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', lagnames, 'xticklabelrotation', -40);
     ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
     xlabel('Lags (# trials)')
     drawnow; tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf', d));
     fprintf('~/Data/serialHDDM/figure1b_HDDM_DIC_regression_d%d.pdf \n', d)
 end
-
-close all;
 
 end
 
@@ -71,12 +69,10 @@ end
 function getPlotDIC(mdls, d, colors)
 
 global datasets mypath
-
-axis square; hold on;
+hold on;
 
 mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
-    
     if ~exist(sprintf('%s/summary/%s/%s_all.mat', ...
             mypath, datasets{d}, mdls{m}), 'file'),
         disp('cant find this model')
@@ -85,7 +81,9 @@ for m = 1:length(mdls),
     
     load(sprintf('%s/summary/%s/%s_all.mat', ...
         mypath, datasets{d}, mdls{m}));
-    
+    fprintf('%s/summary/%s/%s_all.mat \n', ...
+        mypath, datasets{d}, mdls{m});
+
     if (isnan(dic.full) || isempty(dic.full)) && ~all(isnan(dic.chains)),
         dic.full = nanmean(dic.chains);
     end
@@ -95,34 +93,34 @@ end
 % everything relative to the full model
 mdldic = bsxfun(@minus, mdldic, mdldic(1));
 mdldic = mdldic(2:end);
+mdls = mdls(2:end);
 [~, bestMdl] = min(mdldic);
 
 for i = 1:length(mdldic),
 
-    if contains(mdls{i+1}, '_z_'),
-        xpos = i+0.15;
-    elseif contains(mdls{i+1}, '_dc_'),
+    % move together in clusters of 3
+    if contains(mdls{i}, '_z_'),
+        xpos = i+0.2;
+        thiscolor = colors(1, :);
+    elseif contains(mdls{i}, '_dc_'),
         xpos = i;
-    elseif contains(mdls{i+1}, '_dcz_'), 
-        xpos = i-0.15;
+        thiscolor = colors(2, :);
+
+    elseif contains(mdls{i}, '_dcz_'), 
+        xpos = i-0.2;
+        thiscolor = colors(3, :);
+
     end
 
-    b = bar(xpos, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.7, 'BaseValue', 0, ...
+    % best fit with outline
+    if i == bestMdl,
+        b = bar(xpos, mdldic(i), 'facecolor', thiscolor, 'barwidth', 0.8, 'BaseValue', 0, ...
+        'edgecolor', 'k');
+    else
+        b = bar(xpos, mdldic(i), 'facecolor', thiscolor, 'barwidth', 0.8, 'BaseValue', 0, ...
         'edgecolor', 'none');
+    end
 end
-
-% %# Add a text string above/below each bin
-% for i = 1:length(mdldic),
-%     if mdldic(i) < 0,
-%         text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
-%             num2str(round(mdldic(i))), ...
-%             'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
-%     elseif mdldic(i) > 0,
-%         text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
-%             num2str(round(mdldic(i))), ...
-%             'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
-%     end
-% end
 
 axis tight;
 xlim([0.5 length(mdldic)+0.5]);

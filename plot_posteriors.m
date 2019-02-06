@@ -13,26 +13,23 @@ global mypath datasets datasetnames colors
 
 colors2 = cbrewer('qual', 'Set2', length(datasets));
 
+% ========================================== %
 % STARTING POINT POSTERIORS
+% ========================================== %
+
 close; subplot(3,3,1); hold on;
 plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
 
 for d = 1:length(datasets),
     dat = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
     difference = dat.z_trans_1_ - dat.z_trans__1_;
-    
-   %  h = violinPlot(difference', 'color', colors2(d, :), 'showMM', 6, 'xValues', d);
-    violinPlot_distribution(d, difference, colors2(d, :));
+        violinPlot_distribution(d, difference, colors2(d, :));
     legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
-    
-    % add something to indicate significance
-    p_neg = mean(difference > 0);
-    p_pos = mean(difference < 0);
-    
-    %     if p_neg < 0.05 || p_pos < 0.05
-    %         mysigstar(gca, d, min(get(gca, 'ylim')), min([p_neg p_pos]));
-    %     end
-    
+    pval = posteriorpval(dat.z_trans_1_, dat.z_trans__1_);
+    text(d+0.1, -0.5, sprintf('p = %.3f', pval), ...
+        'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
+        set(gca, 'xcolor', 'k', 'ycolor', 'k');
+
 end
 
 set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
@@ -42,7 +39,10 @@ tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_posteriors_startingpoint.pdf'));
 
 
+% ========================================== %
 % DRIFT BIAS POSTERIORS
+% ========================================== %
+
 close; subplot(3,3,1); hold on;
 plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
 
@@ -50,25 +50,71 @@ for d = 1:length(datasets),
     dat = readtable(sprintf('%s/%s/stimcoding_dc_z_prevresp/group_traces.csv', mypath, datasets{d}));
 	disp(datasets{d});
     difference = dat.dc_1_ - dat.dc__1_;
-    %h = violinPlot(difference, 'color', colors2(d, :), 'showMM', 6, 'xValues', d);
     violinPlot_distribution(d, difference, colors2(d, :));
-	
     legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
-    
-    % add something to indicate significance
-    p_neg = mean(difference < 0);
-    p_pos = mean(difference > 0);
-    
-    %     if p_neg < 0.05 || p_pos < 0.05
-    %         mysigstar(gca, d, max(get(gca, 'ylim')), min([p_neg p_pos]));
-    %     end
-    
+    pval = posteriorpval(dat.dc_1_, dat.dc__1_);
+    text(d+0.1, -0.3, sprintf('p = %.3f', pval), ...
+        'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
+        set(gca, 'xcolor', 'k', 'ycolor', 'k');
+
 end
 
 set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
 ylabel({'History shift in v_{bias}'}, 'color', colors(2, :));
 axis tight; offsetAxes;
 tightfig;
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_posteriors_drift bias.pdf'));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_posteriors_driftbias.pdf'));
+
+% ========================================== %
+% STARTING POINT POSTERIORS - error vs. correct
+% ========================================== %
+
+close; subplot(3,3,1); hold on;
+plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
+
+for d = 1:length(datasets),
+    disp(datasets{d});
+    dat = readtable(sprintf('%s/%s/stimcoding_dc_z_prevcorrect/group_traces.csv', mypath, datasets{d}));
+    difference = (dat.z_trans_1_1_ - dat.z_trans_1__1_) - (dat.z_trans_0_1_ - dat.z_trans_0__1_);
+        violinPlot_distribution(d, difference, colors2(d, :));
+    legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
+    pval = posteriorpval((dat.z_trans_1_1_ - dat.z_trans_1__1_), (dat.z_trans_0_1_ - dat.z_trans_0__1_));
+    text(d+0.1, -0.3, sprintf('p = %.3f', pval), ...
+        'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
+    set(gca, 'xcolor', 'k', 'ycolor', 'k');
+end
+
+set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
+ylabel({'History shift in z'; 'after correct - error'});
+axis tight; offsetAxes;
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_posteriors_startingpoint_outcome.pdf'));
+
+
+% ========================================== %
+% DRIFT BIAS POSTERIORS - error vs. correct
+% ========================================== %
+
+close; subplot(3,3,1); hold on;
+plot([1 6], [0 0], 'k-', 'linewidth', 0.5);
+
+for d = 1:length(datasets),
+    dat = readtable(sprintf('%s/%s/stimcoding_dc_z_prevcorrect/group_traces.csv', mypath, datasets{d}));
+    disp(datasets{d});
+    difference = (dat.dc_1_1_ - dat.dc_1__1_) -  (dat.dc_0_1_ - dat.dc_0__1_) ;
+    violinPlot_distribution(d, difference, colors2(d, :));
+    legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
+    pval = posteriorpval((dat.dc_1_1_ - dat.dc_1__1_), (dat.dc_0_1_ - dat.dc_0__1_));
+    text(d+0.1, -1, sprintf('p = %.3f', pval), ...
+        'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
+        set(gca, 'xcolor', 'k', 'ycolor', 'k');
+
+end
+
+set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
+ylabel({'History shift in v_{bias}'; 'after correct - error'});
+axis tight; offsetAxes;
+tightfig;
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_posteriors_driftbias_outcome.pdf'));
 
 end

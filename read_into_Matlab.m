@@ -53,7 +53,7 @@ for d = 1:length(datasets),
         % skip if this model is empty
         stuff = dir(sprintf('%s/%s', usepath, mdls{m}));
         stuff = stuff(arrayfun(@(x) ~strcmp(x.name(1),'.'),stuff)); % remove hidden files
-        if isempty(stuff),
+        if isempty(stuff) | ~exist(sprintf('%s/%s/modelfit-combined.model', usepath, mdls{m}), 'file'),
             disp(['skipping ' mdls{m}]);
             continue;
         end
@@ -139,7 +139,8 @@ for d = 1:length(datasets),
             varnames{v} = regexprep(varnames{v}, '\.0$', '');
             varnames{v} = regexprep(varnames{v}, '\[', '(');
             varnames{v} = regexprep(varnames{v}, '\]', ')');
-            
+            varnames{v} = regexprep(varnames{v}, '-', 'to');
+
             switch datasets{d},
                 
                 case {'NatComm', 'NatComm_500ms'}
@@ -291,6 +292,8 @@ for d = 1:length(datasets),
                     thismdlname = regexprep(thismdlname, 'prevrespstim_prevrtpupil', 'prevrespstimrtpupil');
                     thismdlname = regexprep(thismdlname, 'sessions', 'sess');
                     thismdlname = regexprep(thismdlname, '_', '');
+                    thismdlname = regexprep(thismdlname, '-', 'to');
+
                     varname = [flds{p}(1:end-5) '__' thismdlname];
                     results.(varname) = individuals.(flds{p})';
                     

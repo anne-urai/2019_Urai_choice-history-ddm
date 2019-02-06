@@ -60,12 +60,11 @@ if 0,
 end
 disp('starting');
 
-
-% barplots_DIC_regression
+% barplots_DIC_regression;
+make_dataframe(datasets);
 kernels_lags_bestmodel;
 
 return;
-
 
 
 % ========================================== %

@@ -33,16 +33,13 @@ mdls = {'regress_nohist', ...
 
 numlags = 8;
 lagnames = {'1', '2', '3', '4', '5', '6', '7-10', '11-15'};
-vars = {'z_correct', 'z_error', 'v_correct', 'v_error'};
+vars = {'z_correct', 'z_error', 'v_correct', 'v_error', ...
+    'z_prevresp', 'z_prevstim', 'v_prevresp', 'v_prevstim'};
 for m = 1:length(vars),
-    alldata.(vars{m})   = nan(length(datasets), numlags);
+    alldata.(vars{m})       = nan(length(datasets), numlags);
+    alldata.([vars{m} '_fullmodel'])       = nan(length(datasets), numlags);
     alldata.([vars{m} '_pval'])   = nan(length(datasets), numlags);
 end
-
-mat_z.r     = nan(length(datasets), numlags);
-mat_z.pval  = nan(length(datasets), numlags);
-mat_dc.r    = nan(length(datasets), numlags);
-mat_dc.pval = nan(length(datasets), numlags);
 
 for d = 1:length(datasets),
     
@@ -71,18 +68,10 @@ for d = 1:length(datasets),
     mdldic = bsxfun(@minus, mdldic, mdldic(1));
     mdldic = mdldic(2:end);
     [~, bestMdl] = min(mdldic);
-    bestmodelname = regexprep(mdls{bestMdl+1}, '_', '');
-    
-    % ========================================================== %
-    % use the full model with both starting point and drift bias for plots
-    % ========================================================== %
+    bestmodelname = regexprep(regexprep(mdls{bestMdl+1}, '_', ''), '-', 'to');
+    disp(bestmodelname)
+    fullmodelname = 'regressdczlag6';
 
-    useFullModel = false;
-    if useFullModel,
-        bestMdl = 9;
-        bestmodelname = 'regressdczlag3';
-    end
-    
     % ========================================================== %
     % 2. FOR THIS MODEL, RECODE INTO CORRECT AND ERROR
     % ========================================================== %
@@ -93,103 +82,138 @@ for d = 1:length(datasets),
 
         for l = 1:numlags,
             if l == 1,
-                lname = [];
+                lname = '';
+            elseif l == 7,
+                lname = '7_10';
+            elseif l == 8,
+                lname = '11_15';
             else
-                lname = l;
+                lname = num2str(l);
             end
                 
         for v = 1:length(vars),
-            try
                 switch vars{v}
                 case 'z_correct'
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['z_prev' lname 'resp__' fullmodelname]) + ...
+                    dat.(['z_prev' lname 'stim__' fullmodelname]));
+                    end
+                    try
                 alldata.(vars{v})(d,l) = ...
-                    nanmean(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]) + ...
-                    dat.(['z_prev' num2str(lname) 'stim__' bestmodelname]));
-                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' num2str(lname) 'resp']) + ...
-                    traces.(['z_prev' num2str(lname) 'stim']), 0);
+                    nanmean(dat.(['z_prev' lname 'resp__' bestmodelname]) + ...
+                    dat.(['z_prev' lname  'stim__' bestmodelname]));
+
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'resp']) + ...
+                    traces.(['z_prev' lname  'stim']), 0);
+                    end
 
                 case 'z_error'
-                    alldata.z_error(d,l) = ...
-                nanmean(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]) - ...
-                dat.(['z_prev' num2str(lname) 'stim__' bestmodelname]));
-                                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' num2str(lname) 'resp']) - ...
-                    traces.(['z_prev' num2str(lname) 'stim']), 0);
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['z_prev' lname  'resp__' fullmodelname]) - ...
+                    dat.(['z_prev' lname  'stim__' fullmodelname]));
+                    end
+                    try
+                alldata.z_error(d,l) = ...
+                    nanmean(dat.(['z_prev' lname  'resp__' bestmodelname]) - ...
+                    dat.(['z_prev' lname  'stim__' bestmodelname]));
+
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'resp']) - ...
+                    traces.(['z_prev' lname  'stim']), 0);
+                    end
+
                 case 'v_correct'
-                    alldata.v_correct(d,l) = ...
-                    nanmean(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]) + ...
-                    dat.(['v_prev' num2str(lname) 'stim__' bestmodelname]));
-                                    alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' num2str(lname) 'resp']) + ...
-                    traces.(['v_prev' num2str(lname) 'stim']), 0);
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['v_prev' lname  'resp__' fullmodelname]) + ...
+                    dat.(['v_prev' lname  'stim__' fullmodelname]));
+                    end
+                    try
+                alldata.v_correct(d,l) = ...
+                    nanmean(dat.(['v_prev' lname  'resp__' bestmodelname]) + ...
+                    dat.(['v_prev' lname  'stim__' bestmodelname]));
+
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'resp']) + ...
+                    traces.(['v_prev' lname  'stim']), 0);
+                    end
+
                 case 'v_error'
-                     alldata.v_error(d,l) = ...
-                nanmean(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]) - ...
-                dat.(['v_prev' num2str(lname) 'stim__' bestmodelname]));
-                                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' num2str(lname) 'resp']) - ...
-                    traces.(['v_prev' num2str(lname) 'stim']), 0);
-            end
-        end
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['v_prev' lname  'resp__' fullmodelname]) - ...
+                    dat.(['v_prev' lname  'stim__' fullmodelname]));
+                    end
+                    try
+                alldata.v_error(d,l) = ...
+                    nanmean(dat.(['v_prev' lname  'resp__' bestmodelname]) - ...
+                    dat.(['v_prev' lname  'stim__' bestmodelname]));
+
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'resp']) - ...
+                    traces.(['v_prev' lname  'stim']), 0);
+                    end
+
+            case 'v_prevresp'
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['v_prev' lname  'resp__' fullmodelname]));
+                    end
+                    try
+                alldata.([vars{v}])(d,l) = ...
+                    nanmean(dat.(['v_prev' lname  'resp__' bestmodelname]));
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'resp']), 0);
+                    end   
+
+            case 'z_prevresp'
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['z_prev' lname  'resp__' fullmodelname]));
+                    end
+                    try
+                alldata.([vars{v}])(d,l) = ...
+                    nanmean(dat.(['z_prev' lname  'resp__' bestmodelname]));
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'resp']), 0);
+                    end   
+
+
+            case 'v_prevstim'
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['v_prev' lname  'stim__' fullmodelname]));
+                    end
+                    try
+                alldata.([vars{v}])(d,l)= ...
+                    nanmean(dat.(['v_prev' lname  'stim__' bestmodelname]));
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'stim']), 0);
+                    end   
+
+            case 'z_prevstim'
+                    try
+                alldata.([vars{v} '_fullmodel'])(d,l) = ...
+                    nanmean(dat.(['z_prev' lname  'stim__' fullmodelname]));
+                    end
+                    try
+                alldata.([vars{v}])(d,l) = ...
+                    nanmean(dat.(['z_prev' lname  'stim__' bestmodelname]));
+                alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'stim']), 0);
+                    end   
+
+                end % switch case
 
         end
     
     end
-    
-    % ========================================================== %
-    % ALSO COMPUTE CORRELATIONS
-    % TO DO: PARTIAL OUT THE EFFECT OF PREVIOUS REPETITIONS!
-    % ========================================================== %
-
-    % covariates = zeros(size(dat.(['repetition' num2str(l)])));
-    for l = 1:numlags,
-
-        if l == 1,
-            lname = [];
-            repeat = dat.repetition;
-
-        else
-            lname = l;
-            repeat = dat.(['repetition' num2str(l)]) - arrayfun(@bernouilli_process, ...
-            l*ones(size(dat.repetition)), dat.repetition);
-
-        end
-        
-        %repeat = dat.(['repetition_corrected' num2str(l)]);
-
-        % use as repetition probability the probability corrected by the trivial expected repetition
-        % if the sequence was generated by a markov process      
-        try
-            [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
-                spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                repeat);
-        end
-
-        %     [mat_z.r(d, l), mat_z.pval(d,l)] = ...
-        %         partialcorr(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
-        %         repeat, covariates, 'type', 'spearman', 'rows', 'complete');
-        % end
-        try
-            [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
-                spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                repeat);
-        end
-
-        % [mat_dc.r(d, l), mat_dc.pval(d,l)] = ...
-        %         partialcorri(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
-        %         repeat, covariates, 'type', 'spearman', 'rows', 'complete');
-        % end
-        %covariates = [covariates repeat];
-
-        % if l == 1,
-        %     covariates = covariates(:, 2:end);
-        % elseif l == 4,
-        %         assert(1==0)
-        % end
-    end
-    
 end
 
 % ========================================================== %
 % 3. PLOT THE VARIABLES THAT ARE PRESENT FOR THIS BEST MODEL
 % ========================================================== %
+
+% plot the thin lines only for weight that are not already in the bestmodel
+for v = 1:length(vars),
+    alldata.([vars{v} '_fullmodel'])(~isnan(alldata.([vars{v}]))) = ...
+    alldata.([vars{v}])(~isnan(alldata.([vars{v}])));
+end
 
 colors = cbrewer('qual', 'Set2', length(datasets));
 
@@ -201,6 +225,8 @@ for pltidx = 1:length(vars),
     plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
     
     for d = 1:length(datasets),
+        % full model beneath, thin line
+        plot(1:numlags, alldata.([vars{pltidx} '_fullmodel'])(d, :), 'color', colors(d, :), 'linewidth', 0.5);
         plot(1:numlags, alldata.(vars{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
     
         h = (alldata.([vars{pltidx} '_pval'])(d,:) < 0.05);
@@ -211,14 +237,16 @@ for pltidx = 1:length(vars),
     end
 
     % average across datasets
-    plot(1:numlags, nanmean(alldata.(vars{pltidx})), 'k', 'linewidth', 1);
-    [h, pval] = ttest(alldata.(vars{pltidx}));
+    plot(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), 'k', 'linewidth', 1);
+    [h, pval] = ttest(alldata.([vars{pltidx} '_fullmodel']));
+
     if any(h>0),
-        plot(find(h==1), nanmean(alldata.(vars{pltidx})(:, (h==1))), ...
+        plot(find(h==1), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, (h==1))), ...
             'k.', 'markersize', 10);
     end
     xlabel('Lags (# trials)');
-    ylabel(regexprep(regexprep(vars{pltidx}, '_', ' ~ previous '), 'v ', 'v_{bias} '));
+    ylabel(regexprep(regexprep(regexprep(regexprep(vars{pltidx}, '_', ' ~ previous '), ...
+        'v ', 'v_{bias} '), 'prevresp', 'response'), 'prevstim', 'stimulus'));
     set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
     axis tight; offsetAxes;
     
@@ -233,60 +261,124 @@ end
 % ========================================================== %
 
 
-% Z CORRELATION KERNELS
-close all;
-subplot(441); hold on;
-plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
-for d = 1:length(datasets),
-    plot(1:numlags, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
-    h = (mat_z.r(d,:) < 0.05);
-    if any(h>0),
-        plot(find(h==1), mat_z.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-            'markerfacecolor', colors(d,:), 'markersize', 7);
+% ========================================================== %
+% ALSO COMPUTE CORRELATIONS
+% TO DO: PARTIAL OUT THE EFFECT OF PREVIOUS REPETITIONS!
+% ========================================================== %
+repMets = {'repetition', 'repetition_corrected', 'repetition-trivial', 'logistic', 'logistic-orth'};
+for r = 1:length(repMets),
+
+    disp(repMets{r})
+    mat_z.r     = nan(length(datasets), numlags);
+    mat_z.r_fullmodel     = nan(length(datasets), numlags);
+    mat_z.pval  = nan(length(datasets), numlags);
+    mat_dc.r    = nan(length(datasets), numlags);
+    mat_dc.r_fullmodel    = nan(length(datasets), numlags);
+    mat_dc.pval = nan(length(datasets), numlags);
+
+    for d = 1:length(datasets),
+        bestmodelname = 'regressdczlag6';
+
+        dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
+        dat = dat(dat.session == 0, :);
+
+        % covariates = zeros(size(dat.(['repetition' num2str(l)])));
+        for l = 1:6,
+
+            if l == 1,
+                lname = [];
+            elseif l == 7,
+                lname = '7_10';
+            elseif l == 8,
+                lname = '11_15';
+            else
+                lname = num2str(l);
+            end
+
+            % what metric for repetition do we want to use?
+            switch repMets{r}
+            case 'repetition'
+                repeat = dat.(['repetition' num2str(l)]);
+            case 'repetition_corrected'
+                repeat = dat.(['repetition_corrected' num2str(l)]);
+            case 'repetition-trivial'
+                repeat = dat.(['repetition' num2str(l)]) - arrayfun(@bernouilli_process, ...
+                l*ones(size(dat.repetition)), dat.repetition);
+                if l == 1,
+                    repeat = dat.repetition;
+                end
+            case 'logistic'
+                repeat = dat.(['logistic' num2str(l)]);
+            case 'logistic-orth'
+                repeat = dat.(['logistic_orth' num2str(l)]);
+            end
+            
+            % compute correlation coefficients
+            [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
+                spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
+                repeat);
+
+            [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
+                spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
+                repeat);
+        end
     end
-end
 
-plot(1:numlags, nanmean(mat_z.r), 'k', 'linewidth', 1);
-[h, pval] = ttest(mat_z.r);
-if any(h>0),
-    plot(find(h==1), nanmean(mat_z.r(:, (h==1))), ...
-        '.k',  'markersize', 10);
-end
-
-ylabel({'Correlation, P(repeat) with' 'z ~ previous response'})
-set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
-xlabel('Lags (# trials)');
-axis tight;
-ylim([-0.5 1]);
-offsetAxes; tightfig;
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_z.pdf'));
-
-% DC CORRELATION KERNELS
-close all;
-subplot(441); hold on;
-plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
-for d = 1:length(datasets),
-    plot(1:numlags, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
-    h = (mat_dc.pval(d,:) < 0.05);
-    if any(h>0),
-        plot(find(h==1), mat_dc.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-            'markerfacecolor', colors(d,:), 'markersize', 7);
+    % Z CORRELATION KERNELS
+    close all;
+    subplot(441); hold on;
+    plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
+    for d = 1:length(datasets),
+        plot(1:numlags, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
+        h = (mat_z.r(d,:) < 0.05);
+        if any(h>0),
+            plot(find(h==1), mat_z.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
+                'markerfacecolor', colors(d,:), 'markersize', 7);
+        end
     end
-end
 
-plot(1:numlags, nanmean(mat_dc.r), 'k', 'linewidth', 1);
-[h, pval] = ttest(mat_dc.r);
-if any(h>0),
-    plot(find(h==1), nanmean(mat_dc.r(:, (h==1))), ...
-        '.k',  'markersize', 10);
-end
+    plot(1:numlags, nanmean(mat_z.r), 'k', 'linewidth', 1);
+    [h, pval] = ttest(mat_z.r);
+    if any(h>0),
+        plot(find(h==1), nanmean(mat_z.r(:, (h==1))), ...
+            '.k',  'markersize', 10);
+    end
 
-ylabel({'Correlation, P(repeat) with' 'v_{bias} ~ previous response'})
-set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
-xlabel('Lags (# trials)');
-axis tight;
-ylim([-0.5 1]);
-offsetAxes; tightfig;
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_dc.pdf'));
+    ylabel({'Correlation, P(repeat) with' 'z ~ previous response'})
+    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
+    xlabel('Lags (# trials)');
+    axis tight;
+    ylim([-0.5 1]);
+    offsetAxes; tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_z_%s.pdf', repMets{r}));
+
+    % DC CORRELATION KERNELS
+    close all;
+    subplot(441); hold on;
+    plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
+    for d = 1:length(datasets),
+        plot(1:numlags, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
+        h = (mat_dc.pval(d,:) < 0.05);
+        if any(h>0),
+            plot(find(h==1), mat_dc.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
+                'markerfacecolor', colors(d,:), 'markersize', 7);
+        end
+    end
+
+    plot(1:numlags, nanmean(mat_dc.r), 'k', 'linewidth', 1);
+    [h, pval] = ttest(mat_dc.r);
+    if any(h>0),
+        plot(find(h==1), nanmean(mat_dc.r(:, (h==1))), ...
+            '.k',  'markersize', 10);
+    end
+
+    ylabel({'Correlation, P(repeat) with' 'v_{bias} ~ previous response'})
+    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
+    xlabel('Lags (# trials)');
+    axis tight;
+    ylim([-0.5 1]);
+    offsetAxes; tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_dc_%s.pdf', repMets{r}));
+    end
 
 end

@@ -124,6 +124,8 @@ for sj = subjects,
         % 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
         for l = 1:16,
             data.(['repeat' num2str(l)]) = double(data.response == circshift(data.response, l));
+            data.(['prev' num2str(l) 'resp']) = circshift(data.response, l);
+            data.(['prev' num2str(l) 'resp'])(data.(['prev' num2str(l) 'resp']) == 0) = -1;
             wrongTrls = ((data.trial - circshift(data.trial, l)) ~= l);
             data.(['repeat' num2str(l)])(wrongTrls) = NaN;
         end
@@ -156,7 +158,6 @@ for sj = subjects,
         % for figure 6c
         % ======================================= %
         
-  
         % ALSO REMOVE THE EFFECT OF MORE RECENT LAGS, TAKE THE RESIDUALS
         repetitions_mat = data{:, {'repeat1', 'repeat2', 'repeat3', 'repeat4', ...
             'repeat5', 'repeat6', 'repeat7', 'repeat8', 'repeat9', 'repeat10', ...
@@ -182,6 +183,23 @@ for sj = subjects,
         end
         for l = 1:16,
             results.(['repetition_corrected' num2str(l)])(icnt) = nanmean(data.(['repeat_corrected' num2str(l)]));
+        end
+
+        % ======================================= %
+        % logistic regression weights
+        % ======================================= %
+
+        X = [data.stimulus data.prev1resp data.prev2resp data.prev3resp data.prev4resp ...
+            data.prev5resp data.prev6resp data.prev7resp data.prev8resp data.prev9resp ...
+            data.prev10resp data.prev11resp data.prev12resp data.prev13resp data.prev14resp data.prev15resp];
+        X(X == 0) = -1;
+        b = glmfit(X, data.response, 'binomial', 'constant', 'on');
+        b = b(3:end); % remove overall bias and stimulus weight
+        b2 = glmfit(qr(X), data.response, 'binomial', 'constant', 'on');
+        b2 = b2(3:end); % remove overall bias and stimulus
+        for l = 1:length(b)
+            results.(['logistic' num2str(l)])(icnt) = b(l);
+            results.(['logistic_orth' num2str(l)])(icnt) = b2(l);
         end
 
         % for the first lag, no correction (perhaps not necessary?)
