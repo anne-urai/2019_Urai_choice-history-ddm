@@ -40,6 +40,8 @@ for m = 1:length(vars),
     alldata.([vars{m} '_fullmodel'])       = nan(length(datasets), numlags);
     alldata.([vars{m} '_pval'])   = nan(length(datasets), numlags);
 end
+fullmodelname = 'regressdczlag6';
+global individualrep
 
 for d = 1:length(datasets),
     
@@ -70,7 +72,6 @@ for d = 1:length(datasets),
     [~, bestMdl] = min(mdldic);
     bestmodelname = regexprep(regexprep(mdls{bestMdl+1}, '_', ''), '-', 'to');
     disp(bestmodelname)
-    fullmodelname = 'regressdczlag6';
 
     % ========================================================== %
     % 2. FOR THIS MODEL, RECODE INTO CORRECT AND ERROR
@@ -79,6 +80,7 @@ for d = 1:length(datasets),
     dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
     dat = dat(dat.session == 0, :);
     traces = readtable(sprintf('%s/%s/%s/group_traces.csv', mypath, datasets{d}, mdls{bestMdl+1}));
+    individualrep = sign(dat.repetition - 0.5);
 
         for l = 1:numlags,
             if l == 1,
@@ -96,12 +98,12 @@ for d = 1:length(datasets),
                 case 'z_correct'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['z_prev' lname 'resp__' fullmodelname]) + ...
+                    summarize(dat.(['z_prev' lname 'resp__' fullmodelname]) + ...
                     dat.(['z_prev' lname 'stim__' fullmodelname]));
                     end
                     try
                 alldata.(vars{v})(d,l) = ...
-                    nanmean(dat.(['z_prev' lname 'resp__' bestmodelname]) + ...
+                    summarize(dat.(['z_prev' lname 'resp__' bestmodelname]) + ...
                     dat.(['z_prev' lname  'stim__' bestmodelname]));
 
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'resp']) + ...
@@ -111,12 +113,12 @@ for d = 1:length(datasets),
                 case 'z_error'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['z_prev' lname  'resp__' fullmodelname]) - ...
+                    summarize(dat.(['z_prev' lname  'resp__' fullmodelname]) - ...
                     dat.(['z_prev' lname  'stim__' fullmodelname]));
                     end
                     try
                 alldata.z_error(d,l) = ...
-                    nanmean(dat.(['z_prev' lname  'resp__' bestmodelname]) - ...
+                    summarize(dat.(['z_prev' lname  'resp__' bestmodelname]) - ...
                     dat.(['z_prev' lname  'stim__' bestmodelname]));
 
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'resp']) - ...
@@ -126,12 +128,12 @@ for d = 1:length(datasets),
                 case 'v_correct'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['v_prev' lname  'resp__' fullmodelname]) + ...
+                    summarize(dat.(['v_prev' lname  'resp__' fullmodelname]) + ...
                     dat.(['v_prev' lname  'stim__' fullmodelname]));
                     end
                     try
                 alldata.v_correct(d,l) = ...
-                    nanmean(dat.(['v_prev' lname  'resp__' bestmodelname]) + ...
+                    summarize(dat.(['v_prev' lname  'resp__' bestmodelname]) + ...
                     dat.(['v_prev' lname  'stim__' bestmodelname]));
 
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'resp']) + ...
@@ -141,12 +143,12 @@ for d = 1:length(datasets),
                 case 'v_error'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['v_prev' lname  'resp__' fullmodelname]) - ...
+                    summarize(dat.(['v_prev' lname  'resp__' fullmodelname]) - ...
                     dat.(['v_prev' lname  'stim__' fullmodelname]));
                     end
                     try
                 alldata.v_error(d,l) = ...
-                    nanmean(dat.(['v_prev' lname  'resp__' bestmodelname]) - ...
+                    summarize(dat.(['v_prev' lname  'resp__' bestmodelname]) - ...
                     dat.(['v_prev' lname  'stim__' bestmodelname]));
 
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'resp']) - ...
@@ -156,49 +158,48 @@ for d = 1:length(datasets),
             case 'v_prevresp'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['v_prev' lname  'resp__' fullmodelname]));
+                    summarize(dat.(['v_prev' lname  'resp__' fullmodelname]));
                     end
                     try
                 alldata.([vars{v}])(d,l) = ...
-                    nanmean(dat.(['v_prev' lname  'resp__' bestmodelname]));
+                    summarize(dat.(['v_prev' lname  'resp__' bestmodelname]));
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'resp']), 0);
                     end   
 
             case 'z_prevresp'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['z_prev' lname  'resp__' fullmodelname]));
+                    summarize(dat.(['z_prev' lname  'resp__' fullmodelname]));
                     end
                     try
                 alldata.([vars{v}])(d,l) = ...
-                    nanmean(dat.(['z_prev' lname  'resp__' bestmodelname]));
+                    summarize(dat.(['z_prev' lname  'resp__' bestmodelname]));
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'resp']), 0);
                     end   
-
 
             case 'v_prevstim'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['v_prev' lname  'stim__' fullmodelname]));
+                    summarize(dat.(['v_prev' lname  'stim__' fullmodelname]));
                     end
                     try
                 alldata.([vars{v}])(d,l)= ...
-                    nanmean(dat.(['v_prev' lname  'stim__' bestmodelname]));
+                    summarize(dat.(['v_prev' lname  'stim__' bestmodelname]));
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['v_prev' lname  'stim']), 0);
                     end   
 
             case 'z_prevstim'
                     try
                 alldata.([vars{v} '_fullmodel'])(d,l) = ...
-                    nanmean(dat.(['z_prev' lname  'stim__' fullmodelname]));
+                    summarize(dat.(['z_prev' lname  'stim__' fullmodelname]));
                     end
                     try
                 alldata.([vars{v}])(d,l) = ...
-                    nanmean(dat.(['z_prev' lname  'stim__' bestmodelname]));
+                    summarize(dat.(['z_prev' lname  'stim__' bestmodelname]));
                 alldata.([vars{v} '_pval'])(d,l) = posteriorpval(traces.(['z_prev' lname  'stim']), 0);
                     end   
 
-                end % switch case
+            end % switch case
 
         end
     
@@ -231,17 +232,18 @@ for pltidx = 1:length(vars),
     
         h = (alldata.([vars{pltidx} '_pval'])(d,:) < 0.05);
         if any(h>0),
-            plot(find(h==1), alldata.(vars{pltidx})(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-                'markerfacecolor', colors(d,:), 'markersize', 7);
+           % plot(find(h==1), alldata.(vars{pltidx})(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
+           %    'markerfacecolor', colors(d,:), 'markersize', 7);
         end
     end
 
     % average across datasets
     plot(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), 'k', 'linewidth', 1);
     [h, pval] = ttest(alldata.([vars{pltidx} '_fullmodel']));
+    [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
 
-    if any(h>0),
-        plot(find(h==1), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, (h==1))), ...
+    if any(adj_p < 0.05),
+        plot(find(adj_p < 0.05), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, (adj_p < 0.05))), ...
             'k.', 'markersize', 10);
     end
     xlabel('Lags (# trials)');
@@ -260,11 +262,6 @@ end
 % 4. PLOT CORRELATION KERNELS
 % ========================================================== %
 
-
-% ========================================================== %
-% ALSO COMPUTE CORRELATIONS
-% TO DO: PARTIAL OUT THE EFFECT OF PREVIOUS REPETITIONS!
-% ========================================================== %
 repMets = {'repetition', 'repetition_corrected', 'repetition-trivial', 'logistic', 'logistic-orth'};
 for r = 1:length(repMets),
 
@@ -380,5 +377,15 @@ for r = 1:length(repMets),
     offsetAxes; tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_dc_%s.pdf', repMets{r}));
     end
+
+end
+
+function y = summarize(x)
+
+global individualrep
+
+% flip weights around for alternators
+y = nanmean(individualrep .* x);
+% y = nanmean(x);
 
 end
