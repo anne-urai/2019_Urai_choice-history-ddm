@@ -138,6 +138,7 @@ kostis_makeTable_v2;
 
 % a. panel with all BIC plots
 kostis_all_BICs;
+kostis_all_AICs;
 
 % same for correlations, one big plot
 kostis_all_correlations_selected;
