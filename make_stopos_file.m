@@ -12,9 +12,9 @@ function [] = make_stopos_file()
 % parameter file for HDDM
 % ============================================ #s
 
-nsmp       = [5000]
+nsmp       = [3000]
 datasets   = [0:5]; % dataset number, 0-5 for all main ones
-models     = [26:31]; % the nr of the models
+models     = [0:21]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];

@@ -59,7 +59,7 @@ parser.add_option ( "-d", "--dataset",
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(25),
+        default = range(10),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
@@ -100,6 +100,15 @@ def run_model(m, mypath, model_name, trace_id, n_samples):
     text_file = open(os.path.join(mypath, model_name, 'DIC-md%d.txt'%trace_id), 'w')
     text_file.write("Model {}: {}\n".format(trace_id, m.dic))
     text_file.close()
+
+    # save the other model comparison indices
+    df = dict()
+    df['dic_original'] = [m.dic]
+    df['aic'] = [aic(m)]
+    df['bic'] = [bic(m)]
+    df2 = pd.DataFrame(df)
+    df2.to_csv(os.path.join(mypath, models[vx], 'model_comparison_md%d.csv'%trace_id))
+
 
 def concat_models(mypath, model_name):
     
@@ -194,113 +203,85 @@ def concat_models(mypath, model_name):
         all_traces = m.get_traces()
         all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
-def cornerplot(mypath, datasetname, modelname):
 
-    # ============================================ #
-    # corner plot for parameter recovery
-    # ============================================ #
+# ============================================ #
+# also compute BIC, AIC
+# from https://groups.google.com/forum/#!searchin/hddm-users/bic%7Csort:date/hddm-users/Bo2vUcpR008/RLRpL0faptAJ
+# ============================================ #
 
-    m = hddm.load(os.path.join(mypath, modelname, 'modelfit-combined.model'))
-    print os.path.join(mypath, modelname, 'modelfit-combined.model')
+def aic(self):
+	k = len(self.get_stochastics())
+	try:
+		logp = sum([x.logp for x in self.get_observeds()['node']])	
+	except:
+		shell()
+	return 2 * k - 2 * logp
 
-    # dictionary with all parameters that were fit
-    params_of_interest_0 = list(m.get_group_nodes().index)
-    # dont plot the std
-    params_of_interest_0 = [x for x in params_of_interest_0 if not 'std' in x]
-    params_of_interest_0 = [x for x in params_of_interest_0 if not 'sv' in x]
-
-    traces_0 = []
-    for p in range(len(params_of_interest_0)):
-        traces_0.append(m.nodes_db.node[params_of_interest_0[p]].trace.gettrace())
-
-    fig = corner.corner(np.array(traces_0).T, color='b', labels=params_of_interest_0, show_titles=True, **{'lw':1})
-    try:
-        fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
-    except:
-        print('cannot save figure')
-
-    df0 = pd.DataFrame(np.array(traces_0).T[:,:len(params_of_interest_0)], columns=params_of_interest_0)
-    fig = corner.corner(df0, color='b', **{'lw':1})
-
-    # now add regression lines and stats, from JW
-    for i, j in zip(*np.triu_indices_from(np.zeros((len(params_of_interest_0),len(params_of_interest_0))), 1)):
-        # add titles:
-        r0, p0 = sp.stats.pearsonr(df0.iloc[:,i], df0.iloc[:,j])
-        fig.axes[(j*len(params_of_interest_0))+i].set_title('r={}; p={}'.format(round(r0, 3), round(p0, 3),))
-        # add regression lines:
-        x_line = np.linspace(fig.axes[(j*len(params_of_interest_0))+i].axis()[0], fig.axes[(j*len(params_of_interest_0))+i].axis()[1], 100)
-        (m,b) = sp.polyfit(df0.iloc[:,i], df0.iloc[:,j],1)
-        regression_line = sp.polyval([m,b],x_line)
-        if p0 < 0.05:
-            fig.axes[(j*len(params_of_interest_0))+i].plot(x_line, regression_line, color='r', zorder=3)
-        else:
-            fig.axes[(j*len(params_of_interest_0))+i].plot(x_line, regression_line, color='b', zorder=3)
-
-    # sns.despine(offset=0, trim=True)
-    plt.tight_layout()
-    try:
-        fig.savefig(os.path.join('/nfs/aeurai/HDDM/summary/figures',  'corner_%s_%s.pdf' %(datasetname,modelname)))
-    except:
-        print('cannot save figure')
+def bic(self):
+    k = len(self.get_stochastics())
+    n = len(self.data)
+    logp = sum([x.logp for x in self.get_observeds()['node']])
+    return -2 * logp + k * np.log(n)
 
 # ============================================ #
 # PREPARE THE ACTUAL MODEL FITS
 # ============================================ #
 
 # which model are we running at the moment?
-models = ['stimcoding_nohist', # 0
-    'stimcoding_dc_prevresp', #1
-    'stimcoding_z_prevresp', #2
-    'stimcoding_dc_z_prevresp', #3
-    'stimcoding_dc_z_prevresp_st', #4
-    'stimcoding_dc_z_prevresp_pharma', #5
-    'stimcoding_dc_z_prevcorrect',#6
-    'stimcoding_prevcorrect',#7
-    'stimcoding_dc_z_prev2resp', #8
-    'stimcoding_dc_prevresp_multiplicative', #9
-    'stimcoding_dc_z_prevresp_multiplicative', #10
-    'stimcoding_dc_prevcorrect', #11
-    'regress_dc_z_visualgamma',  #12
-    'regress_dc_z_motorstart', #13
-    'regress_dc_z_prevresp_visualgamma', #14
-    'regress_dc_z_prevresp_motorstart', #15
-    'stimcoding_nohist_svgroup', #16
-    'stimcoding_dc_z_prevresp_svgroup'] #17
+models = [] #17
 
 # new additional models
-models = ['regress_nohist',
-          'regress_dc_lag1',
-          'regress_z_lag1',
-          'regress_dcz_lag1',
-          'regress_dc_lag2',
-          'regress_z_lag2',
-          'regress_dcz_lag2',
-          'regress_dc_lag3',
-          'regress_z_lag3',
-          'regress_dcz_lag3',
-          'stimcoding_nohist_stcoh',  # 0
-          'stimcoding_dc_prevresp_stcoh',  # 1
-          'stimcoding_z_prevresp_stcoh',  # 2
-          'stimcoding_dc_z_prevresp_stcoh',  # 3
-          'regress_dc_lag4', #14
-          'regress_z_lag4',
-          'regress_dcz_lag4',
-          'regress_dc_lag5',
-          'regress_z_lag5',
-          'regress_dcz_lag5',
-          'regress_dc_lag6',
-          'regress_z_lag6',
-          'regress_dcz_lag6',
-          'regress_dc_lag7',
-          'regress_z_lag7',
-          'regress_dcz_lag7', # 25
-          'regress_dc_lag7-10', # 26
-          'regress_z_lag7-10',
-          'regress_dcz_lag7-10',
-          'regress_dc_lag11-15', 
-          'regress_z_lag11-15',
-          'regress_dcz_lag11-15',
-          'regress_dcz_lag7_recode'] # 32
+models = ['regress_nohist', #0
+'regress_dc_lag1',
+'regress_z_lag1',
+'regress_dcz_lag1',
+'regress_dc_lag2',
+'regress_z_lag2',
+'regress_dcz_lag2',
+'regress_dc_lag3',
+'regress_z_lag3',
+'regress_dcz_lag3',
+'regress_dc_lag4', #14
+'regress_z_lag4',
+'regress_dcz_lag4',
+'regress_dc_lag5',
+'regress_z_lag5',
+'regress_dcz_lag5',
+'regress_dc_lag6', #20
+'regress_z_lag6',
+'regress_dcz_lag6',
+'regress_dc_lag7',
+'regress_z_lag7',
+'regress_dcz_lag7', # 2
+'regress_dc_lag7-10', # 26
+'regress_z_lag7-10',
+'regress_dcz_lag7-10',
+'regress_dc_lag11-15', 
+'regress_z_lag11-15',
+'regress_dcz_lag11-15',
+'regress_dcz_lag7_recode', #32
+'stimcoding_nohist', # 0
+'stimcoding_dc_prevresp', #1
+'stimcoding_z_prevresp', #2
+'stimcoding_dc_z_prevresp', #3
+'stimcoding_dc_z_prevresp_st', #4
+'stimcoding_dc_z_prevresp_pharma', #5
+'stimcoding_dc_z_prevcorrect',#6
+'stimcoding_prevcorrect',#7
+'stimcoding_dc_z_prev2resp', #8
+'stimcoding_dc_prevresp_multiplicative', #9
+'stimcoding_dc_z_prevresp_multiplicative', #10
+'stimcoding_dc_prevcorrect', #11
+'regress_dc_z_visualgamma',  #12
+'regress_dc_z_motorstart', #13
+'regress_dc_z_prevresp_visualgamma', #14
+'regress_dc_z_prevresp_motorstart', #15
+'stimcoding_nohist_svgroup', #16
+'stimcoding_dc_z_prevresp_svgroup',
+'stimcoding_nohist_stcoh',  # `10
+'stimcoding_dc_prevresp_stcoh',  # 
+'stimcoding_z_prevresp_stcoh',  # 
+'stimcoding_dc_z_prevresp_stcoh']  # ] # 50
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
@@ -319,7 +300,6 @@ for dx in d:
     # find path depending on location and dataset
     usr = os.environ['USER']
     if 'aeurai' in usr:
-
         mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
     elif 'anne' in usr:
         mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
@@ -464,3 +444,36 @@ for dx in d:
             params.to_csv(os.path.join(mypath, models[vx], 'Gsquare.csv'))
             bic = pd.DataFrame(bic)
             bic.to_csv(os.path.join(mypath, models[vx], 'BIC.csv'))
+
+        elif runMe == 4:
+
+			if os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
+				print("%s, %s"%(mypath, models[vx]))
+				m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
+
+
+				# keep the original DIC from the combined model
+				df = dict()
+				df['dic_original'] = [m.dic]
+
+				# updated DIC, Plummer (2008)
+				# https://groups.google.com/forum/#!topic/hddm-users/OEkGAVyY5iY
+				# DIC_new = DIC + pD = D+ 2*pD
+
+				# AIC
+				df['aic'] = [aic(m)]
+
+				try:
+					# BIC
+					df['bic'] = [bic(m)]
+	
+				except:
+					raise
+
+				df2 = pd.DataFrame(df)
+				df2.to_csv(os.path.join(mypath, models[vx], 'model_comparison.csv'))
+
+
+
+
+

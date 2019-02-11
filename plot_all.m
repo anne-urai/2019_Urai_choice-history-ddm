@@ -60,6 +60,10 @@ if 0,
 end
 disp('starting');
 
+barplots_modelcomparison_regression;
+return;
+
+
 barplots_DIC_regression;
 kernels_lags_bestmodel;
 
