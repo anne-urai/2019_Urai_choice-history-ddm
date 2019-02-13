@@ -11,7 +11,7 @@ addpath(genpath('~/code/Tools'));
 warning off; close all;
 global datasets datasetnames mypath colors
 
-modelIC = {'dic_original', 'bic', 'aic'};
+modelIC = {'aic'};
 for s = 1:length(modelIC),
     
     % ============================================ %
@@ -37,23 +37,17 @@ for s = 1:length(modelIC),
         'regress_dcz_lag5', ...
         'regress_z_lag6', ...
         'regress_dc_lag6', ...
-        'regress_dcz_lag6', ...
-        'regress_z_lag7', ...
-        'regress_dc_lag7', ...
-        'regress_dcz_lag7'};
+        'regress_dcz_lag6'};
 
-    numlags = 8;
-    lagnames = {'1', '2', '3', '4', '5', '6', '7-10', '11-15'};
-
-    numlags = 7;
-    lagnames = {'1', '2', '3', '4', '5', '6', '7'};
+    numlags = 6;
+    lagnames = {'1', '2', '3', '4', '5', '6'};
 
     for d = 1:length(datasets),
         close all;
-        subplot(4, 5, 1);
+        subplot(4, 4, 1);
         getPlotModelIC(mdls, modelIC{s}, d, colors);
         title(datasetnames{d});
-        set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', lagnames, 'xticklabelrotation', -40);
+        set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', lagnames);
         xlabel('Lags (# trials)')
 
 		switch modelIC{s}
