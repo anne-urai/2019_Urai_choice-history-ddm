@@ -39,7 +39,6 @@ from hddm_models import make_model
 import os, hddm, time, kabuki, glob
 from math import ceil
 import os, fnmatch
-import corner
 import pandas as pd
 import scipy as sp
 
@@ -59,7 +58,7 @@ parser.add_option ( "-d", "--dataset",
         type = "int",
         help = "Which dataset, see below" )
 parser.add_option ( "-v", "--version",
-        default = range(10),
+        default = range(26),
         type = "int",
         help = "Version of the model to run" )
 parser.add_option ( "-i", "--trace_id",
@@ -253,13 +252,6 @@ models = ['regress_nohist', #0
 'regress_dc_lag7',
 'regress_z_lag7',
 'regress_dcz_lag7', # 2
-'regress_dc_lag7-10', # 26
-'regress_z_lag7-10',
-'regress_dcz_lag7-10',
-'regress_dc_lag11-15', 
-'regress_z_lag11-15',
-'regress_dcz_lag11-15',
-'regress_dcz_lag7_recode', #32
 'stimcoding_nohist', # 0
 'stimcoding_dc_prevresp', #1
 'stimcoding_z_prevresp', #2
@@ -268,16 +260,12 @@ models = ['regress_nohist', #0
 'stimcoding_dc_z_prevresp_pharma', #5
 'stimcoding_dc_z_prevcorrect',#6
 'stimcoding_prevcorrect',#7
-'stimcoding_dc_z_prev2resp', #8
-'stimcoding_dc_prevresp_multiplicative', #9
-'stimcoding_dc_z_prevresp_multiplicative', #10
+'stimcoding_dc_z_prev2resp', #
 'stimcoding_dc_prevcorrect', #11
 'regress_dc_z_visualgamma',  #12
 'regress_dc_z_motorstart', #13
 'regress_dc_z_prevresp_visualgamma', #14
 'regress_dc_z_prevresp_motorstart', #15
-'stimcoding_nohist_svgroup', #16
-'stimcoding_dc_z_prevresp_svgroup',
 'stimcoding_nohist_stcoh',  # `10
 'stimcoding_dc_prevresp_stcoh',  # 
 'stimcoding_z_prevresp_stcoh',  # 
@@ -311,20 +299,17 @@ for dx in d:
         thispath = os.path.join(mypath, models[vx])
         if not os.path.exists(thispath):
             os.mkdir(thispath)
-        
-        # get the csv file for this dataset
-        filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
-        mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
-
-        # remove RTs below 250 ms
-        # mydata = mydata.loc[mydata.rt > 0.250,:]
-
-        # correct a weirdness in Anke's data
-        if 'transitionprob' in mydata.columns:
-            mydata.transitionprob = mydata.transitionprob * 100;
-            mydata.transitionprob = mydata.transitionprob.round();
     
         if runMe == 1:
+
+        	# get the csv file for this dataset
+            filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
+            mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
+
+        	# correct a weirdness in Anke's data
+            if 'transitionprob' in mydata.columns:
+                mydata.transitionprob = mydata.transitionprob * 100;
+                mydata.transitionprob = mydata.transitionprob.round();
 
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
@@ -447,31 +432,27 @@ for dx in d:
 
         elif runMe == 4:
 
-			if os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')):
-				print("%s, %s"%(mypath, models[vx]))
-				m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
+			print("%s, %s"%(mypath, models[vx]))
+			# average model comparison values across chains
+			if os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and os.path.exists(os.path.join(mypath, models[vx], 'model_comparison_md0.csv')):
+				print('concatenating')
 
+				nchains = 30
+				for trace_id in range(nchains): # how many chains were run?
+					filename = os.path.join(mypath, models[vx], 'model_comparison_md%d.csv'%trace_id)
+					df = pd.read_csv(filename)
 
-				# keep the original DIC from the combined model
-				df = dict()
-				df['dic_original'] = [m.dic]
+					if trace_id == 0:
+						df2 = df
+					else:
+						df2 = df2.append(df, ignore_index=True)
 
-				# updated DIC, Plummer (2008)
-				# https://groups.google.com/forum/#!topic/hddm-users/OEkGAVyY5iY
-				# DIC_new = DIC + pD = D+ 2*pD
-
-				# AIC
-				df['aic'] = [aic(m)]
-
-				try:
-					# BIC
-					df['bic'] = [bic(m)]
-	
-				except:
-					raise
-
-				df2 = pd.DataFrame(df)
-				df2.to_csv(os.path.join(mypath, models[vx], 'model_comparison.csv'))
+				# average over chains
+				df3 = df2.mean()
+				df3 = df2.describe().loc[['mean']]
+				df3.to_csv(os.path.join(mypath, models[vx], 'model_comparison.csv'))
+			else:
+				print('skipping')
 
 
 

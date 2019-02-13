@@ -23,15 +23,9 @@ mdls = {'regress_nohist', ...
     'regress_dcz_lag5', ...
     'regress_z_lag6', ...
     'regress_dc_lag6', ...
-    'regress_dcz_lag6', ...
-    'regress_dc_lag7-10', ...
-    'regress_z_lag7-10',...
-    'regress_dcz_lag7-10',...
-    'regress_dc_lag11-15', ...
-    'regress_z_lag11-15',...
-    'regress_dcz_lag11-15'};
+    'regress_dcz_lag6'};
 
-numlags = 8;
+numlags = 6;
 lagnames = {'1', '2', '3', '4', '5', '6', '7-10', '11-15'};
 vars = {'z_correct', 'z_error', 'v_correct', 'v_error', ...
     'z_prevresp', 'z_prevstim', 'v_prevresp', 'v_prevstim'};
@@ -71,6 +65,7 @@ for d = 1:length(datasets),
     mdldic = mdldic(2:end);
     [~, bestMdl] = min(mdldic);
     bestmodelname = regexprep(regexprep(mdls{bestMdl+1}, '_', ''), '-', 'to');
+    bestmodelnames{d} = bestmodelname;
     disp(bestmodelname)
 
     % ========================================================== %
@@ -249,7 +244,7 @@ for pltidx = 1:length(vars),
     xlabel('Lags (# trials)');
     ylabel(regexprep(regexprep(regexprep(regexprep(vars{pltidx}, '_', ' ~ previous '), ...
         'v ', 'v_{bias} '), 'prevresp', 'response'), 'prevstim', 'stimulus'));
-    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
+    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
     axis tight; offsetAxes;
     
     tightfig;
@@ -274,13 +269,14 @@ for r = 1:length(repMets),
     mat_dc.pval = nan(length(datasets), numlags);
 
     for d = 1:length(datasets),
-        bestmodelname = 'regressdczlag6';
 
+        % from which model to take the correlations?
+        bestmodelname = bestmodelnames{d};
         dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
         dat = dat(dat.session == 0, :);
 
         % covariates = zeros(size(dat.(['repetition' num2str(l)])));
-        for l = 1:6,
+        for l = 1:numlags,
 
             if l == 1,
                 lname = [];
@@ -310,6 +306,7 @@ for r = 1:length(repMets),
                 repeat = dat.(['logistic_orth' num2str(l)]);
             end
             
+            try
             % compute correlation coefficients
             [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
                 spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
@@ -318,6 +315,7 @@ for r = 1:length(repMets),
             [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
                 spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
                 repeat);
+            end
         end
     end
 
@@ -342,7 +340,7 @@ for r = 1:length(repMets),
     end
 
     ylabel({'Correlation, P(repeat) with' 'z ~ previous response'})
-    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
+    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
     xlabel('Lags (# trials)');
     axis tight;
     ylim([-0.5 1]);
@@ -370,7 +368,7 @@ for r = 1:length(repMets),
     end
 
     ylabel({'Correlation, P(repeat) with' 'v_{bias} ~ previous response'})
-    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xticklabelrotation', -20, 'xcolor', 'k', 'ycolor', 'k');
+    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
     xlabel('Lags (# trials)');
     axis tight;
     ylim([-0.5 1]);

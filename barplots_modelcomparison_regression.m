@@ -88,7 +88,7 @@ mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
     try
     modelcomp = readtable(sprintf('%s/%s/%s/model_comparison.csv', ...
-        mypath, datasets{d}, mdls{m}));
+        mypath, datasets{d}, mdls{m}), 'readrownames', true);
     mdldic(m) = modelcomp.(s);
 catch
     fprintf('%s/%s/%s/model_comparison.csv  NOT FOUND\n', ...

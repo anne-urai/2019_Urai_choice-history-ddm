@@ -139,7 +139,7 @@ for d = 1:length(datasets),
             varnames{v} = regexprep(varnames{v}, '\.0$', '');
             varnames{v} = regexprep(varnames{v}, '\[', '(');
             varnames{v} = regexprep(varnames{v}, '\]', ')');
-            varnames{v} = regexprep(varnames{v}, '-', 'to');
+            % varnames{v} = regexprep(varnames{v}, '-', 'to');
 
             switch datasets{d},
                 

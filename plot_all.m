@@ -61,14 +61,9 @@ end
 disp('starting');
 
 barplots_modelcomparison_regression;
-return;
-
-
-barplots_DIC_regression;
 kernels_lags_bestmodel;
 
 return;
-
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
@@ -124,6 +119,13 @@ barplots_DIC_previousresponse_outcome;
 
 % ========================================== %
 % FIGURE 6
+% ========================================== %
+
+barplots_modelcomparison_regression;
+kernels_lags_bestmodel;
+
+% ========================================== %
+% FIGURE 7
 % ========================================== %
 
 % a. motion energy filtering: this has to run before, 
