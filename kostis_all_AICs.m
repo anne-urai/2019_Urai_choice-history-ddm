@@ -16,7 +16,8 @@ colors = [colors; cols1(2, :); cols2(6, :); nanmean([cols1(2, :); cols2(6, :)]);
 
 % results = readtable('/Users/urai/Data/HDDM/summary/Anke_MEG_transition/allindividualresults_kostis.csv');
 results = readtable(sprintf('%s/summary/%s/allindividualresults_kostis.csv', mypath, 'Anke_MEG_transition'));
-baselineModel = results.ddmK_vanilla_aic;
+% baselineModel = results.ddmK_vanilla_aic;
+
 % ddmK = normal DDM, with ramping
 % ddmColl = collapsing bounds
 % ddmDColl = collapsing bounds, accumulation from stimulus onset
@@ -26,21 +27,21 @@ baselineModel = results.ddmK_vanilla_aic;
 
 model(1).data = [results.ddmK_z_aic results.ddmK_dc_aic  results.ddmK_dcz_aic];
 model(1).vanilla = results.ddmK_vanilla_aic;
-model(1).name = {'1. Standard DDM' ''};
+model(1).name = {'1. Standard' 'DDM'};
 model(1).ticklabels = {'z', 'v_{bias}', 'z+v_{bias}'};
 model(1).colors = [colors; mean(colors([1 2], :))];
 model(1).basevalue = unique(results.ddmK_vanilla_aic);
 model(1).ylim = [-400 200];
 model(1).subplot = 1;
 
-model(end+1).data = [ results.ddmD_dc_aic results.ddmD_rp_aic results.ddmD_rp2_aic];
+model(end+1).data = [ results.ddmK_dc_aic results.ddmK_rp_aic results.ddmK_rp2_aic];
 model(end).vanilla = results.ddmK_vanilla_aic;
-model(end).name = {'2. DDM, dynamic', 'drift bias'};
+model(end).name = {'2. DDM', 'dynamic v_{bias}'};
 model(end).ticklabels = {'constant v_{bias}', 'ramp', 'constant+ramp'};
 cols1 = cbrewer('qual', 'Set1', 8);
 cols2 = cbrewer('qual', 'Dark2', 8);
 model(end).colors = [cols1(2, :); cols2(6, :); nanmean([cols1(2, :); cols2(6, :)])];
-model(end).basevalue = unique(results.ddmD_vanilla_aic);
+model(end).basevalue = unique(results.ddmK_vanilla_aic);
 model(end).ylim = [-400 200];
 model(end).subplot = 2;
 
@@ -66,7 +67,7 @@ model(end).subplot = 4;
 
 model(end+1).data = [results.ouD_sp_aic results.ouD_input_aic results.ouD_lambda_aic];
 model(end).vanilla = results.ddmK_vanilla_aic;
-model(end).name = {'4. Leaky accumulator' ''};
+model(end).name = {'4. Leaky' 'accumulator'};
 model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
 model(end).colors = [cols2([5 3 4], :)];
 model(end).basevalue = unique(results.ddmD_vanilla_aic);
@@ -86,6 +87,8 @@ model(end).subplot = 6;
 subplot = @(m,n,p) subtightplot (m, n, p, [0.01 0.03], [0.1 0.01], [0.1 0.01]);
 
 close all;
+set(gcf, 'defaultaxesfontsize', 4, 'defaultaxestitlefontsizemultiplier', 1);
+
 for m = 1:length(model),
     
     %everything relative to the full model
@@ -133,7 +136,7 @@ for m = 1:length(model),
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     offsetAxes;
     set(gca, 'xtick', 1:length(model(m).ticklabels), 'xticklabel', model(m).ticklabels, 'xticklabelrotation', -30);
-    title(model(m).name);
+    title(model(m).name, 'fontweight', 'normal', 'fontangle', 'italic');
     axis square;
     
     switch m
@@ -141,7 +144,7 @@ for m = 1:length(model),
             ylabel({'\DeltaAIC from DDM'; 'without history'}, 'interpreter', 'tex');
         case 3
             set(gca, 'ytick', [-8000:2000:0]);
-            ylabel({'\DeltaAIC from dynamic DDM'; 'without history'}, 'interpreter', 'tex');
+            ylabel({'\DeltaAIC from dyn-DDM'; 'without history'}, 'interpreter', 'tex');
 
         otherwise
             set(gca, 'ycolor', 'w', 'yticklabel', []);

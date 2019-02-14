@@ -86,7 +86,8 @@ params_ddm_rp       = array2table([params4 ll2bic(outgf(:, 4), 6, notrials) ll2a
 %params_ddm_rp.slope = params_ddm_rp.slope * 5;
 
 %for params5, column 6: slope (multiply by sign of offset), column 7: offset
-params_ddm_rp2      = array2table([params5 ll2bic(outgf(:, 5), 7, notrials)], 'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'offset', 'bic'});
+params_ddm_rp2      = array2table([params5 ll2bic(outgf(:, 5), 7, notrials) ll2aic(outgf(:, 5), 7)], ...
+    'variablenames', {'threshold', 'scale', 'T0', 'dv', 'bsp', 'slope', 'offset', 'bic', 'aic'});
 params_ddm_rp2.slope = params_ddm_rp2.slope .* sign(params_ddm_rp2.offset);
 
 params_ddm.Properties.VariableNames         = cellfun((@(x) cat(2, 'ddmK_vanilla_', x)), params_ddm.Properties.VariableNames, 'un', 0);

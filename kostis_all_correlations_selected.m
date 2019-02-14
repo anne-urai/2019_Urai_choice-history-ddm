@@ -27,13 +27,13 @@ baselineModel = results.repetitionK;
 % ouDColl = O-U with collapsing bounds, accumulation from stimulus onset
 
 model(1).data       = {{results.ddmK_dcz_zbias results.ddmK_dcz_dcbias}};
-model(1).name       = {'1. Standard DDM' ''};
+model(1).name       = {'1. Standard' 'DDM'};
 model(1).ticklabels = {{'z', 'v_{bias}'}};
 model(1).colors     = [grey; grey];
 model(1).subplot    = 1;
 
 model(end+1).data = {{results.ddmK_rp2_offset results.ddmK_rp2_slope}};
-model(end).name = {'2. DDM, dynamic', 'drift bias'};
+model(end).name = {'2. DDM', 'dynamic v_{bias}'};
 model(end).ticklabels = {{'constant', 'ramp'}};
 cols1 = cbrewer('qual', 'Set1', 8);
 cols2 = cbrewer('qual', 'Dark2', 8);
@@ -94,6 +94,8 @@ model(end).subplot = 4;
 subplot = @(m,n,p) subtightplot (m, n, p, [0.01 0.03], [0.1 0.01], [0.1 0.01]);
 
 close all;
+set(gcf, 'defaultaxesfontsize', 4, 'defaultaxestitlefontsizemultiplier', 1);
+
 for m = 1:length(model),
     
     %everything relative to the full model
@@ -157,7 +159,7 @@ for m = 1:length(model),
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     offsetAxes;
     set(gca, 'xtick', xticks, 'xticklabel', xticklabels, 'xticklabelrotation', -30);
-    title(model(m).name);
+    title(model(m).name, 'fontweight', 'normal', 'fontangle', 'italic', 'fontsize', 8);
     %axis square;
     
     switch model(m).subplot
