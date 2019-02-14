@@ -49,18 +49,11 @@ for s = 1:length(modelIC),
         title(datasetnames{d});
         set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', lagnames);
         xlabel('Lags (# trials)')
-
-		switch modelIC{s}
-        case 'dic_original'
-        	ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
-        case 'bic'
-            ylabel({'\Delta BIC from model'; 'without history'}, 'interpreter', 'tex');
-        case 'aic'
-            ylabel({'\Delta AIC from model'; 'without history'}, 'interpreter', 'tex');
-        end
+        ylabel({'\DeltaAIC from model'; 'without history'}, 'interpreter', 'tex');
 
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/modelcomparison_regression_%s_d%d.pdf', modelIC{s}, d));
+        disp(d);
     end
 end
 

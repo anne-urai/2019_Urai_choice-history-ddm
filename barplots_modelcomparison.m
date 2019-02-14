@@ -11,7 +11,7 @@ addpath(genpath('~/code/Tools'));
 warning off; close all;
 global datasets datasetnames mypath
 
-modelIC = {'dic_original', 'bic', 'aic'};
+modelIC = {'aic'};
 for s = 1:length(modelIC),
     
     % ============================================ %
@@ -27,18 +27,11 @@ for s = 1:length(modelIC),
         getPlotModelIC(mdls, modelIC{s}, d);
         title(datasetnames{d});
         set(gca, 'xtick', 1:3, 'xticklabel', {'z', 'v_{bias}', 'both'});
-        
-		switch modelIC{s}
-        case 'dic_original'
-        	ylabel({'\Delta DIC from model'; 'without history'}, 'interpreter', 'tex');
-        case 'bic'
-            ylabel({'\Delta BIC from model'; 'without history'}, 'interpreter', 'tex');
-        case 'aic'
-            ylabel({'\Delta AIC from model'; 'without history'}, 'interpreter', 'tex');
-        end
+        ylabel({'\DeltaAIC from model'; 'without history'}, 'interpreter', 'tex');
 
         drawnow; tightfig;
         print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/modelcomparison_%s_d%d.pdf', modelIC{s}, d));
+        disp(d);
     end
 end
 
@@ -74,8 +67,13 @@ mdldic = mdldic(1:end-1);
 [~, bestMdl] = min(mdldic);
 
 for i = 1:length(mdldic),
+    if i == bestMdl,
+    b = bar(i, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
+        'edgecolor', 'k');
+    else
     b = bar(i, mdldic(i), 'facecolor', colors(i, :), 'barwidth', 0.6, 'BaseValue', 0, ...
         'edgecolor', 'none');
+    end
 end
 
 %# Add a text string above/below each bin

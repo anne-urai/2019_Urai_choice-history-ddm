@@ -250,7 +250,7 @@ for pltidx = 1:length(vars),
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/regressionkernels_correcterror_%d.pdf', pltidx));
-    fprintf('~/Data/serialHDDM/regressionkernels_correcterror_%d.pdf \n', pltidx)
+    % fprintf('~/Data/serialHDDM/regressionkernels_correcterror_%d.pdf \n', pltidx)
 end
 
 
@@ -258,7 +258,7 @@ end
 % 4. PLOT CORRELATION KERNELS
 % ========================================================== %
 
-repMets = {'repetition', 'repetition_corrected', 'repetition-trivial', 'logistic', 'logistic-orth'};
+repMets = {'repetition-trivial'};
 for r = 1:length(repMets),
 
     disp(repMets{r})
@@ -271,12 +271,12 @@ for r = 1:length(repMets),
 
     for d = 1:length(datasets),
 
-        % from which model to take the correlations?
-        bestmodelname = bestmodelnames{d};
         dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
         dat = dat(dat.session == 0, :);
 
-        % covariates = zeros(size(dat.(['repetition' num2str(l)])));
+        % from which model to take the correlations take the full model at the best lag
+        bestmodelname = regexprep(bestmodelnames{d}, 'dcl', 'dczl');
+    
         for l = 1:numlags,
 
             if l == 1,
@@ -296,37 +296,52 @@ for r = 1:length(repMets),
             case 'repetition_corrected'
                 repeat = dat.(['repetition_corrected' num2str(l)]);
             case 'repetition-trivial'
-                repeat = dat.(['repetition' num2str(l)]) - arrayfun(@bernouilli_process, ...
-                l*ones(size(dat.repetition)), dat.repetition);
+
+                % remove trivial repetition probabilities
                 if l == 1,
                     repeat = dat.repetition;
+                elseif l == 2,
+                    repeat = dat.(['repetition' num2str(l)]) ...
+                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition);
+                elseif l == 3,
+                    repeat = dat.(['repetition' num2str(l)]) ...
+                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition) ...
+                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition2);
+                elseif l == 4,
+                    repeat = dat.(['repetition' num2str(l)]) ...
+                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition) ...
+                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition2) ...
+                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition3);
                 end
+
             case 'logistic'
                 repeat = dat.(['logistic' num2str(l)]);
             case 'logistic-orth'
                 repeat = dat.(['logistic_orth' num2str(l)]);
             end
-            
-            try
-            % compute correlation coefficients
-            [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
-                spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                repeat);
 
-            [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
-                spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                repeat);
+            try
+                % compute correlation coefficients
+                % only for those lags that are in the best-fitting model
+                [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
+                    spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
+                    repeat);
+
+                [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
+                    spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
+                    repeat);
             end
         end
     end
 
     % Z CORRELATION KERNELS
     close all;
-    subplot(441); hold on;
+    subplot(451); hold on;
     plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
     for d = 1:length(datasets),
         plot(1:numlags, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
-        h = (mat_z.r(d,:) < 0.05);
+        [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(mat_z.pval(d,:));
+
         if any(h>0),
             plot(find(h==1), mat_z.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
                 'markerfacecolor', colors(d,:), 'markersize', 7);
@@ -335,6 +350,7 @@ for r = 1:length(repMets),
 
     plot(1:numlags, nanmean(mat_z.r), 'k', 'linewidth', 1);
     [h, pval] = ttest(mat_z.r);
+    [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
     if any(h>0),
         plot(find(h==1), nanmean(mat_z.r(:, (h==1))), ...
             '.k',  'markersize', 10);
@@ -344,17 +360,18 @@ for r = 1:length(repMets),
     set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
     xlabel('Lags (# trials)');
     axis tight;
-    ylim([-0.5 1]);
-    offsetAxes; tightfig;
+    ylim([-0.5 1]); xlim([1 4]);
+    offsetAxes;  tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_z_%s.pdf', repMets{r}));
 
     % DC CORRELATION KERNELS
     close all;
-    subplot(441); hold on;
+    subplot(451); hold on;
     plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
     for d = 1:length(datasets),
         plot(1:numlags, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
-        h = (mat_dc.pval(d,:) < 0.05);
+
+        [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(mat_dc.pval(d,:));
         if any(h>0),
             plot(find(h==1), mat_dc.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
                 'markerfacecolor', colors(d,:), 'markersize', 7);
@@ -363,6 +380,8 @@ for r = 1:length(repMets),
 
     plot(1:numlags, nanmean(mat_dc.r), 'k', 'linewidth', 1);
     [h, pval] = ttest(mat_dc.r);
+    [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
+
     if any(h>0),
         plot(find(h==1), nanmean(mat_dc.r(:, (h==1))), ...
             '.k',  'markersize', 10);
@@ -372,8 +391,8 @@ for r = 1:length(repMets),
     set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
     xlabel('Lags (# trials)');
     axis tight;
-    ylim([-0.5 1]);
-    offsetAxes; tightfig;
+    ylim([-0.5 1]); xlim([1 4]);
+    offsetAxes;  tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_dc_%s.pdf', repMets{r}));
     end
 

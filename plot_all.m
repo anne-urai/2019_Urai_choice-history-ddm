@@ -60,7 +60,7 @@ if 0,
 end
 disp('starting');
 
-barplots_modelcomparison_regression;
+% barplots_modelcomparison_regression;
 kernels_lags_bestmodel;
 
 return;
@@ -82,8 +82,8 @@ strategy_plot;
 % FIGURE 3
 % ========================================== %
 
-barplots_DIC; % 3a
- 
+barplots_modelcomparison;
+
 close all; subplot(3,3,1);
 conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0);
 tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed.pdf'); % 3b
