@@ -60,8 +60,7 @@ if 0,
 end
 disp('starting');
 
-% barplots_modelcomparison_regression;
-kernels_lags_bestmodel;
+correlations_regression_lags;
 
 return;
 

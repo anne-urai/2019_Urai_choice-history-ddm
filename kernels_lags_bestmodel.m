@@ -14,7 +14,7 @@ for m = 1:length(vars),
     alldata.([vars{m} '_fullmodel'])       = nan(length(datasets), numlags);
     alldata.([vars{m} '_pval'])   = nan(length(datasets), numlags);
 end
-fullmodelname = 'regressdczlag4'; % extend thin lines for weights from biggest model
+fullmodelname = 'regressdczlag6'; % extend thin lines for weights from biggest model
 global individualrep
 
 for d = 1:length(datasets),
@@ -76,15 +76,12 @@ for d = 1:length(datasets),
     try
         traces = readtable(sprintf('%s/%s/%s/group_traces.csv', mypath, datasets{d}, mdls{bestMdl+1}));
     end
+    % flip around weights for alternators
     individualrep = sign(dat.repetition - 0.5);
 
         for l = 1:numlags,
             if l == 1,
                 lname = '';
-            elseif l == 7,
-                lname = '7_10';
-            elseif l == 8,
-                lname = '11_15';
             else
                 lname = num2str(l);
             end
@@ -235,8 +232,8 @@ for pltidx = 1:length(vars),
 
     % average across datasets
     plot(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), 'k', 'linewidth', 1);
-    [h, pval] = ttest(alldata.([vars{pltidx} '_fullmodel']));
-    [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
+    [h, adj_p] = ttest(alldata.([vars{pltidx}])); % stats on best fits
+    %[h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
 
     if any(adj_p < 0.05),
         plot(find(adj_p < 0.05), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, (adj_p < 0.05))), ...
@@ -253,148 +250,6 @@ for pltidx = 1:length(vars),
     % fprintf('~/Data/serialHDDM/regressionkernels_correcterror_%d.pdf \n', pltidx)
 end
 
-
-% ========================================================== %
-% 4. PLOT CORRELATION KERNELS
-% ========================================================== %
-
-repMets = {'repetition-trivial'};
-for r = 1:length(repMets),
-
-    disp(repMets{r})
-    mat_z.r     = nan(length(datasets), numlags);
-    mat_z.r_fullmodel     = nan(length(datasets), numlags);
-    mat_z.pval  = nan(length(datasets), numlags);
-    mat_dc.r    = nan(length(datasets), numlags);
-    mat_dc.r_fullmodel    = nan(length(datasets), numlags);
-    mat_dc.pval = nan(length(datasets), numlags);
-
-    for d = 1:length(datasets),
-
-        dat = readtable(sprintf('%s/summary/%s/allindividualresults.csv', mypath, datasets{d}));
-        dat = dat(dat.session == 0, :);
-
-        % from which model to take the correlations take the full model at the best lag
-        bestmodelname = regexprep(bestmodelnames{d}, 'dcl', 'dczl');
-    
-        for l = 1:numlags,
-
-            if l == 1,
-                lname = [];
-            elseif l == 7,
-                lname = '7_10';
-            elseif l == 8,
-                lname = '11_15';
-            else
-                lname = num2str(l);
-            end
-
-            % what metric for repetition do we want to use?
-            switch repMets{r}
-            case 'repetition'
-                repeat = dat.(['repetition' num2str(l)]);
-            case 'repetition_corrected'
-                repeat = dat.(['repetition_corrected' num2str(l)]);
-            case 'repetition-trivial'
-
-                % remove trivial repetition probabilities
-                if l == 1,
-                    repeat = dat.repetition;
-                elseif l == 2,
-                    repeat = dat.(['repetition' num2str(l)]) ...
-                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition);
-                elseif l == 3,
-                    repeat = dat.(['repetition' num2str(l)]) ...
-                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition) ...
-                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition2);
-                elseif l == 4,
-                    repeat = dat.(['repetition' num2str(l)]) ...
-                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition) ...
-                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition2) ...
-                    - arrayfun(@bernouilli_process, l*ones(size(dat.repetition)), dat.repetition3);
-                end
-
-            case 'logistic'
-                repeat = dat.(['logistic' num2str(l)]);
-            case 'logistic-orth'
-                repeat = dat.(['logistic_orth' num2str(l)]);
-            end
-
-            try
-                % compute correlation coefficients
-                % only for those lags that are in the best-fitting model
-                [mat_z.r(d, l), mat_z.ci(d,l,:), mat_z.pval(d,l)] = ...
-                    spearmans(dat.(['z_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                    repeat);
-
-                [mat_dc.r(d, l), mat_dc.ci(d,l,:), mat_dc.pval(d,l)] = ...
-                    spearmans(dat.(['v_prev' num2str(lname) 'resp__' bestmodelname]), ...
-                    repeat);
-            end
-        end
-    end
-
-    % Z CORRELATION KERNELS
-    close all;
-    subplot(451); hold on;
-    plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
-    for d = 1:length(datasets),
-        plot(1:numlags, mat_z.r(d, :), 'color', colors(d, :), 'linewidth', 1);
-        [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(mat_z.pval(d,:));
-
-        if any(h>0),
-            plot(find(h==1), mat_z.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-                'markerfacecolor', colors(d,:), 'markersize', 7);
-        end
-    end
-
-    plot(1:numlags, nanmean(mat_z.r), 'k', 'linewidth', 1);
-    [h, pval] = ttest(mat_z.r);
-    [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
-    if any(h>0),
-        plot(find(h==1), nanmean(mat_z.r(:, (h==1))), ...
-            '.k',  'markersize', 10);
-    end
-
-    ylabel({'Correlation, P(repeat) with' 'z ~ previous response'})
-    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
-    xlabel('Lags (# trials)');
-    axis tight;
-    ylim([-0.5 1]); xlim([1 4]);
-    offsetAxes;  tightfig;
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_z_%s.pdf', repMets{r}));
-
-    % DC CORRELATION KERNELS
-    close all;
-    subplot(451); hold on;
-    plot([1 numlags], [0 0], 'k', 'linewidth', 0.5);
-    for d = 1:length(datasets),
-        plot(1:numlags, mat_dc.r(d, :), 'color', colors(d, :), 'linewidth', 1);
-
-        [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(mat_dc.pval(d,:));
-        if any(h>0),
-            plot(find(h==1), mat_dc.r(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-                'markerfacecolor', colors(d,:), 'markersize', 7);
-        end
-    end
-
-    plot(1:numlags, nanmean(mat_dc.r), 'k', 'linewidth', 1);
-    [h, pval] = ttest(mat_dc.r);
-    [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
-
-    if any(h>0),
-        plot(find(h==1), nanmean(mat_dc.r(:, (h==1))), ...
-            '.k',  'markersize', 10);
-    end
-
-    ylabel({'Correlation, P(repeat) with' 'v_{bias} ~ previous response'})
-    set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
-    xlabel('Lags (# trials)');
-    axis tight;
-    ylim([-0.5 1]); xlim([1 4]);
-    offsetAxes;  tightfig;
-    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/correlationkernels_dc_%s.pdf', repMets{r}));
-    end
 
 end
 

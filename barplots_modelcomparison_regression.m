@@ -93,24 +93,24 @@ for i = 1:length(mdldic),
 
     % move together in clusters of 3
     if contains(mdls{i}, '_z_'),
-        xpos = i+0.2;
+        xpos = i+0.18;
         thiscolor = colors(1, :);
     elseif contains(mdls{i}, '_dc_'),
         xpos = i;
         thiscolor = colors(2, :);
 
     elseif contains(mdls{i}, '_dcz_'), 
-        xpos = i-0.2;
+        xpos = i-0.18;
         thiscolor = colors(3, :);
 
     end
 
     % best fit with outline
     if i == bestMdl,
-        b = bar(xpos, mdldic(i), 'facecolor', thiscolor, 'barwidth', 0.8, 'BaseValue', 0, ...
+        b = bar(xpos, mdldic(i), 'facecolor', thiscolor-0.1, 'barwidth', 0.8, 'BaseValue', 0, ...
         'edgecolor', 'k');
     else
-        b = bar(xpos, mdldic(i), 'facecolor', thiscolor, 'barwidth', 0.8, 'BaseValue', 0, ...
+        b = bar(xpos, mdldic(i), 'facecolor', thiscolor+0.1, 'barwidth', 0.8, 'BaseValue', 0, ...
         'edgecolor', 'none');
     end
 end

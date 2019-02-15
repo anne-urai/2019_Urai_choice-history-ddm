@@ -72,13 +72,13 @@ plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 disp('z bayes factor');
 bf = prod([alldat(ds).bfz])
 if bf < 100,
-    t = title(sprintf('BF_{10} < 1/100'));
+    t = title(sprintf('BF_{10} < 1/100'), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf > 100,
-    t = title(sprintf('BF_{10} > 100'));
+    t = title(sprintf('BF_{10} > 100'), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf < 1,
-    t = title(sprintf('BF_{10} = 1/%.2f', 1/bf));
+    t = title(sprintf('BF_{10} = 1/%.2f', 1/bf), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf > 1,
-    t = title(sprintf('BF_{10} = %.2f', bf));
+    t = title(sprintf('BF_{10} = %.2f', bf), 'fontweight', 'normal', 'fontangle', 'italic');
 end
 t.Position(2) = t.Position(2) - 1.2;
 
@@ -133,13 +133,13 @@ disp('v bayes factor');
 
 bf = prod([alldat(ds).bfv]);
 if bf < 100,
-    t = title(sprintf('BF_{10} < 1/100'));
+    t = title(sprintf('BF_{10} < 1/100'), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf > 100,
-    t = title(sprintf('BF_{10} > 100'));
+    t = title(sprintf('BF_{10} > 100'), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf < 1,
-    t = title(sprintf('BF_{10} = 1/%.2f', 1/bf));
+    t = title(sprintf('BF_{10} = 1/%.2f', 1/bf), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf > 1,
-    t = title(sprintf('BF_{10} = %.2f', bf));
+    t = title(sprintf('BF_{10} = %.2f', bf), 'fontweight', 'normal', 'fontangle', 'italic');
 end
 t.Position(2) = t.Position(2) - 1.2;
 % move closer together

@@ -19,7 +19,6 @@ varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'repetition'
 
 nrSess          = length(unique(alldata.session)) + 1;
 results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, length(varnames)), 'variablenames', varnames);
-% results.drug    = repmat({'NaN'}, length(unique(alldata.subj_idx))*nrSess, 1);
 
 % preallocate dprime for different coherence levels
 if sum(strcmp(alldata.Properties.VariableNames, 'coherence')) > 0,
@@ -45,21 +44,6 @@ if all(cellfun(@isempty, strfind(alldata.Properties.VariableNames, 'correct'))),
     tmpstim = (alldata.stimulus > 0);
     tmpresp = (alldata.response > 0);
     alldata.correct = (tmpstim == tmpresp);
-end
-
-% % only MEG-PL data has starthand
-% if isfield(alldata, 'startHand'),
-%     alldata.startHand(alldata.startHand > 20) = nan;
-% else
-%     alldata.startHand = nan(size(alldata.subj_idx));
-% end
-
-% for criterion shift
-alldata.nextstim = circshift(alldata.stimulus, -1);
-alldata.nextresp = circshift(alldata.response, -1);
-try
-    alldata.nextstim((diff(alldata.trial) ~= 1)) = NaN;
-    alldata.nextresp((diff(alldata.trial) ~= 1)) = NaN;
 end
 
 % for mulder et al. analysis
@@ -122,10 +106,12 @@ for sj = subjects,
         % data.stimrepeat = [~(abs(diff(data.stimulus)) > 0); NaN];
         
         % 01.10.2017, use the same metric as in MEG, A1c_writeCSV.m
-        for l = 1:16,
-            data.(['repeat' num2str(l)]) = double(data.response == circshift(data.response, l));
+        for l = 1:6,
             data.(['prev' num2str(l) 'resp']) = circshift(data.response, l);
+            data.(['prev' num2str(l) 'stim']) = circshift(data.stimulus, l);
             data.(['prev' num2str(l) 'resp'])(data.(['prev' num2str(l) 'resp']) == 0) = -1;
+
+            data.(['repeat' num2str(l)]) = double(data.response == circshift(data.response, l));
             wrongTrls = ((data.trial - circshift(data.trial, l)) ~= l);
             data.(['repeat' num2str(l)])(wrongTrls) = NaN;
         end
@@ -158,64 +144,21 @@ for sj = subjects,
         % for figure 6c
         % ======================================= %
         
-        % ALSO REMOVE THE EFFECT OF MORE RECENT LAGS, TAKE THE RESIDUALS
-        repetitions_mat = data{:, {'repeat1', 'repeat2', 'repeat3', 'repeat4', ...
-            'repeat5', 'repeat6', 'repeat7', 'repeat8', 'repeat9', 'repeat10', ...
-            'repeat11', 'repeat12', 'repeat13', 'repeat14', 'repeat15', 'repeat16'}};
-        repetitions_mat(repetitions_mat == 0) = -1;
-        repetitions_mat(isnan(repetitions_mat)) = 0;
-        qr_mat = qr(repetitions_mat);
-
-        for l = 1:size(repetitions_mat, 2),
-
-            usetrls = find((repetitions_mat(:, l) ~= 0));
-            % use QR decomposition, only on valid trials, to remove the effect of more recent choice sequences
-            cleaned = qr_mat(usetrls, l);
-            
-            % put back
-            data.(['repeat_corrected' num2str(l)]) = nan(size(data.(['repeat' num2str(l)])));
-            data.(['repeat_corrected' num2str(l)])(usetrls) = cleaned(:, end);
-
-        end
-        
-        for l = 1:16,
+        for l = 1:6,
             results.(['repetition' num2str(l)])(icnt) = nanmean(data.(['repeat' num2str(l)]));
-        end
-        for l = 1:16,
-            results.(['repetition_corrected' num2str(l)])(icnt) = nanmean(data.(['repeat_corrected' num2str(l)]));
-        end
-
-        % ======================================= %
-        % logistic regression weights
-        % ======================================= %
-
-        X = [data.stimulus data.prev1resp data.prev2resp data.prev3resp data.prev4resp ...
-            data.prev5resp data.prev6resp data.prev7resp data.prev8resp data.prev9resp ...
-            data.prev10resp data.prev11resp data.prev12resp data.prev13resp data.prev14resp data.prev15resp];
-        X(X == 0) = -1;
-        b = glmfit(X, data.response, 'binomial', 'constant', 'on');
-        b = b(3:end); % remove overall bias and stimulus weight
-        b2 = glmfit(qr(X), data.response, 'binomial', 'constant', 'on');
-        b2 = b2(3:end); % remove overall bias and stimulus
-        for l = 1:length(b)
-            results.(['logistic' num2str(l)])(icnt) = b(l);
-            results.(['logistic_orth' num2str(l)])(icnt) = b2(l);
-        end
+            results.(['repetition_correct' num2str(l)])(icnt) = ...
+            nanmean(data.(['repeat' num2str(l)])((data.(['prev' num2str(l) 'stim']) > 0) == (data.(['prev' num2str(l) 'resp']) > 0)));
+            results.(['repetition_error' num2str(l)])(icnt) = ...
+            nanmean(data.(['repeat' num2str(l)])((data.(['prev' num2str(l) 'stim']) > 0) ~= (data.(['prev' num2str(l) 'resp']) > 0)));
+        end 
 
         % for the first lag, no correction (perhaps not necessary?)
-        %results.repetition_corrected1(icnt) = results.repetition1(icnt);
         results.repetition(icnt)        = nanmean(data.repeat1);
         
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
         results.repetition_preverror(icnt)   = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
-        
-        % % criterion based on repetition and stimulus sequences
-        % [~, c] = dprime(data.stimrepeat, data.repeat);
-        % results.repetitioncrit(icnt)    = -c;
-        
-        % criterion based on next trial bias, then collapsed
-        results.criterionshift(icnt)    = criterionshift(data.response, data.nextstim, data.nextresp);
+
     end
 end
 
