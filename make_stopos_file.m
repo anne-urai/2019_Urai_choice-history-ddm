@@ -13,17 +13,17 @@ function [] = make_stopos_file()
 % ============================================ #s
 
 nsmp       = [3000]
-datasets   = [0:5]; % dataset number, 0-5 for all main ones
-models     = [0:21]; % the nr of the models
+datasets   = [4]; % dataset number, 0-5 for all main ones
+models     = [10]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
 for n = nsmp,
     for b = models,
         for a = datasets,
-            for c = 0:nrTraces-1, % put all chains of same model together on a node
-                alldat = [alldat; a b c n];
-            end
+            %for c = 0:nrTraces-1, % put all chains of same model together on a node
+                alldat = [alldat; a b 29 n];
+            % end
         end
     end
 end

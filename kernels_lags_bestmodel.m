@@ -223,22 +223,23 @@ for pltidx = 1:length(vars),
         plot(1:numlags, alldata.([vars{pltidx} '_fullmodel'])(d, :), 'color', colors(d, :), 'linewidth', 0.2);
         plot(1:numlags, alldata.(vars{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
     
-        h = (alldata.([vars{pltidx} '_pval'])(d,:) < 0.05);
-        if any(h>0),
-           % plot(find(h==1), alldata.(vars{pltidx})(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
-           %    'markerfacecolor', colors(d,:), 'markersize', 7);
-        end
+        % h = (alldata.([vars{pltidx} '_pval'])(d,:) < 0.05);
+        % if any(h>0),
+        %    % plot(find(h==1), alldata.(vars{pltidx})(d, (h==1)), '.', 'markeredgecolor', colors(d, :), ...
+        %    %    'markerfacecolor', colors(d,:), 'markersize', 7);
+        % end
     end
 
     % average across datasets
     plot(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), 'k', 'linewidth', 1);
-    [h, adj_p] = ttest(alldata.([vars{pltidx}])); % stats on best fits
-    %[h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
+    % [h, adj_p] = ttest(alldata.([vars{pltidx}])); % stats on best fits
+    % %[h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
 
-    if any(adj_p < 0.05),
-        plot(find(adj_p < 0.05), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, (adj_p < 0.05))), ...
-            'k.', 'markersize', 10);
-    end
+    % if any(adj_p < 0.05),
+    %     plot(find(adj_p < 0.05), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, (adj_p < 0.05))), ...
+    %         'k.', 'markersize', 10);
+    % end
+    
     xlabel('Lags (# trials)');
     ylabel(regexprep(regexprep(regexprep(regexprep(vars{pltidx}, '_', ' ~ previous '), ...
         'v ', 'v_{bias} '), 'prevresp', 'response'), 'prevstim', 'stimulus'));

@@ -434,7 +434,7 @@ for dx in d:
 
 			print("%s, %s"%(mypath, models[vx]))
 			# average model comparison values across chains
-			if os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and os.path.exists(os.path.join(mypath, models[vx], 'model_comparison_md0.csv')):
+			if os.path.exists(os.path.join(mypath, models[vx], 'model_comparison_md0.csv')):
 				print('concatenating')
 
 				nchains = 30

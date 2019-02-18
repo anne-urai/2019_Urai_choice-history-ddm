@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#SBATCH -t 00:00:05 # maximum 5 days on cartesius
+#SBATCH -N 1
+#SBATCH -p short
+#SBATCH -o /home/aeurai/jobs/slurm-%A_%a.out
+#SBATCH -e /home/aeurai/jobs/slurm-%A_%a.err
+
+# load necessary modules
+source activate python27 # use anaconda
+
+# determine how many parallel jobs we can run on this node
+ncores=`sara-get-num-cores` # 16 in total on LISA normal nodes
+((ncores -= 1)) # subtract one for system processes, will have 15
+echo "ncores = $ncores, starting"
+
+python "/home/aeurai/code/serialDDM/fitHDDM.py -r 1 -d 4 -v 10 -i 29"
+eval "python /home/aeurai/code/serialDDM/fitHDDM.py -r 1 -d 4 -v 10 -i 29"
+
+echo "DONE!"
