@@ -1,15 +1,18 @@
 function plot_dynamic_bias_signal_hanks
 
 colors = [77,175,74; 55,126,184] ./ 256; % green blue
+colors(3, :) = mean(colors);
 cols2 = cbrewer('qual', 'Dark2', 8);
-
+close all;
 global mypath
 kostisPath = sprintf('%s/Anke_MEG_transition/KostisFits', mypath);
 
 % nicer colors
-subplot(4,3,1);
+subplot(3,2,1);
 
-%% OU
+ % =================== %
+%% start plot
+ % =================== %
 
 durs=240;
 
@@ -19,30 +22,33 @@ P1=0;
 P2=0;
 dt=0.01/2;
 % lk=4.22;
-% incr=0.1602;
-% a=[];
-% load('OUDallmodels.mat')
-% for t=1:durs;
-%
-%     P1=P1+dt.*(lk+incr)*P1+I1*dt; % accumulator with bias
-%
-%     P2=P2+dt.*lk*P2+I1*dt; % accumulator without bias
-%     a=[a;P1 P2];
-% end
-% %%
-%
-% hold on;
-% plot([1:240]*dt,(min(a(:,1)-a(:,2)-11.5,0))./11.5,'LineWidth',3);
+% % incr=0.1602;
+% % a=[];
+% % load('OUDallmodels.mat')
+% % for t=1:durs;
+% %
+% %     P1=P1+dt.*(lk+incr)*P1+I1*dt; % accumulator with bias
+% %
+% %     P2=P2+dt.*lk*P2+I1*dt; % accumulator without bias
+% %     a=[a;P1 P2];
+% % end
+% % %%
+% %
+% % hold on;
+% % plot([1:240]*dt,(min(a(:,1)-a(:,2)-11.5,0))./11.5,'LineWidth',3);
 ylabel({'Effective bias' '(fraction of bound)'});
 xlabel('Time (s)');
 hold on;
 %set(gca,'YTicklabel',[0:0.1:1]); hold on;
 
+ % =================== %
 %%DDM Collapsing
+ % =================== %
+
 load(sprintf('%s/DynDDMCol_allmodels.mat', kostisPath));
-thr=mean(params2(:,1));
-bias=mean(abs(params2(:,end)));
-dv=mean(params2(:,4));
+thr=mean(params4(:,1));
+bias=mean(abs(params4(:,6)));
+dv=mean(params4(:,4));
 timest=240;
 dt=0.01/2;
 
@@ -52,6 +58,7 @@ TH1=max(y,thr/2);
 TH2=min(thr/2,-y+thr);
 
 P1=0;
+P1 = mean(abs(params4(:,7)));% should be replaced by P1=stp, where stp=mean(abs(PARAMETER))
 P2=0;
 I1=.01*33;
 I2=.01*33;
@@ -63,11 +70,12 @@ for t=1:durs;
     P2=P2+I2*dt;
     a=[a;P1 P2];
 end
-plot([1:240]*dt,min((a(:,1)-a(:,2))./(TH1'-thr/2),1),'color', colors(2, :), 'linewidth', 2);
+plot([1:240]*dt,min((a(:,1)-a(:,2))./(TH1'-thr/2),1),'color', colors(3, :), 'linewidth', 2);
 
-
-
+ % =================== %
 %%OU Collapsing
+ % =================== %
+
 for m=1:2;
     load(sprintf('%s/OUcollapse_allmodels.mat', kostisPath));
     clear a;

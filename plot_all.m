@@ -153,7 +153,7 @@ kostis_all_correlations_selected;
 kostis_plotOUD_correlation;
 
 % timecourse of dynamic bias signal, across models
-plot_dynamic_bias_signal;
+plot_dynamic_bias_signal_hanks;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 1
