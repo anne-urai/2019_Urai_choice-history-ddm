@@ -325,6 +325,32 @@ def make_model(mypath, mydata, model_name, trace_id):
                 'sv': ['biasgroup']})
 
     # ============================================ #
+    # SEPARATE FIT FOR REPEATERS AND ALTERNATORS
+    # ============================================ #
+
+    elif model_name == 'stimcoding_dc_z_prevresp_groupsplit':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # add coding for repeaters and alternators
+        mydata['repeat']    = (mydata.response == (mydata.prevresp > 0))
+        sjrepetition        = mydata.groupby(['subj_idx'])['repeat'].mean().reset_index()
+        sjrepetition['group'] = np.sign(sjrepetition['repeat'] - 0.5)
+        mydata2 = pd.merge(mydata, sjrepetition, on='subj_idx', how='inner')
+
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'group'], 'z':['prevresp', 'group']})
+        else:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'dc':['prevresp', 'group'], 'z':['prevresp', 'group']})
+
+    # ============================================ #
     # STIMCODING PREVRESP + PREVCORRECT
     # ============================================ #
 
@@ -350,6 +376,51 @@ def make_model(mypath, mydata, model_name, trace_id):
                 drift_criterion=True, bias=True, p_outlier=0.05,
                 include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
                 depends_on={'dc':['prevresp', 'prevcorrect'], 'z':['prevresp', 'prevcorrect']})
+
+    # ============================================ #
+    # SUBSAMPLE TO HAVE THE SAME NUMBER OF TRIALS
+    # ============================================ #
+
+    elif model_name == 'stimcoding_dc_z_prevcorrect_subsampled':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # SUBSAMPLE THE DATA FOR PREVIOUS CORRECT, SO THAT FOR
+        # EACH PARTICIPANT THERE ARE THE SAME NUMBER OF TRIALS FOR PREVIOUS CORRECT AND ERROR
+        trialcounts = mydata.groupby(['subj_idx', 'prevcorrect'])['response'].count().reset_index()
+        trialcounts_error = trialcounts.groupby(['subj_idx'])['response'].min().reset_index()
+
+        for name, grouped in mydata.groupby(['subj_idx', 'prevcorrect']):
+
+            # find the lowest number of trials for this subject
+            num_trials = trialcounts_error.loc[trialcounts_error['subj_idx'] == name[0], 'response'].item()
+            subsampled = grouped.sample(n=num_trials)
+
+            # subsample that many
+            if not 'mydata2' in locals():
+                mydata2 = subsampled.copy()
+            else:
+                mydata2 = mydata2.append(subsampled.copy(), ignore_index=True)
+
+        # check that now, the trials are equally numbered
+        trialcounts_subsampled = mydata2.groupby(['subj_idx', 'prevcorrect'])['response'].count().reset_index()
+        print('trialcounts, before subsampling:')
+        print(trialcounts)
+        print('trialcounts, after subsampling:')
+        print(trialcounts_subsampled)
+
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'prevcorrect'], 'z':['prevresp', 'prevcorrect']})
+        else:
+            m = hddm.HDDMStimCoding(mydata2, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'dc':['prevresp', 'prevcorrect'], 'z':['prevresp', 'prevcorrect']})
+
 
     elif model_name == 'stimcoding_dc_prevcorrect':
 
@@ -395,6 +466,27 @@ def make_model(mypath, mydata, model_name, trace_id):
              include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
              depends_on={'v': ['prevcorrect'], 'a':['prevcorrect']})
 
+    elif model_name == 'stimcoding_dc_z_PES':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # allow for both choice history effects as well as post-error slowing,
+        # so combine 'stimcoding_prevcorrect' and 'stimcoding_dc_z_prevresp'
+
+        if len(mydata.coherence.unique()) > 1:
+         m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+             drift_criterion=True, bias=True, p_outlier=0.05,
+             include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+             depends_on={'v': ['coherence', 'prevcorrect'], 'a':['prevcorrect'], 
+             'dc':['prevresp'], 'z':['prevresp']})
+        else:
+         m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+             drift_criterion=True, bias=True, p_outlier=0.05,
+             include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+             depends_on={'v': ['prevcorrect'], 'a':['prevcorrect'],
+             'dc':['prevresp'], 'z':['prevresp']})
+
     # ============================================ #
     # REPEAT FOR LAG 2
     # ============================================ #
@@ -427,7 +519,6 @@ def make_model(mypath, mydata, model_name, trace_id):
     # MULTIPLICATIVE DRIFT BIAS
     # ============================================ #
 
-    # this is the model that will generate most of the figures
     elif model_name == 'stimcoding_dc_z_prevresp_multiplicative':
 
         # get the right variable coding
@@ -455,6 +546,31 @@ def make_model(mypath, mydata, model_name, trace_id):
                 depends_on={'v': ['coherence'], 'dc':['coherence', 'prevresp']})
         else:
             m = []
+
+    # ============================================ #
+    # SPLIT BY CONGRUENCE BETWEEN PREVIOUS CHOICE AND CURRENT STIMULUS
+    # ============================================ #
+
+    elif model_name == 'stimcoding_dc_z_prevresp_congruency':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # add a column coding for the previous congruency
+        mydata['stimulus_signed'] = np.sign(mydata.stimulus - 0.2)
+        # compute a double (not boolean) to indicate congruence
+        mydata['congruent'] = (mydata['prevresp'] == mydata['stimulus_signed']) * 1
+
+        if len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevresp', 'congruent'], 'z':['prevresp', 'congruent']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'dc':['prevresp', 'congruent'], 'z':['prevresp', 'congruent']})
 
     # ============================================ #
     # MEG DATA
@@ -545,7 +661,6 @@ def make_model(mypath, mydata, model_name, trace_id):
         include=['z', 'sv'], group_only_nodes=['sv'],
         group_only_regressors=False, keep_regressor_trace=False,  p_outlier=0.05)
 
-
     # ============================================ #
     # REGRESSION MODELS WITH MULTIPLE LAGS
     # ============================================ #
@@ -570,6 +685,35 @@ def make_model(mypath, mydata, model_name, trace_id):
 
         v_reg = {'model': 'v ~ 1 + stimulus + prevresp + prevstim', 'link_func': lambda x:x}
         z_reg = {'model': 'z ~ 1  + prevresp + prevstim', 'link_func': z_link_func}
+        m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
+                               include=['z', 'sv'], group_only_nodes=['sv'],
+                               group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+    
+    # ============================================ #
+    # REGRESSION MODELS WITH MULTIPLE LAGS
+    # only prevresp, does this improve on AIC?
+    # ============================================ #
+
+    elif model_name == 'regress_dc_prevresp_lag1':
+
+        v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+        m = hddm.HDDMRegressor(mydata, v_reg,
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_z_prevresp_lag1':
+
+        z_reg = {'model': 'z ~ 1  + prevresp', 'link_func': z_link_func}
+        v_reg = {'model': 'v ~ 1 + stimulus', 'link_func': lambda x:x}
+
+        m = hddm.HDDMRegressor(mydata, [z_reg, v_reg],
+            include=['z', 'sv'], group_only_nodes=['sv'],
+            group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)
+
+    elif model_name == 'regress_dcz_prevresp_lag1':
+
+        v_reg = {'model': 'v ~ 1 + stimulus + prevresp', 'link_func': lambda x:x}
+        z_reg = {'model': 'z ~ 1  + prevresp ', 'link_func': z_link_func}
         m = hddm.HDDMRegressor(mydata, [v_reg, z_reg],
                                include=['z', 'sv'], group_only_nodes=['sv'],
                                group_only_regressors=False, keep_regressor_trace=False, p_outlier=0.05)

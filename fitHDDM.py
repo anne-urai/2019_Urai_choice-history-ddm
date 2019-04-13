@@ -210,10 +210,7 @@ def concat_models(mypath, model_name):
 
 def aic(self):
 	k = len(self.get_stochastics())
-	try:
-		logp = sum([x.logp for x in self.get_observeds()['node']])	
-	except:
-		shell()
+	logp = sum([x.logp for x in self.get_observeds()['node']])	
 	return 2 * k - 2 * logp
 
 def bic(self):
@@ -226,8 +223,6 @@ def bic(self):
 # PREPARE THE ACTUAL MODEL FITS
 # ============================================ #
 
-# which model are we running at the moment?
-models = [] #17
 
 # new additional models
 models = ['regress_nohist', #0
@@ -271,11 +266,19 @@ models = ['regress_nohist', #0
 'stimcoding_z_prevresp_stcoh',  # 
 'stimcoding_dc_z_prevresp_stcoh']  # ] # 50
 
+models = ['stimcoding_dc_z_prevcorrect_subsampled',
+	'stimcoding_dc_z_prevresp_congruency',
+	'stimcoding_dc_z_PES',
+	'regress_dc_prevresp_lag1',
+	'regress_z_prevresp_lag1',
+	'regress_dcz_prevresp_lag1', 
+	'stimcoding_dc_z_prevresp_groupsplit']
+
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
-    'MEG_MEGdata']
+    'MEG_MEGdata',  'NatComm_rescaled']
 
-datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_transition', 'NatComm_rescaled']
+datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_transition']
 
 # recode
 if isinstance(d, int):
