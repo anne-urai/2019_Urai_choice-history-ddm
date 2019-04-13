@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 01:00 # maximum 5 days on cartesius
+#SBATCH -t 5-00:00 # maximum 5 days on cartesius. Acceptable time formats include "minutes", "minutes:seconds", "hours:minutes:seconds", "days-hours", "days-hours:minutes" and "days-hours:minutes:seconds".
 #SBATCH -N 1
 #SBATCH -o /home/aeurai/jobs/slurm-%A_%a.out
 #SBATCH -e /home/aeurai/jobs/slurm-%A_%a.err
