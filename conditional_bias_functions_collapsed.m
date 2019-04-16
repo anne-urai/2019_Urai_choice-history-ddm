@@ -36,8 +36,8 @@ switch whichModels
         models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_z_prevresp'};
         thesecolors = {[0 0 0],  colors(1, :), mean(colors([1 2], :))};
     case 3
-        models = {'data', 'stimcoding_nohist', 'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp'};
-        thesecolors = {[0 0 0], [0.5 0.5 0.5],  colors(1, :), colors(2, :), mean(colors([1 2], :))};
+        models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp'};
+        thesecolors = {[0 0 0], colors(1, :), colors(2, :), mean(colors([1 2], :))};
     case 4
         models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_prevresp'};
         thesecolors = {[0 0 0], colors(1, :), colors(2, :)};

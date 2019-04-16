@@ -52,7 +52,7 @@ colors = [77,175,74; 55,126,184] ./ 256; % green blue
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-if 1,
+if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
@@ -60,11 +60,7 @@ if 1,
 end
 disp('starting');
 
-barplots_modelcomparison_regression;
-correlations_regression_lags;
-kernels_lags_bestmodel;
-
-return;
+return
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
@@ -86,7 +82,7 @@ strategy_plot;
 barplots_modelcomparison;
 
 close all; subplot(3,3,1);
-conditional_bias_functions_collapsed(4, 3, 'rt', 0, 0);
+conditional_bias_functions_collapsed(3, 3, 'rt', 0, 0);
 tightfig; print(gcf, '-dpdf', '~/Data/serialHDDM/conditionalBiasFunctions_collapsed.pdf'); % 3b
 
 % barplots
@@ -116,7 +112,7 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
 compare_correlations_correct_error(alldat);
 
 % DIC comparison
-barplots_DIC_previousresponse_outcome;
+%vbarplots_DIC_previousresponse_outcome;
 
 % ========================================== %
 % FIGURE 6

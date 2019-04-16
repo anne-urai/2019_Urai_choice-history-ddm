@@ -44,20 +44,20 @@ for d = length(datasets):-1:1
     
     % use the stimcoding difference
     results.z_prevresp_correct = ...
-        results.(['z_1_1__' whichmdls 'dczprevcorrect']) - results.(['z_1_2__' whichmdls 'dczprevcorrect']);
+        results.(['z_1_1__' whichmdls 'dczprevcorrectsubsampled']) - results.(['z_1_2__' whichmdls 'dczprevcorrectsubsampled']);
     results.v_prevresp_correct = ...
-        results.(['dc_1_1__' whichmdls 'dczprevcorrect']) - results.(['dc_1_2__' whichmdls 'dczprevcorrect']);
+        results.(['dc_1_1__' whichmdls 'dczprevcorrectsubsampled']) - results.(['dc_1_2__' whichmdls 'dczprevcorrectsubsampled']);
     
     try
         results.z_prevresp_error = ...
-            results.(['z_0_1__' whichmdls 'dczprevcorrect']) - results.(['z_0_2__' whichmdls 'dczprevcorrect']);
+            results.(['z_0_1__' whichmdls 'dczprevcorrectsubsampled']) - results.(['z_0_2__' whichmdls 'dczprevcorrectsubsampled']);
         results.v_prevresp_error = ...
-            results.(['dc_0_1__' whichmdls 'dczprevcorrect']) - results.(['dc_0_2__' whichmdls 'dczprevcorrect']);
+            results.(['dc_0_1__' whichmdls 'dczprevcorrectsubsampled']) - results.(['dc_0_2__' whichmdls 'dczprevcorrectsubsampled']);
     catch
         results.z_prevresp_error = ...
-            results.z_c10__stimcodingdczprevcorrect - results.(['z_0_2__' whichmdls 'dczprevcorrect']);
+            results.z_c10__stimcodingdczprevcorrect - results.(['z_0_2__' whichmdls 'dczprevcorrectsubsampled']);
         results.v_prevresp_error = ...
-            results.dc_c10__stimcodingdczprevcorrect - results.(['dc_0_2__' whichmdls 'dczprevcorrect']);
+            results.dc_c10__stimcodingdczprevcorrect - results.(['dc_0_2__' whichmdls 'dczprevcorrectsubsampled']);
     end
         
     cols = cbrewer('qual', 'Paired', 10);
