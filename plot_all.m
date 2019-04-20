@@ -60,6 +60,9 @@ if 0,
 end
 disp('starting');
 
+individual_correlation_congruency;
+bias_by_congruency; 
+
 return
 
 % ========================================== %

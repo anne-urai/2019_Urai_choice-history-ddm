@@ -15,7 +15,8 @@ warning off;
 
 % preallocate variables
 varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'repetition', 'repetition2', 'repetition3', ...
-    'criterionshift', 'repetition_prevcorrect', 'repetition_preverror', 'posterrorslowing'};
+    'criterionshift', 'repetition_prevcorrect', 'repetition_preverror', 'posterrorslowing', ...
+    'repetition_congruent', 'repetition_incongruent'};
 
 nrSess          = length(unique(alldata.session)) + 1;
 results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, length(varnames)), 'variablenames', varnames);
@@ -49,6 +50,7 @@ end
 % for mulder et al. analysis
 alldata.prevstim = circshift(alldata.stimulus, 1);
 alldata.prevresp = circshift(alldata.response, 1);
+alldata.congruent = (sign(alldata.prevresp - 0.1) == alldata.stimulus);
 
 try
     wrongtrls        = find([NaN; diff(alldata.trial)] ~= 1);
@@ -158,6 +160,10 @@ for sj = subjects,
         % also compute this after error and correct trials
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
         results.repetition_preverror(icnt)   = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
+
+        %
+        results.repetition_congruent(icnt) = nanmean(data.repeat(data.congruent == 1));
+        results.repetition_incongruent(icnt) = nanmean(data.repeat(data.congruent == 0));
 
     end
 end
