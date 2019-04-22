@@ -60,13 +60,8 @@ if 0,
 end
 disp('starting');
 
-alldat = individual_correlation_fastslow;
+barplots_modelcomparison_regression;
 
-% separate plots for correct and error
-forestPlot(alldat(1:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_fastRT.pdf'));
-forestPlot(alldat(2:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_slowRT.pdf'));
 
 return
 
