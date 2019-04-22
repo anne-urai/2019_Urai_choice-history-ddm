@@ -48,7 +48,7 @@ for d = length(datasets):-1:1
     % assign to structure
     allresults(1).z_prevresp     = z_congruent;
     allresults(1).v_prevresp     = dc_congruent;
-    allresults(1).criterionshift = results.repetition_congruent;
+    allresults(1).criterionshift = results.repetition_incongruent;
     alltitles{1}                 = cat(2, datasetnames{d}{1}, ' - ', 'Congruent');
     allresults(1).marker 			= 'o';
     allresults(1).meancolor 		= cols(10, :);
@@ -57,7 +57,7 @@ for d = length(datasets):-1:1
     % also after error choices
     allresults(2).z_prevresp     = z_incongruent;
     allresults(2).v_prevresp     = dc_incongruent;
-    allresults(2).criterionshift = results.repetition_incongruent;
+    allresults(2).criterionshift = results.repetition_congruent;
     alltitles{2}                 = cat(2, datasetnames{d}{1}, ' - ', 'Incongruent');
     allresults(2).marker        = 's';
     allresults(2).meancolor 		= cols(8, :);

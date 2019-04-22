@@ -168,7 +168,6 @@ for sj = subjects,
         results.repetition_incongruent(icnt) = nanmean(data.repeat(data.congruent == 0));
         
         % REPETITION FOR SLOW VS FAST RTS
-        % CHECK: IS REPEAT REFLECTING THE CURRENT OR PREVIOUS TRIAL?
         results.repetition_fastRT(icnt) = nanmean(data.repeat(data.rt < nanmedian(data.rt)));
         results.repetition_slowRT(icnt) = nanmean(data.repeat(data.rt > nanmedian(data.rt)));
      

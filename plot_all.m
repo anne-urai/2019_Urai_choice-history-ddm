@@ -13,7 +13,7 @@ clear all; clc; close all;
 set(groot, 'defaultaxesfontsize', 6, 'defaultaxestitlefontsizemultiplier', 1.1, ...
     'defaultaxeslabelfontsizemultiplier', 1.1, ...
     'defaultaxestitlefontweight', 'bold', ...
-    'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'painters', ...
+    'defaultfigurerenderermode', 'manual', 'defaultfigurerenderer', 'opengl', ...
     'DefaultAxesBox', 'off', ...
     'DefaultAxesTickLength', [0.02 0.05], 'defaultaxestickdir', 'out', 'DefaultAxesTickDirMode', 'manual', ...
     'defaultfigurecolormap', [1 1 1], 'defaultTextInterpreter','tex', ...
@@ -59,6 +59,15 @@ if 0,
     % rename_PPC_files(datasets);
 end
 disp('starting');
+
+alldat = individual_correlation_fastslow;
+
+% separate plots for correct and error
+forestPlot(alldat(1:2:end));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_fastRT.pdf'));
+forestPlot(alldat(2:2:end));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_slowRT.pdf'));
+
 
 return
 
@@ -120,6 +129,7 @@ compare_correlations_correct_error(alldat);
 
 barplots_modelcomparison_regression;
 kernels_lags_bestmodel;
+correlations_regression_lags; % forestplot for multi-lag regression models
 
 % ========================================== %
 % FIGURE 7
