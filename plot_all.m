@@ -60,9 +60,6 @@ if 0,
 end
 disp('starting');
 
-individual_correlation_congruency;
-bias_by_congruency; 
-
 return
 
 % ========================================== %
@@ -256,3 +253,21 @@ meg_regression_posteriors;
 barplots_DIC_regression;
 kernels_lags_bestmodel;
 
+% ========================================== %
+% REVISION & REBUTTAL - congruency
+% ========================================== %
+
+individual_correlation_congruency;
+bias_by_congruency; 
+
+% ========================================== %
+% Correlation with fast vs. slow P(repeat)
+% ========================================== %
+
+alldat = individual_correlation_fastslow;
+
+% separate plots for correct and error
+forestPlot(alldat(1:2:end));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_fastRT.pdf'));
+forestPlot(alldat(2:2:end));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_slowRT.pdf'));
