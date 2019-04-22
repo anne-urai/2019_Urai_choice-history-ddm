@@ -201,7 +201,7 @@ def summary_plot(df, quantiles, mean_correct, mean_response, xlim=None):
 
     return fig
 
-def conditional_response_plot(df, quantiles, mean_response, xlim=None):
+def conditional_response_plot(df, quantiles, mean_response, xlim=None, cmap="Blues"):
     
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(1,1,1)
@@ -211,14 +211,16 @@ def conditional_response_plot(df, quantiles, mean_response, xlim=None):
     # for s, a in zip(np.unique(d["subj_idx"]), [0.1, 0.5, 0.9]):
     #     ax.plot(np.array(quantiles)[1:], d.loc[d["subj_idx"]==s, "response"], color='k', alpha=a)
     # plt.xticks(np.array(quantiles)[1:], list(np.array(quantiles)[1:]))
-    for s, c in zip(np.unique(d["subj_idx"]), ['lightgrey', 'grey', 'black']):
+
+    colors = sns.color_palette(cmap, len(np.unique(df['subj_idx'])))
+    for s, c in zip(np.unique(d["subj_idx"]), colors):
         ax.errorbar(d.loc[d["subj_idx"]==s, "rt"], d.loc[d["subj_idx"]==s, "response"], fmt='-o', color=c, markersize=5)
     if xlim:
         ax.set_xlim(xlim)
     ax.set_ylim(0.4,1)
     ax.set_title('P(correct) = {}\nP(bias) = {}'.format(
-                                                    round(df.loc[df["subj_idx"]==np.unique(df["subj_idx"])[1], 'correct'].mean(), 2),
-                                                    round(df.loc[df["subj_idx"]==np.unique(df["subj_idx"])[1], 'response'].mean(), 2),
+                                                    round(df.loc[:, 'correct'].mean(), 2),
+                                                    round(df.loc[:, 'response'].mean(), 2),
                                                     ))
     ax.set_xlabel('RT (s)')
     ax.set_ylabel('P(bias)')

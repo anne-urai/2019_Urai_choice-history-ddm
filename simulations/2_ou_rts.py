@@ -71,10 +71,11 @@ def do_simulations(params):
     df.loc[:,'subj_idx'] = params['subj_idx']
     df.to_csv(os.path.join(data_folder, 'df_{}.csv'.format(params['subj_idx'])))
 
-data_folder = os.path.expanduser('~/Desktop/simulations/ou_data/')
-fig_folder = os.path.expanduser('~/Desktop/simulations/ou_figs/')
+data_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ou_data/')
+fig_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ou_figs/')
+fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
-simulate = True
+simulate = False
 nr_trials = int(1e5) #100K
 tmax = 5
 dt = 0.01
@@ -97,36 +98,58 @@ sArray = [
         
     # OU neutral:
     {'subj_idx':0, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':1, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':2, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     # OU starting point bias:
-    {'subj_idx':3, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.05,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':4, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.10,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':5, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.15,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':1, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.00,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':2, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.02,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':3, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.04,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':4, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.06,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':5, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.08,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':6, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.10,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':7, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.12,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':8, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.14,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':9, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.16,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':10, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.18,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':11, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.20,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     # OU input bias:
-    {'subj_idx':6, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.2,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':7, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.5,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':8, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.8,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':12, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.0,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':13, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.1,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':14, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.2,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':15, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.3,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':16, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.4,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':17, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.5,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':18, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.6,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':19, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.7,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':20, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.8,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':21, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.9,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':22, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+1.0,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     # # OU leak bias:
-    {'subj_idx':9, 'v':[v,0], 'λ':[λ-0.5,λ+0.5], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':10, 'v':[v,0], 'λ':[λ-1.5,λ+1.5], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':11, 'v':[v,0], 'λ':[λ-2.5,λ+2.5], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':23, 'v':[v,0], 'λ':[λ-0.0,λ+0.0], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':24, 'v':[v,0], 'λ':[λ-0.3,λ+0.3], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':25, 'v':[v,0], 'λ':[λ-0.6,λ+0.6], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':26, 'v':[v,0], 'λ':[λ-0.9,λ+0.9], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':27, 'v':[v,0], 'λ':[λ-1.2,λ+1.2], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':28, 'v':[v,0], 'λ':[λ-1.5,λ+1.5], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':29, 'v':[v,0], 'λ':[λ-1.8,λ+1.8], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':30, 'v':[v,0], 'λ':[λ-2.1,λ+2.1], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':31, 'v':[v,0], 'λ':[λ-2.4,λ+2.4], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':32, 'v':[v,0], 'λ':[λ-2.7,λ+2.7], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':33, 'v':[v,0], 'λ':[λ-3.0,λ+3.0], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     ]
 
 if simulate:
     from joblib import Parallel, delayed
-    n_jobs = 6
+    n_jobs = 42
     res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
     # do_simulations(sArray[12])
 
 # groups = [[0,1,2],]
-groups = [[0,1,2], [3,4,5], [6,7,8], [9,10,11],]
-# groups = []
+groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)),]
 quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
+cmaps = ["Greens", 'Blues', 'RdPu',]
 for i, group in enumerate(groups):
     
     # neutral:
@@ -143,19 +166,19 @@ for i, group in enumerate(groups):
     # plots:
     quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9]
 
-    fig = conditional_response_plot(df, quantiles, mean_response, xlim=(0.1,0.7))
+    fig = conditional_response_plot(df, quantiles, mean_response, xlim=(0.1,0.7), cmap=cmaps[i])
     fig.savefig(os.path.join(fig_folder, 'crf_{}.pdf'.format(i)))
 
-    fig = summary_plot(df, quantiles, mean_correct, mean_response, xlim=(0.1,0.7))
-    fig.savefig(os.path.join(fig_folder, 'summary_{}.pdf'.format(i)))
-    
+    # fig = summary_plot(df, quantiles, mean_correct, mean_response, xlim=(0.1,0.7))
+    # fig.savefig(os.path.join(fig_folder, 'summary_{}.pdf'.format(i)))
+
+shell()
+
 # save combined for DDM fitting:
-groups = [[4], [7], [10],]
+groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)),]
 for i, group in enumerate(groups): 
     df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
-    df.loc[:,'condition'] = 0
-    df.loc[:,'subj_idx'] = 0
-    df.to_csv(os.path.join(os.path.expanduser('~/Desktop/simulations/ddm_fits_data/'), '2018_ou_data_{}.csv'.format(i+1)))
+    df.to_csv(os.path.join(fits_folder, '2018_ou_data_{}.csv'.format(i+1)))
 
 # hyperbolic collapse:
 fig = plt.figure()
@@ -164,3 +187,56 @@ b1, b0 = _bounds_collapse_hyperbolic(a=a, c=c, lower_is_0=False, tmax=tmax, dt=d
 plt.plot(t,b1)
 plt.plot(t,b0)
 fig.savefig(os.path.join(fig_folder, 'collapse_hyperbolic.pdf'))
+
+# load ddm results:
+for i, group in enumerate(groups):
+    
+    # simulated data:
+    df = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}.csv'.format(i+1)))
+    
+    # model params:
+    params = []
+    for v in range(4):
+        param = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}_{}'.format(i+1, v), 'results.csv'))
+        param['version'] = v
+        params.append(param)
+    param = pd.concat(params)
+    param['z'] = param['z'] - 0.5
+    for v in [1,2,3]:
+        param.loc[param['version']==v, 'bic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(param.loc[param['version']==0, 'bic'])
+
+    # plots:
+    fig = plt.figure(figsize=(2,2))
+    ax = fig.add_subplot(111)
+    sns.barplot(data=param.loc[param['version']==3,:].loc[:,['z', 'dc']], palette=['forestgreen', 'royalblue'], ci=None, ax=ax)
+    for s in range(11):
+        ax.scatter([0,1], np.array(param.loc[param['version']==3,:].loc[:,['z', 'dc']].iloc[s]), color=sns.color_palette("Greys",11)[s], linewidth=0.5, edgecolor='black', zorder=10)
+    plt.xticks([0,1], ['z_bias', 'v_bias'])
+    plt.tight_layout()
+    sns.despine(offset=2, trim=False)
+    fig.savefig(os.path.join(fig_folder, 'bars_{}.pdf'.format(i+1)))
+
+    fig = plt.figure(figsize=(2,2))
+    ax = fig.add_subplot(111)
+    sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
+    plt.step(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
+    plt.ylabel('delta BIC')
+    plt.tight_layout()
+    sns.despine(offset=2, trim=False)
+    fig.savefig(os.path.join(fig_folder, 'bics_{}.pdf'.format(i+1)))
+
+    fig = plt.figure(figsize=(2,2))
+    ax = fig.add_subplot(111)
+    if sp.stats.pearsonr(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'])[1] < 0.05:
+        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], fit_reg=True, color='forestgreen', ax=ax)
+    else:
+        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], fit_reg=False, color='forestgreen', ax=ax)
+    plt.ylabel('P(bias)')
+    ax = ax.twiny()
+    if sp.stats.pearsonr(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'])[1] < 0.05:
+        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], fit_reg=True, color='royalblue', ax=ax)
+    else:
+        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], fit_reg=False, color='royalblue', ax=ax)
+    plt.tight_layout()
+    sns.despine(offset=2, trim=False, top=False)
+    fig.savefig(os.path.join(fig_folder, 'regs_{}.pdf'.format(i+1)))

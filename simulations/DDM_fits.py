@@ -20,11 +20,6 @@ import kabuki
 from IPython import embed as shell
 from joblib import Parallel, delayed
 
-import json
-
-from jw_tools import myfuncs
-from jw_tools import ddm_tools
-
 matplotlib.rcParams['pdf.fonttype'] = 42
 sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'axes.linewidth': 0.25, 
@@ -41,14 +36,18 @@ sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'ytick.color':'Black',} )
 sns.plotting_context()
 
-base_dir = os.path.expanduser('~/Desktop/simulations/')
-data_dir = os.path.join(base_dir, 'ddm_fits_data')
-model_dir = os.path.join(base_dir, 'ddm_fits_model')
+data_dir = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
+model_dir = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
 datasets = [
-            "2018_ou_data_1",                       # 0
-            "2018_ou_data_2",                       # 1
-            "2018_ou_data_3",                       # 2
+            "2018_ddm_data_1",                       # 0
+            "2018_ddm_data_2",                       # 1
+            "2018_ddm_data_3",                       # 2
+            "2018_ddm_data_4",                       # 3
+            "2018_ddm_data_5",                       # 4
+            "2018_ou_data_1",                        # 5
+            "2018_ou_data_2",                        # 6
+            "2018_ou_data_3",                        # 7
             ]
     
 def fit_ddm_per_group(data, model, model_dir, model_name, samples=5000, burn=1000, thin=1, n_models=3, n_jobs=12):
@@ -89,7 +88,7 @@ def fit_ddm_subject(data, subj_idx, model, model_dir, model_name, n_runs=5):
     exec('global m; m = {}'.format(model))
 
     # optimize:
-    m.optimize('gsquare', quantiles=analysis_info['quantiles'], n_runs=n_runs)
+    m.optimize('gsquare', quantiles=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], n_runs=n_runs)
     res = pd.concat((pd.DataFrame([m.values], index=[subj_idx]), pd.DataFrame([m.bic_info], index=[subj_idx])), axis=1)
     
     return res
@@ -102,116 +101,68 @@ def load_ddm_per_subject(model_dir, model_name):
 # version = 0
 
 run = True
-for ds in [0,1,2,]:
-    for version in [0]:
-        
-        # load analysis info:
-        with open(os.path.join(data_dir, '{}.json'.format(datasets[ds]))) as json_data:
-            analysis_info = json.load(json_data)
+for ds in [5,6,7]:
+# for ds in [4]:
+    for version in [0,1,2,3]:
         
         # load data:
-        try:
-            data = pd.read_csv(os.path.join(data_dir, analysis_info['data_file'])).drop('Unnamed: 0', 1)
-        except:
-            data = pd.read_csv(os.path.join(data_dir, analysis_info['data_file']))
-        
-        # stimcoding?
-        if analysis_info['stimcoding'] == "True":
-            stimcoding = True
-            data.rename(columns={'choice_a':'response'}, inplace=True)
-        else:
-            stimcoding = False
-            data.rename(columns={'correct':'response'}, inplace=True)
-        
-        # variables:
-        subjects = np.unique(data.subj_idx)
-        nr_subjects = len(subjects)
-        model = analysis_info["model"][version]
-        
-        # run:
-        for split_by in analysis_info['split_by']:
-            
-            # model_name:
-            model_name = '{}_{}_{}'.format(analysis_info["model_name"], split_by, version)
-        
-            # create figure dir:
-            fig_dir = model_dir = os.path.join(base_dir, 'ddm_fits_figs', model_name)
-            try:
-                os.system('mkdir {}'.format(fig_dir))
-                os.system('mkdir {}'.format(os.path.join(fig_dir, 'diagnostics')))
-            except:
-                pass
-            
-            # prepare dataframe:
-            df = data.copy()
-                        
-            # fit model:
-            if run:
-                
-                print("fitting {}".format(model_name))
-                n_jobs = 4
-                
-                # # hierarchical:
-                # results = fit_ddm_per_group(data, model, model_dir, model_name, samples=5000, burn=1000, thin=1, n_models=3, n_jobs=n_jobs)
-                
-                # flat:
-                results = fit_ddm_per_subject(df, model, model_dir, model_name, n_runs=5, n_jobs=n_jobs)
-                
-            # for fit_type in ['flat', 'hierarchical']:
-            for fit_type in ['flat']:
-            
-                if fit_type == 'flat':
-                    results = load_ddm_per_subject(model_dir, model_name)
-                else:
-                    models = load_ddm_per_group(model_dir, model_name, n_models=3)
-                    
-                    # gelman rubic:
-                    gr = hddm.analyze.gelman_rubin(models)
-                    text_file = open(os.path.join(fig_dir, 'diagnostics', 'gelman_rubic_{}.txt'.format(fit_type)), 'w')
-                    for p in gr.items():
-                        text_file.write("%s:%s\n" % p)
-                    text_file.close()
+        df = pd.read_csv(os.path.join(data_dir, '{}.csv'.format(datasets[ds])))
 
-                    # dic:
-                    text_file = open(os.path.join(fig_dir, 'diagnostics', 'DIC_{}.txt'.format(fit_type)), 'w')
-                    for i, m in enumerate(models):
-                        text_file.write("Model {}: {}\n".format(i, m.dic))
-                    text_file.close()
-                    
-                    # posteriors:
-                    m.plot_posteriors(save=True, path=os.path.join(fig_dir, 'diagnostics'), format='pdf')
-                    
-                    # dataframe:
-                    m = models[1]
-                    results = m.gen_stats()['50q'].reset_index()
-                    results = results.loc[['subj' in c for c in results["index"]],:]
-                    a = np.array([results.iloc[i]["index"].split('.')[0] for i in range(results.shape[0])])
-                    _, idx = np.unique(a, return_index=True)
-                    cols = a[np.sort(idx)]
-                    cols = np.array([c.replace('_subj', '') for c in cols])
-                    results = pd.DataFrame(np.vstack([np.array(results.loc[np.array([str(subj_idx) == c.split('.')[-1] for c in results["index"]]),:]["50q"]) for subj_idx in subjects]))
-                    results.columns = cols
-                try:
-                    params = results.drop(['bic', 'likelihood', 'penalty'], 1)
-                except:
-                    params = results.copy()
-                params = params.loc[:,~np.array(['z_trans' in c for c in params.columns])]
-                params.to_csv(os.path.join(fig_dir, 'params_{}.csv'.format(fit_type)))
-                
-                # barplot:
-                fig = plt.figure(figsize=(6,2))
-                ax = fig.add_subplot(111)
-                sns.barplot(data=params, ax=ax)
-                sns.despine(offset=5, trim=True)
-                plt.tight_layout()
-                fig.savefig(os.path.join(fig_dir, 'bars_{}.pdf'.format(fit_type)))
-                
-                # barplot only z and dc:
-                params['z'] = params['z'] - 0.5
-                fig = plt.figure(figsize=(1.25,1.6))
-                ax = fig.add_subplot(111)
-                sns.barplot(data=params.loc[:,['z', 'dc']], ax=ax)
-                ax.set_ylim(0,0.8)
-                sns.despine(offset=5, trim=True)
-                plt.tight_layout()
-                fig.savefig(os.path.join(fig_dir, 'bars2_{}.pdf'.format(fit_type)))
+        # stimcoding?
+        stimcoding = True
+        df.rename(columns={'choice_a':'response'}, inplace=True)
+
+        # variables:
+        subjects = np.unique(df.subj_idx)
+        nr_subjects = len(subjects)
+
+        # model:
+        if version == 0:
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=False, include=('sv'), p_outlier=0)"
+        if version == 1:
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=True, include=('sv'), p_outlier=0)"
+        elif version == 2:
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=False, include=('sv'), p_outlier=0)"
+        elif version == 3:
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, include=('sv'), p_outlier=0)"
+
+        # model_name:
+        model_name = '{}_{}'.format(datasets[ds], version)
+    
+        # create figure dir:
+        fig_dir = os.path.join(model_dir, model_name)
+        try:
+            os.system('mkdir {}'.format(fig_dir))
+            os.system('mkdir {}'.format(os.path.join(fig_dir, 'diagnostics')))
+        except:
+            pass
+        
+        # fit model:
+        if run:
+            
+            print("fitting {}".format(model_name))
+            n_jobs = 24
+
+            # flat:
+            results = fit_ddm_per_subject(df, model, model_dir, model_name, n_runs=5, n_jobs=n_jobs)
+
+            # save:
+            results.to_csv(os.path.join(fig_dir, 'results.csv'))
+
+            # # barplot:
+            # fig = plt.figure(figsize=(6,2))
+            # ax = fig.add_subplot(111)
+            # sns.barplot(data=results.loc[:,['a', 'v', 't', 'z', 'dc']], ax=ax)
+            # sns.despine(offset=5, trim=True)
+            # plt.tight_layout()
+            # fig.savefig(os.path.join(fig_dir, 'bars.pdf'))
+            
+            # # barplot only z and dc:
+            # # results['z'] = results['z'] - 0.5
+            # fig = plt.figure(figsize=(1.25,1.6))
+            # ax = fig.add_subplot(111)
+            # sns.barplot(data=results.loc[:,['z', 'dc']], ax=ax)
+            # ax.set_ylim(0,0.8)
+            # sns.despine(offset=5, trim=True)
+            # plt.tight_layout()
+            # fig.savefig(os.path.join(fig_dir, 'bars2.pdf'))

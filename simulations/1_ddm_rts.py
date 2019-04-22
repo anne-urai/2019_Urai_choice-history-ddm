@@ -70,10 +70,12 @@ def do_simulations(params):
     df.loc[:,'subj_idx'] = params['subj_idx']
     df.to_csv(os.path.join(data_folder, 'df_{}.csv'.format(params['subj_idx'])))
 
-data_folder = os.path.expanduser('~/Desktop/simulations/ddm_data/')
-fig_folder = os.path.expanduser('~/Desktop/simulations/ddm_figs/')
 
-simulate = True
+data_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_data/')
+fig_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_figs/')
+fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
+
+simulate = False
 nr_trials = int(1e5) #100K
 tmax = 5
 dt = 0.01
@@ -87,51 +89,97 @@ sv = 0.5
 
 sArray = [
 
-    # 0 DDM neutral
-    {'subj_idx':0, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':1, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':2, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    # # 0 DDM neutral
+    # {'subj_idx':0, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
     # 1 DDM starting point bias:
-    {'subj_idx':3, 'v':v, 'dc':dc, 'z':0.56*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':4, 'v':v, 'dc':dc, 'z':0.62*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':5, 'v':v, 'dc':dc, 'z':0.68*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':1, 'v':v, 'dc':dc, 'z':0.50*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':2, 'v':v, 'dc':dc, 'z':0.52*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':3, 'v':v, 'dc':dc, 'z':0.54*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':4, 'v':v, 'dc':dc, 'z':0.56*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':5, 'v':v, 'dc':dc, 'z':0.58*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':6, 'v':v, 'dc':dc, 'z':0.60*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':7, 'v':v, 'dc':dc, 'z':0.62*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':8, 'v':v, 'dc':dc, 'z':0.64*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':9, 'v':v, 'dc':dc, 'z':0.66*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':10, 'v':v, 'dc':dc, 'z':0.68*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':11, 'v':v, 'dc':dc, 'z':0.70*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
     # 2 DDM drift bias:
-    {'subj_idx':6, 'v':v, 'dc':dc+0.2, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':7, 'v':v, 'dc':dc+0.5, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':8, 'v':v, 'dc':dc+0.8, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':12, 'v':v, 'dc':dc+0.00, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':13, 'v':v, 'dc':dc+0.08, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':14, 'v':v, 'dc':dc+0.16, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':15, 'v':v, 'dc':dc+0.24, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':16, 'v':v, 'dc':dc+0.32, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':17, 'v':v, 'dc':dc+0.40, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':18, 'v':v, 'dc':dc+0.48, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':19, 'v':v, 'dc':dc+0.56, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':20, 'v':v, 'dc':dc+0.64, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':21, 'v':v, 'dc':dc+0.72, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':22, 'v':v, 'dc':dc+0.80, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
     # 3 DDM increasing drift bias:
-    {'subj_idx':9, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+1.5, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':10, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+2.5, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':11, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+3.5, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':23, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+0.0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':24, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+0.4, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':25, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+0.8, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':26, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+1.2, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':27, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+1.6, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':28, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+2.0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':29, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+2.4, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':30, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+2.8, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':31, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+3.2, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':32, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+3.6, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':33, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope+4.0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
-    # 4 DDM collapsing / expanding bounds:
-    {'subj_idx':12, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0.2, 'c0':-0.2, 'nr_trials':nr_trials},
-    {'subj_idx':13, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0.5, 'c0':-0.5, 'nr_trials':nr_trials},
-    {'subj_idx':14, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0.8, 'c0':-0.8, 'nr_trials':nr_trials},
+    # 4 DDM drift criterion + hyperbolically collapsing bounds:
+    {'subj_idx':34, 'v':v, 'dc':dc+0.00, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':35, 'v':v, 'dc':dc+0.08, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':36, 'v':v, 'dc':dc+0.16, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':37, 'v':v, 'dc':dc+0.24, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':38, 'v':v, 'dc':dc+0.32, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':39, 'v':v, 'dc':dc+0.40, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':40, 'v':v, 'dc':dc+0.48, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':41, 'v':v, 'dc':dc+0.56, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':42, 'v':v, 'dc':dc+0.64, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':43, 'v':v, 'dc':dc+0.72, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    {'subj_idx':44, 'v':v, 'dc':dc+0.80, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
 
-    # 5 DDM one collapsing bound:
-    {'subj_idx':15, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0, 'c0':-0.3, 'nr_trials':nr_trials},
-    {'subj_idx':16, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0, 'c0':-0.5, 'nr_trials':nr_trials},
-    {'subj_idx':17, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0, 'c0':-0.7, 'nr_trials':nr_trials},
+    # 5 DDM drift bias, opposing starting point bias:
+    {'subj_idx':45, 'v':v, 'dc':dc+0.00, 'z':0.500*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':46, 'v':v, 'dc':dc+0.08, 'z':0.495*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':47, 'v':v, 'dc':dc+0.16, 'z':0.490*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':48, 'v':v, 'dc':dc+0.24, 'z':0.485*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':49, 'v':v, 'dc':dc+0.32, 'z':0.480*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':50, 'v':v, 'dc':dc+0.40, 'z':0.475*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':51, 'v':v, 'dc':dc+0.48, 'z':0.470*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':52, 'v':v, 'dc':dc+0.56, 'z':0.465*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':53, 'v':v, 'dc':dc+0.64, 'z':0.460*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':54, 'v':v, 'dc':dc+0.72, 'z':0.455*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':55, 'v':v, 'dc':dc+0.80, 'z':0.450*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
-    # 6 DDM drift criterion + hyperbolically collapsing bounds:
-    {'subj_idx':18, 'v':v, 'dc':dc+0.2, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
-    {'subj_idx':19, 'v':v, 'dc':dc+0.5, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
-    {'subj_idx':20, 'v':v, 'dc':dc+0.8, 'z':0.5*a*2, 'a':a*2, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_hyperbolic', 'c':1, 'nr_trials':nr_trials},
+    # # 4 DDM collapsing / expanding bounds:
+    # {'subj_idx':12, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0.2, 'c0':-0.2, 'nr_trials':nr_trials},
+    # {'subj_idx':13, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0.5, 'c0':-0.5, 'nr_trials':nr_trials},
+    # {'subj_idx':14, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0.8, 'c0':-0.8, 'nr_trials':nr_trials},
+
+    # # 5 DDM one collapsing bound:
+    # {'subj_idx':15, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0, 'c0':-0.3, 'nr_trials':nr_trials},
+    # {'subj_idx':16, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0, 'c0':-0.5, 'nr_trials':nr_trials},
+    # {'subj_idx':17, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'collapse_linear', 'c1':0, 'c0':-0.7, 'nr_trials':nr_trials},
 
     ]
 
 if simulate:
     from joblib import Parallel, delayed
-    n_jobs = 6
+    n_jobs = 42
     res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
     # do_simulations(sArray[0])
 
-groups = [[0,1,2], [3,4,5], [6,7,8], [9,10,11], [12,13,14], [15,16,17], [18,19,20],]
+groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)), list(np.arange(34,45)), list(np.arange(45,56))]
 quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
+
+cmaps = ["Greens", 'Blues', 'Oranges', 'Purples', 'RdPu']
+
 for i, group in enumerate(groups):
     
     # neutral:
@@ -145,19 +193,17 @@ for i, group in enumerate(groups):
     # plots:
     quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9,]
 
-    fig = conditional_response_plot(df, quantiles, mean_response, xlim=(0.1,0.7))
+    fig = conditional_response_plot(df, quantiles, mean_response, xlim=(0.1,0.7), cmap=cmaps[i])
     fig.savefig(os.path.join(fig_folder, 'crf_{}.pdf'.format(i)))
 
-    fig = summary_plot(df, quantiles, mean_correct, mean_response, xlim=(0.1,0.7))
-    fig.savefig(os.path.join(fig_folder, 'summary_{}.pdf'.format(i)))
+    # fig = summary_plot(df, quantiles, mean_correct, mean_response, xlim=(0.1,0.7))
+    # fig.savefig(os.path.join(fig_folder, 'summary_{}.pdf'.format(i)))
 
-# # save combined for DDM fitting:
-# groups = [[1], [4], [7], [10],]
-# for i, group in enumerate(groups): 
-#     df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
-#     df.loc[:,'condition'] = 0
-#     df.loc[:,'subj_idx'] = 0
-#     df.to_csv(os.path.join(os.path.expanduser('~/Desktop/simulations/ddm_fits_data/'), '2018_ddm_data_{}.csv'.format(i+1)))
+# save combined for DDM fitting:
+groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)), list(np.arange(34,45)), list(np.arange(45,56))]
+for i, group in enumerate(groups): 
+    df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
+    df.to_csv(os.path.join(fits_folder, '2018_ddm_data_{}.csv'.format(i+1)))
 
 tmax = 1
 dt = 0.01
@@ -177,3 +223,57 @@ b1, b0 = _bounds_collapse_hyperbolic(a=2, c=1, lower_is_0=True, tmax=tmax, dt=dt
 plt.plot(t,b1)
 plt.plot(t,b0)
 fig.savefig(os.path.join(fig_folder, 'collapse_hyperbolic.pdf'))
+
+# load ddm results:
+for i, group in enumerate(groups):
+    
+    # simulated data:
+    df = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}.csv'.format(i+1)))
+    
+    # model params:
+    params = []
+    for v in range(4):
+        param = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}_{}'.format(i+1, v), 'results.csv'))
+        param['version'] = v
+        params.append(param)
+    param = pd.concat(params)
+    param['z'] = param['z'] - 0.5
+    for v in [1,2,3]:
+        param.loc[param['version']==v, 'bic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(param.loc[param['version']==0, 'bic'])
+
+    # plots:
+    fig = plt.figure(figsize=(2,2))
+    ax = fig.add_subplot(111)
+    sns.barplot(data=param.loc[param['version']==3,:].loc[:,['z', 'dc']], palette=['forestgreen', 'royalblue'], ci=None, ax=ax)
+    for s in range(11):
+        ax.scatter([0,1], np.array(param.loc[param['version']==3,:].loc[:,['z', 'dc']].iloc[s]), color=sns.color_palette("Greys",11)[s], linewidth=0.5, edgecolor='black', zorder=10)
+    plt.xticks([0,1], ['z_bias', 'v_bias'])
+    plt.tight_layout()
+    sns.despine(offset=2, trim=False)
+    fig.savefig(os.path.join(fig_folder, 'bars_{}.pdf'.format(i+1)))
+
+    fig = plt.figure(figsize=(2,2))
+    ax = fig.add_subplot(111)
+    sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
+    plt.step(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
+    plt.ylabel('delta BIC')
+    plt.tight_layout()
+    sns.despine(offset=2, trim=False)
+    fig.savefig(os.path.join(fig_folder, 'bics_{}.pdf'.format(i+1)))
+
+    fig = plt.figure(figsize=(2,2))
+    ax = fig.add_subplot(111)
+    if sp.stats.pearsonr(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'])[1] < 0.05:
+        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], fit_reg=True, color='forestgreen', ax=ax)
+    else:
+        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], fit_reg=False, color='forestgreen', ax=ax)
+    plt.ylabel('P(bias)')
+    ax = ax.twiny()
+    if sp.stats.pearsonr(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'])[1] < 0.05:
+        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], fit_reg=True, color='royalblue', ax=ax)
+    else:
+        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], fit_reg=False, color='royalblue', ax=ax)
+    plt.tight_layout()
+    sns.despine(offset=2, trim=False, top=False)
+    fig.savefig(os.path.join(fig_folder, 'regs_{}.pdf'.format(i+1)))
+
