@@ -71,7 +71,8 @@ plot(nanmean([alldat(ds).corrz]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest([alldat(ds).corrz]);
 disp('z bayes factor');
 bf = prod([alldat(ds).bfz])
-if bf < 100,
+
+if bf < 1/100,
     t = title(sprintf('BF_{10} < 1/100'), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf > 100,
     t = title(sprintf('BF_{10} > 100'), 'fontweight', 'normal', 'fontangle', 'italic');
@@ -129,10 +130,11 @@ xlim([-1 1]); offsetAxes;
 % ADD THE AVERAGE??
 plot(nanmean([alldat(ds).corrv]), 0.1, 'd', 'color', 'k', 'markersize', 4);
 [h, pval, ci, stats] = ttest(fisherz([alldat(ds).corrv]));
-disp('v bayes factor');
 
-bf = prod([alldat(ds).bfv]);
-if bf < 100,
+disp('v bayes factor');
+bf = prod([alldat(ds).bfv])
+
+if bf < 1/100,
     t = title(sprintf('BF_{10} < 1/100'), 'fontweight', 'normal', 'fontangle', 'italic');
 elseif bf > 100,
     t = title(sprintf('BF_{10} > 100'), 'fontweight', 'normal', 'fontangle', 'italic');

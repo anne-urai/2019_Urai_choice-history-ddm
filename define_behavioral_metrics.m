@@ -16,7 +16,7 @@ warning off;
 % preallocate variables
 varnames = {'subjnr', 'session', 'dprime', 'accuracy', 'criterion', 'repetition', 'repetition2', 'repetition3', ...
     'criterionshift', 'repetition_prevcorrect', 'repetition_preverror', 'posterrorslowing', ...
-    'repetition_congruent', 'repetition_incongruent'};
+    'repetition_congruent', 'repetition_incongruent', 'repetition_fastRT', 'repetition_slowRT'};
 
 nrSess          = length(unique(alldata.session)) + 1;
 results         = array2table(nan(length(unique(alldata.subj_idx))*nrSess, length(varnames)), 'variablenames', varnames);
@@ -114,13 +114,15 @@ for sj = subjects,
             data.(['prev' num2str(l) 'resp'])(data.(['prev' num2str(l) 'resp']) == 0) = -1;
 
             data.(['repeat' num2str(l)]) = double(data.response == circshift(data.response, l));
+            
+            % EXCLUDE TRIALS THAT ARE NOT CONTINUOUS
             wrongTrls = ((data.trial - circshift(data.trial, l)) ~= l);
             data.(['repeat' num2str(l)])(wrongTrls) = NaN;
         end
         
         data.repeat = data.repeat1;
         data.stimrepeat = [NaN; (diff(data.response) == 0)];
-        
+       
         if sum(strcmp(data.Properties.VariableNames, 'coherence')) > 0,
             cohlevels = unique(data.coherence);
             for c = 1:length(cohlevels),
@@ -161,10 +163,14 @@ for sj = subjects,
         results.repetition_prevcorrect(icnt) = nanmean(data.repeat((data.prevstim > 0) == (data.prevresp > 0)));
         results.repetition_preverror(icnt)   = nanmean(data.repeat((data.prevstim > 0) ~= (data.prevresp > 0)));
 
-        %
+        % split by congruency
         results.repetition_congruent(icnt) = nanmean(data.repeat(data.congruent == 1));
         results.repetition_incongruent(icnt) = nanmean(data.repeat(data.congruent == 0));
-
+        
+        % REPETITION FOR SLOW VS FAST RTS
+        results.repetition_fastRT(icnt) = nanmean(data.repeat(data.rt < nanmedian(data.rt)));
+        results.repetition_slowRT(icnt) = nanmean(data.repeat(data.rt > nanmedian(data.rt)));
+     
     end
 end
 
