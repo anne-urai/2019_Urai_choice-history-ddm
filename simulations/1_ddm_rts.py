@@ -75,7 +75,7 @@ data_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_da
 fig_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_figs/')
 fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
-simulate = False
+simulate = True
 nr_trials = int(1e5) #100K
 tmax = 5
 dt = 0.01
