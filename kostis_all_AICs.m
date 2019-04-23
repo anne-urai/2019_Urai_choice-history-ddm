@@ -65,14 +65,14 @@ model(end).basevalue = unique(results.ddmD_vanilla_aic);
 model(end).ylim = [-8000 0];
 model(end).subplot = 4;
 
-model(end+1).data = [results.ouD_sp_aic results.ouD_input_aic results.ouD_lambda_aic];
-model(end).vanilla = results.ddmK_vanilla_aic;
-model(end).name = {'4. Leaky' 'accumulator'};
-model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
-model(end).colors = [cols2([5 3 4], :)];
-model(end).basevalue = unique(results.ddmD_vanilla_aic);
-model(end).ylim = [-8000 0];
-model(end).subplot = 5;
+% model(end+1).data = [results.ouD_sp_aic results.ouD_input_aic results.ouD_lambda_aic];
+% model(end).vanilla = results.ddmK_vanilla_aic;
+% model(end).name = {'4. Leaky' 'accumulator'};
+% model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
+% model(end).colors = [cols2([5 3 4], :)];
+% model(end).basevalue = unique(results.ddmD_vanilla_aic);
+% model(end).ylim = [-8000 0];
+% model(end).subplot = 5;
 
 model(end+1).data = [results.ouDColl_sp_aic results.ouDColl_input_aic results.ouDColl_lambda_aic];
 model(end).vanilla = results.ddmK_vanilla_aic;
@@ -81,7 +81,7 @@ model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
 model(end).colors = [cols2([5 3 4], :)];
 model(end).basevalue = unique(results.ddmD_vanilla_aic);
 model(end).ylim = [-8000 0];
-model(end).subplot = 6;
+model(end).subplot = 5;
 
 % move subplots closer together
 subplot = @(m,n,p) subtightplot (m, n, p, [0.01 0.03], [0.1 0.01], [0.1 0.01]);
