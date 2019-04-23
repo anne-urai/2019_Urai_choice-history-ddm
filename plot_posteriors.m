@@ -26,9 +26,16 @@ for d = 1:length(datasets),
         violinPlot_distribution(d, difference, colors2(d, :));
     legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
     pval = posteriorpval(dat.z_trans_1_, dat.z_trans__1_);
+
+    if pval < 0.001,
+            text(d+0.1, -0.5, sprintf('p < 0.001'), ...
+        'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
+        set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    else
     text(d+0.1, -0.5, sprintf('p = %.3f', pval), ...
         'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
         set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    end
 
 end
 
@@ -53,10 +60,15 @@ for d = 1:length(datasets),
     violinPlot_distribution(d, difference, colors2(d, :));
     legtext{d} = cat(2, datasetnames{d}{1}, ' ', datasetnames{d}{2});
     pval = posteriorpval(dat.dc_1_, dat.dc__1_);
+    if pval < 0.001,
+    text(d+0.1, -0.3, sprintf('p < 0.001'), ...
+        'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
+        set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    else
     text(d+0.1, -0.3, sprintf('p = %.3f', pval), ...
         'fontangle', 'italic', 'fontsize', 4, 'rotation', -30);
         set(gca, 'xcolor', 'k', 'ycolor', 'k');
-
+    end
 end
 
 set(gca, 'xtick', 1:length(datasets), 'xticklabel', legtext, 'xticklabelrotation', -30, 'xcolor', 'k');
