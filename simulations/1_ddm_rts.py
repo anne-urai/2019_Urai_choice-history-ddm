@@ -5,7 +5,9 @@ import os
 import numpy as np
 import scipy as sp
 import matplotlib as mpl
+mpl.use("TkAgg")
 mpl.rcParams['pdf.fonttype'] = 42
+
 import matplotlib.pylab as plt
 import seaborn as sns
 import pandas as pd
@@ -13,6 +15,7 @@ from IPython import embed as shell
 
 from sim_tools import get_DDM_traces, apply_bounds_diff_trace, _bounds, _bounds_collapse_linear, _bounds_collapse_hyperbolic
 from sim_tools import summary_plot, conditional_response_plot
+import tqdm
 
 sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'axes.linewidth': 0.25, 
@@ -77,6 +80,7 @@ fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/'
 
 simulate = True
 nr_trials = int(1e5) #100K
+nr_trials = int(1e4) #10.000
 tmax = 5
 dt = 0.01
 
@@ -170,10 +174,14 @@ sArray = [
     ]
 
 if simulate:
-    from joblib import Parallel, delayed
-    n_jobs = 42
-    res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
-    # do_simulations(sArray[0])
+	if not parallel:
+		for i in tqdm(sArray):
+			do_simulations(i) 
+	else:
+	    from joblib import Parallel, delayed
+	    n_jobs = 42
+	    res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
+	    # do_simulations(sArray[0])
 
 groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)), list(np.arange(34,45)), list(np.arange(45,56))]
 quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]

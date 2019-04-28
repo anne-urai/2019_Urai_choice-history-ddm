@@ -4,8 +4,11 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from IPython import embed as shell
+
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
 
 def get_DDM_traces(v=1, z=0.5, dc=0, dc_slope=0, sv=0.1, noise_sd=1, stim=0, nr_trials=1000, tmax=5.0, dt=0.01):
     

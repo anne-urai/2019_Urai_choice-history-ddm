@@ -4,15 +4,20 @@
 import os
 import numpy as np
 import scipy as sp
+
 import matplotlib as mpl
+mpl.use("TkAgg")
 mpl.rcParams['pdf.fonttype'] = 42
-import matplotlib.pylab as plt
+
+from matplotlib import pyplot as plt
+
 import seaborn as sns
 import pandas as pd
 from IPython import embed as shell
 
 from datetime import datetime
 from tqdm import tqdm
+import random
 
 from sim_tools import get_DDM_traces, apply_bounds_diff_trace, _bounds, _bounds_collapse_linear, _bounds_collapse_hyperbolic
 from sim_tools import summary_plot, conditional_response_plot
@@ -34,20 +39,29 @@ sns.plotting_context()
 
 def do_simulations(params):
 
+    # https://machinelearningmastery.com/gentle-introduction-random-walk-times-series-forecasting-python/
+    random.seed(1)
+    random_walk = list()
+    random_walk.append(-1 if random.random() < 0.5 else 1)
+    for i in range(params['nr_trials']):
+        movement = -1 if random.random() < 0.5 else 1
+        value = random_walk[i-1] + movement
+        random_walk.append(value)
 
     # SIMULATE A SLOWLY AUTOCORRELATED DRIFT BIAS
-    dc_autocorr = params['nr_trials']
-    stims       = stim
+    v_autocorr  = params['v'] + 0.1 * ((random_walk - np.mean(random_walk)) / np.std(random_walk))
+    stims       = np.repeat([0, 1], int(params['nr_trials']/2))
+    np.random.shuffle(stims)
 
     rt = []
     response = []
     stimulus = []
-    for t in range(params['n_trial'])
+    for t in tqdm(range(params['nr_trials'])):
         
         # get traces:
-        x = get_DDM_traces(v=params['v'],
+        x = get_DDM_traces(v=v_autocorr[t],
                             z=params['z'],
-                            dc=dc_autocorr[t],
+                            dc=params['dc'],
                             dc_slope=params['dc_slope'],
                             sv=params['sv'],
                             stim=stims[t],
@@ -74,18 +88,18 @@ def do_simulations(params):
     df = pd.DataFrame()
     df.loc[:,'rt'] = np.concatenate(rt)
     df.loc[:,'response'] = np.concatenate(response)
-    df.loc[:,'stimulus'] = np.concatenate(stimulus)
-    df.loc[:,'correct'] = np.array(np.concatenate(stimulus) == np.concatenate(response), dtype=int)
+    df.loc[:,'stimulus'] = stimulus
+    df.loc[:,'correct'] = np.array(stimulus == np.concatenate(response), dtype=int)
     df.loc[:,'subj_idx'] = params['subj_idx']
     df.to_csv(os.path.join(data_folder, 'df_{}.csv'.format(params['subj_idx'])))
-
 
 data_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_data/')
 fig_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_figs/')
 fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
-simulate = True
+simulate = False
 nr_trials = int(1e5) #100K
+# nr_trials = 100
 tmax = 5
 dt = 0.01
 
@@ -99,7 +113,7 @@ sv = 0.5
 sArray = [
 
     # # 0 DDM neutral
-    {'subj_idx':0, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':0, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials}
 
     # # 1 DDM starting point bias:
     # {'subj_idx':1, 'v':v, 'dc':dc, 'z':0.50*a, 'a':a, 'dc_slope':dc_slope, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
@@ -179,17 +193,21 @@ sArray = [
     ]
 
 if simulate:
-    from joblib import Parallel, delayed
-    n_jobs = 42
-    print('starting parallel jobs')
-    # add status bar
-    res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in tqdm(sArray))
-    # do_simulations(sArray[0])
+
+    do_simulations(sArray[0]) 
+
+    # from joblib import Parallel, delayed
+    # n_jobs = 42
+    # print('starting parallel jobs')
+    # # add status bar
+    # res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in tqdm(sArray))
+    # # do_simulations(sArray[0])
 
 groups = [list(np.arange(1,12)), list(np.arange(12,23)),
           list(np.arange(23,34)), list(np.arange(34,45)), list(np.arange(45,56))]
-quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 
+groups = [list(np.arange(0,1))]
+quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 cmaps = ["Greens", 'Blues', 'Oranges', 'Purples', 'RdPu']
 
 for i, group in enumerate(groups):
@@ -216,6 +234,10 @@ groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)),
 for i, group in enumerate(groups): 
     df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
     df.to_csv(os.path.join(fits_folder, '2018_ddm_data_{}.csv'.format(i+1)))
+
+
+shell()
+
 
 ## DDMS ARE FIT HERE??
 
@@ -268,9 +290,9 @@ for i, group in enumerate(groups):
 
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(111)
-    sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
+    # sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
     plt.step(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
-    plt.ylabel('delta BIC')
+    plt.ylabel('delta AIC')
     plt.tight_layout()
     sns.despine(offset=2, trim=False)
     fig.savefig(os.path.join(fig_folder, 'bics_{}.pdf'.format(i+1)))
