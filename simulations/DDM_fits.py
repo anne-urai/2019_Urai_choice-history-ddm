@@ -39,6 +39,9 @@ sns.plotting_context()
 data_dir = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 model_dir = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
+global parallel
+parallel = False
+
 datasets = [
             "2018_ddm_data_1",                       # 0
             "2018_ddm_data_2",                       # 1
@@ -50,9 +53,32 @@ datasets = [
             "2018_ou_data_3",                        # 7
             ]
     
+
+
+datasets = [
+            "2018_ddm_autocorr_data_1",                       # 0
+            "2018_ddm_autocorr_data_2",                       # 1
+            "2018_ddm_autocorr_data_3",                       # 2
+            ]
+
+def aic(self):
+    k = len(self.get_stochastics())
+    logp = sum([x.logp for x in self.get_observeds()['node']])  
+    return 2 * k - 2 * logp
+
+def bic(self):
+    k = len(self.get_stochastics())
+    n = len(self.data)
+    logp = sum([x.logp for x in self.get_observeds()['node']])
+    return -2 * logp + k * np.log(n)
+
+    
 def fit_ddm_per_group(data, model, model_dir, model_name, samples=5000, burn=1000, thin=1, n_models=3, n_jobs=12):
     
-    res = Parallel(n_jobs=n_jobs)(delayed(fit_ddm_hierarchical)(df, model, model_dir, model_name, samples, burn, thin, model_id) for model_id in range(n_models))
+    if parallel:
+        res = Parallel(n_jobs=n_jobs)(delayed(fit_ddm_hierarchical)(df, model, model_dir, model_name, samples, burn, thin, model_id) for model_id in range(n_models))
+    else:
+        fit_ddm_hierarchical(df, model, model_dir, model_name, samples, burn, thin, 0)
 
 def fit_ddm_hierarchical(data, model, model_dir, model_name, samples=5000, burn=1000, thin=1, model_id=0):
     
@@ -60,7 +86,20 @@ def fit_ddm_hierarchical(data, model, model_dir, model_name, samples=5000, burn=
     m.find_starting_values()
     m.sample(samples, burn=burn, thin=thin, dbname=os.path.join(model_dir, '{}_{}.db'.format(model_name, model_id)), db='pickle')
     m.save(os.path.join(model_dir, '{}_{}.hddm'.format(model_name, model_id)))
-    
+
+    # GET INDIVIDUAL SUBJECT PARAMETERS, FLAT FORMAT
+    print "saving stats"
+    results = m.gen_stats() # point estimate for each parameter and subject
+    results.to_csv(os.path.join(model_dir, '{}_{}_results.csv'.format(model_name, model_id)))
+
+    # FIT MODEL COMPARISON INDICES
+    df = dict()
+    df['dic_original'] = [m.dic]
+    df['aic'] = [aic(m)]
+    df['bic'] = [bic(m)]
+    df2 = pd.DataFrame(df)
+    df2.to_csv(os.path.join(model_dir, '{}_{}_model_comparison.csv'.format(model_name, model_id)))
+
     return m
 
 def load_ddm_per_group(model_dir, model_name, n_models=3):
@@ -101,7 +140,7 @@ def load_ddm_per_subject(model_dir, model_name):
 # version = 0
 
 run = True
-for ds in [5,6,7]:
+for ds in [0,1,2]:
 # for ds in [4]:
     for version in [0,1,2,3]:
         
@@ -144,10 +183,13 @@ for ds in [5,6,7]:
             n_jobs = 24
 
             # flat:
-            results = fit_ddm_per_subject(df, model, model_dir, model_name, n_runs=5, n_jobs=n_jobs)
+            # results = fit_ddm_per_subject(df, model, model_dir, model_name, n_runs=5, n_jobs=n_jobs)
+
+            # hierarchical:
+            results = fit_ddm_per_group(df, model, model_dir, model_name, n_jobs=2)
 
             # save:
-            results.to_csv(os.path.join(fig_dir, 'results.csv'))
+            # results.to_csv(os.path.join(fig_dir, 'results.csv'))
 
             # # barplot:
             # fig = plt.figure(figsize=(6,2))
