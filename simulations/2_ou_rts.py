@@ -192,12 +192,12 @@ fig.savefig(os.path.join(fig_folder, 'collapse_hyperbolic.pdf'))
 for i, group in enumerate(groups):
     
     # simulated data:
-    df = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}.csv'.format(i+1)))
+    df = pd.read_csv(os.path.join(fits_folder, '2018_ou_data_{}.csv'.format(i+1)))
     
     # model params:
     params = []
     for v in range(4):
-        param = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}_{}'.format(i+1, v), 'results.csv'))
+        param = pd.read_csv(os.path.join(fits_folder, '2018_ou_data_{}_{}'.format(i+1, v), 'results.csv'))
         param['version'] = v
         params.append(param)
     param = pd.concat(params)
