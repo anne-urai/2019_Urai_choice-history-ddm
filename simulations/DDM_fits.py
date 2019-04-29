@@ -51,11 +51,6 @@ datasets = [
             "2018_ou_data_1",                        # 5
             "2018_ou_data_2",                        # 6
             "2018_ou_data_3",                        # 7
-            ]
-    
-
-
-datasets = [
             "2018_ddm_autocorr_data_1",                       # 0
             "2018_ddm_autocorr_data_2",                       # 1
             "2018_ddm_autocorr_data_3",                       # 2
@@ -71,7 +66,6 @@ def bic(self):
     n = len(self.data)
     logp = sum([x.logp for x in self.get_observeds()['node']])
     return -2 * logp + k * np.log(n)
-
     
 def fit_ddm_per_group(data, model, model_dir, model_name, samples=5000, burn=1000, thin=1, n_models=3, n_jobs=12):
     
@@ -140,11 +134,12 @@ def load_ddm_per_subject(model_dir, model_name):
 # version = 0
 
 run = True
-for ds in [0,1,2]:
+for ds in np.arange(10):
 # for ds in [4]:
     for version in [0,1,2,3]:
         
         # load data:
+        print(os.path.join(data_dir, '{}.csv'.format(datasets[ds])))
         df = pd.read_csv(os.path.join(data_dir, '{}.csv'.format(datasets[ds])))
 
         # stimcoding?
