@@ -31,7 +31,7 @@ model(1).name = {'1. Standard' 'DDM'};
 model(1).ticklabels = {'z', 'v_{bias}', 'z+v_{bias}'};
 model(1).colors = [colors; mean(colors([1 2], :))];
 model(1).basevalue = unique(results.ddmK_vanilla_aic);
-model(1).ylim = [-400 200];
+model(1).ylim = [-650 0];
 model(1).subplot = 1;
 
 model(end+1).data = [ results.ddmK_dc_aic results.ddmK_rp_aic results.ddmK_rp2_aic];
@@ -42,7 +42,7 @@ cols1 = cbrewer('qual', 'Set1', 8);
 cols2 = cbrewer('qual', 'Dark2', 8);
 model(end).colors = [cols1(2, :); cols2(6, :); nanmean([cols1(2, :); cols2(6, :)])];
 model(end).basevalue = unique(results.ddmK_vanilla_aic);
-model(end).ylim = [-400 200];
+model(end).ylim = [-650 0];
 model(end).subplot = 2;
 
 % model(end+1).data = [ results.ddmD_dc_aic results.ddmD_rp_aic results.ddmD_rp2_aic];
@@ -57,31 +57,31 @@ model(end).subplot = 2;
 % model(end).subplot = 4;
 
 model(end+1).data = [results.ddmDColl_z_aic results.ddmDColl_dc_aic results.ddmDColl_dcz_aic];
-model(end).vanilla = results.ddmK_vanilla_aic;
+model(end).vanilla = unique(results.ddmD_vanilla_aic)-6000;
 model(end).name = {'3. Dynamic DDM', 'collapsing bounds'};
 model(end).ticklabels = {'z', 'v_{bias}', 'z+v_{bias}'};
 model(end).colors = [colors; mean(colors([1 2], :))];
 model(end).basevalue = unique(results.ddmD_vanilla_aic);
-model(end).ylim = [-8000 0];
+model(end).ylim = [-8000 -6000];
 model(end).subplot = 4;
 
-model(end+1).data = [results.ouD_sp_aic results.ouD_input_aic results.ouD_lambda_aic];
-model(end).vanilla = results.ddmK_vanilla_aic;
-model(end).name = {'4. Leaky' 'accumulator'};
-model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
-model(end).colors = [cols2([5 3 4], :)];
-model(end).basevalue = unique(results.ddmD_vanilla_aic);
-model(end).ylim = [-8000 0];
-model(end).subplot = 5;
+% model(end+1).data = [results.ouD_sp_aic results.ouD_input_aic results.ouD_lambda_aic];
+% model(end).vanilla = results.ddmK_vanilla_aic;
+% model(end).name = {'4. Leaky' 'accumulator'};
+% model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
+% model(end).colors = [cols2([5 3 4], :)];
+% model(end).basevalue = unique(results.ddmD_vanilla_aic);
+% model(end).ylim = [-8000 0];
+% model(end).subplot = 5;
 
 model(end+1).data = [results.ouDColl_sp_aic results.ouDColl_input_aic results.ouDColl_lambda_aic];
-model(end).vanilla = results.ddmK_vanilla_aic;
-model(end).name = {'5. Leaky accumulator' 'collapsing bounds'};
+model(end).vanilla = unique(results.ddmD_vanilla_aic)-6000;
+model(end).name = {'4. Leaky accumulator' 'collapsing bounds'};
 model(end).ticklabels = {'starting point bias', 'input bias', '\lambda bias'};
 model(end).colors = [cols2([5 3 4], :)];
 model(end).basevalue = unique(results.ddmD_vanilla_aic);
-model(end).ylim = [-8000 0];
-model(end).subplot = 6;
+model(end).ylim = [-8000 -6000];
+model(end).subplot = 5;
 
 % move subplots closer together
 subplot = @(m,n,p) subtightplot (m, n, p, [0.01 0.03], [0.1 0.01], [0.1 0.01]);
@@ -112,7 +112,7 @@ for m = 1:length(model),
     % now break the y-axes
     xlim([0.5 length(mdldic)+0.5]);
     hline(0, [0 0 0]);
-   % ylim(model(m).ylim);
+    ylim(model(m).ylim);
     disp(get(gca, 'ylim'))
     
     if m > 0
@@ -135,7 +135,8 @@ for m = 1:length(model),
     set(gca, 'color', 'none');
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
     offsetAxes;
-    set(gca, 'xtick', 1:length(model(m).ticklabels), 'xticklabel', model(m).ticklabels, 'xticklabelrotation', -30);
+    set(gca, 'xtick', 1:length(model(m).ticklabels), ...
+        'xticklabel', model(m).ticklabels, 'xticklabelrotation', -30);
     title(model(m).name, 'fontweight', 'normal', 'fontangle', 'italic');
     axis square;
     
@@ -143,9 +144,7 @@ for m = 1:length(model),
         case 1
             ylabel({'\DeltaAIC from DDM'; 'without history'}, 'interpreter', 'tex');
         case 3
-            set(gca, 'ytick', [-8000:2000:0]);
             ylabel({'\DeltaAIC from dyn-DDM'; 'without history'}, 'interpreter', 'tex');
-
         otherwise
             set(gca, 'ycolor', 'w', 'yticklabel', []);
     end

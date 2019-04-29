@@ -170,7 +170,24 @@ for sj = subjects,
         % REPETITION FOR SLOW VS FAST RTS
         results.repetition_fastRT(icnt) = nanmean(data.repeat(data.rt < nanmedian(data.rt)));
         results.repetition_slowRT(icnt) = nanmean(data.repeat(data.rt > nanmedian(data.rt)));
+
+        % get the cumulative p(repeat) after a sequence, as in hermoso-mendizabal fig 2e
+        results.cum_rep0(icnt) = nanmean(data.repeat);
+        for sl = 1:10,
+            startIndex = strfind(data.repeat', ones(1,sl));
+            endIndex = startIndex + sl;
+            endIndex(endIndex > length(data.repeat)) = [];
+            results.(['cum_rep' num2str(sl)])(icnt) = nanmean(data.repeat(endIndex));
+        end
      
+        % and alternating sequences
+        results.cum_alt0(icnt) = nanmean(data.repeat);
+        for sl = 1:10,
+            startIndex = strfind(data.repeat', zeros(1,sl));
+            endIndex = startIndex + sl;
+            endIndex(endIndex > length(data.repeat)) = [];
+            results.(['cum_alt' num2str(sl)])(icnt) = nanmean(data.repeat(endIndex));
+        end
     end
 end
 

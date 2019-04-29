@@ -4,8 +4,11 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from IPython import embed as shell
+
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
 
 def get_DDM_traces(v=1, z=0.5, dc=0, dc_slope=0, sv=0.1, noise_sd=1, stim=0, nr_trials=1000, tmax=5.0, dt=0.01):
     
@@ -201,11 +204,11 @@ def summary_plot(df, quantiles, mean_correct, mean_response, xlim=None):
 
     return fig
 
-def conditional_response_plot(df, quantiles, mean_response, xlim=None, cmap="Blues"):
+def conditional_response_plot(df, quantiles, mean_response, xlim=[0.1,0.6], cmap="Blues"):
     
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(1,1,1)
-    plt.axhline(mean_response, lw=0.5, color='k')
+    plt.axhline(mean_response, xmin=xlim[0]-0.1, xmax=xlim[1]+0.1, lw=0.5, color='k')
     df.loc[:,'rt_bin'] = pd.qcut(df['rt'], quantiles, labels=False)
     d = df.groupby(['subj_idx', 'rt_bin']).mean().reset_index()
     # for s, a in zip(np.unique(d["subj_idx"]), [0.1, 0.5, 0.9]):
@@ -224,7 +227,7 @@ def conditional_response_plot(df, quantiles, mean_response, xlim=None, cmap="Blu
                                                     ))
     ax.set_xlabel('RT (s)')
     ax.set_ylabel('P(bias)')
-    sns.despine(offset=10, trim=True)
+    sns.despine(trim=True, offset=5)
     plt.tight_layout()
     
     return fig

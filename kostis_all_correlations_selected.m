@@ -77,7 +77,7 @@ model(end).subplot = 3;
 
 model(end+1).data = {results.ouDColl_input_inputbias};
 model(end).vanilla = NaN;
-model(end).name = {'5. Leaky accumulator' 'collapsing bounds'};
+model(end).name = {'4. Leaky accumulator' 'collapsing bounds'};
 model(end).ticklabels = {'input bias'};
 model(end).colors = grey;
 model(end).subplot = 4;

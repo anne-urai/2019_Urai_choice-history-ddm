@@ -274,6 +274,29 @@ models = ['stimcoding_dc_z_prevcorrect_subsampled',
 	'regress_dcz_prevresp_lag1', 
 	'stimcoding_dc_z_prevresp_groupsplit']
 
+# REGRESSION MODELS WITHOUT ERROR/CORRECT SPLIT
+models = ['regress_dc_prevresp_lag1',
+'regress_z_prevresp_lag1',
+'regress_dcz_prevresp_lag1',
+'regress_dc_prevresp_lag2',
+'regress_z_prevresp_lag2',
+'regress_dcz_prevresp_lag2',
+'regress_dc_prevresp_lag3',
+'regress_z_prevresp_lag3',
+'regress_dcz_prevresp_lag3',
+'regress_dc_prevresp_lag4', 
+'regress_z_prevresp_lag4',
+'regress_dcz_prevresp_lag4',
+'regress_dc_prevresp_lag5',
+'regress_z_prevresp_lag5',
+'regress_dcz_prevresp_lag5',
+'regress_dc_prevresp_lag6', 
+'regress_z_prevresp_lag6',
+'regress_dcz_prevresp_lag6',
+'regress_dc_prevresp_lag7',
+'regress_z_prevresp_lag7',
+'regress_dcz_prevresp_lag7'] #20
+
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
     'MEG_MEGdata',  'NatComm_rescaled']

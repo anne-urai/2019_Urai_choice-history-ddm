@@ -5,7 +5,9 @@ import os
 import numpy as np
 import scipy as sp
 import matplotlib as mpl
+mpl.use("TkAgg")
 mpl.rcParams['pdf.fonttype'] = 42
+
 import matplotlib.pylab as plt
 import seaborn as sns
 import pandas as pd
@@ -13,6 +15,7 @@ from IPython import embed as shell
 
 from sim_tools import get_DDM_traces, apply_bounds_diff_trace, _bounds, _bounds_collapse_linear, _bounds_collapse_hyperbolic
 from sim_tools import summary_plot, conditional_response_plot
+from tqdm import tqdm
 
 sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'axes.linewidth': 0.25, 
@@ -76,7 +79,9 @@ fig_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_fig
 fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
 simulate = False
+parallel = False
 nr_trials = int(1e5) #100K
+nr_trials = int(1e4) #10.000
 tmax = 5
 dt = 0.01
 
@@ -170,12 +175,17 @@ sArray = [
     ]
 
 if simulate:
-    from joblib import Parallel, delayed
-    n_jobs = 42
-    res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
-    # do_simulations(sArray[0])
+	if not parallel:
+		for i, s in tqdm(enumerate(sArray)):
+			do_simulations(s) 
+	else:
+	    from joblib import Parallel, delayed
+	    n_jobs = 42
+	    res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
+	    # do_simulations(sArray[0])
 
-groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)), list(np.arange(34,45)), list(np.arange(45,56))]
+groups = [list(np.arange(1,12)), list(np.arange(12,23)), list(np.arange(23,34)), 
+	list(np.arange(34,45)), list(np.arange(45,56))]
 quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 
 cmaps = ["Greens", 'Blues', 'Oranges', 'Purples', 'RdPu']
@@ -233,7 +243,7 @@ for i, group in enumerate(groups):
     # model params:
     params = []
     for v in range(4):
-        param = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}_{}'.format(i+1, v), 'results.csv'))
+        param = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}_{}_params_flat.csv'.format(i+1, v)))
         param['version'] = v
         params.append(param)
     param = pd.concat(params)
@@ -242,38 +252,70 @@ for i, group in enumerate(groups):
         param.loc[param['version']==v, 'bic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(param.loc[param['version']==0, 'bic'])
 
     # plots:
+    # 1. PARAMETER ESTIMATES
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(111)
-    sns.barplot(data=param.loc[param['version']==3,:].loc[:,['z', 'dc']], palette=['forestgreen', 'royalblue'], ci=None, ax=ax)
+    plt.axhline(0, xmin=-0.1, xmax=1.1, lw=0.5, color='k')
+    sns.barplot(data=param.loc[param['version']==3,:].loc[:,['z', 'dc']], 
+    	palette=['forestgreen', 'royalblue'], ci=None, ax=ax)
     for s in range(11):
-        ax.scatter([0,1], np.array(param.loc[param['version']==3,:].loc[:,['z', 'dc']].iloc[s]), color=sns.color_palette("Greys",11)[s], linewidth=0.5, edgecolor='black', zorder=10)
-    plt.xticks([0,1], ['z_bias', 'v_bias'])
+        ax.scatter([0,1], np.array(param.loc[param['version']==3,:].loc[:,['z', 'dc']].iloc[s]), 
+        	color=sns.color_palette("Greys",11)[s], linewidth=0.5, edgecolor=None, zorder=10)
+    plt.xticks([0,1], ['z', '$\mathregular{v_{bias}}$'], fontsize='medium')
+    plt.ylim([-0.15, 1.15])
+    plt.ylabel('Parameter estimate (a.u.)')
+    sns.despine(offset=5, trim=True)
     plt.tight_layout()
-    sns.despine(offset=2, trim=False)
     fig.savefig(os.path.join(fig_folder, 'bars_{}.pdf'.format(i+1)))
 
+    # 2. BIC
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(111)
-    sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
-    plt.step(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
-    plt.ylabel('delta BIC')
+    plt.axhline(0, xmin=-0.1, xmax=1.1, lw=0.5, color='k')
+    #sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
+    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']),
+    	palette=['forestgreen', 'royalblue', 'darkcyan'], ci=None, ax=ax)
+    # plt.bar(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
+    plt.ylabel('$\mathregular{\Delta BIC}}$')
+    plt.xticks(np.arange(3), ['z', '$\mathregular{v_{bias}}$', 'both'], fontsize='medium')
+    plt.xlabel('')
+    sns.despine(offset=5, trim=True)
     plt.tight_layout()
-    sns.despine(offset=2, trim=False)
     fig.savefig(os.path.join(fig_folder, 'bics_{}.pdf'.format(i+1)))
 
+    # 3. correlations
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(111)
     if sp.stats.pearsonr(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'])[1] < 0.05:
-        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], fit_reg=True, color='forestgreen', ax=ax)
+        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], 
+        	fit_reg=True, color='forestgreen', ax=ax, ci=None)
     else:
-        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], fit_reg=False, color='forestgreen', ax=ax)
+        sns.regplot(x=param.loc[param['version']==3,'z'], y=df.groupby('subj_idx').mean()['response'], 
+        	fit_reg=False, color='forestgreen', ax=ax, ci=None)
+    plt.ylim([0.45, 0.75])
     plt.ylabel('P(bias)')
+
+    ax.spines['bottom'].set_color('forestgreen')
+    ax.spines['top'].set_color('forestgreen')
+    ax.xaxis.label.set_color('forestgreen')
+    ax.tick_params(axis='x', colors='forestgreen')
+
     ax = ax.twiny()
     if sp.stats.pearsonr(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'])[1] < 0.05:
-        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], fit_reg=True, color='royalblue', ax=ax)
+        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], 
+        	fit_reg=True, ci=None, color='royalblue', ax=ax)
     else:
-        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], fit_reg=False, color='royalblue', ax=ax)
+        sns.regplot(x=param.loc[param['version']==3,'dc'], y=df.groupby('subj_idx').mean()['response'], 
+        	fit_reg=False, ci=None, color='royalblue', ax=ax)
+    plt.xlabel('$\mathregular{v_{bias}}$')
+
+    ax.spines['bottom'].set_color('royalblue')
+    ax.spines['top'].set_color('royalblue')
+    ax.xaxis.label.set_color('royalblue')
+    ax.tick_params(axis='x', colors='royalblue')
+
+    # ax.ylim([0.45, 0.75])
+    sns.despine(offset=2, trim=True, top=False)
     plt.tight_layout()
-    sns.despine(offset=2, trim=False, top=False)
     fig.savefig(os.path.join(fig_folder, 'regs_{}.pdf'.format(i+1)))
 

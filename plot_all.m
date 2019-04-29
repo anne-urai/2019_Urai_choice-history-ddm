@@ -60,8 +60,9 @@ if 0,
 end
 disp('starting');
 
-barplots_modelcomparison_regression;
+    make_dataframe(datasets);
 
+cumulative_prepeat;
 
 return
 
@@ -121,7 +122,6 @@ compare_correlations_correct_error(alldat);
 % FIGURE 6
 % ========================================== %
 
-barplots_modelcomparison_regression;
 kernels_lags_bestmodel;
 correlations_regression_lags; % forestplot for multi-lag regression models
 
@@ -140,7 +140,7 @@ motionEnergy_kernels;
 kostis_makeTable_v2;
 
 % a. panel with all BIC plots
-kostis_all_BICs;
+% kostis_all_BICs;
 kostis_all_AICs;
 
 % same for correlations, one big plot
@@ -150,7 +150,7 @@ kostis_all_correlations_selected;
 % kostis_plotDDM_correlation;
 % kostis_plotRamp_correlation;
 % kostis_plotDDMCol_correlation;
-kostis_plotOUD_correlation;
+% kostis_plotOUD_correlation;
 
 % timecourse of dynamic bias signal, across models
 plot_dynamic_bias_signal_hanks;
@@ -220,7 +220,7 @@ post_error_slowing;
 % SUPPLEMENTARY FIGURE 7
 % ========================================== %
 
-
+barplots_modelcomparison_regression;
 
 % ========================================== %
 % SUPPLEMENTARY FIGURE 8
@@ -275,3 +275,24 @@ forestPlot(alldat(1:2:end));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_fastRT.pdf'));
 forestPlot(alldat(2:2:end));
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_slowRT.pdf'));
+
+
+% ========================================== %
+% repeaters vs alternators
+% ========================================== %
+
+ individual_correlations_repeaters_vs_alternators;
+
+% ========================================== %
+% combine post-error slowing with choice history
+% ========================================== %
+
+alldat = individual_correlation_PES; % figure 4
+forestPlot(alldat);
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_PES_HDDM.pdf'));
+
+
+% ========================================== %
+% CUMULATIVE P(REPEAT)
+% ========================================== %
+
