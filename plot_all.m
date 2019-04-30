@@ -60,9 +60,8 @@ if 0,
 end
 disp('starting');
 
-    make_dataframe(datasets);
+kernels_lags_bestmodel;
 
-cumulative_prepeat;
 
 return
 
