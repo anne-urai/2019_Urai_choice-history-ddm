@@ -60,9 +60,6 @@ if 0,
 end
 disp('starting');
 
-kernels_lags_bestmodel;
-
-
 return
 
 % ========================================== %

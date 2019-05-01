@@ -50,8 +50,8 @@ for d = length(datasets):-1:1
     allresults(1).criterionshift = results.repetition_fastRT;
     allresults(1).title         = {datasetnames{d}{1}, 'Fast'};
     allresults(1).marker 			= 'o'; % yellow
-    allresults(1).meancolor 		= set2(7, :);
-    allresults(1).scattercolor	 	= pastel2(7, :);
+    allresults(1).meancolor 		= set2(1, :);
+    allresults(1).scattercolor	 	= pastel2(1, :);
     
     % also after error choices
     allresults(2).z_prevresp     = results.z_prevresp;
