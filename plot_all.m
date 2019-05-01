@@ -60,10 +60,6 @@ if 0,
 end
 disp('starting');
 
-    make_dataframe(datasets);
-
-cumulative_prepeat;
-
 return
 
 % ========================================== %
