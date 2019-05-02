@@ -51,9 +51,9 @@ datasets = [
             "2018_ou_data_1",                        # 5
             "2018_ou_data_2",                        # 6
             "2018_ou_data_3",                        # 7
-            "2018_ddm_autocorr_data_1",                       # 0
-            "2018_ddm_autocorr_data_2",                       # 1
-            "2018_ddm_autocorr_data_3",                       # 2
+            "2018_ddm_autocorr_data_1",                       # 8
+            "2018_ddm_autocorr_data_2",                       # 9
+            "2018_ddm_autocorr_data_3",                       # 10
             ]
 
 def aic(self):
@@ -82,7 +82,7 @@ def fit_ddm_hierarchical(data, model, model_dir, model_name, samples=5000, burn=
     m.save(os.path.join(model_dir, '{}_{}.hddm'.format(model_name, model_id)))
 
     # GET INDIVIDUAL SUBJECT PARAMETERS, FLAT FORMAT
-    print "saving stats"
+    print("saving stats")
     results = m.gen_stats() # point estimate for each parameter and subject
     results.to_csv(os.path.join(model_dir, '{}_{}_results.csv'.format(model_name, model_id)))
 
@@ -120,10 +120,15 @@ def fit_ddm_subject(data, subj_idx, model, model_dir, model_name, n_runs=5):
     data = data.loc[data["subj_idx"]==subj_idx,:]
     exec('global m; m = {}'.format(model))
 
+    m = hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0.05)
+    
     # optimize:
+    # m.approximate_map()
     m.optimize('gsquare', quantiles=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], n_runs=n_runs)
     res = pd.concat((pd.DataFrame([m.values], index=[subj_idx]), pd.DataFrame([m.bic_info], index=[subj_idx])), axis=1)
-    
+    res['aic'] = m.aic
+    res['bic'] = m.bic
+
     return res
 
 def load_ddm_per_subject(model_dir, model_name):
@@ -134,8 +139,7 @@ def load_ddm_per_subject(model_dir, model_name):
 # version = 0
 
 run = True
-for ds in np.arange(10):
-# for ds in [4]:
+for ds in np.arange(8):
     for version in [0,1,2,3]:
         
         # load data:
@@ -152,13 +156,13 @@ for ds in np.arange(10):
 
         # model:
         if version == 0:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=False, include=('sv'), p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=False, p_outlier=0)"
         if version == 1:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=True, include=('sv'), p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=True, p_outlier=0)"
         elif version == 2:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=False, include=('sv'), p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=False, p_outlier=0)"
         elif version == 3:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, include=('sv'), p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0)"
 
         # model_name:
         model_name = '{}_{}'.format(datasets[ds], version)
@@ -178,10 +182,10 @@ for ds in np.arange(10):
             n_jobs = 24
 
             # flat:
-            # results = fit_ddm_per_subject(df, model, model_dir, model_name, n_runs=5, n_jobs=n_jobs)
+            results = fit_ddm_per_subject(df, model, model_dir, model_name, n_runs=5, n_jobs=n_jobs)
 
-            # hierarchical:
-            results = fit_ddm_per_group(df, model, model_dir, model_name, n_jobs=2)
+            # # hierarchical:
+            # results = fit_ddm_per_group(df, model, model_dir, model_name, n_jobs=2)
 
             # save:
             # results.to_csv(os.path.join(fig_dir, 'results.csv'))
