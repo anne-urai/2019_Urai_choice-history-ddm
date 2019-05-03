@@ -29,14 +29,16 @@ for d = 1:length(datasets),
     % split for repeaters and alternators
     alldat.alt(d, :) = nanmean(cumrep(dat.repetition < 0.5, :));
     alldat.rep(d, :) = nanmean(cumrep(dat.repetition > 0.5, :));
+    alldat.all(d, :) = nanmean(cumrep;
 
     alldat_alt.alt(d, :) = nanmean(cumalt(dat.repetition < 0.5, :));
     alldat_alt.rep(d, :) = nanmean(cumalt(dat.repetition > 0.5, :));
+    alldat_alt.all(d, :) = nanmean(cumalt);
+
 end
 
 colors = cbrewer('qual', 'Set2', length(datasets));
-
-groups = {'rep', 'alt'};
+groups = {'all', 'rep', 'alt'};
 
 close all;
 for g = 1:length(groups),
@@ -62,7 +64,7 @@ end
 	
 xlim([0 6]);
 offsetAxes;
-xlabel('Repeating sequence length');
+xlabel('Preceding # repeats');
 if g == 1, ylabel('P(repeat)'); end
 
 end
@@ -99,7 +101,7 @@ end
 	
 xlim([0 6]);
 offsetAxes;
-xlabel('Alternating sequence length');
+xlabel('Preceding # alternatios');
 if g == 1, ylabel('P(repeat)'); end
 
 end

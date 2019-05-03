@@ -250,6 +250,7 @@ for i, group in enumerate(groups):
     param['z'] = param['z'] - 0.5
     for v in [1,2,3]:
         param.loc[param['version']==v, 'bic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(param.loc[param['version']==0, 'bic'])
+        param.loc[param['version']==v, 'aic'] = np.array(param.loc[param['version']==v, 'aic']) - np.array(param.loc[param['version']==0, 'aic'])
 
     # plots:
     # 1. PARAMETER ESTIMATES
@@ -282,6 +283,21 @@ for i, group in enumerate(groups):
     sns.despine(offset=5, trim=True)
     plt.tight_layout()
     fig.savefig(os.path.join(fig_folder, 'bics_{}.pdf'.format(i+1)))
+
+
+    fig = plt.figure(figsize=(2,2))
+    ax = fig.add_subplot(111)
+    plt.axhline(0, xmin=-0.1, xmax=1.1, lw=0.5, color='k')
+    #sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
+    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['aic']),
+        palette=['forestgreen', 'royalblue', 'darkcyan'], ci=None, ax=ax)
+    # plt.bar(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
+    plt.ylabel('$\mathregular{\Delta AIC}}$')
+    plt.xticks(np.arange(3), ['z', '$\mathregular{v_{bias}}$', 'both'], fontsize='medium')
+    plt.xlabel('')
+    sns.despine(offset=5, trim=True)
+    plt.tight_layout()
+    fig.savefig(os.path.join(fig_folder, 'aics_{}.pdf'.format(i+1)))
 
     # 3. correlations
     fig = plt.figure(figsize=(2,2))
