@@ -232,6 +232,35 @@ def conditional_response_plot(df, quantiles, mean_response, xlim=[0.1,0.6], cmap
     
     return fig
 
+
+def conditional_history_plot(df, quantiles, mean_response, xlim=[0.1, 0.6], cmap="Blues"):
+    fig = plt.figure(figsize=(2, 2))
+    ax = fig.add_subplot(1, 1, 1)
+    plt.axhline(mean_response, xmin=xlim[0] - 0.1, xmax=xlim[1] + 0.1, lw=0.5, color='k')
+    df.loc[:, 'rt_bin'] = pd.qcut(df['rt'], quantiles, labels=False)
+    d = df.groupby(['subj_idx', 'rt_bin']).mean().reset_index()
+    # for s, a in zip(np.unique(d["subj_idx"]), [0.1, 0.5, 0.9]):
+    #     ax.plot(np.array(quantiles)[1:], d.loc[d["subj_idx"]==s, "response"], color='k', alpha=a)
+    # plt.xticks(np.array(quantiles)[1:], list(np.array(quantiles)[1:]))
+
+    colors = sns.color_palette(cmap, len(np.unique(df['subj_idx'])))
+    for s, c in zip(np.unique(d["subj_idx"]), colors):
+        ax.errorbar(d.loc[d["subj_idx"] == s, "rt"], d.loc[d["subj_idx"] == s, "repeat"], fmt='-o', color=c,
+                    markersize=5)
+    if xlim:
+        ax.set_xlim(xlim)
+    ax.set_ylim(0.4, 1)
+    ax.set_title('P(correct) = {}\nP(repeat) = {}'.format(
+        round(df.loc[:, 'correct'].mean(), 2),
+        round(df.loc[:, 'repeat'].mean(), 2),
+    ))
+    ax.set_xlabel('RT (s)')
+    ax.set_ylabel('P(repeat)')
+    sns.despine(trim=True, offset=5)
+    plt.tight_layout()
+
+    return fig
+
 def traces_plot(df, x1, x2, a, ndt):
     
     fig = plt.figure(figsize=(2,2))
