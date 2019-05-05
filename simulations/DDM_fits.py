@@ -56,6 +56,10 @@ datasets = [
             "2018_ddm_autocorr_data_3",                       # 10
             ]
 
+datasets = ["2018_ou_data_1",                        # 5
+            "2018_ou_data_2",                        # 6
+            "2018_ou_data_3"]                        # 7
+
 def aic(self):
     k = len(self.get_stochastics())
     logp = sum([x.logp for x in self.get_observeds()['node']])  
@@ -114,20 +118,28 @@ def fit_ddm_per_subject(data, model, model_dir, model_name, n_runs=5, n_jobs=12)
     return res
 
 def fit_ddm_subject(data, subj_idx, model, model_dir, model_name, n_runs=5):
-    
-    import hddm
 
     data = data.loc[data["subj_idx"]==subj_idx,:]
     exec('global m; m = {}'.format(model))
 
-    m = hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0.05)
+    # m = hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True,
+    # p_outlier=0.05)
     
     # optimize:
     # m.approximate_map()
     m.optimize('gsquare', quantiles=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], n_runs=n_runs)
     res = pd.concat((pd.DataFrame([m.values], index=[subj_idx]), pd.DataFrame([m.bic_info], index=[subj_idx])), axis=1)
-    res['aic'] = m.aic
-    res['bic'] = m.bic
+
+    try:
+        res['aic'] = m.aic
+        res['bic'] = m.bic
+    except:
+        res['aic'] = np.nan
+        res['bic'] = np.nan
+
+    # compare with bic_info from kabuki
+    bic_info = m.bic_info
+    res['bic_info'] = bic_info['bic']
 
     return res
 
@@ -139,7 +151,7 @@ def load_ddm_per_subject(model_dir, model_name):
 # version = 0
 
 run = True
-for ds in np.arange(8):
+for ds, dataset in enumerate(datasets):
     for version in [0,1,2,3]:
         
         # load data:
@@ -169,11 +181,6 @@ for ds in np.arange(8):
     
         # create figure dir:
         fig_dir = os.path.join(model_dir, model_name)
-        try:
-            os.system('mkdir {}'.format(fig_dir))
-            os.system('mkdir {}'.format(os.path.join(fig_dir, 'diagnostics')))
-        except:
-            pass
         
         # fit model:
         if run:

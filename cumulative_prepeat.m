@@ -29,7 +29,7 @@ for d = 1:length(datasets),
     % split for repeaters and alternators
     alldat.alt(d, :) = nanmean(cumrep(dat.repetition < 0.5, :));
     alldat.rep(d, :) = nanmean(cumrep(dat.repetition > 0.5, :));
-    alldat.all(d, :) = nanmean(cumrep;
+    alldat.all(d, :) = nanmean(cumrep);
 
     alldat_alt.alt(d, :) = nanmean(cumalt(dat.repetition < 0.5, :));
     alldat_alt.rep(d, :) = nanmean(cumalt(dat.repetition > 0.5, :));
@@ -55,6 +55,10 @@ errorbar(0:10, nanmean(alldat.(groups{g})), nanstd(alldat.(groups{g})) ./ sqrt(6
 	 'ok-', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'k', 'markerfacecolor', 'k');
 axis tight;
 
+% add stats
+pval = permtest();
+
+
 switch groups{g}
 	case 'rep'
 		title('Repeaters', 'fontweight', 'normal', 'fontangle', 'italic');
@@ -75,7 +79,6 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/cumulative_prepeat.pdf'));
 
 
 %% PRINT AGAIN, NOW FOR ALTERNATING SEQUENCES
-
 
 close all;
 for g = 1:length(groups),

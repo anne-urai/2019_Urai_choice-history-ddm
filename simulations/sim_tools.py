@@ -31,13 +31,13 @@ def get_DDM_traces(v=1, z=0.5, dc=0, dc_slope=0, sv=0.1, noise_sd=1, stim=0, nr_
         x[:,i+1] = x[:,i] + ((v + dc + (dc_slope*dt*i) ) * dt) + (np.random.normal(0,noise_sd,nr_trials)*np.sqrt(dt))
     return x
     
-def get_OU_traces(v, λ, dc, z, noise_sd=1, pre_generated=False, stim=0, nr_trials=1000, tmax=5.0, dt=0.01):
+def get_OU_traces(v, ll, dc, z, noise_sd=1, pre_generated=False, stim=0, nr_trials=1000, tmax=5.0, dt=0.01):
     
     """
     OU-model
     
     v:  mean drift rate
-    λ: Ornstein-Uhlenbeck process parameter (effective leak / self-excitation)
+    ll: Ornstein-Uhlenbeck process parameter (effective leak / self-excitation)
     z:  starting point
     dc: drift criterion
     """
@@ -53,11 +53,11 @@ def get_OU_traces(v, λ, dc, z, noise_sd=1, pre_generated=False, stim=0, nr_tria
     x2[:,0] = z[1]
     for i in range((int(tmax/dt))-1):
         if pre_generated:
-            x1[:,i+1] = x1[:,i] + v[0][:,i] + dc[0] - (λ[0]*x1[:,i])
-            x2[:,i+1] = x2[:,i] + v[1][:,i] + dc[1] - (λ[1]*x2[:,i])
+            x1[:,i+1] = x1[:,i] + v[0][:,i] + dc[0] - (ll[0]*x1[:,i])
+            x2[:,i+1] = x2[:,i] + v[1][:,i] + dc[1] - (ll[1]*x2[:,i])
         else:
-            x1[:,i+1] = x1[:,i] + ((v[0] + dc[0] - (λ[0]*x1[:,i])) * dt) + (np.random.normal(0,noise_sd/np.sqrt(2),nr_trials)*np.sqrt(dt))
-            x2[:,i+1] = x2[:,i] + ((v[1] + dc[1] - (λ[1]*x2[:,i])) * dt) + (np.random.normal(0,noise_sd/np.sqrt(2),nr_trials)*np.sqrt(dt))
+            x1[:,i+1] = x1[:,i] + ((v[0] + dc[0] - (ll[0]*x1[:,i])) * dt) + (np.random.normal(0,noise_sd/np.sqrt(2),nr_trials)*np.sqrt(dt))
+            x2[:,i+1] = x2[:,i] + ((v[1] + dc[1] - (ll[1]*x2[:,i])) * dt) + (np.random.normal(0,noise_sd/np.sqrt(2),nr_trials)*np.sqrt(dt))
     return x1-x2
 
 def get_LCA_traces(v, k, w, dc, z, noise_sd=1, pre_generated=False, stim=0, nr_trials=1000, tmax=5.0, dt=0.01):

@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="480aae8d-f3a8-4c36-be98-5effa645413a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../kostis_all_AICs.m" beforeDir="false" afterPath="$PROJECT_DIR$/../kostis_all_AICs.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../kostis_all_correlations_selected.m" beforeDir="false" afterPath="$PROJECT_DIR$/../kostis_all_correlations_selected.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../plot_all.m" beforeDir="false" afterPath="$PROJECT_DIR$/../plot_all.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../cumulative_prepeat.m" beforeDir="false" afterPath="$PROJECT_DIR$/../cumulative_prepeat.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../define_behavioral_metrics.m" beforeDir="false" afterPath="$PROJECT_DIR$/../define_behavioral_metrics.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../make_dataframe.m" beforeDir="false" afterPath="$PROJECT_DIR$/../make_dataframe.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1_ddm_rts.py" beforeDir="false" afterPath="$PROJECT_DIR$/1_ddm_rts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2_ou_rts.py" beforeDir="false" afterPath="$PROJECT_DIR$/2_ou_rts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DDM_fits.py" beforeDir="false" afterPath="$PROJECT_DIR$/DDM_fits.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sim_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/sim_tools.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,12 +17,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/4_ddm_autocorrelation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="73" column="80" lean-forward="true" selection-start-line="73" selection-start-column="80" selection-end-line="73" selection-end-column="80" />
+            <state relative-caret-position="1296">
+              <caret line="72" column="21" lean-forward="true" selection-start-line="72" selection-start-column="21" selection-end-line="72" selection-end-column="21" />
               <folding>
                 <element signature="e#41#50#0" expanded="true" />
               </folding>
@@ -26,7 +30,51 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/1_ddm_rts.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="279">
+              <caret line="260" selection-start-line="260" selection-end-line="261" selection-end-column="55" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/2_ou_rts.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="178">
+              <caret line="49" column="39" lean-forward="true" selection-start-line="49" selection-start-column="39" selection-end-line="49" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sim_tools.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1221">
+              <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/DDM_fits.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="126">
+              <caret line="52" column="56" lean-forward="true" selection-start-line="52" selection-start-column="56" selection-end-line="52" selection-end-column="56" />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>λ</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>ll</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -35,12 +83,16 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/4_ddm_autocorrelation.py" />
+        <option value="$PROJECT_DIR$/sim_tools.py" />
+        <option value="$PROJECT_DIR$/1_ddm_rts.py" />
+        <option value="$PROJECT_DIR$/DDM_fits.py" />
+        <option value="$PROJECT_DIR$/2_ou_rts.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="71" />
-    <option name="width" value="1421" />
+    <option name="x" value="19" />
+    <option name="width" value="1661" />
     <option name="height" value="1050" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -92,10 +144,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="71" y="0" width="1421" height="1050" extended-state="0" />
+    <frame x="19" y="0" width="1661" height="1050" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.060714286" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.051829267" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -106,9 +158,9 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.5176471" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32941177" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -117,11 +169,39 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/4_ddm_autocorrelation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="73" column="80" lean-forward="true" selection-start-line="73" selection-start-column="80" selection-end-line="73" selection-end-column="80" />
+        <state relative-caret-position="1296">
+          <caret line="72" column="21" lean-forward="true" selection-start-line="72" selection-start-column="21" selection-end-line="72" selection-end-column="21" />
           <folding>
             <element signature="e#41#50#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sim_tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1221">
+          <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/1_ddm_rts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="279">
+          <caret line="260" selection-start-line="260" selection-end-line="261" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DDM_fits.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="52" column="56" lean-forward="true" selection-start-line="52" selection-start-column="56" selection-end-line="52" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/2_ou_rts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="49" column="39" lean-forward="true" selection-start-line="49" selection-start-column="39" selection-end-line="49" selection-end-column="39" />
         </state>
       </provider>
     </entry>

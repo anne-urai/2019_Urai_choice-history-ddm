@@ -215,27 +215,30 @@ for i, group in enumerate(groups):
     df = pd.concat([pd.read_csv(os.path.join(data_folder, 'df_{}.csv'.format(g))) for g in group], axis=0)
     df.to_csv(os.path.join(fits_folder, '2018_ddm_data_{}.csv'.format(i+1)))
 
-tmax = 1
-dt = 0.01
+# tmax = 1
+# dt = 0.01
 
-# linear collapse:
-fig = plt.figure()
-t = np.arange(0,tmax,dt)
-b1, b0 = _bounds_collapse_linear(a=2, c1=0.3, c0=0.3, tmax=tmax, dt=dt)
-plt.plot(t,b1)
-plt.plot(t,b0)
-fig.savefig(os.path.join(fig_folder, 'collapse_linear.pdf'))
-
-# hyperbolic collapse:
-fig = plt.figure()
-t = np.arange(0,tmax,dt)
-b1, b0 = _bounds_collapse_hyperbolic(a=2, c=1, lower_is_0=True, tmax=tmax, dt=dt)
-plt.plot(t,b1)
-plt.plot(t,b0)
-fig.savefig(os.path.join(fig_folder, 'collapse_hyperbolic.pdf'))
+# # linear collapse:
+# fig = plt.figure()
+# t = np.arange(0,tmax,dt)
+# b1, b0 = _bounds_collapse_linear(a=2, c1=0.3, c0=0.3, tmax=tmax, dt=dt)
+# plt.plot(t,b1)
+# plt.plot(t,b0)
+# fig.savefig(os.path.join(fig_folder, 'collapse_linear.pdf'))
+#
+# # hyperbolic collapse:
+# fig = plt.figure()
+# t = np.arange(0,tmax,dt)
+# b1, b0 = _bounds_collapse_hyperbolic(a=2, c=1, lower_is_0=True, tmax=tmax, dt=dt)
+# plt.plot(t,b1)
+# plt.plot(t,b0)
+# fig.savefig(os.path.join(fig_folder, 'collapse_hyperbolic.pdf'))
 
 # load ddm results:
 for i, group in enumerate(groups):
+
+    print(i)
+    print(group)
     
     # simulated data:
     df = pd.read_csv(os.path.join(fits_folder, '2018_ddm_data_{}.csv'.format(i+1)))
@@ -247,10 +250,20 @@ for i, group in enumerate(groups):
         param['version'] = v
         params.append(param)
     param = pd.concat(params)
+
     param['z'] = param['z'] - 0.5
     for v in [1,2,3]:
-        param.loc[param['version']==v, 'bic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(param.loc[param['version']==0, 'bic'])
-        param.loc[param['version']==v, 'aic'] = np.array(param.loc[param['version']==v, 'aic']) - np.array(param.loc[param['version']==0, 'aic'])
+
+        param.loc[param['version']==v, 'Dbic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(
+            param.loc[param['version']==0, 'bic'])
+        param.loc[param['version']==v, 'Daic'] = np.array(param.loc[param['version']==v, 'aic']) - np.array(
+            param.loc[param['version']==0, 'aic'])
+        param.loc[param['version']==v, 'Dbic_info'] = np.array(param.loc[param['version']==v, 'bic_info']) - np.array(
+            param.loc[param['version']==0, 'bic_info'])
+
+    param.groupby(['version'])['Dbic', 'Daic', 'Dbic_info'].mean()
+
+    print('plotting DDM results')
 
     # plots:
     # 1. PARAMETER ESTIMATES
@@ -269,35 +282,26 @@ for i, group in enumerate(groups):
     plt.tight_layout()
     fig.savefig(os.path.join(fig_folder, 'bars_{}.pdf'.format(i+1)))
 
-    # 2. BIC
+    palette = ['forestgreen', 'royalblue', 'darkcyan']
+    # BIC COMPUTED DIFFERENTLY
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(111)
     plt.axhline(0, xmin=-0.1, xmax=1.1, lw=0.5, color='k')
     #sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
-    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']),
-    	palette=['forestgreen', 'royalblue', 'darkcyan'], ci=None, ax=ax)
+    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['Dbic_info']),
+    	palette=palette, ci=None, ax=ax)
+
+    # find the lowest BIC
+    avgbic = np.array(param.loc[param['version']!=0,:].groupby('version').mean()['Dbic_info'])
+    ax.bar(np.argmin(avgbic), np.min(avgbic), facecolor=palette[np.argmin(avgbic)], edgecolor="k")
+
     # plt.bar(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
     plt.ylabel('$\mathregular{\Delta BIC}}$')
     plt.xticks(np.arange(3), ['z', '$\mathregular{v_{bias}}$', 'both'], fontsize='medium')
     plt.xlabel('')
     sns.despine(offset=5, trim=True)
     plt.tight_layout()
-    fig.savefig(os.path.join(fig_folder, 'bics_{}.pdf'.format(i+1)))
-
-
-    fig = plt.figure(figsize=(2,2))
-    ax = fig.add_subplot(111)
-    plt.axhline(0, xmin=-0.1, xmax=1.1, lw=0.5, color='k')
-    #sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
-    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['aic']),
-        palette=['forestgreen', 'royalblue', 'darkcyan'], ci=None, ax=ax)
-    # plt.bar(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
-    plt.ylabel('$\mathregular{\Delta AIC}}$')
-    plt.xticks(np.arange(3), ['z', '$\mathregular{v_{bias}}$', 'both'], fontsize='medium')
-    plt.xlabel('')
-    sns.despine(offset=5, trim=True)
-    plt.tight_layout()
-    fig.savefig(os.path.join(fig_folder, 'aics_{}.pdf'.format(i+1)))
+    fig.savefig(os.path.join(fig_folder, 'bic_info_{}.pdf'.format(i+1)))
 
     # 3. correlations
     fig = plt.figure(figsize=(2,2))

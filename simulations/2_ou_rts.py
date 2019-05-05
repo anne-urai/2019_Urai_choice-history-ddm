@@ -40,7 +40,7 @@ def do_simulations(params):
         
         # get traces:
         x = get_OU_traces(v=params['v'],
-                                λ=params['λ'],
+                                ll=params['ll'],
                                 dc=params['dc'],
                                 z=params['z'],
                                 pre_generated=False,
@@ -87,7 +87,7 @@ dt = 0.01
 # self-excitation regime:
 v = 1
 a = 1.2
-λ = -2.5
+ll = -2.5
 dc = 0
 z = 0
 ndt = 0.1
@@ -95,51 +95,51 @@ c = 0.3
 
 # # leaky regime:
 # a = 0.42 # means boundary separation of 0.84 as upper boundary becomes 0.42, and lower -0.42
-# λ = 4
+# ll = 4
 
 sArray = [
         
     # OU neutral:
-    {'subj_idx':0, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':0, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     # OU starting point bias:
-    {'subj_idx':1, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.00,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':2, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.02,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':3, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.04,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':4, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.06,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':5, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.08,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':6, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.10,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':7, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.12,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':8, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.14,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':9, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.16,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':10, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.18,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':11, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc,dc], 'z':[z+0.20,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':1, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.00,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':2, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.02,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':3, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.04,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':4, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.06,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':5, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.08,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':6, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.10,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':7, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.12,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':8, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.14,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':9, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.16,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':10, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.18,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':11, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc,dc], 'z':[z+0.20,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     # OU input bias:
-    {'subj_idx':12, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.0,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':13, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.1,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':14, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.2,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':15, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.3,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':16, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.4,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':17, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.5,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':18, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.6,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':19, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.7,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':20, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.8,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':21, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+0.9,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':22, 'v':[v,0], 'λ':[λ,λ], 'a':a, 'dc':[dc+1.0,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':12, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.0,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':13, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.1,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':14, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.2,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':15, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.3,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':16, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.4,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':17, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.5,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':18, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.6,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':19, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.7,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':20, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.8,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':21, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+0.9,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':22, 'v':[v,0], 'll':[ll,ll], 'a':a, 'dc':[dc+1.0,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     # # OU leak bias:
-    {'subj_idx':23, 'v':[v,0], 'λ':[λ-0.0,λ+0.0], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':24, 'v':[v,0], 'λ':[λ-0.3,λ+0.3], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':25, 'v':[v,0], 'λ':[λ-0.6,λ+0.6], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':26, 'v':[v,0], 'λ':[λ-0.9,λ+0.9], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':27, 'v':[v,0], 'λ':[λ-1.2,λ+1.2], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':28, 'v':[v,0], 'λ':[λ-1.5,λ+1.5], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':29, 'v':[v,0], 'λ':[λ-1.8,λ+1.8], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':30, 'v':[v,0], 'λ':[λ-2.1,λ+2.1], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':31, 'v':[v,0], 'λ':[λ-2.4,λ+2.4], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':32, 'v':[v,0], 'λ':[λ-2.7,λ+2.7], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
-    {'subj_idx':33, 'v':[v,0], 'λ':[λ-3.0,λ+3.0], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':23, 'v':[v,0], 'll':[ll-0.0,ll+0.0], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':24, 'v':[v,0], 'll':[ll-0.3,ll+0.3], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':25, 'v':[v,0], 'll':[ll-0.6,ll+0.6], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':26, 'v':[v,0], 'll':[ll-0.9,ll+0.9], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':27, 'v':[v,0], 'll':[ll-1.2,ll+1.2], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':28, 'v':[v,0], 'll':[ll-1.5,ll+1.5], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':29, 'v':[v,0], 'll':[ll-1.8,ll+1.8], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':30, 'v':[v,0], 'll':[ll-2.1,ll+2.1], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':31, 'v':[v,0], 'll':[ll-2.4,ll+2.4], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':32, 'v':[v,0], 'll':[ll-2.7,ll+2.7], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
+    {'subj_idx':33, 'v':[v,0], 'll':[ll-3.0,ll+3.0], 'a':a, 'dc':[dc,dc], 'z':[z,z], 'bound':'collapse_hyperbolic', 'c':c, 'nr_trials':nr_trials},
 
     ]
 
@@ -207,12 +207,14 @@ for i, group in enumerate(groups):
         param = pd.read_csv(os.path.join(fits_folder, '2018_ou_data_{}_{}_params_flat.csv'.format(i+1, v)))
         param['version'] = v
         params.append(param)
+
     param = pd.concat(params)
     param['z'] = param['z'] - 0.5
     for v in [1,2,3]:
-        param.loc[param['version']==v, 'bic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(param.loc[param['version']==0, 'bic'])
-        param.loc[param['version']==v, 'aic'] = np.array(param.loc[param['version']==v, 'aic']) - np.array(param.loc[param['version']==0, 'aic'])
-
+        # param.loc[param['version']==v, 'bic'] = np.array(param.loc[param['version']==v, 'bic']) - np.array(param.loc[param['version']==0, 'bic'])
+        # param.loc[param['version']==v, 'aic'] = np.array(param.loc[param['version']==v, 'aic']) - np.array(param.loc[param['version']==0, 'aic'])
+        param.loc[param['version']==v, 'Dbic_info'] = np.array(param.loc[param['version']==v, 'bic_info']) - np.array(
+            param.loc[param['version']==0, 'bic_info'])
     # plots:
     # 1. PARAMETER ESTIMATES
     fig = plt.figure(figsize=(2,2))
@@ -231,12 +233,18 @@ for i, group in enumerate(groups):
     fig.savefig(os.path.join(fig_folder, 'bars_{}.pdf'.format(i+1)))
 
     # 2. BIC
+    palette = ['forestgreen', 'royalblue', 'darkcyan']
     fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(111)
     plt.axhline(0, xmin=-0.1, xmax=1.1, lw=0.5, color='k')
     #sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
-    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']),
-        palette=['forestgreen', 'royalblue', 'darkcyan'], ci=None, ax=ax)
+    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['Dbic_info']),
+        palette=palette, ci=None, ax=ax)
+
+    # find the lowest BIC
+    avgbic = np.array(param.loc[param['version']!=0,:].groupby('version').mean()['Dbic_info'])
+    ax.bar(np.argmin(avgbic), np.min(avgbic), facecolor=palette[np.argmin(avgbic)], edgecolor="k")
+
     # plt.bar(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
     plt.ylabel('$\mathregular{\Delta BIC}}$')
     plt.xticks(np.arange(3), ['z', '$\mathregular{v_{bias}}$', 'both'], fontsize='medium')
@@ -244,21 +252,6 @@ for i, group in enumerate(groups):
     sns.despine(offset=5, trim=True)
     plt.tight_layout()
     fig.savefig(os.path.join(fig_folder, 'bics_{}.pdf'.format(i+1)))
-
-
-    fig = plt.figure(figsize=(2,2))
-    ax = fig.add_subplot(111)
-    plt.axhline(0, xmin=-0.1, xmax=1.1, lw=0.5, color='k')
-    #sns.stripplot(x='version', y='bic', data=param.loc[param['version']!=0,:], color='lightgrey', linewidth=0.5, edgecolor='black', ax=ax)
-    sns.barplot(x=np.arange(3), y=np.array(param.loc[param['version']!=0,:].groupby('version').mean()['aic']),
-        palette=['forestgreen', 'royalblue', 'darkcyan'], ci=None, ax=ax)
-    # plt.bar(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
-    plt.ylabel('$\mathregular{\Delta AIC}}$')
-    plt.xticks(np.arange(3), ['z', '$\mathregular{v_{bias}}$', 'both'], fontsize='medium')
-    plt.xlabel('')
-    sns.despine(offset=5, trim=True)
-    plt.tight_layout()
-    fig.savefig(os.path.join(fig_folder, 'aics_{}.pdf'.format(i+1)))
 
     # 3. correlations
     fig = plt.figure(figsize=(2,2))
