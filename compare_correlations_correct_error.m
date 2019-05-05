@@ -56,13 +56,15 @@ for v = 1:length(vars),
     % set(gca, 'ytick', 1:length(datasets), 'yticklabel', []);
     switch vars{v}
         case 'corrz'
-            xlabel('\Delta\rho, z');
+            xlabel('\Delta\rho correct vs. error, z');
         case 'corrv'
-            xlabel('\Delta\rho, v_{bias}');
+            xlabel('\Delta\rho correct vs. error, v_{bias}');
+            set(gca, 'yticklabel', []);
     end
     
     xlim([-1 1]);
     offsetAxes;
+    set(gca, 'ycolor', 'k');
     
     plot(nanmean(ridiff), 0.1, 'd', 'color', 'k', 'markersize', 4);
     
@@ -73,6 +75,7 @@ for v = 1:length(vars),
     t.Position(2) = t.Position(2) - 1.2; % move down
     
     tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_correctError_%s.pdf', vars{v}));
 end
 
 end

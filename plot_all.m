@@ -60,6 +60,16 @@ if 0,
 end
 disp('starting');
 
+alldat = individual_correlation_prevcorrect;
+% separate plots for correct and error
+forestPlot(alldat(1:2:end));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf'));
+forestPlot(alldat(2:2:end));
+print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
+
+% compare the correlation coefficients for figure 5d
+compare_correlations_correct_error(alldat);
+
 return
 
 % ========================================== %
