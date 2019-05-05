@@ -117,7 +117,7 @@ fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/'
 
 simulate = True
 parallel = False
-nr_trials = int(1e4) #100K
+nr_trials = int(1e5) #100K
 tmax = 5
 dt = 0.01
 
