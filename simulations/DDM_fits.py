@@ -56,9 +56,6 @@ datasets = [
             "2018_ddm_autocorr_data_3",                       # 10
             ]
 
-datasets = ["2018_ddm_autocorr_data_1",                       # 8
-            "2018_ddm_autocorr_data_2",                       # 9
-            "2018_ddm_autocorr_data_3"]
 
 def aic(self):
     k = len(self.get_stochastics())

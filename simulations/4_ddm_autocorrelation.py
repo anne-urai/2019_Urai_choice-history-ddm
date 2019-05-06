@@ -115,7 +115,7 @@ data_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_au
 fig_folder  = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_autocorr_figs/')
 fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
-simulate = True
+simulate = False
 parallel = False
 nr_trials = int(1e5) #100K
 tmax = 5
@@ -207,7 +207,7 @@ for i, group in enumerate(groups):
     
     # model params:
     params = []
-    for v in [3, 4, 5, 6]:
+    for v in np.arange(7):
         param = pd.read_csv(os.path.join(fits_folder, '2018_ddm_autocorr_data_{}_{}_params_flat.csv'.format(i+1, v)))
         param['version'] = v
         params.append(param)
@@ -222,8 +222,6 @@ for i, group in enumerate(groups):
     for v in [4,5,6]:
         param.loc[param['version']==v, 'Dbic_info'] = np.array(param.loc[param['version']==v, 'bic_info']) - np.array(
             param.loc[param['version']==3, 'bic_info'])
-
-    # plots:
 
     # 1. PARAMETER ESTIMATES
     fig = plt.figure(figsize=(2,2))
@@ -253,8 +251,6 @@ for i, group in enumerate(groups):
     # find the lowest BIC
     avgbic = np.array(param.loc[param['version']!=3,:].groupby('version').mean()['Dbic_info'])
     ax.bar(np.argmin(avgbic), np.min(avgbic), facecolor=palette[np.argmin(avgbic)], edgecolor="k")
-
-    # plt.bar(np.arange(3), np.array(param.loc[param['version']!=0,:].groupby('version').mean()['bic']), where='mid', lw=1, color='k')
     plt.ylabel('$\mathregular{\Delta BIC}}$')
     plt.xticks(np.arange(3), ['z', '$\mathregular{v_{bias}}$', 'both'], fontsize='medium')
     plt.xlabel('')
