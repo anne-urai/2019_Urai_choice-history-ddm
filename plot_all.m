@@ -60,9 +60,11 @@ if 0,
     % rename_PPC_files(datasets);
 end
 disp('starting');
+return;
+
+kernels_lags_bestmodel;
 
 
-return
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
@@ -74,7 +76,7 @@ schematic;
 % FIGURE 2
 % ========================================== %
 
-repetition_range;
+% repetition_range;
 strategy_plot;
 
 % ========================================== %
@@ -248,13 +250,6 @@ meg_regression_dic;
 meg_regression_posteriors;
 
 % ========================================== %
-% REGRESSION RESULTS, UP TO LAG 3
-% ========================================== %
-
-barplots_DIC_regression;
-kernels_lags_bestmodel;
-
-% ========================================== %
 % REVISION & REBUTTAL - congruency
 % ========================================== %
 
@@ -292,4 +287,6 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_PES_HDDM.pdf'));
 % ========================================== %
 % CUMULATIVE P(REPEAT)
 % ========================================== %
+
+cumulative_prepeat;
 

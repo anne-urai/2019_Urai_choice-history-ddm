@@ -75,22 +75,24 @@ for i = 1:length(mdldic),
     end
 end
 
-%# Add a text string above/below each bin
-for i = 1:length(mdldic),
-    if mdldic(i) < 0,
-        text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
-            num2str(round(mdldic(i))), ...
-            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
-    elseif mdldic(i) > 0,
-        text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
-            num2str(round(mdldic(i))), ...
-            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', 'w');
-    end
-end
+
 axis square; axis tight; 
 xlim([0.5 length(mdldic)+0.5]);
 offsetAxes; box off;
 set(gca, 'color', 'none');
 set(gca, 'xcolor', 'k', 'ycolor', 'k');
+
+%# Add a text string above/below each bin
+for i = 1:length(mdldic),
+    if mdldic(i) < 0,
+        text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
+            num2str(round(mdldic(i))), ...
+            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', [1 1 1]);
+    elseif mdldic(i) > 0,
+        text(i, mdldic(i) + 0.12*range(get(gca, 'ylim')), ...
+            num2str(round(mdldic(i))), ...
+            'VerticalAlignment', 'top', 'FontSize', 4, 'horizontalalignment', 'center', 'color', [1 1 1]);
+    end
+end
 
 end

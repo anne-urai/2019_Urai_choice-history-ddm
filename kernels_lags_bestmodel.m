@@ -335,27 +335,29 @@ for pltidx = 1:length(vars),
         plot(1:numlags, alldata.([vars{pltidx} '_fullmodel'])(d, :), 'color', colors(d, :), 'linewidth', 0.2);
         plot(1:numlags, alldata.(vars{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
     end
-    
-    
-    errorbar(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), ...
-        nanstd(alldata.([vars{pltidx} '_fullmodel'])) ./ sqrt(6), ...
-        'ok', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'k', 'markerfacecolor', 'w');
-    
-    % INDICATE WHICH ARE SIGNIFICANT!
-    [h, pval] = ttest(alldata.([vars{pltidx} '_fullmodel']));
-    
-    errorbar((pval < 0.05), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, pval < 0.05), ...
-        nanstd(alldata.([vars{pltidx} '_fullmodel'])(:, pval < 0.05) ./ sqrt(6), ...
-        'ok', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'w', 'markerfacecolor', 'k');
-    
-    % show the model on top
+
+        % show the model on top
     params = coeffvalues(f);
     disp(coeffnames(f));
     y = feval(f, linspace(1, numlags, 100));
     plot(linspace(1, numlags, 100), y, 'color', 'k', 'linewidth', 1);
     text(3.3, -0.08, sprintf('$V(t) = %.2f e^{-t/%.2f}$', params(1), -1/params(2)), ...
         'interpreter', 'latex', 'fontsize', 5);
-    %text(2, 0.08, sprintf('$\frac{%d}{%d}$', 1, 2),'Interpreter','latex')
+    %text(2, 0.08, sprintf('$\frac{%d}{%d}$', 1, 2),'Interpreter','latex'
+    
+    errorbar(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), ...
+        nanstd(alldata.([vars{pltidx} '_fullmodel'])) ./ sqrt(6), ...
+        'ok', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'k', 'markerfacecolor', 'k');
+    
+    % INDICATE WHICH ARE SIGNIFICANT!
+    [h, pval] = ttest(alldata.([vars{pltidx} '_fullmodel']));
+    [h, crit_p, adj_ci_cvrg, adj_p] = fdr_bh(pval);
+
+    if any(adj_p < 0.05),
+        errorbar(find(adj_p < 0.05), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, adj_p < 0.05)), ...
+        nanstd(alldata.([vars{pltidx} '_fullmodel'])(:, adj_p < 0.05)) ./ sqrt(6), ...
+        'ok', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'k', 'markerfacecolor', 'w');
+    end
 
     xlabel('Lags (# trials)');
     ylabel(regexprep(regexprep(regexprep(regexprep(vars{pltidx}, '_', ' ~ previous '), ...
