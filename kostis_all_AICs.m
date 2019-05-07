@@ -5,7 +5,6 @@ function kostis_all_AICs
 % ============================================ %
 
 global mypath colors
-colors(3, :) = mean(colors([1 2], :));
 
 cols1 = cbrewer('qual', 'Set1', 8);
 cols2 = cbrewer('qual', 'Dark2', 8);

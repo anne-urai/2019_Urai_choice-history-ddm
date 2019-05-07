@@ -1,7 +1,7 @@
 function conditional_bias_functions_collapsed_summary
 
 global colors
-thesecolors = {[0 0 0], colors(1, :), colors(2, :), mean(colors([1 2], :))};
+thesecolors = {[0 0 0], colors(1, :), colors(2, :), colors(3, :)};
 
 load(sprintf('~/Data/serialHDDM/allds_cbfs_mediansplit.mat'));
 periods    = {'fast', 'slow'};

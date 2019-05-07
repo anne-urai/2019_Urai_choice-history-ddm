@@ -11,7 +11,6 @@ addpath(genpath('~/code/Tools'));
 warning off; close all;
 global datasets datasetnames mypath colors
 disp(datasets)
-colors(3, :) = mean(colors([1 2], :));
 % colors = repmat(colors, 10, 1);
 
 % ============================================ %

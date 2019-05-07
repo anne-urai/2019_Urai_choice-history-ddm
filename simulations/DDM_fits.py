@@ -51,11 +51,10 @@ datasets = [
             "2018_ou_data_1",                        # 5
             "2018_ou_data_2",                        # 6
             "2018_ou_data_3",                        # 7
-            "2018_ddm_autocorr_data_1",                       # 8
-            "2018_ddm_autocorr_data_2",                       # 9
-            "2018_ddm_autocorr_data_3",                       # 10
+            # "2018_ddm_autocorr_data_1",                       # 8
+            # "2018_ddm_autocorr_data_2",                       # 9
+            # "2018_ddm_autocorr_data_3",                       # 10
             ]
-
 
 def aic(self):
     k = len(self.get_stochastics())
@@ -149,8 +148,8 @@ def load_ddm_per_subject(model_dir, model_name):
 
 run = True
 for ds, dataset in enumerate(datasets):
-    # for version in [0,1,2,3]:
-    for version in [4,5,6]:
+    for version in [0,1,2,3]:
+    #for version in [4,5,6]:
         
         # load data:
         print(os.path.join(data_dir, '{}.csv'.format(datasets[ds])))
@@ -166,18 +165,21 @@ for ds, dataset in enumerate(datasets):
 
         # model:
         if version == 0:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=False, p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, " \
+                    "bias=False, p_outlier=0.01)"
         if version == 1:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, bias=True, p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=False, " \
+                    "bias=True, p_outlier=0.01)"
         elif version == 2:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=False, p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, " \
+                    "bias=False, p_outlier=00.01)"
         elif version == 3:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0)"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0.01)"
 
         elif version == 4:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0, depends_on={'z':['prevresp']})"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0.01, depends_on={'z':['prevresp']})"
         elif version == 5:
-            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0, depends_on={'dc':['prevresp']})"
+            model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0.01, depends_on={'dc':['prevresp']})"
         elif version == 6:
             model = "hddm.HDDMStimCoding(data, stim_col='stimulus', split_param='v', drift_criterion=True, bias=True, p_outlier=0, " \
                     "depends_on={'dc':['prevresp'], 'z':['prevresp']})"

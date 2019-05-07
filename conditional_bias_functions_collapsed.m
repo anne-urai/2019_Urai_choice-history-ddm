@@ -31,13 +31,13 @@ end
 switch whichModels
     case 1
         models = {'data', 'stimcoding_nohist', 'stimcoding_dc_z_prevresp'};
-        thesecolors = {[0 0 0], [0.5 0.5 0.5], mean(colors([1 2], :))};
+        thesecolors = {[0 0 0], [0.5 0.5 0.5], colors(3, :)};
     case 2
         models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_z_prevresp'};
-        thesecolors = {[0 0 0],  colors(1, :), mean(colors([1 2], :))};
+        thesecolors = {[0 0 0],  colors(1, :), colors(3, :)};
     case 3
         models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_prevresp', 'stimcoding_dc_z_prevresp'};
-        thesecolors = {[0 0 0], colors(1, :), colors(2, :), mean(colors([1 2], :))};
+        thesecolors = {[0 0 0], colors(1, :), colors(2, :), colors(3, :)};
     case 4
         models = {'data', 'stimcoding_z_prevresp', 'stimcoding_dc_prevresp'};
         thesecolors = {[0 0 0], colors(1, :), colors(2, :)};

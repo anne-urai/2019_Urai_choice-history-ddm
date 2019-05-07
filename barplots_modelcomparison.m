@@ -46,7 +46,6 @@ end
 function getPlotModelIC(mdls, s, d)
 
 global datasets mypath colors
-colors(3, :) = mean(colors([1 2], :));
 axis square; hold on;
 
 mdldic = nan(1, length(mdls));

@@ -45,7 +45,8 @@ try
 end
 
 % from Thomas, green blue grey
-colors = [77,175,74; 55,126,184] ./ 256; % green blue
+colors = [77,175,74; 55,126,184; 52, 103, 51] ./ 256; % green blue
+
 
 %% ========================================== %
 % PREPARING DATA
@@ -60,15 +61,6 @@ if 0,
 end
 disp('starting');
 
-alldat = individual_correlation_prevcorrect;
-% separate plots for correct and error
-forestPlot(alldat(1:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_prevcorrect.pdf'));
-forestPlot(alldat(2:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_preverror.pdf'));
-
-% compare the correlation coefficients for figure 5d
-compare_correlations_correct_error(alldat);
 
 return
 
@@ -201,7 +193,6 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_st%d_HDDM.pdf', 1));
 % c. added non-decision time between coherence levels
 
 nondecisiontime_coherence;
-
 barplots_DIC_stcoh;
 
 alldat = individual_correlation_tcoh(); % figure 4

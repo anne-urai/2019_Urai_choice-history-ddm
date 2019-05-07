@@ -336,9 +336,17 @@ for pltidx = 1:length(vars),
         plot(1:numlags, alldata.(vars{pltidx})(d, :), 'color', colors(d, :), 'linewidth', 1);
     end
     
+    
     errorbar(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), ...
         nanstd(alldata.([vars{pltidx} '_fullmodel'])) ./ sqrt(6), ...
-        'ok', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'k', 'markerfacecolor', 'k');
+        'ok', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'k', 'markerfacecolor', 'w');
+    
+    % INDICATE WHICH ARE SIGNIFICANT!
+    [h, pval] = ttest(alldata.([vars{pltidx} '_fullmodel']));
+    
+    errorbar((pval < 0.05), nanmean(alldata.([vars{pltidx} '_fullmodel'])(:, pval < 0.05), ...
+        nanstd(alldata.([vars{pltidx} '_fullmodel'])(:, pval < 0.05) ./ sqrt(6), ...
+        'ok', 'linewidth', 1, 'capsize', 0, 'markersize', 3, 'markeredgecolor', 'w', 'markerfacecolor', 'k');
     
     % show the model on top
     params = coeffvalues(f);
