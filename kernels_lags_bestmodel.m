@@ -19,7 +19,7 @@ fullmodelname = 'regressdczlag6'; % extend thin lines for weights from biggest m
 global individualrep
 
 global flipAlternators;
-flipAlternators = 1;
+flipAlternators = 0;
 
 for d = 1:length(datasets),
     
@@ -371,6 +371,7 @@ for pltidx = 1:length(vars),
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/regressionkernels_correcterror_exponential_%d_flipAlt%d.pdf', pltidx, flipAlternators));
+    disp('done');
     
 end
 end

@@ -23,11 +23,15 @@ groups = {'alternators', 'repeaters', 'all'};
 
 for g = 1:length(groups),
     
-    alldat.repeat = nan(6,3);
-    alldat.bias = nan(6,3);
-    alldat.rt = nan(6,3);
+    alldat.repeat = nan(6,4);
+    alldat.bias = nan(6,4);
+    alldat.rt = nan(6,4);
     
     
+    close all; subplot(4,4,1); hold on;
+    colors2 = cbrewer('qual', 'Set2', length(datasets));
+    markers = {'d', 's', '^', 'v',  '>', '<'};
+
     for d = 1:length(datasets),
         
         filename    = dir(sprintf('%s/%s/*.csv', mypath, datasets{d}));
@@ -56,8 +60,9 @@ for g = 1:length(groups),
         end
         
         % divide RT into quantiles for each subject
-        discretizeRTs = @(x) {discretize(x, [0 0.4 0.8 1.6])};
-        
+        discretizeRTs = @(x) {discretize(x, [0 0.4 0.8 1.6 5])};
+        discretizeRTs = @(x) {discretize(x, [0 quantile(x, [.2, .4, .6, .8, .95])])};
+
         % discretize into bins of RT
         rtbins = splitapply(discretizeRTs, data.rt, findgroups(data.subj_idx));
         data.rtbins = cat(1, rtbins{:});
@@ -108,55 +113,63 @@ for g = 1:length(groups),
         assert(isequal(size(mat), size(xRTs)), 'mismatch');
         
         % NOW PLOT
-        close all; subplot(3,3,d); hold on;
-        errorbar(nanmean(xRTs), nanmean(mat), nanstd(mat) ./ sqrt(size(mat, 1)), '-bo', ...
-            'capsize', 0, 'markerfacecolor', 'b', 'markeredgecolor', 'w');
-        errorbar(nanmean(xRTs), nanmean(mat2), nanstd(mat2) ./ sqrt(size(mat2, 1)), '-ko', ...
-            'capsize', 0, 'markerfacecolor', 'k', 'markeredgecolor', 'w');
-        %legend({'repetition', 'bias'}); legend boxoff;
+
+        errorbar(nanmean(xRTs), nanmean(mat2), nanstd(mat2) ./ sqrt(size(mat, 1)), '-', 'marker', markers{d},...
+         'color', colors2(d, :), ...
+            'capsize', 0, 'markerfacecolor', 'w',  'markersize', 3, 'markeredgecolor', colors2(d, :));
+        % errorbar(nanmean(xRTs), nanmean(mat2), nanstd(mat2) ./ sqrt(size(mat2, 1)), '-ko', ...
+        %     'capsize', 0, 'markerfacecolor', 'k', 'markeredgecolor', 'w');
+        % %legend({'repetition', 'bias'}); legend boxoff;, 'markeredgecolor', colors2(d, :)
         
+        end
+
         %
         hline(0.5);
-        set(gca, 'xtick', nanmean(xRTs), 'xticklabelrotation', 45);
+        % set(gca, 'xtick', [0.4 0.8 1.6], 'xticklabelrotation', 45);
         % ylim([0.4 0.6]);
         offsetAxes;
-        ylabel('Probability');
-        title(datasetnames{d});2
+        ylabel('P(history bias)');
+        %title(datasetnames{d});2
         %         if contains(datasetnames{d}{2}, 'RT'),
-        xlabel('RT from stim onset (s)');
+        xlabel('RT (s)');
         %         elseif contains(datasetnames{d}{2}, 'FD'),
         %             xlabel('RT from stim offset (s)');
         %         end
         set(gca, 'xcolor', 'k', 'ycolor', 'k');
         tightfig;
-        switch groups{g}
-            case 'all'
-                        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_withintrial_%d.pdf', d)); % 3b
-            otherwise
-        print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_withintrial_%d_%s.pdf', d, groups{g})); % 3b
-        end
+            print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_withintrial_summary_quantiles.pdf', d)); % 3b
+
+
+        % switch groups{g}
+        %     case 'all'
+        %     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_withintrial_%d.pdf', d)); % 3b
+        %     otherwise
+        %     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_withintrial_%d_%s.pdf', d, groups{g})); % 3b
+        % end
         
-        try
-            alldat.repeat(d, :) = nanmean(mat);
-            alldat.bias(d, :)   = nanmean(mat2);
-            alldat.rt(d, :)     = nanmean(xRTs);
-        catch
-            alldat.repeat(d, 2:3) = nanmean(mat);
-            alldat.bias(d, 2:3)   = nanmean(mat2);
-            alldat.rt(d, 2:3)     = nanmean(xRTs);
-        end
+        % try
+        %     alldat.repeat(d, :) = nanmean(mat);
+        %     alldat.bias(d, :)   = nanmean(mat2);
+        %     alldat.rt(d, :)     = nanmean(xRTs);
+        % catch
+        %     alldat.repeat(d, 2:end) = nanmean(mat);
+        %     alldat.bias(d, 2:end)   = nanmean(mat2);
+        %     alldat.rt(d, 2:end)     = nanmean(xRTs);
+        % end
         
     end
     
+    return;
+
     %%%%%%%%%%%%%%%%%
     % AVERAGE ACROSS DATASETs
     %%%%%%%%%%%%%%%%%
     
-    close all; subplot(3,3,d); hold on;
+    close all; subplot(4,4,d); hold on;
     errorbar(nanmean(alldat.rt), nanmean(alldat.repeat), nanstd(alldat.repeat) ./ sqrt(size(alldat.repeat, 1)), '-bo', ...
         'capsize', 0, 'markerfacecolor', 'b', 'markeredgecolor', 'w');
-    errorbar(nanmean(alldat.rt), nanmean(alldat.bias), nanstd(alldat.bias) ./ sqrt(size(alldat.bias, 1)), '-ko', ...
-        'capsize', 0, 'markerfacecolor', 'k', 'markeredgecolor', 'w');
+    % errorbar(nanmean(alldat.rt), nanmean(alldat.bias), nanstd(alldat.bias) ./ sqrt(size(alldat.bias, 1)), '-ko', ...
+    %     'capsize', 0, 'markerfacecolor', 'k', 'markeredgecolor', 'w');
     
     hline(0.5);
     set(gca, 'xtick', nanmean(alldat.rt), 'xticklabelrotation', 45);
@@ -166,7 +179,7 @@ for g = 1:length(groups),
     end
     
     offsetAxes;
-    ylabel('Probability');
+    ylabel('P(repeat)');
     title(capitalize(groups{g}));
     xlabel('RT (s)');
     set(gca, 'xcolor', 'k', 'ycolor', 'k');

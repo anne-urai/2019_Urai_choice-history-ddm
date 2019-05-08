@@ -61,12 +61,9 @@ if 0,
 end
 disp('starting');
 
-barplots_modelcomparison_regression;
+kernels_lags_bestmodel;
 
 return;
-
-
-
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
