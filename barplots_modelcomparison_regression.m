@@ -47,7 +47,7 @@ for s = 1:length(modelIC),
         subplot(4, 4, 1);
         getPlotModelIC(mdls, modelIC{s}, d, colors);
         title(datasetnames{d});
-        set(gca, 'xtick', 2:3:length(mdls), 'xticklabel', lagnames);
+        set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames);
         xlabel('Lags (# trials)')
         ylabel({'\DeltaAIC from model'; 'without history'}, 'interpreter', 'tex');
 
@@ -68,8 +68,8 @@ end
 function getPlotModelIC(mdls, s, d, colors)
 
 global datasets mypath 
-colors(3, :) = mean(colors([1 2], :));
 axis square; hold on;
+plot([1 6], [0 0], 'color', 'k', 'linewidth', 0.5);
 
 mdldic = nan(1, length(mdls));
 for m = 1:length(mdls),
@@ -89,34 +89,15 @@ mdldic = mdldic(2:end);
 mdls = mdls(2:end);
 [~, bestMdl] = min(mdldic);
 
-for i = 1:length(mdldic),
-
-    % move together in clusters of 3
-    if contains(mdls{i}, '_z_'),
-        xpos = i+0.18;
-        thiscolor = colors(1, :);
-    elseif contains(mdls{i}, '_dc_'),
-        xpos = i;
-        thiscolor = colors(2, :);
-
-    elseif contains(mdls{i}, '_dcz_'), 
-        xpos = i-0.18;
-        thiscolor = colors(3, :);
-
-    end
-
-    % best fit with outline
-    if i == bestMdl,
-        b = bar(xpos, mdldic(i), 'facecolor', thiscolor-0.1, 'barwidth', 0.8, 'BaseValue', 0, ...
-        'edgecolor', 'k');
-    else
-        b = bar(xpos, mdldic(i), 'facecolor', thiscolor+0.1, 'barwidth', 0.8, 'BaseValue', 0, ...
-        'edgecolor', 'none');
-    end
+for c = 1:3,
+    b = plot(1:6, mdldic(c:3:end), 'o-', 'color', colors(c, :),'markersize', 6,  ...
+        'markerfacecolor', colors(c, :));
+    
 end
 
 axis square; axis tight; 
-xlim([0.5 length(mdldic)+0.5]);
+set(gca, 'xtick', 1:6);
+% xlim([0.5 length(mdldic)+0.5]);
 offsetAxes; box off;
 set(gca, 'color', 'none');
 set(gca, 'xcolor', 'k', 'ycolor', 'k');

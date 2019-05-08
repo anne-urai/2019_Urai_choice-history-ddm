@@ -60,9 +60,11 @@ if 0,
     % rename_PPC_files(datasets);
 end
 disp('starting');
+
+barplots_modelcomparison_regression;
+
 return;
 
-kernels_lags_bestmodel;
 
 
 
