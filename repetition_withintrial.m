@@ -16,10 +16,12 @@ addpath(genpath('~/code/Tools'));
 warning off; % close all;
 global datasets datasetnames mypath colors
 groups = {'alternators', 'repeaters', 'all'};
+groups = {'all'};
 
 % ========================================== %
 % START
 % ========================================== %
+
 
 for g = 1:length(groups),
     
@@ -31,6 +33,7 @@ for g = 1:length(groups),
     close all; subplot(4,4,1); hold on;
     colors2 = cbrewer('qual', 'Set2', length(datasets));
     markers = {'d', 's', '^', 'v',  '>', '<'};
+    alldata = {};
 
     for d = 1:length(datasets),
         
@@ -114,51 +117,61 @@ for g = 1:length(groups),
         
         % NOW PLOT
 
-        errorbar(nanmean(xRTs), nanmean(mat2), nanstd(mat2) ./ sqrt(size(mat, 1)), '-', 'marker', markers{d},...
+        errorbar(nanmean(xRTs), nanmean(mat), nanstd(mat) ./ sqrt(size(mat, 1)), '-', 'marker', markers{d},...
          'color', colors2(d, :), ...
             'capsize', 0, 'markerfacecolor', 'w',  'markersize', 3, 'markeredgecolor', colors2(d, :));
-        % errorbar(nanmean(xRTs), nanmean(mat2), nanstd(mat2) ./ sqrt(size(mat2, 1)), '-ko', ...
-        %     'capsize', 0, 'markerfacecolor', 'k', 'markeredgecolor', 'w');
-        % %legend({'repetition', 'bias'}); legend boxoff;, 'markeredgecolor', colors2(d, :)
-        
-        end
 
-        %
-        hline(0.5);
-        % set(gca, 'xtick', [0.4 0.8 1.6], 'xticklabelrotation', 45);
-        % ylim([0.4 0.6]);
-        offsetAxes;
-        ylabel('P(history bias)');
-        %title(datasetnames{d});2
-        %         if contains(datasetnames{d}{2}, 'RT'),
-        xlabel('RT (s)');
-        %         elseif contains(datasetnames{d}{2}, 'FD'),
-        %             xlabel('RT from stim offset (s)');
-        %         end
-        set(gca, 'xcolor', 'k', 'ycolor', 'k');
-        tightfig;
-            print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_withintrial_summary_quantiles.pdf', d)); % 3b
-
-
-        % switch groups{g}
-        %     case 'all'
-        %     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_withintrial_%d.pdf', d)); % 3b
-        %     otherwise
-        %     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/repetition_withintrial_%d_%s.pdf', d, groups{g})); % 3b
-        % end
-        
-        % try
-        %     alldat.repeat(d, :) = nanmean(mat);
-        %     alldat.bias(d, :)   = nanmean(mat2);
-        %     alldat.rt(d, :)     = nanmean(xRTs);
-        % catch
-        %     alldat.repeat(d, 2:end) = nanmean(mat);
-        %     alldat.bias(d, 2:end)   = nanmean(mat2);
-        %     alldat.rt(d, 2:end)     = nanmean(xRTs);
-        % end
-        
+        % fixed effects across dataset
+        data.subj_idx = data.subj_idx + 1000*d;
+        alldata{end+1} = data(:, {'subj_idx', 'rt', 'repeat'});
     end
+
+    end
+
+    hline(0.5);
+
+    data = cat(1, alldata{:});
+
+    discretizeRTs = @(x) {discretize(x, [0 quantile(x, [0.1, .2, .4, .6, .8, .95])])};
+
+    rtbins = splitapply(discretizeRTs, data.rt, findgroups(data.subj_idx));
+    data.rtbins = cat(1, rtbins{:});
     
+    % SPLIT REPETITION BIAS BY RT QUANTILES
+    [gr, sjidx, rtbins]      = findgroups(data.subj_idx, data.rtbins);
+    repetition               = array2table([sjidx, rtbins], 'variablenames', {'subj_idx', 'rtbin'});
+    repetition.choice        = splitapply(@nanmean, data.repeat, gr); % choice proportion
+    
+    % make into a subjects by rtbin matrix
+    mat_tmp = unstack(repetition, 'choice', 'rtbin');
+    mat     = mat_tmp{:, 2:end}; % remove the last one, only has some weird tail
+    
+      % also compute the mean RT for each subject and RT bin
+    rtAvg               = array2table([sjidx, rtbins], 'variablenames', {'subj_idx', 'rtbin'});
+    rtAvg.rt            = splitapply(@nanmean, data.rt, gr); % choice proportion
+    xRTs                = unstack(rtAvg, 'rt', 'rtbin');
+    xRTs                = xRTs{:, 2:end}; % remove the last one, only has some weird tail
+    assert(isequal(size(mat), size(xRTs)), 'mismatch');
+    
+    % ADD THE MEAN ACROSS DATASETS
+    plot(nanmean(xRTs), nanmean(mat), '-', 'marker', '.', 'color', 'k');
+
+    % set(gca, 'xtick', [0.4 0.8 1.6], 'xticklabelrotation', 45);
+    % ylim([0.4 0.6]);
+    axis tight;
+    offsetAxes;
+    ylabel('P(repeat)');
+    %title(datasetnames{d});2
+    %         if contains(datasetnames{d}{2}, 'RT'),
+    xlabel('RT (s)');
+    %         elseif contains(datasetnames{d}{2}, 'FD'),
+    %             xlabel('RT from stim offset (s)');
+    %         end
+    set(gca, 'xcolor', 'k', 'ycolor', 'k');
+    tightfig;
+    print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/bias_withintrial_summary_quantiles.pdf', d)); % 3b
+    disp('done repetition within trial')
+
     return;
 
     %%%%%%%%%%%%%%%%%
