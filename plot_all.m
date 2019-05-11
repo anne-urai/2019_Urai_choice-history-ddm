@@ -61,7 +61,7 @@ if 0,
 end
 disp('starting');
 
-repetition_withintrial;
+kernels_lags_bestmodel;
 
 return;
 

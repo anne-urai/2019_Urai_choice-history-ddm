@@ -90,16 +90,15 @@ mdls = mdls(2:end);
 [~, bestMdl] = min(mdldic);
 
 for c = 1:3,
-    b = plot(1:6, mdldic(c:3:end), 'o-', 'color', colors(c, :),'markersize', 6,  ...
-        'markerfacecolor', colors(c, :));
+    b = plot(1:6, mdldic(c:3:end), 'o-', 'color', colors(c, :),'markersize', 5,  ...
+        'markerfacecolor', colors(c, :), 'markeredgecolor', [1 1 1]);
     
 end
 
 axis square; axis tight; 
 set(gca, 'xtick', 1:6);
-% xlim([0.5 length(mdldic)+0.5]);
 offsetAxes; box off;
-set(gca, 'color', 'none');
+% set(gca, 'color', 'none');
 set(gca, 'xcolor', 'k', 'ycolor', 'k');
 
 end

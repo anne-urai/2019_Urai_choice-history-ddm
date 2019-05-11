@@ -79,7 +79,7 @@ end
 axis square; axis tight; 
 xlim([0.5 length(mdldic)+0.5]);
 offsetAxes; box off;
-set(gca, 'color', 'none');
+% set(gca, 'color', 'none');
 set(gca, 'xcolor', 'k', 'ycolor', 'k');
 
 %# Add a text string above/below each bin

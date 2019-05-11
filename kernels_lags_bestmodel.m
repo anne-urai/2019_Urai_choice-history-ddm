@@ -19,7 +19,7 @@ fullmodelname = 'regressdczlag6'; % extend thin lines for weights from biggest m
 global individualrep
 
 global flipAlternators;
-flipAlternators = 0;
+flipAlternators = 1;
 
 for d = 1:length(datasets),
     
@@ -341,9 +341,11 @@ for pltidx = 1:length(vars),
     disp(coeffnames(f));
     y = feval(f, linspace(1, numlags, 100));
     plot(linspace(1, numlags, 100), y, 'color', 'k', 'linewidth', 1);
-    text(3.3, -0.08, sprintf('$V(t) = %.2f e^{-t/%.2f}$', params(1), -1/params(2)), ...
-        'interpreter', 'latex', 'fontsize', 5);
-    %text(2, 0.08, sprintf('$\frac{%d}{%d}$', 1, 2),'Interpreter','latex'
+    % text(3.3, -0.08, sprintf('$V(t) = %.2f e^{-t/%.2f}$', params(1), -1/params(2)), ...
+    %     'interpreter', 'latex', 'fontsize', 5);
+
+    text(4, 0.15, sprintf('\\tau = %.2f', -1/params(2)), ...
+        'interpreter', 'tex', 'fontsize', 6);
     
     errorbar(1:numlags, nanmean(alldata.([vars{pltidx} '_fullmodel'])), ...
         nanstd(alldata.([vars{pltidx} '_fullmodel'])) ./ sqrt(6), ...
@@ -366,7 +368,7 @@ for pltidx = 1:length(vars),
     
     
     set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
-    axis tight;
+    axis tight; axis square;
     ylim([-0.1 0.22]); offsetAxes;
     
     tightfig;
