@@ -2,12 +2,13 @@
 # encoding: utf-8
 
 """
-Code to fit the history-dependent drift diffusion models described in
-Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
 
-MIT License
-Copyright (c) Anne Urai, 2018
-anne.urai@gmail.com
 """
 
 # ============================================ #
@@ -223,8 +224,7 @@ def bic(self):
 # PREPARE THE ACTUAL MODEL FITS
 # ============================================ #
 
-
-# new additional models
+# SPECIFY THE MODELS TO RUN HERE - SEE hddm_models.py for specifications
 models = ['regress_nohist', #0
 'regress_dc_lag1',
 'regress_z_lag1',
@@ -265,37 +265,6 @@ models = ['regress_nohist', #0
 'stimcoding_dc_prevresp_stcoh',  # 
 'stimcoding_z_prevresp_stcoh',  # 
 'stimcoding_dc_z_prevresp_stcoh']  # ] # 50
-
-models = ['stimcoding_dc_z_prevcorrect_subsampled',
-	'stimcoding_dc_z_prevresp_congruency',
-	'stimcoding_dc_z_PES',
-	'regress_dc_prevresp_lag1',
-	'regress_z_prevresp_lag1',
-	'regress_dcz_prevresp_lag1', 
-	'stimcoding_dc_z_prevresp_groupsplit']
-
-# REGRESSION MODELS WITHOUT ERROR/CORRECT SPLIT
-models = ['regress_dc_prevresp_lag1',
-'regress_z_prevresp_lag1',
-'regress_dcz_prevresp_lag1',
-'regress_dc_prevresp_lag2',
-'regress_z_prevresp_lag2',
-'regress_dcz_prevresp_lag2',
-'regress_dc_prevresp_lag3',
-'regress_z_prevresp_lag3',
-'regress_dcz_prevresp_lag3',
-'regress_dc_prevresp_lag4', 
-'regress_z_prevresp_lag4',
-'regress_dcz_prevresp_lag4',
-'regress_dc_prevresp_lag5',
-'regress_z_prevresp_lag5',
-'regress_dcz_prevresp_lag5',
-'regress_dc_prevresp_lag6', 
-'regress_z_prevresp_lag6',
-'regress_dcz_prevresp_lag6',
-'regress_dc_prevresp_lag7',
-'regress_z_prevresp_lag7',
-'regress_dcz_prevresp_lag7'] #20
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 

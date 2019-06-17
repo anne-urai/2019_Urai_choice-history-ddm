@@ -1,13 +1,11 @@
 function subjectdata = subjectspecifics(sj)
 
-% path = '/projects/0/neurodec/Data/MEG-PL';
-% for sj = 2:65,
-%   files = dir(sprintf('/projects/0/neurodec/home/aurai/Data/MEG-PL/P%02d/MEG/Preproc/*_data.mat', sj));
-%   for f = 1:length(files),
-%     movefile(sprintf('/projects/0/neurodec/home/aurai/Data/MEG-PL/P%02d/MEG/Preproc/%s', sj, files(f).name), ...
-%     sprintf('/projects/0/neurodec/Data/MEG-PL/P%02d/MEG/Preproc/%s', sj, files(f).name));
-%   end
-% end
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
 
 % determine the path to the data
 usr = getenv('USER');

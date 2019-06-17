@@ -1,5 +1,12 @@
 function compare_correlations_correct_error(alldat)
 
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
+
 global datasets
 
 vars = {'corrv', 'corrz'};

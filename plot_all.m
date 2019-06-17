@@ -1,8 +1,8 @@
-% Code to fit the history-dependent drift diffusion models described in
-% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
 %
 % MIT License
-% Copyright (c) Anne Urai, 2018
+% Copyright (c) Anne Urai, 2019
 % anne.urai@gmail.com
 
 %% ========================================== %
@@ -30,40 +30,33 @@ switch usr
         mypath  = '/nfs/aeurai/HDDM';
 end
 
-% neutral vs biased plotsC
-% reorder the datasets: first show the ?standard ones? ?visual motion 2AFC with
-% feedback, then 2IFC, and only then yes-no / no feedback.
+% ORDER O THE DATASETS
 datasets = {'Murphy', 'Anke_MEG_transition', 'NatComm', 'MEG', 'JW_PNAS', 'JW_yesno'};
 datasetnames = {{'Visual motion' '2AFC (RT)'},   {'Visual motion' '2AFC (FD)'},...
     {'Visual motion' '2IFC (FD) #1'}, {'Visual motion' '2IFC (FD) #2'}, ...
     {'Visual contrast' 'yes/no (RT)'}, {'Auditory' 'yes/no (RT)'}};
 
-% go to code
+% go to code folder
 try
     addpath(genpath('~/code/Tools'));
     cd('/Users/urai/Documents/code/serialDDM');
 end
 
-% from Thomas, green blue grey
+% from Thomas, green; blue; darkteal
 colors = [77,175,74; 55,126,184; 52, 103, 51] ./ 256; % green blue
 
-
-%% ========================================== %
+% ========================================== %
 % PREPARING DATA
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-if 0,
+if 1,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
-    % rename_PPC_files(datasets);
+    rename_PPC_files(datasets);
 end
-disp('starting');
-
-kernels_lags_bestmodel;
-
-return;
+disp('starting visualization');
 
 % ========================================== %
 % Figure 1. SCHEMATIC/HYPOTHESES
@@ -75,7 +68,7 @@ schematic;
 % FIGURE 2
 % ========================================== %
 
-% repetition_range;
+repetition_range;
 strategy_plot;
 
 % ========================================== %
@@ -144,12 +137,6 @@ kostis_all_AICs;
 
 % same for correlations, one big plot
 kostis_all_correlations_selected;
-
-% b. for a few correlations, bargraphs of correlation coefficients
-% kostis_plotDDM_correlation;
-% kostis_plotRamp_correlation;
-% kostis_plotDDMCol_correlation;
-% kostis_plotOUD_correlation;
 
 % timecourse of dynamic bias signal, across models
 plot_dynamic_bias_signal_hanks;
@@ -221,24 +208,9 @@ post_error_slowing;
 barplots_modelcomparison_regression;
 
 % ========================================== %
-% SUPPLEMENTARY FIGURE 8
-% ========================================== %
-
-multiplicative_vbias_psychfuncs_ppc;
-multiplicative_vbias_DIC;
-
-% ========================================== %
 % SUPPLEMENTARY FIGURE 9
 % see JW's code in simulations/ folder
 % ========================================== %
-
-
-% ========================================== %
-% SUPPLEMENTARY FIGURE 10, SV-GROUP
-% ========================================== %
-
-compare_svgroups;
-gelman_rubin;
 
 % ========================================== %
 % MEG REGRESSION RESULTS 
@@ -249,30 +221,10 @@ meg_regression_dic;
 meg_regression_posteriors;
 
 % ========================================== %
-% REVISION & REBUTTAL - congruency
-% ========================================== %
-
-individual_correlation_congruency;
-bias_by_congruency; 
-
-% ========================================== %
-% Correlation with fast vs. slow P(repeat)
-% ========================================== %
-
-alldat = individual_correlation_fastslow;
-
-% separate plots for correct and error
-forestPlot(alldat(1:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_fastRT.pdf'));
-forestPlot(alldat(2:2:end));
-print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_slowRT.pdf'));
-
-
-% ========================================== %
 % repeaters vs alternators
 % ========================================== %
 
- individual_correlations_repeaters_vs_alternators;
+individual_correlations_repeaters_vs_alternators;
 
 % ========================================== %
 % combine post-error slowing with choice history
@@ -281,7 +233,6 @@ print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_HDDM_slowRT.pdf'));
 alldat = individual_correlation_PES; % figure 4
 forestPlot(alldat);
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/forestplot_PES_HDDM.pdf'));
-
 
 % ========================================== %
 % CUMULATIVE P(REPEAT)

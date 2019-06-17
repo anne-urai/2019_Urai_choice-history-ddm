@@ -45,7 +45,7 @@ for d = 1:length(datasets),
     else
         set(gca, 'xticklabel', []);
     end
-    offsetAxes;
+    try; offsetAxes; end % sometimes throws an error
     set(gca, 'xcolor', 'k', 'ycolor', 'k');
 
     tightfig;

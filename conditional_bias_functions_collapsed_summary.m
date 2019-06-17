@@ -1,4 +1,11 @@
 function conditional_bias_functions_collapsed_summary
+	
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
 
 global colors
 thesecolors = {[0 0 0], colors(1, :), colors(2, :), colors(3, :)};

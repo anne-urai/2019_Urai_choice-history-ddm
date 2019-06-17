@@ -1,5 +1,12 @@
 function kostis_makeTable_v2
 
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
+
 close all; clc;
 global mypath
 kostisPath = sprintf('%s/Anke_MEG_transition/KostisFits', mypath);
@@ -11,27 +18,6 @@ for s=1:length(ss);
     indx=find(data.behavior.subj_idx==ss(s) & data.behavior.RT>0.25 & data.behavior.coherence~=81  &  ~isnan(data.behavior.prevresp));
     notrials(s)=length(indx);
 end
-
-%{
-HDDM: def aic(self):
-	k = len(self.get_stochastics())
-	try:
-		logp = sum([x.logp for x in self.get_observeds()['node']])	
-	except:
-		shell()
-	return 2 * k - 2 * logp
-
-matlab: 2*k +2*-logl
-y=2.*logl+(2.*k);        % computes Akaike's information criterion (AIC)
-
-def bic(self):
-    k = len(self.get_stochastics())
-    n = len(self.data)
-    logp = sum([x.logp for x in self.get_observeds()['node']])
-    return -2 * logp + k * np.log(n)
-matlab: 2*logl + k*log*2)
-
-%}
     
 % function for BIC computation - treating all subjects as a super subject
 ll2bic = @(ll, k, n) repmat((2*sum(ll) + length(n)*k.*log(sum(n))), length(n), 1);

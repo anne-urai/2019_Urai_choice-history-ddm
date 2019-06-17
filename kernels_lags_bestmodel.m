@@ -1,5 +1,12 @@
 function kernels_lags_bestmodel
 
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
+
 global mypath datasets
 addpath(genpath('~/code/Tools'));
 warning off; close all;
@@ -369,7 +376,8 @@ for pltidx = 1:length(vars),
     
     set(gca, 'xtick', 1:numlags, 'xticklabel', lagnames, 'xcolor', 'k', 'ycolor', 'k');
     axis tight; axis square;
-    ylim([-0.1 0.22]); offsetAxes;
+    ylim([-0.1 0.22]); 
+    offsetAxes;
     
     tightfig;
     print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/regressionkernels_correcterror_exponential_%d_flipAlt%d.pdf', pltidx, flipAlternators));

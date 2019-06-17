@@ -1,11 +1,11 @@
 
 function alldat = individual_correlation_tcoh()
-
-% Code to fit the history-dependent drift diffusion models described in
-% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+    
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
 %
 % MIT License
-% Copyright (c) Anne Urai, 2018
+% Copyright (c) Anne Urai, 2019
 % anne.urai@gmail.com
 
 close all; clc;

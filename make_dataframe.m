@@ -1,11 +1,11 @@
 
 function make_dataframe(datasets)
 
-% Code to fit the history-dependent drift diffusion models described in
-% Urai AE, Gee JW de, Donner TH (2018) Choice history biases subsequent evidence accumulation. bioRxiv:251595
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
 %
 % MIT License
-% Copyright (c) Anne Urai, 2018
+% Copyright (c) Anne Urai, 2019
 % anne.urai@gmail.com
 
 close all; clc;
@@ -38,10 +38,25 @@ for d = ds,
         alldata.stimulus    = alldata.stimulus2;
     end
 
+    % SAVE IN A NICE CSV
+    switch d
+    case 1
+        writetable(alldata, sprintf('%s/summary/visual_motion_2afc_rt.csv', mypath));
+    case 2
+        writetable(alldata, sprintf('%s/summary/visual_motion_2afc_fd.csv', mypath));
+    case 3
+        writetable(alldata, sprintf('%s/summary/visual_motion_2ifc_fd_1.csv', mypath));
+    case 4
+        writetable(alldata, sprintf('%s/summary/visual_motion_2ifc_fd_2.csv', mypath));
+    case 5
+        writetable(alldata, sprintf('%s/summary/visual_contrast_yesno.csv', mypath));
+    case 6
+        writetable(alldata, sprintf('%s/summary/auditory_yesno.csv', mypath));
+    end
+
     % compute a bunch of basic things from Matlab
     % ===================================== %
     results     = define_behavioral_metrics(alldata);
-    
     % ===================================== %
 
     results     = [results; array2table(nan(size(results.Properties.VariableNames)), ...
@@ -157,6 +172,16 @@ for d = ds,
 
                 %% ALSO SAVE FOR FIGSHARE
                 tab2 = tab(tab.session == 0 | isnan(tab.session), :);
+                tab2(isnan(tab2.subjnr), :) = [];
+                tab2(:, cat(2, {'repetition2', 'repetition3', 'dic', 'criterionshift'}, ...
+                    tab2.Properties.VariableNames(endsWith(tab2.Properties.VariableNames, 'groupsplit')), ...
+                    tab2.Properties.VariableNames(endsWith(tab2.Properties.VariableNames, 'svgroup')), ...
+                    tab2.Properties.VariableNames(endsWith(tab2.Properties.VariableNames, 'multiplicative')), ...
+                    tab2.Properties.VariableNames(endsWith(tab2.Properties.VariableNames, 'congruency')), ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'cum')), ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'alt')), ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'sv')), ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'sz')))) = [];
 
                 switch d
                 case 1
@@ -178,6 +203,13 @@ for d = ds,
 
                 %% ALSO SAVE FOR FIGSHARE
                 tab2 = tab(tab.session == 0, :);
+                tab2(isnan(tab2.subjnr), :) = [];
+
+                tab2(:, cat(2, {'repetition2', 'repetition3', 'criterionshift'}, ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'cum')), ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'alt')), ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'sv')), ...
+                    tab2.Properties.VariableNames(startsWith(tab2.Properties.VariableNames, 'sz')))) = [];
 
                 switch d
                 case 1
@@ -194,9 +226,8 @@ for d = ds,
                     writetable(tab2, sprintf('%s/summary/auditory_yesno_gsquarefits.csv', mypath));
                 end
         end
+
         fprintf('%s/summary/%s/allindividualresults.csv \n', mypath,  datasets{d});
-
-
 
     end
 end

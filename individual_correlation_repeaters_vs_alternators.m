@@ -1,6 +1,14 @@
 function alldat = individual_correlation_repeaters_vs_alternators
-% from the csv table, make an overview of repetition behaviour
+    
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
 
+
+% from the csv table, make an overview of repetition behaviour
 % get a huge list with values for each participant
 % can then work with this dataframe
 

@@ -1,5 +1,12 @@
 function [bias, slope, lapseLow, lapseHigh] = fitLogistic(x,y)
 
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
+
 % if there are NaNs, remove
 x = x(~isnan(y));
 y = y(~isnan(y));

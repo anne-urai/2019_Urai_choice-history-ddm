@@ -1,6 +1,16 @@
 function motionEnergy_kernels()
 addpath('~/Desktop/code/gramm');
 global mypath;
+
+
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
+
+
 %{
     Psychophysical kernels were computed by averaging contrast fluctuations as a
 function of the sample number of the test stimulus. We treated the reference grating

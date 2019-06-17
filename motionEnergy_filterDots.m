@@ -1,5 +1,12 @@
 function motionEnergy_filterDots(subjects, sessions, runs)
-% Anne Urai, 2018
+
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
+
 % run with: sj = 1:33, sess = 1:3, run = 1:6
 %
 % requires code from

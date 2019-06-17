@@ -1,8 +1,11 @@
 function alldat = individual_correlation_prevcorrect
-% from the csv table, make an overview of repetition behaviour
 
-% get a huge list with values for each participant
-% can then work with this dataframe
+% Code to fit the history-dependent drift diffusion models as described in
+% Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, in press.
+%
+% MIT License
+% Copyright (c) Anne Urai, 2019
+% anne.urai@gmail.com
 
 close all; clc;
 addpath(genpath('~/code/Tools'));
@@ -12,6 +15,11 @@ cnt = 1;
 
 if ~exist('Gsq', 'var'), Gsq = 0; end
 if ~exist('sz', 'var'),  sz = 0; end
+
+% from the csv table, make an overview of repetition behaviour
+
+% get a huge list with values for each participant
+% can then work with this dataframe
 
 % ============================================ %
 % ONE LARGE PLOT WITH PANEL FOR EACH DATASET
