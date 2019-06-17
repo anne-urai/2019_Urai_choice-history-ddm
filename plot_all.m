@@ -50,7 +50,7 @@ colors = [77,175,74; 55,126,184; 52, 103, 51] ./ 256; % green blue
 % This will generate the allindividualresults.csv files
 % ========================================== %
 
-if 1,
+if 0,
     read_into_Matlab(datasets);
     read_into_Matlab_gSquare(datasets);
     make_dataframe(datasets);
