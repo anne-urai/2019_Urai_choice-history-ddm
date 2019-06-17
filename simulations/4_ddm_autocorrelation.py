@@ -58,6 +58,7 @@ def do_simulations(params):
 
     # SIMULATE A SLOWLY AUTOCORRELATED DRIFT BIAS
     v_autocorr  = sample_signal(params['nr_trials'], params['v_autocorr'], mu=params['v'], sigma=1)
+    dc_autocorr  = sample_signal(params['nr_trials'], params['dc_autocorr'], mu=params['dc'], sigma=1)
 
     # SIMULATE A SEQUENCE OF RANDOM STIMULI
     stims       = np.repeat([0, 1], int(params['nr_trials']/2))
@@ -72,7 +73,7 @@ def do_simulations(params):
         # get traces:
         x = get_DDM_traces(v=v_autocorr[t],
                             z=params['z'],
-                            dc=params['dc'],
+                            dc=dc_autocorr[t],
                             dc_slope=0,
                             sv=params['sv'],
                             stim=stims[t],
@@ -115,7 +116,7 @@ data_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_au
 fig_folder  = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/ddm_autocorr_figs/')
 fits_folder = os.path.expanduser('~/projects/2018_Urai_choice-history-ddm/fits/')
 
-simulate = False
+simulate = True
 parallel = False
 nr_trials = int(1e5) #100K
 tmax = 5
@@ -130,31 +131,56 @@ sv = 0.5
 
 sArray = [
 
-    {'subj_idx':0, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':0, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
     # positive autocorrelation
-    {'subj_idx':1, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.1, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':2, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.2, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':3, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.3, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':4, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.4, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':5, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.5, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':6, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.6, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':7, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.7, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':8, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.8, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':9, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.9, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':10, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':1, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':1, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.1, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':2, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.2, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':3, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.3, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':4, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.4, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':5, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.5, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':6, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.6, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':7, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.7, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':8, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.8, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':9, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0.9, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':10, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':1, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
     # negative autocorrelation, i.e. 'regression to the mean'
-    {'subj_idx':11, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.1, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':12, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.2, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':13, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.3, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':14, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.4, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':15, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.5, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':16, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.6, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':17, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.7, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':18, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.8, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':19, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.9, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
-    {'subj_idx':20, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-1, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':11, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.1, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':12, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.2, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':13, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.3, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':14, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.4, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':15, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.5, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':16, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.6, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':17, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.7, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':18, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.8, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':19, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-0.9, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':20, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':-1, 'dc_autocorr':0, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+
+    # NOW AUTOCORRELATION IN DRFT BIAS, NOT DRIFT RATE
+    # positive autocorrelation
+    {'subj_idx':21, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.1, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':22, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.2, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':23, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.3, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':24, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.4, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':25, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.5, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':26, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.6, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':27, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.7, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':28, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.8, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':29, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':0.9, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':30, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':10, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+
+    # negative autocorrelation, i.e. 'regression to the mean'
+    {'subj_idx':31, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.1, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':32, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.2, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':33, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.3, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':34, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.4, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':35, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.5, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':36, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.6, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':37, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.7, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':38, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.8, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':39, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-0.9, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
+    {'subj_idx':40, 'v':v, 'dc':dc, 'z':0.5*a, 'a':a, 'v_autocorr':0, 'dc_autocorr':-1, 'sv':sv, 'bound':'default', 'nr_trials':nr_trials},
 
     ]
 
@@ -169,7 +195,7 @@ if simulate:
         res = Parallel(n_jobs=n_jobs)(delayed(do_simulations)(params) for params in sArray)
         # do_simulations(sArray[0])
 
-groups = [list(np.arange(0,1)), list(np.arange(1,11)), list(np.arange(11,21))]
+groups = [list(np.arange(0,1)), list(np.arange(1,11)), list(np.arange(11,21)), list(np.arange(21,31)), list(np.arange(31,41))]
 quantiles = [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 cmaps = ["Greens", 'Blues', 'Oranges', 'Purples', 'RdPu']
 

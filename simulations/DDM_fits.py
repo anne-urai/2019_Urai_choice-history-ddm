@@ -56,6 +56,13 @@ datasets = [
             # "2018_ddm_autocorr_data_3",                       # 10
             ]
 
+datasets = [                     
+"2018_ddm_autocorr_data_1",                       # 8
+"2018_ddm_autocorr_data_2",                       # 9
+"2018_ddm_autocorr_data_3",                       # 10
+"2018_ddm_autocorr_data_4",                       # 10
+"2018_ddm_autocorr_data_5"]
+
 def aic(self):
     k = len(self.get_stochastics())
     logp = sum([x.logp for x in self.get_observeds()['node']])  
@@ -148,8 +155,8 @@ def load_ddm_per_subject(model_dir, model_name):
 
 run = True
 for ds, dataset in enumerate(datasets):
-    for version in [0,1,2,3]:
-    #for version in [4,5,6]:
+    # for version in [0,1,2,3]:
+    for version in [4,5,6]:
         
         # load data:
         print(os.path.join(data_dir, '{}.csv'.format(datasets[ds])))
