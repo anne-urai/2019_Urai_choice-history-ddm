@@ -1,9 +1,9 @@
 
 Code and data for
 
-#### Urai AE, de Gee JW, Tsetsos K, Donner TH (2018) Choice history biases subsequent evidence accumulation. eLife, in press. ####
+#### Urai AE, de Gee JW, Tsetsos K, Donner TH (2019) Choice history biases subsequent evidence accumulation. eLife, 8:e46331. ####
 
-Behavioral data and model fits are available at https://doi.org/10.6084/m9.figshare.7268558.v2 under a CC-BY 4.0 license.
+Behavioral data and model fits are available at https://doi.org/10.6084/m9.figshare.7268558 under a CC-BY 4.0 license.
 
 To fit the models, install the HDDM package (http://ski.clps.brown.edu/hddm_docs/index.html). Then run the HDDM models using b1_HDDM_run.py (the models are specified in hddm_models.py). Easiest is to use a batch job submission system, and do e.g.
 <code>
