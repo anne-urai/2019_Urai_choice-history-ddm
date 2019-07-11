@@ -73,6 +73,7 @@ for sj =  1:length(sjgroups)
     box off; ylim([0.8 1]); set(gca, 'ytick', [0.8:0.025:1]);
     % legend({'Regression slope', 'Pearson', 'Spearman'}, 'box', 'off', 'location', 'southeast', 'AutoUpdate','off');
     
+    set(gca, 'ytick', [0.8 0.9 1]);
     if sj == 1,
         % add
         vline(mean(trialcount(correct == 0)), 'color', 'k');
@@ -84,6 +85,7 @@ for sj =  1:length(sjgroups)
     end
     
 end
+
 tightfig;
 print(gcf, '-dpdf', sprintf('~/Data/serialHDDM/trialcount_correlation_simulation.pdf'));
 

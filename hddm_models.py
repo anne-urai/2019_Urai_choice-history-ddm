@@ -185,6 +185,77 @@ def make_model(mypath, mydata, model_name, trace_id):
                 include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
                 depends_on={'dc':['prevresp'], 'z':['prevresp']})
 
+    # ============================================ #
+    # STIMCODING PREVSTIM
+    # ============================================ #
+
+    elif model_name == 'stimcoding_dc_prevstim':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # also split by transition probability and include coherence-dependence of drift rate
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevstim', 'transitionprob']})
+        elif len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevstim']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'dc':['prevstim']})
+
+    elif model_name == 'stimcoding_z_prevstim':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'z':['prevstim', 'transitionprob']})
+        elif len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'z':['prevstim']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'z':['prevstim']})
+
+    # this is the model that will generate most of the figures
+    elif model_name == 'stimcoding_dc_z_prevstim':
+
+        # get the right variable coding
+        mydata = recode_4stimcoding(mydata)
+
+        # for Anke's data, also split by transition probability
+        if 'transitionprob' in mydata.columns:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevstim', 'transitionprob'],
+                'z':['prevstim', 'transitionprob']})
+        elif len(mydata.coherence.unique()) > 1:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'v': ['coherence'], 'dc':['prevstim'], 'z':['prevstim']})
+        else:
+            m = hddm.HDDMStimCoding(mydata, stim_col='stimulus', split_param='v',
+                drift_criterion=True, bias=True, p_outlier=0.05,
+                include=('sv', 'sz'), group_only_nodes=['sv', 'sz'],
+                depends_on={'dc':['prevstim'], 'z':['prevstim']})
 
     # ============================================ #
     # different non-decision time per coherence

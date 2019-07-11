@@ -266,11 +266,20 @@ models = ['regress_nohist', #0
 'stimcoding_z_prevresp_stcoh',  # 
 'stimcoding_dc_z_prevresp_stcoh']  # ] # 50
 
+models = ['stimcoding_nohist',
+          'stimcoding_dc_prevresp',
+          'stimcoding_z_prevresp',
+          'stimcoding_dc_z_prevresp',
+          'stimcoding_dc_prevstim',
+          'stimcoding_z_prevstim',
+          'stimcoding_dc_z_prevresp']
+
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
     'MEG_MEGdata',  'NatComm_rescaled']
 
 datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_transition']
+datasets = ['Anke_MEG_blocks']
 
 # recode
 if isinstance(d, int):
@@ -284,6 +293,9 @@ for dx in d:
     usr = os.environ['USER']
     if 'aeurai' in usr:
         mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
+        # LISA PROJECT SPACE ENDED, USE HOME SPACE
+        mypath = os.path.realpath(os.path.expanduser('/home/aeurai/Data/HDDM/%s'%datasets[dx]))
+
     elif 'anne' in usr:
         mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
 
@@ -301,10 +313,9 @@ for dx in d:
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
 
-        	# correct a weirdness in Anke's data
+        	# round up to 20,50,80
             if 'transitionprob' in mydata.columns:
-                mydata.transitionprob = mydata.transitionprob * 100;
-                mydata.transitionprob = mydata.transitionprob.round();
+                mydata.transitionprob = (mydata.transitionprob * 100).round()
 
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
