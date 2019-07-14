@@ -204,6 +204,33 @@ def concat_models(mypath, model_name):
         all_traces.to_csv(os.path.join(mypath, model_name, 'all_traces.csv'))
 
 
+        # ============================================ #
+        # CONCATENATE MODEL COMPARISON
+        # ============================================ #
+
+        # average model comparison values across chains
+        print('concatenating model comparison')
+
+        nchains = 30
+        for trace_id in range(nchains): # how many chains were run?
+            filename = os.path.join(mypath, models[vx], 'model_comparison_md%d.csv'%trace_id)
+            df = pd.read_csv(filename)
+
+            if trace_id == 0:
+                df2 = df
+            else:
+                df2 = df2.append(df, ignore_index=True)
+
+        # average over chains
+        df3 = df2.mean()
+        df3 = df2.describe().loc[['mean']]
+        df3.to_csv(os.path.join(mypath, models[vx], 'model_comparison.csv'))
+
+        for fl in glob.glob(os.path.join(mypath, models[vx], 'model_comparison_md*.csv')):
+            print(fl)
+            os.remove(fl)
+            
+
 # ============================================ #
 # also compute BIC, AIC
 # from https://groups.google.com/forum/#!searchin/hddm-users/bic%7Csort:date/hddm-users/Bo2vUcpR008/RLRpL0faptAJ
@@ -320,33 +347,6 @@ for dx in d:
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
 
-            # ============================================ #
-            # CONCATENATE MODEL COMPARISON
-            # ============================================ #
-
-            # average model comparison values across chains
-            if trace_id == 29 and os.path.exists(os.path.join(mypath, models[vx], 'model_comparison_md0.csv')):
-                print('concatenating model comparison')
-
-                nchains = 30
-                for trace_id in range(nchains): # how many chains were run?
-                    filename = os.path.join(mypath, models[vx], 'model_comparison_md%d.csv'%trace_id)
-                    df = pd.read_csv(filename)
-
-                    if trace_id == 0:
-                        df2 = df
-                    else:
-                        df2 = df2.append(df, ignore_index=True)
-
-                # average over chains
-                df3 = df2.mean()
-                df3 = df2.describe().loc[['mean']]
-                df3.to_csv(os.path.join(mypath, models[vx], 'model_comparison.csv'))
-
-                for fl in glob.glob(os.path.join(mypath, models[vx], 'model_comparison_md*.csv')):
-                    print(fl)
-                    os.remove(fl)
-            
             # ============================================ #
             # DECIDE WHAT TO DO
             # ============================================ #
