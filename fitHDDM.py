@@ -210,9 +210,9 @@ def concat_models(mypath, model_name):
 # ============================================ #
 
 def aic(self):
-	k = len(self.get_stochastics())
-	logp = sum([x.logp for x in self.get_observeds()['node']])	
-	return 2 * k - 2 * logp
+    k = len(self.get_stochastics())
+    logp = sum([x.logp for x in self.get_observeds()['node']])  
+    return 2 * k - 2 * logp
 
 def bic(self):
     k = len(self.get_stochastics())
@@ -295,7 +295,6 @@ for dx in d:
         mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
         # LISA PROJECT SPACE ENDED, USE HOME SPACE
         mypath = os.path.realpath(os.path.expanduser('/home/aeurai/Data/HDDM/%s'%datasets[dx]))
-
     elif 'anne' in usr:
         mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
 
@@ -309,17 +308,49 @@ for dx in d:
     
         if runMe == 1:
 
-        	# get the csv file for this dataset
+            # get the csv file for this dataset
             filename    = fnmatch.filter(os.listdir(mypath), '*.csv')
             mydata      = hddm.load_csv(os.path.join(mypath, filename[0]))
 
-        	# round up to 20,50,80
+            # round up
             if 'transitionprob' in mydata.columns:
-                mydata.transitionprob = (mydata.transitionprob * 100).round()
+                mydata.transitionprob = mydata.transitionprob * 100;
+                mydata.transitionprob = mydata.transitionprob.round();
 
             starttime = time.time()
             model_filename = os.path.join(mypath, models[vx], 'modelfit-md%d.model'%trace_id)
+
+            # ============================================ #
+            # CONCATENATE MODEL COMPARISON
+            # ============================================ #
+
+            # average model comparison values across chains
+            if trace_id == 29 and os.path.exists(os.path.join(mypath, models[vx], 'model_comparison_md0.csv')):
+                print('concatenating model comparison')
+
+                nchains = 30
+                for trace_id in range(nchains): # how many chains were run?
+                    filename = os.path.join(mypath, models[vx], 'model_comparison_md%d.csv'%trace_id)
+                    df = pd.read_csv(filename)
+
+                    if trace_id == 0:
+                        df2 = df
+                    else:
+                        df2 = df2.append(df, ignore_index=True)
+
+                # average over chains
+                df3 = df2.mean()
+                df3 = df2.describe().loc[['mean']]
+                df3.to_csv(os.path.join(mypath, models[vx], 'model_comparison.csv'))
+
+                for fl in glob.glob(os.path.join(mypath, models[vx], 'model_comparison_md*.csv')):
+                    print(fl)
+                    os.remove(fl)
             
+            # ============================================ #
+            # DECIDE WHAT TO DO
+            # ============================================ #
+
             # now sample and save
             if not os.path.exists(os.path.join(mypath, models[vx], 'modelfit-combined.model')) and os.path.exists(model_filename):
                 pass # this model has been run but the job isn't finished
@@ -436,29 +467,7 @@ for dx in d:
             bic = pd.DataFrame(bic)
             bic.to_csv(os.path.join(mypath, models[vx], 'BIC.csv'))
 
-        elif runMe == 4:
 
-			print("%s, %s"%(mypath, models[vx]))
-			# average model comparison values across chains
-			if os.path.exists(os.path.join(mypath, models[vx], 'model_comparison_md0.csv')):
-				print('concatenating')
-
-				nchains = 30
-				for trace_id in range(nchains): # how many chains were run?
-					filename = os.path.join(mypath, models[vx], 'model_comparison_md%d.csv'%trace_id)
-					df = pd.read_csv(filename)
-
-					if trace_id == 0:
-						df2 = df
-					else:
-						df2 = df2.append(df, ignore_index=True)
-
-				# average over chains
-				df3 = df2.mean()
-				df3 = df2.describe().loc[['mean']]
-				df3.to_csv(os.path.join(mypath, models[vx], 'model_comparison.csv'))
-			else:
-				print('skipping')
 
 
 
