@@ -14,7 +14,7 @@ function [] = make_stopos_file()
 
 nsmp       = [5000];
 datasets   = [0]; % dataset number, 0-5 for all main ones
-models     = [0:6]; % the nr of the models
+models     = [6]; % the nr of the models
 nrTraces   = 30; % nr of chains, 15 cores/node (so make sure this is a multiple of 15)
 
 alldat = [];
