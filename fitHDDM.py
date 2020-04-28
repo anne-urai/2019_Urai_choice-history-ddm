@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 
 """
@@ -26,10 +26,10 @@
 
 # to avoid errors when plotting on cartesius
 # http://stackoverflow.com/questions/4706451/how-to-save-a-figure-remotely-with-pylab/4706614#4706614
-import matplotlib
-matplotlib.use('Agg') # to still plot even when no display is defined
-import matplotlib.pyplot as plt
-from IPython import embed as shell
+# import matplotlib
+# matplotlib.use('Agg') # to still plot even when no display is defined
+# import matplotlib.pyplot as plt
+# from IPython import embed as shell
 import numpy as np
 
 import warnings
@@ -84,10 +84,10 @@ def run_model(m, mypath, model_name, trace_id, n_samples):
     # do the actual sampling
     # ============================================ #
 
-    print "finding starting values"
+    print("finding starting values")
     m.find_starting_values() # this should help the sampling
 
-    print "begin sampling"
+    print("begin sampling")
     m.sample(n_samples, burn=n_samples/2, thin=3, db='pickle',
         dbname=os.path.join(mypath, model_name, 'modelfit-md%d.db'%trace_id))
     m.save(os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)) # save the model to disk
@@ -116,7 +116,7 @@ def concat_models(mypath, model_name):
 
     # CHECK IF COMBINED MODEL EXISTS
     if os.path.isfile(os.path.join(mypath, model_name, 'modelfit-combined.model')):
-        print os.path.join(mypath, model_name, 'modelfit-combined.model')
+        print(os.path.join(mypath, model_name, 'modelfit-combined.model'))
 
     else:
         # ============================================ #
@@ -124,13 +124,13 @@ def concat_models(mypath, model_name):
         # ============================================ #
 
         allmodels = []
-        print ("appending models for %s" %model_name)
+        print("appending models for %s" %model_name)
         for trace_id in range(nchains): # how many chains were run?
             model_filename        = os.path.join(mypath, model_name, 'modelfit-md%d.model'%trace_id)
             modelExists           = os.path.isfile(model_filename)
 
             if modelExists == True: # if not, this model has to be rerun
-                print model_filename
+                print(model_filename)
                 thism                 = hddm.load(model_filename)
                 allmodels.append(thism) # now append into a list
 
@@ -152,9 +152,9 @@ def concat_models(mypath, model_name):
                 # Values should be close to 1 and not larger than 1.02 which would indicate convergence problems.
                 # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3731670/
                 if abs(p[1]-1) > 0.02:
-                    print "non-convergence found, %s:%s" %p
+                    print("non-convergence found, %s:%s" %p)
             text_file.close()
-            print "written gelman rubin stats to file"
+            print("written gelman rubin stats to file")
         except:
             pass
 
@@ -165,11 +165,11 @@ def concat_models(mypath, model_name):
         # SAVE THE FULL MODEL
         # ============================================ #
 
-        print "concatenated models"
+        print("concatenated models")
         m.save(os.path.join(mypath, model_name, 'modelfit-combined.model')) # save the model to disk
 
         # DELETE FILES to save space
-        print "deleting separate chains..."
+        print("deleting separate chains...")
         for fl in glob.glob(os.path.join(mypath, models[vx], 'modelfit-md*.model')):
                 print(fl)
                 os.remove(fl)
@@ -182,7 +182,7 @@ def concat_models(mypath, model_name):
         # SAVE POINT ESTIMATES
         # ============================================ #
 
-        print "saving stats"
+        print("saving stats")
         results = m.gen_stats() # point estimate for each parameter and subject
         results.to_csv(os.path.join(mypath, model_name, 'results-combined.csv'))
 
@@ -195,7 +195,7 @@ def concat_models(mypath, model_name):
         # SAVE TRACES
         # ============================================ #
 
-        print "saving traces"
+        print("saving traces")
         # get the names for all nodes that are available here
         group_traces = m.get_group_traces()
         group_traces.to_csv(os.path.join(mypath, model_name, 'group_traces.csv'))
@@ -296,17 +296,15 @@ models = ['regress_nohist', #0
 models = ['stimcoding_nohist',
           'stimcoding_dc_prevresp',
           'stimcoding_z_prevresp',
-          'stimcoding_dc_z_prevresp',
-          'stimcoding_dc_prevstim',
-          'stimcoding_z_prevstim',
-          'stimcoding_dc_z_prevstim']
+          'stimcoding_dc_z_prevresp']
 
-datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
-    'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
-    'MEG_MEGdata',  'NatComm_rescaled']
+# datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
+#     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
+#     'MEG_MEGdata',  'NatComm_rescaled']
 
-datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_transition']
-datasets = ['Anke_MEG_blocks']
+# datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_transition']
+# datasets = ['Anke_MEG_blocks']
+datasets = ['MEG_choicehist']
 
 # recode
 if isinstance(d, int):
@@ -322,6 +320,10 @@ for dx in d:
         mypath = os.path.realpath(os.path.expanduser('/nfs/aeurai/HDDM/%s'%datasets[dx]))
         # LISA PROJECT SPACE ENDED, USE HOME SPACE
         mypath = os.path.realpath(os.path.expanduser('/home/aeurai/Data/HDDM/%s'%datasets[dx]))
+
+        # RUN THIS ON CARTESIUS
+        mypath = os.path.realpath(os.path.expanduser('~/neurodec/Data/MEG-PL/HDDM/%s'%datasets[dx]))
+
     elif 'anne' in usr:
         mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
 
@@ -358,7 +360,7 @@ for dx in d:
                 
                 # there is a concatenated model, but this file still remains - delete!
                 # DELETE FILES to save space
-                print "deleting separate chains..."
+                print("deleting separate chains...")
                 for fl in glob.glob(os.path.join(mypath, models[vx], 'modelfit-md*.model')):
                         print(fl)
                         os.remove(fl)
@@ -396,7 +398,7 @@ for dx in d:
                 for t in range(30):
                     filelist.append(os.path.join(mypath, models[vx], 'modelfit-md%d.model'%t))
 
-                print filelist
+                print(filelist)
                 # wait until all the files are present
                 while True:
                     if all([os.path.isfile(f) for f in filelist]):
@@ -416,11 +418,11 @@ for dx in d:
             # ============================================ #
 
             starttime = time.time()
-            print "computing ppc"
+            print("computing ppc")
 
             # specify how many samples are needed
             m = hddm.load(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
-            print os.path.join(mypath, models[vx], 'modelfit-combined.model')
+            print(os.path.join(mypath, models[vx], 'modelfit-combined.model'))
             if 'MEG' in datasets[dx]:
                 nsmp = 50
             else:
