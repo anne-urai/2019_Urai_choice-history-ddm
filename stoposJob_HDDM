@@ -4,6 +4,8 @@
 #SBATCH -N 1
 #SBATCH -o /home/aeurai/jobs/slurm-%A_%a.out
 #SBATCH -e /home/aeurai/jobs/slurm-%A_%a.err
+#SBATCH --mail-user=anne.urai@gmail.com
+#SBATCH --mail-type=END,FAIL
 
 # load necessary modules
 module load stopos

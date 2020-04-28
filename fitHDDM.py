@@ -304,7 +304,7 @@ models = ['stimcoding_nohist',
 
 # datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 'Anke_MEG_transition']
 # datasets = ['Anke_MEG_blocks']
-datasets = ['MEG_choicehist']
+datasets = ['MEG_MEGdata']
 
 # recode
 if isinstance(d, int):
@@ -322,7 +322,7 @@ for dx in d:
         mypath = os.path.realpath(os.path.expanduser('/home/aeurai/Data/HDDM/%s'%datasets[dx]))
 
         # RUN THIS ON CARTESIUS
-        mypath = os.path.realpath(os.path.expanduser('~/neurodec/Data/MEG-PL/HDDM/%s'%datasets[dx]))
+        #mypath = os.path.realpath(os.path.expanduser('~/neurodec/Data/MEG-PL/HDDM/%s'%datasets[dx]))
 
     elif 'anne' in usr:
         mypath = os.path.realpath(os.path.expanduser('~/Data/HDDM/%s'%datasets[dx]))
