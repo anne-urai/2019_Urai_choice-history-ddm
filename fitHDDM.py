@@ -293,6 +293,10 @@ models = ['regress_nohist', #0
 'stimcoding_z_prevresp_stcoh',  # 
 'stimcoding_dc_z_prevresp_stcoh']  # ] # 
 
+models = ['regress_nohist', 
+'regress_dc_prevresp', 
+'regress_z_prevresp',
+'regress_dcz_prevresp']
 
 # datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
 #     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 
