@@ -14,11 +14,11 @@ warning off MATLAB:table:ModifiedVarnames % skip this warning
 for d = 1:length(datasets),
 
     clear allres;
-    mypath  = '/nfs/aeurai/HDDM';
-    usepath = sprintf('/nfs/aeurai/HDDM/%s/', datasets{d});
-    savepath = sprintf('/nfs/aeurai/HDDM/summary/%s', datasets{d});
+    mypath  = '/home/aeurai/Data/HDDM';
+    usepath = sprintf('/home/aeurai/Data/HDDM/%s/', datasets{d});
+    savepath = sprintf('/home/aeurai/Data/HDDM/summary/%s', datasets{d});
     if ~exist(savepath, 'dir'),
-        cp = pwd; cd('/nfs/aeurai/HDDM/summary');
+        cp = pwd; cd('/home/aeurai/Data/HDDM/summary');
         mkdir(datasets{d}); cd(cp);
     end
 

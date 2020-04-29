@@ -253,9 +253,9 @@ def bic(self):
 
 # SPECIFY THE MODELS TO RUN HERE - SEE hddm_models.py for specifications
 models = ['regress_nohist', #0
-'regress_dc_lag1',
-'regress_z_lag1',
-'regress_dcz_lag1',
+'regress_dc_prevresp_lag1', # regress_dcz_prevresp_lag1
+'regress_z_prevresp_lag1',
+'regress_dcz_prevresp_lag1',
 'regress_dc_lag2',
 'regress_z_lag2',
 'regress_dcz_lag2',
@@ -274,29 +274,25 @@ models = ['regress_nohist', #0
 'regress_dc_lag7',
 'regress_z_lag7',
 'regress_dcz_lag7', # 2
-'stimcoding_nohist', # 0
-'stimcoding_dc_prevresp', #1
-'stimcoding_z_prevresp', #2
-'stimcoding_dc_z_prevresp', #3
-'stimcoding_dc_z_prevresp_st', #4
-'stimcoding_dc_z_prevresp_pharma', #5
-'stimcoding_dc_z_prevcorrect',#6
-'stimcoding_prevcorrect',#7
+'stimcoding_nohist', # 22
+'stimcoding_dc_prevresp', #
+'stimcoding_z_prevresp', #
+'stimcoding_dc_z_prevresp', # 25
+'stimcoding_dc_z_prevresp_st', #
+'stimcoding_dc_z_prevresp_pharma', #
+'stimcoding_dc_z_prevcorrect',#
+'stimcoding_prevcorrect',#
 'stimcoding_dc_z_prev2resp', #
-'stimcoding_dc_prevcorrect', #11
-'regress_dc_z_visualgamma',  #12
-'regress_dc_z_motorstart', #13
-'regress_dc_z_prevresp_visualgamma', #14
-'regress_dc_z_prevresp_motorstart', #15
-'stimcoding_nohist_stcoh',  # `10
+'stimcoding_dc_prevcorrect', #
+'regress_dc_z_visualgamma',  #
+'regress_dc_z_motorstart', #
+'regress_dc_z_prevresp_visualgamma', #
+'regress_dc_z_prevresp_motorstart', #
+'stimcoding_nohist_stcoh',  # 
 'stimcoding_dc_prevresp_stcoh',  # 
 'stimcoding_z_prevresp_stcoh',  # 
-'stimcoding_dc_z_prevresp_stcoh']  # ] # 50
+'stimcoding_dc_z_prevresp_stcoh']  # ] # 
 
-models = ['stimcoding_nohist',
-          'stimcoding_dc_prevresp',
-          'stimcoding_z_prevresp',
-          'stimcoding_dc_z_prevresp']
 
 # datasets = ['Murphy', 'JW_yesno', 'JW_PNAS', 'NatComm', 'MEG', 
 #     'Anke_MEG_neutral', 'Anke_MEG_transition', 'Anke_MEG_transition_no81', 

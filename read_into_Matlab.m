@@ -18,7 +18,7 @@ for d = 1:length(datasets),
         case 'anne'
             mypath = '~/Data/HDDM';
         case 'aeurai'
-            mypath  = '/nfs/aeurai/HDDM';
+            mypath  = '/home/aeurai/Data/HDDM';
     end
     
     usepath = sprintf('%s/%s/', mypath, datasets{d});
